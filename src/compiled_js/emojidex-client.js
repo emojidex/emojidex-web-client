@@ -103,6 +103,46 @@
       });
     };
 
+    EmojidexClient.prototype.search_sw = function(term, callback, opts) {
+      var _this = this;
+      if (callback == null) {
+        callback = null;
+      }
+      this.next = function() {
+        return this.search_sw(term, callback, $.extend(opts, {
+          page: opts.page + 1
+        }));
+      };
+      opts = this._combine_opts(opts);
+      return $.getJSON(this.api_uri + 'search/emoji?' + $.param($.extend({}, {
+        code_sw: this._escape_term(term)
+      }, opts))).error(function(response) {
+        return _this.results = [];
+      }).success(function(response) {
+        return _this._succeed(response, callback);
+      });
+    };
+
+    EmojidexClient.prototype.search_ew = function(term, callback, opts) {
+      var _this = this;
+      if (callback == null) {
+        callback = null;
+      }
+      this.next = function() {
+        return this.search_ew(term, callback, $.extend(opts, {
+          page: opts.page + 1
+        }));
+      };
+      opts = this._combine_opts(opts);
+      return $.getJSON(this.api_uri + 'search/emoji?' + $.param($.extend({}, {
+        code_ew: this._escape_term(term)
+      }, opts))).error(function(response) {
+        return _this.results = [];
+      }).success(function(response) {
+        return _this._succeed(response, callback);
+      });
+    };
+
     EmojidexClient.prototype.tag_search = function(tags, callback, opts) {
       var _this = this;
       if (callback == null) {
@@ -186,6 +226,42 @@
       };
       opts = this._combine_opts(opts);
       return $.getJSON(this.api_uri + '/emoji?' + $.param(opts)).error(function(response) {
+        return _this.results = [];
+      }).success(function(response) {
+        return _this._succeed(response, callback);
+      });
+    };
+
+    EmojidexClient.prototype.get_newest = function(callback, opts) {
+      var _this = this;
+      if (callback == null) {
+        callback = null;
+      }
+      this.next = function() {
+        return this.get_newest(callback, $.extend(opts, {
+          page: opts.page + 1
+        }));
+      };
+      opts = this._combine_opts(opts);
+      return $.getJSON(this.api_uri + '/newest?' + $.param(opts)).error(function(response) {
+        return _this.results = [];
+      }).success(function(response) {
+        return _this._succeed(response, callback);
+      });
+    };
+
+    EmojidexClient.prototype.get_popular = function(callback, opts) {
+      var _this = this;
+      if (callback == null) {
+        callback = null;
+      }
+      this.next = function() {
+        return this.get_popular(callback, $.extend(opts, {
+          page: opts.page + 1
+        }));
+      };
+      opts = this._combine_opts(opts);
+      return $.getJSON(this.api_uri + '/popular?' + $.param(opts)).error(function(response) {
         return _this.results = [];
       }).success(function(response) {
         return _this._succeed(response, callback);
