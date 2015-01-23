@@ -8,6 +8,37 @@ All examples here will be given as JavaScript. If you are bundling/using the cli
 (which is the recommend way to use it) please use the original coffee file and convert syntax
 accordingly.
 
+Building
+--------
+You will need node with a usable npm, grunt, bower. In general grunt and bower should be 
+installed globally or should be present and usable in your path. We'll assume you have a 
+working node/npm that you either installed using your package manager or built yourself.
+
+### Get the source
+First off we need the actual source to build. Clone this repository if you haven't already.
+```shell
+git clone git@github.com:emojidex/emojidex-web-client.git
+cd emojidex-web-client
+```
+
+### Install Packages and Obtain Required Sources
+```shell
+npm install
+bower install
+```
+
+### Build
+For a regular one-off build:
+```shell
+grunt
+```
+
+For development mode with dynamic compilation and dev server:
+```shell
+grunt dev
+```
+A live version of the latest build will be availble at http://localhost:8000/dist/
+
 Design
 ======
 
