@@ -94,6 +94,30 @@ class @EmojidexClient
       .success (response) =>
         @_succeed(response, callback)
 
+  # Executes a search starting with the given term
+  search_sw: (term, callback = null, opts) ->
+    @next = () ->
+      @search_sw(term, callback, $.extend(opts, {page: opts.page + 1}))
+    opts = @_combine_opts(opts)
+    $.getJSON((@api_uri +  'search/emoji?' + $.param(($.extend {}, \
+        {code_sw: @_escape_term(term)}, opts))))
+      .error (response) =>
+        @results = []
+      .success (response) =>
+        @_succeed(response, callback)
+
+  # Executes a search ending with the given term
+  search_ew: (term, callback = null, opts) ->
+    @next = () ->
+      @search_ew(term, callback, $.extend(opts, {page: opts.page + 1}))
+    opts = @_combine_opts(opts)
+    $.getJSON((@api_uri +  'search/emoji?' + $.param(($.extend {}, \
+        {code_ew: @_escape_term(term)}, opts))))
+      .error (response) =>
+        @results = []
+      .success (response) =>
+        @_succeed(response, callback)
+
   # Searches by a tag
   tag_search: (tags, callback = null, opts) ->
     @next = () ->
@@ -124,6 +148,36 @@ class @EmojidexClient
   user_emoji: (username, callback = null, opts) ->
     opts = @_combine_opts(opts)
     $.getJSON((@api_uri +  'users/' + username + '/emoji?' + $.param(opts)))
+      .error (response) =>
+        @results = []
+      .success (response) =>
+        @_succeed(response, callback)
+
+  get_index: (callback = null, opts) ->
+    @next = () ->
+      @get_index(callback, $.extend(opts, {page: opts.page + 1}))
+    opts = @_combine_opts(opts)
+    $.getJSON((@api_uri + '/emoji?' + $.param(opts)))
+      .error (response) =>
+        @results = []
+      .success (response) =>
+        @_succeed(response, callback)
+
+  get_newest: (callback = null, opts) ->
+    @next = () ->
+      @get_newest(callback, $.extend(opts, {page: opts.page + 1}))
+    opts = @_combine_opts(opts)
+    $.getJSON((@api_uri + '/newest?' + $.param(opts)))
+      .error (response) =>
+        @results = []
+      .success (response) =>
+        @_succeed(response, callback)
+
+  get_popular: (callback = null, opts) ->
+    @next = () ->
+      @get_popular(callback, $.extend(opts, {page: opts.page + 1}))
+    opts = @_combine_opts(opts)
+    $.getJSON((@api_uri + '/popular?' + $.param(opts)))
       .error (response) =>
         @results = []
       .success (response) =>
