@@ -102,9 +102,6 @@ module.exports = (grunt) ->
           vendor:[
             'https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js'
           ]
-          helpers:[
-            'node_modules/jasmine-jquery/lib/jasmine-jquery.js'
-          ]
 
   grunt.loadNpmTasks 'grunt-contrib-coffee'
   grunt.loadNpmTasks 'grunt-contrib-concat'
