@@ -1,6 +1,5 @@
-emojidex Coffee/Java Script Client Usage
-========================================
-
+emojidex Coffee/Java Script Client
+==================================
 The emojidex Coffee/Java Script client is set up to handle searching, listing, login, history,
 favorites etc. against the emojidex API.
 
