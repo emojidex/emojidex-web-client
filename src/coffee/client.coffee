@@ -129,6 +129,17 @@ class @EmojidexClient
       .success (response) =>
         @_succeed(response, callback)
 
+  get_index: (callback = null, opts) ->
+    @next = () ->
+      @get_index(callback, $.extend(opts, {page: opts.page + 1}))
+    opts = @_combine_opts(opts)
+    $.getJSON((@api_uri + '/emoji?' + $.param(opts)))
+      .error (response) =>
+        @results = []
+      .success (response) =>
+        @_succeed(response, callback)
+
+
   # Gets the full list of caetgories available
   get_categories: (callback = null, opts) ->
     opts = @_combine_opts(opts)

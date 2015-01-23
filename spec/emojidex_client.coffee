@@ -29,3 +29,8 @@ describe "EmojidexClient", ->
       ec.get_categories (categories) ->
         expect(categories.length).toBeTruthy()
         done()
+
+    it "get_index", (done) ->
+      ec.get_index, (emoji_data) ->
+        expect(emoji_data.length).toBeTruthy()
+        done()

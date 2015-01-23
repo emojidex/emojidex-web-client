@@ -174,6 +174,24 @@
       });
     };
 
+    EmojidexClient.prototype.get_index = function(callback, opts) {
+      var _this = this;
+      if (callback == null) {
+        callback = null;
+      }
+      this.next = function() {
+        return this.get_index(callback, $.extend(opts, {
+          page: opts.page + 1
+        }));
+      };
+      opts = this._combine_opts(opts);
+      return $.getJSON(this.api_uri + '/emoji?' + $.param(opts)).error(function(response) {
+        return _this.results = [];
+      }).success(function(response) {
+        return _this._succeed(response, callback);
+      });
+    };
+
     EmojidexClient.prototype.get_categories = function(callback, opts) {
       var _this = this;
       if (callback == null) {
