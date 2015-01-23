@@ -21,11 +21,11 @@ module.exports = (grunt) ->
 
     # CoffeeScript compilation
     coffee:
-      emojidex:
+      client:
         options:
           join: true
         files:
-          'src/compiled_js/emojidex_pack.js': ['src/coffee/**/*.coffee']
+          'src/compiled_js/emojidex-client.js': ['src/coffee/**/*.coffee']
       spec:
         expand: true
         flatten: true
@@ -36,58 +36,24 @@ module.exports = (grunt) ->
 
     # Concat definitions
     concat:
-      src_js:
+      compiled_js:
         options:
           stripBanners: true
           banner: '<%= meta.banner %>'
         src: [
-          # 'bower_components/Caret.js/dist/jquery.caret.min.js'
-          # 'bower_components/At.js/dist/js/jquery.atwho.min.js'
           'src/compiled_js/**/*.js'
         ]
-        dest: 'dist/js/emojidex.js'
+        dest: 'dist/js/emojidex-client.js'
 
     # Minify definitions
     uglify:
       emojidex:
         options:
           manglet: true
-        src: ['dist/js/emojidex.js']
-        dest: 'dist/js/emojidex.min.js'
-      bootstrap:
-        src: ['node_modules/bootstrap-sass/assets/javascripts/bootstrap.js']
-        dest: 'dist/js/bootstrap.min.js'
-
+        src: ['dist/js/emojidex-client.js']
+        dest: 'dist/js/emojidex-client.min.js'
       options:
         preserveComments: 'all'
-
-    # connect definitions
-    connect:
-      site: {}
-
-    # sass definitions
-    sass:
-     dist:
-       files: [
-        expand: true
-        cwd: 'src/sass/'
-        src: '*.scss'
-        dest: 'dist/css/'
-        ext: '.css'
-       ]
-
-    # slim definitions
-    slim:
-      options:
-        pretty: true
-      dsit:
-        files: [
-          expand: true
-          cwd: 'src/slim/'
-          src: '*.slim'
-          dest: 'dist/'
-          ext: '.html'
-        ]
 
     # copy definitions
     copy:
@@ -100,45 +66,24 @@ module.exports = (grunt) ->
         files: [
           {
             expand: true,
-            cwd: 'bower_components/Caret.js/dist/'
-            src: 'jquery.caret.min.js'
-            dest: 'dist/js/'
-          }
-          {
-            expand: true,
-            cwd: 'bower_components/At.js/dist/css'
-            src: 'jquery.atwho.min.css'
-            dest: 'dist/css/'
-          }
-          {
-            expand: true,
-            cwd: 'bower_components/At.js/dist/js'
-            src: 'jquery.atwho.min.js'
-            dest: 'dist/js/'
-          }
-          {
-            expand: true,
             cwd: 'bower_components/jquery.storageapi/'
             src: 'jquery.storageapi.min.js'
             dest: 'dist/js/'
           }
         ]
 
+    # connect definitions
+    connect:
+      site: {}
+
     # watch definitions
     watch:
-      html:
-        files:['src/slim/*.slim']
-        tasks:['slim']
       coffee:
         files: ['src/coffee/**/*.coffee']
-        tasks: ['coffee:emojidex', 'concat:src_js', 'uglify:emojidex', 'jasmine']
-      sass:
-        files: ['src/sass/*.scss']
-        tasks: ['sass']
+        tasks: ['coffee:client', 'concat:compiled_js', 'uglify:emojidex', 'jasmine']
       spec:
         files: ['spec/**/*.coffee']
         tasks: ['coffee:spec', 'jasmine']
-
       options:
         livereload: true
 
@@ -161,23 +106,13 @@ module.exports = (grunt) ->
             'node_modules/jasmine-jquery/lib/jasmine-jquery.js'
           ]
 
-    # Lint definitions
-    # jshint:
-    #   files: ['src/jquery.emojidex.js']
-    #   options:
-    #     jshintrc: '.jshintrc'
-
   grunt.loadNpmTasks 'grunt-contrib-coffee'
   grunt.loadNpmTasks 'grunt-contrib-concat'
   grunt.loadNpmTasks 'grunt-contrib-uglify'
   grunt.loadNpmTasks 'grunt-contrib-connect'
-  grunt.loadNpmTasks 'grunt-contrib-sass'
-  grunt.loadNpmTasks 'grunt-slim'
   grunt.loadNpmTasks 'grunt-contrib-watch'
   grunt.loadNpmTasks 'grunt-contrib-copy'
   grunt.loadNpmTasks 'grunt-contrib-jasmine'
-  # grunt.loadNpmTasks 'grunt-contrib-jshint'
 
-  grunt.registerTask 'default', ['coffee', 'concat:src_js', 'uglify', 'sass', 'slim', 'copy', 'jasmine']
+  grunt.registerTask 'default', ['coffee', 'concat:compiled_js', 'uglify', 'copy', 'jasmine']
   grunt.registerTask 'dev', ['connect', 'watch']
-  # grunt.registerTask 'travis', ['jshint']
