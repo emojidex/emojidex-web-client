@@ -182,3 +182,9 @@ selection = emojidex.combine_emoji(emoji_we_want_users_to_use_on_our_site);
 results_for_a_list = simplify();
 simple_list_of_seal_sized_emoji = emojidex.simplify(emojidex.results, 'seal');
 ```
+
+License
+=======
+emojidex and emojidex tools are licensed under the [emojidex Open License](https://www.emojidex.com/emojidex/emojidex_open_license).
+
+©2013 the emojidex project / Genshin Souzou K.K. [Phantom Creation Inc.]
