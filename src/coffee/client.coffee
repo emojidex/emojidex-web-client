@@ -9,18 +9,32 @@
 
 class @EmojidexClient
   constructor: (opts = {}) ->
+    @_init_base_opts(opts)
+    @_auto_login()
+    # short-circuit next()
+    @next = () ->
+      null
+
+  # sets global default values
+  _init_base_opts: (opts) ->
     @defaults =
       locale: 'en'
-      api_uri: 'https://www.emojidex.com/api/v1/'
-      cdn_uri: 'http://cdn.emojidex.com/emoji'
+      api_url: 'https://www.emojidex.com/api/v1/'
+      cdn_url: 'http://cdn.emojidex.com/emoji'
+      closed_net: false
+      min_query_len: 4
       size_code: 'px32'
       detailed: false
       limit: 32
     opts = $.extend {}, @defaults, opts
 
+    # set closed network flag (for OSS distrobutions, intranet/private neworks, or closed license)
+    # DO NOT set to true unless permitted by an emojidex License
+    @closed_net = opts.closed_net
+
     # set end points
-    @api_uri = opts.api_uri
-    @cdn_uri = opts.cdn_uri
+    @api_url = opts.api_url
+    @cdn_url = opts.cdn_url
     @size_code = opts.size_code
 
     # common opts
@@ -34,12 +48,7 @@ class @EmojidexClient
     @cur_limit = @limit
     @count = opts.count || 0
 
-    @_auto_login()
-
-    # short-circuit next()
-    @next = () ->
-      null
-
+  # initializes local storages and/or syncs with instance variables
   _init_storages: (opts) ->
     @storage = $.localStorage
 
@@ -74,6 +83,7 @@ class @EmojidexClient
 
   # Checks for local saved login data, and if present sets the username and api_key
   _auto_login: () ->
+    return if @closed_net
     if @storage.get("emojidex.auth_token")?
       @auth_status = @storage.get("emojidex.auth_status")
       @auth_token = @storage.get("emojidex.auth_token")
@@ -87,19 +97,27 @@ class @EmojidexClient
     @next = () ->
       @search(term, callback, $.extend(opts, {page: opts.page + 1}))
     opts = @_combine_opts(opts)
-    $.getJSON((@api_uri +  'search/emoji?' + $.param(($.extend {}, \
-        {code_cont: @_escape_term(term)}, opts))))
-      .error (response) =>
-        @results = []
-      .success (response) =>
-        @_succeed(response, callback)
+    if term.length >= @min_query_len && !@closed_net
+      $.getJSON((@api_url +  'search/emoji?' + $.param(($.extend {}, \
+          {code_cont: @_escape_term(term)}, opts))))
+        .error (response) =>
+          @results = []
+        .success (response) =>
+          @_succeed(response, callback)
+    else
+      @local_search(term, callback)
+    @local_search(term)
+
+  local_search: (term, callback = null) ->
+    res = (moji for moji in @emoji when @emoji.code.match('.*' + term + '.*/i'))
+    callback(res) if callback
 
   # Executes a search starting with the given term
   search_sw: (term, callback = null, opts) ->
     @next = () ->
       @search_sw(term, callback, $.extend(opts, {page: opts.page + 1}))
     opts = @_combine_opts(opts)
-    $.getJSON((@api_uri +  'search/emoji?' + $.param(($.extend {}, \
+    $.getJSON((@api_url +  'search/emoji?' + $.param(($.extend {}, \
         {code_sw: @_escape_term(term)}, opts))))
       .error (response) =>
         @results = []
@@ -111,7 +129,7 @@ class @EmojidexClient
     @next = () ->
       @search_ew(term, callback, $.extend(opts, {page: opts.page + 1}))
     opts = @_combine_opts(opts)
-    $.getJSON((@api_uri +  'search/emoji?' + $.param(($.extend {}, \
+    $.getJSON((@api_url +  'search/emoji?' + $.param(($.extend {}, \
         {code_ew: @_escape_term(term)}, opts))))
       .error (response) =>
         @results = []
@@ -123,7 +141,7 @@ class @EmojidexClient
     @next = () ->
       @tag_search(term, callback, $.extend(opts, {page: opts.page + 1}))
     opts = @_combine_opts(opts)
-    $.getJSON((@api_uri +  'search/emoji?' + $.param(($.extend {}, \
+    $.getJSON((@api_url +  'search/emoji?' + $.param(($.extend {}, \
         {"tags[]": @_breakout(tags)}, opts))))
       .error (response) =>
         @results = []
@@ -138,7 +156,7 @@ class @EmojidexClient
     params = {code_cont: @_escape_term(term)}
     params = $.extend(params, {"tags[]": @_breakout(tags)}) if tags.length > 0
     params = $.extend(params, {"categories[]": @_breakout(categories)}) if categories.length > 0
-    $.getJSON((@api_uri +  'search/emoji?' + $.param(($.extend params, opts))))
+    $.getJSON((@api_url +  'search/emoji?' + $.param(($.extend params, opts))))
       .error (response) =>
         @results = []
       .success (response) =>
@@ -147,7 +165,7 @@ class @EmojidexClient
   # Obtains a user emoji collection
   user_emoji: (username, callback = null, opts) ->
     opts = @_combine_opts(opts)
-    $.getJSON((@api_uri +  'users/' + username + '/emoji?' + $.param(opts)))
+    $.getJSON((@api_url +  'users/' + username + '/emoji?' + $.param(opts)))
       .error (response) =>
         @results = []
       .success (response) =>
@@ -157,7 +175,7 @@ class @EmojidexClient
     @next = () ->
       @get_index(callback, $.extend(opts, {page: opts.page + 1}))
     opts = @_combine_opts(opts)
-    $.getJSON((@api_uri + '/emoji?' + $.param(opts)))
+    $.getJSON((@api_url + '/emoji?' + $.param(opts)))
       .error (response) =>
         @results = []
       .success (response) =>
@@ -167,7 +185,7 @@ class @EmojidexClient
     @next = () ->
       @get_newest(callback, $.extend(opts, {page: opts.page + 1}))
     opts = @_combine_opts(opts)
-    $.getJSON((@api_uri + '/newest?' + $.param(opts)))
+    $.getJSON((@api_url + '/newest?' + $.param(opts)))
       .error (response) =>
         @results = []
       .success (response) =>
@@ -177,7 +195,7 @@ class @EmojidexClient
     @next = () ->
       @get_popular(callback, $.extend(opts, {page: opts.page + 1}))
     opts = @_combine_opts(opts)
-    $.getJSON((@api_uri + '/popular?' + $.param(opts)))
+    $.getJSON((@api_url + '/popular?' + $.param(opts)))
       .error (response) =>
         @results = []
       .success (response) =>
@@ -186,7 +204,7 @@ class @EmojidexClient
   # Gets the full list of caetgories available
   get_categories: (callback = null, opts) ->
     opts = @_combine_opts(opts)
-    $.getJSON((@api_uri +  'categories?' + $.param(opts)))
+    $.getJSON((@api_url +  'categories?' + $.param(opts)))
       .error (response) =>
         @categories = []
         @storage.set("emojidex.categories", @categories)
@@ -198,14 +216,17 @@ class @EmojidexClient
   # login
   # takes a hash with one of the following combinations:
   # 1. { authtype: 'plain', username: 'username-or-email', password: '****'}
-  # 2. { authtype: 'google', #TODO
+  # 1. { authtype: 'basic', user: 'username-or-email', pass: '****'}
+  # 3. { authtype: 'google', #TODO
   # * if no hash is given auto login is attempted
   login: (params) ->
     switch params.authtype
       when 'plain'
-        @_plain_login(params.username, params.password, params.callback)
+        @plain_auth(params.username, params.password, params.callback)
+      when 'basic'
+        @basic_auth(params.user, params.pass, params.callback)
       when 'google'
-        @_google_login(params.callback)
+        @google_auth(params.callback)
       else
         @_auto_login()
 
@@ -220,8 +241,8 @@ class @EmojidexClient
     @storage.set("emojidex.auth_token", @auth_token)
 
   # regular login with username/email and password
-  _plain_login: (username, password, callback = null) ->
-    url = @api_uri + 'users/authenticate?' + $.param(username: username, password: password)
+  plain_auth: (username, password, callback = null) ->
+    url = @api_url + 'users/authenticate?' + $.param(username: username, password: password)
     $.getJSON(url)
       .error (response) =>
         @auth_status = response.auth_status
@@ -231,8 +252,13 @@ class @EmojidexClient
         @_set_auth_from_response(response)
         callback(response.auth_token) if callback
 
+  # auth with HTTP basic auth
+  basic_auth: (user, pass, callback = null) ->
+    # TODO
+    return false
+
   # auth with google oauth2
-  _google_login: (callback = null) ->
+  google_auth: (callback = null) ->
     return false
 
   # sets auth parameters from a successful auth request [login]
@@ -251,7 +277,7 @@ class @EmojidexClient
 
   get_history: (opts) ->
     if @auth_token?
-      $.getJSON((@api_uri +  'users/history?' + $.param({auth_token: @auth_token})))
+      $.getJSON((@api_url +  'users/history?' + $.param({auth_token: @auth_token})))
         .error (response) =>
           @history = []
         .success (response) =>
@@ -259,13 +285,13 @@ class @EmojidexClient
 
   set_history: (emoji_code) ->
     if @auth_token?
-      $.post(@api_uri + 'users/history?' + \
+      $.post(@api_url + 'users/history?' + \
         $.param({auth_token: @auth_token, emoji_code: emoji_code}))
 
   get_favorites: () ->
     if @auth_token?
       $.ajax
-        url: @api_uri + 'users/favorites'
+        url: @api_url + 'users/favorites'
         data:
           auth_token: @auth_token
 
@@ -279,7 +305,7 @@ class @EmojidexClient
     if @auth_token?
       $.ajax
         type: 'POST'
-        url: @api_uri + 'users/favorites'
+        url: @api_url + 'users/favorites'
         data:
           auth_token: @auth_token
           emoji_code: emoji_code
@@ -291,7 +317,7 @@ class @EmojidexClient
     if @auth_token?
       $.ajax
         type: 'DELETE'
-        url: @api_uri + 'users/favorites'
+        url: @api_url + 'users/favorites'
         data:
           auth_token: @auth_token
           emoji_code: emoji_code
@@ -305,7 +331,7 @@ class @EmojidexClient
 
   # Converts an emoji array to [{code: "moji_code", img_url: "http://cdn...moji_code.png}] format
   simplify: (emoji = @results, size_code = @size_code) ->
-    ({code: @_escape_term(moji.code), img_url: "#{@cdn_uri}/#{size_code}/#{@_escape_term(moji.code)}.png"} \
+    ({code: @_escape_term(moji.code), img_url: "#{@cdn_url}/#{size_code}/#{@_escape_term(moji.code)}.png"} \
       for moji in emoji)
 
   # Combines opts against common defaults
