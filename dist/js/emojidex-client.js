@@ -10,11 +10,16 @@
  *  Copyright 2013 Genshin Souzou Kabushiki Kaisha
  */
 (function() {
+  var Test;
+
   this.EmojidexClient = (function() {
     function EmojidexClient(opts) {
+      var test;
       if (opts == null) {
         opts = {};
       }
+      test = new Test;
+      test.log("test test test");
       this._init_base_opts(opts);
       this._auto_login();
       this.next = function() {
@@ -534,6 +539,19 @@
     };
 
     return EmojidexClient;
+
+  })();
+
+  Test = (function() {
+    function Test() {
+      console.log("Test Class");
+    }
+
+    Test.prototype.log = function(log) {
+      return console.log(log);
+    };
+
+    return Test;
 
   })();
 

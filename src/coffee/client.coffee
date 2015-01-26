@@ -9,6 +9,10 @@
 
 class @EmojidexClient
   constructor: (opts = {}) ->
+
+    test = new Test
+    test.log "test test test"
+
     @_init_base_opts(opts)
     @_auto_login()
     # short-circuit next()
