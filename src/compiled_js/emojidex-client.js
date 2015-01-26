@@ -420,7 +420,8 @@
       }
     };
 
-    EmojidexClient.prototype.get_favorites = function() {
+    EmojidexClient.prototype.get_favorites = function(callback) {
+      var _this = this;
       if (this.auth_token != null) {
         return $.ajax({
           url: this.api_url + 'users/favorites',
@@ -428,16 +429,20 @@
             auth_token: this.auth_token
           },
           success: function(response) {
-            return this.favorites = response;
+            _this.favorites = response;
+            if (callback != null) {
+              return callback(_this.favorites);
+            }
           },
           error: function(response) {
-            return this.favorites = [];
+            return _this.favorites = [];
           }
         });
       }
     };
 
-    EmojidexClient.prototype.set_favorites = function(emoji_code) {
+    EmojidexClient.prototype.set_favorites = function(emoji_code, callback) {
+      var _this = this;
       if (this.auth_token != null) {
         return $.ajax({
           type: 'POST',
@@ -446,7 +451,12 @@
             auth_token: this.auth_token,
             emoji_code: emoji_code
           },
-          success: function(response) {}
+          success: function(response) {
+            _this.get_favorites();
+            if (callback != null) {
+              return callback(_this.favorites);
+            }
+          }
         });
       }
     };

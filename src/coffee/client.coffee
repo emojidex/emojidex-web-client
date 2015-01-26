@@ -292,20 +292,21 @@ class @EmojidexClient
       $.post(@api_url + 'users/history?' + \
         $.param({auth_token: @auth_token, emoji_code: emoji_code}))
 
-  get_favorites: () ->
+  get_favorites: (callback) ->
     if @auth_token?
       $.ajax
         url: @api_url + 'users/favorites'
         data:
           auth_token: @auth_token
 
-        success: (response) ->
+        success: (response) =>
           @favorites = response
+          callback(@favorites) if callback?
 
-        error: (response) ->
+        error: (response) =>
           @favorites = []
 
-  set_favorites: (emoji_code) ->
+  set_favorites: (emoji_code, callback) ->
     if @auth_token?
       $.ajax
         type: 'POST'
@@ -314,8 +315,9 @@ class @EmojidexClient
           auth_token: @auth_token
           emoji_code: emoji_code
 
-        success: (response) ->
-          # @get_favorites() # re-obtain favorites
+        success: (response) =>
+          @get_favorites() # re-obtain favorites
+          callback(@favorites) if callback?
 
   unset_favorites: (emoji_code) ->
     if @auth_token?
