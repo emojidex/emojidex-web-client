@@ -1,0 +1,299 @@
+/*
+ *  emojidex client - v0.1.0
+ *  * Provides search, index caching and combining and asset URI resolution
+ *  https://github.com/emojidex/emojidex-web-client
+ *
+ *  =LICENSE=
+ *  Licensed under the emojidex Open License
+ *  https://www.emojidex.com/emojidex/emojidex_open_license
+ *
+ *  Copyright 2013 Genshin Souzou Kabushiki Kaisha
+ */
+(function() {
+  var EmojidexCategories, EmojidexData, EmojidexShared, EmojidexUtil, Test;
+
+  this.EmojidexClient = (function() {
+    function EmojidexClient(opts) {
+      if (opts == null) {
+        opts = {};
+      }
+<<<<<<< HEAD
+      this.Util = new EmojidexUtil;
+      this.Data = new EmojidexData(opts);
+      this.S = new EmojidexShared(this.Data, opts);
+      this.Categories = new EmojidexCategories(this.Data, opts);
+=======
+      this._init_base_opts(opts);
+      this._auto_login();
+>>>>>>> origin/closed_net
+      this.next = function() {
+        return null;
+      };
+    }
+
+    return EmojidexClient;
+
+  })();
+
+  EmojidexCategories = (function() {
+    function EmojidexCategories(shared, data, opts) {
+      this.S = shared || new EmojidexShared;
+      this.Data = data || new EmojidexData;
+      this._categories = this.Data.categories();
+      if (this.Data.categories().length === 0) {
+        this.sync(null, opts.locale || 'en');
+      }
+    }
+
+    EmojidexCategories.prototype.sync = function(callback, locale) {
+      var _this = this;
+      if (callback == null) {
+        callback = null;
+      }
+<<<<<<< HEAD
+      return $.getJSON(this.S.api_url + 'categories?' + $.param({
+        locale: locale
+      })).success(function(response) {
+        _this._categories = _this.Data.categories(response.categories);
+        if (callback) {
+          return callback(response.categories);
+=======
+      this.next = function() {
+        return this.search(term, callback, $.extend(opts, {
+          page: opts.page + 1
+        }));
+      };
+      opts = this._combine_opts(opts);
+      if (term.length >= this.defaults.min_query_len && !this.closed_net) {
+        $.getJSON(this.api_url + 'search/emoji?' + $.param($.extend({}, {
+          code_cont: this._escape_term(term)
+        }, opts))).error(function(response) {
+          return _this.results = [];
+        }).success(function(response) {
+          return _this._succeed(response, callback);
+        });
+      } else {
+        this.local_search(term, callback);
+      }
+      return this.local_search(term);
+    };
+
+    EmojidexClient.prototype.local_search = function(term, callback) {
+      var moji, res;
+      if (callback == null) {
+        callback = null;
+      }
+      res = (function() {
+        var _i, _len, _ref, _results;
+        _ref = this.emoji;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          moji = _ref[_i];
+          if (this.emoji.code.match('.*' + term + '.*/i')) {
+            _results.push(moji);
+          }
+>>>>>>> origin/closed_net
+        }
+      });
+    };
+
+    EmojidexCategories.prototype.all = function() {
+      return this._categories;
+    };
+
+    return EmojidexCategories;
+
+  })();
+
+  EmojidexData = (function() {
+    function EmojidexData(opts) {
+      this.storage = $.localStorage;
+      if (!this.storage.isSet("emojidex")) {
+        this.storage.set("emojidex", {});
+      }
+      if (!this.storage.isSet("emojidex.emoji")) {
+        this.storage.set("emojidex.emoji", opts.emoji || []);
+      }
+      if (!this.storage.isSet("emojidex.history")) {
+        this.storage.set("emojidex.history", opts.history || []);
+      }
+      if (!this.storage.isSet("emojidex.favorites")) {
+        this.storage.set("emojidex.favorites", opts.favorites || []);
+      }
+    }
+
+    EmojidexData.prototype.emoji = function(emoji_set) {
+      if (emoji_set == null) {
+        emoji_set = null;
+      }
+      if (emoji_set !== null) {
+        this.storage.set("emojidex.emoji", emoji_set);
+      }
+      return this.storage.get("emojidex.emoji");
+    };
+
+    EmojidexData.prototype.favorites = function(favorites_set) {
+      if (favorites_set == null) {
+        favorites_set = null;
+      }
+      if (favorites_set !== null) {
+        this.storage.set("emojidex.favorites", favorites_set);
+      }
+      return this.storage.get("emojidex.favorites");
+    };
+
+    EmojidexData.prototype.history = function(history_set) {
+      if (history_set == null) {
+        history_set = null;
+      }
+      if (history_set !== null) {
+        this.storage.set("emojidex.history", history_set);
+      }
+      return this.storage.get("emojidex.history");
+    };
+
+    EmojidexData.prototype.categories = function(categories_set) {
+      if (categories_set == null) {
+        categories_set = null;
+      }
+      if (categories_set !== null) {
+        this.storage.set("emojidex.categories", categories_set);
+      }
+      return this.storage.get("emojidex.categories");
+    };
+
+    return EmojidexData;
+
+  })();
+
+  EmojidexShared = (function() {
+    EmojidexShared.prototype.defaults = function() {
+      return {
+        locale: 'en',
+        api_url: 'https://www.emojidex.com/api/v1/',
+        cdn_url: 'http://cdn.emojidex.com/emoji',
+        closed_net: false,
+        min_query_len: 4,
+        size_code: 'px32',
+        detailed: false,
+        limit: 32
+      };
+    };
+
+    function EmojidexShared(opts) {
+      opts = $.extend({}, this.defaults(), opts);
+      this.closed_net = opts.closed_net;
+      this.api_url = opts.api_url;
+      this.cdn_url = opts.cdn_url;
+      this.size_code = opts.size_code;
+      this.detailed = opts.detailed;
+      this.limit = opts.limit;
+    }
+
+    return EmojidexShared;
+
+<<<<<<< HEAD
+  })();
+
+  Test = (function() {
+    function Test() {
+      console.log("Test Class");
+    }
+
+    Test.prototype.log = function(log) {
+      return console.log(log);
+=======
+    EmojidexClient.prototype.get_favorites = function(callback) {
+      var _this = this;
+      if (this.auth_token != null) {
+        return $.ajax({
+          url: this.api_url + 'users/favorites',
+          data: {
+            auth_token: this.auth_token
+          },
+          success: function(response) {
+            _this.favorites = response;
+            if (callback != null) {
+              return callback(_this.favorites);
+            }
+          },
+          error: function(response) {
+            return _this.favorites = [];
+          }
+        });
+      }
+    };
+
+    EmojidexClient.prototype.set_favorites = function(emoji_code, callback) {
+      var _this = this;
+      if (this.auth_token != null) {
+        return $.ajax({
+          type: 'POST',
+          url: this.api_url + 'users/favorites',
+          data: {
+            auth_token: this.auth_token,
+            emoji_code: emoji_code
+          },
+          success: function(response) {
+            return _this.get_favorites(function(favorites) {
+              if (callback != null) {
+                return callback(favorites);
+              }
+            });
+          }
+        });
+      }
+    };
+
+    EmojidexClient.prototype.unset_favorites = function(emoji_code, callback) {
+      var _this = this;
+      if (this.auth_token != null) {
+        return $.ajax({
+          type: 'DELETE',
+          url: this.api_url + 'users/favorites',
+          data: {
+            auth_token: this.auth_token,
+            emoji_code: emoji_code
+          },
+          success: function(response) {
+            return _this.get_favorites(function(favorites) {
+              if (callback != null) {
+                return callback(favorites);
+              }
+            });
+          }
+        });
+      }
+>>>>>>> origin/closed_net
+    };
+
+    return Test;
+
+  })();
+
+  EmojidexUtil = (function() {
+    function EmojidexUtil() {}
+
+    EmojidexUtil.prototype.escape_term = function(term) {
+      return term.split(' ').join('_');
+    };
+
+    EmojidexUtil.prototype.de_escape_term = function(term) {
+      return term.split('_').join(' ');
+    };
+
+    EmojidexUtil.prototype.breakout = function(items) {
+      if (items === null) {
+        return [];
+      }
+      if (!(items instanceof Array)) {
+        items = [items];
+      }
+      return items;
+    };
+
+    return EmojidexUtil;
+
+  })();
+
+}).call(this);

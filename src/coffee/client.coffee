@@ -10,13 +10,12 @@
 class @EmojidexClient
   constructor: (opts = {}) ->
     @Util = new EmojidexUtil
-    @Data = new EmojidexData(opts)
-    @S = new EmojidexShared(@Data, opts)
-    @Categories = new EmojidexCategories(@Data, opts)
+    @S = new EmojidexShared(opts)
+    @Data = @S.Data
+    @Emoji = @S.Emoji
+    @Categories = @S.Categories
+    @Search = new EmojidexSearch(@S)
     #@_auto_login()
-    # short-circuit next()
-    @next = () ->
-      null
 
 #    # init storage and state instances
 #    @results = opts.results || []
@@ -25,15 +24,6 @@ class @EmojidexClient
 #    @count = opts.count || 0
 #
 #
-#  _pre_cache: (opts) ->
-#    if @_emoji.length == 0
-#      switch opts.locale
-#        when 'en'
-#          @user_emoji('emoji')
-#          @user_emoji('emojidex')
-#        when 'ja'
-#          @user_emoji('絵文字')
-#          @user_emoji('絵文字デックス')
 #
 #
 #  # Checks for local saved login data, and if present sets the username and api_key
@@ -47,114 +37,8 @@ class @EmojidexClient
 #    else
 #      @logout()
 #
-#  # Executes a general search (code_cont)
-#  search: (term, callback = null, opts) ->
-#    @next = () ->
-#      @search(term, callback, $.extend(opts, {page: opts.page + 1}))
-#    opts = @_combine_opts(opts)
-#    if term.length >= @min_query_len && !@closed_net
-#      $.getJSON((@api_url +  'search/emoji?' + $.param(($.extend {}, \
-#          {code_cont: @Util.escape_term(term)}, opts))))
-#        .error (response) =>
-#          @results = []
-#        .success (response) =>
-#          @_succeed(response, callback)
-#    else
-#      @local_search(term, callback)
-#    @local_search(term)
 #
-#  local_search: (term, callback = null) ->
-#    res = (moji for moji in @emoji when @emoji.code.match('.*' + term + '.*/i'))
-#    callback(res) if callback
-#
-#  # Executes a search starting with the given term
-#  search_sw: (term, callback = null, opts) ->
-#    @next = () ->
-#      @search_sw(term, callback, $.extend(opts, {page: opts.page + 1}))
-#    opts = @_combine_opts(opts)
-#    $.getJSON((@api_url +  'search/emoji?' + $.param(($.extend {}, \
-#        {code_sw: @Util.escape_term(term)}, opts))))
-#      .error (response) =>
-#        @results = []
-#      .success (response) =>
-#        @_succeed(response, callback)
-#
-#  # Executes a search ending with the given term
-#  search_ew: (term, callback = null, opts) ->
-#    @next = () ->
-#      @search_ew(term, callback, $.extend(opts, {page: opts.page + 1}))
-#    opts = @_combine_opts(opts)
-#    $.getJSON((@api_url +  'search/emoji?' + $.param(($.extend {}, \
-#        {code_ew: @Util.escape_term(term)}, opts))))
-#      .error (response) =>
-#        @results = []
-#      .success (response) =>
-#        @_succeed(response, callback)
-#
-#  # Searches by a tag
-#  tag_search: (tags, callback = null, opts) ->
-#    @next = () ->
-#      @tag_search(term, callback, $.extend(opts, {page: opts.page + 1}))
-#    opts = @_combine_opts(opts)
-#    $.getJSON((@api_url +  'search/emoji?' + $.param(($.extend {}, \
-#        {"tags[]": @Util.breakout(tags)}, opts))))
-#      .error (response) =>
-#        @results = []
-#      .success (response) =>
-#        @_succeed(response, callback)
-#
-#  # Searches using an array of keys and an array of tags
-#  advanced_search: (term, tags = [], categories = [], callback = null, opts) ->
-#    @next = () ->
-#      @advanced_search(term, tags, categories, callback, $.extend(opts, {page: opts.page + 1}))
-#    opts = @_combine_opts(opts)
-#    params = {code_cont: @Util.escape_term(term)}
-#    params = $.extend(params, {"tags[]": @Util.breakout(tags)}) if tags.length > 0
-#    params = $.extend(params, {"categories[]": @Util.breakout(categories)}) if categories.length > 0
-#    $.getJSON((@api_url +  'search/emoji?' + $.param(($.extend params, opts))))
-#      .error (response) =>
-#        @results = []
-#      .success (response) =>
-#        @_succeed(response, callback)
-#
-#  # Obtains a user emoji collection
-#  user_emoji: (username, callback = null, opts) ->
-#    opts = @_combine_opts(opts)
-#    $.getJSON((@api_url +  'users/' + username + '/emoji?' + $.param(opts)))
-#      .error (response) =>
-#        @results = []
-#      .success (response) =>
-#        @_succeed(response, callback)
-#
-#  get_index: (callback = null, opts) ->
-#    @next = () ->
-#      @get_index(callback, $.extend(opts, {page: opts.page + 1}))
-#    opts = @_combine_opts(opts)
-#    $.getJSON((@api_url + '/emoji?' + $.param(opts)))
-#      .error (response) =>
-#        @results = []
-#      .success (response) =>
-#        @_succeed(response, callback)
-#
-#  get_newest: (callback = null, opts) ->
-#    @next = () ->
-#      @get_newest(callback, $.extend(opts, {page: opts.page + 1}))
-#    opts = @_combine_opts(opts)
-#    $.getJSON((@api_url + '/newest?' + $.param(opts)))
-#      .error (response) =>
-#        @results = []
-#      .success (response) =>
-#        @_succeed(response, callback)
-#
-#  get_popular: (callback = null, opts) ->
-#    @next = () ->
-#      @get_popular(callback, $.extend(opts, {page: opts.page + 1}))
-#    opts = @_combine_opts(opts)
-#    $.getJSON((@api_url + '/popular?' + $.param(opts)))
-#      .error (response) =>
-#        @results = []
-#      .success (response) =>
-#        @_succeed(response, callback)
+
 #
 #
 #  # login
@@ -269,23 +153,3 @@ class @EmojidexClient
 #        success: (response) ->
 #          # @get_favorites()
 #
-#  # Concatenates and flattens the given emoji array into the @emoji array
-#  combine_emoji: (emoji) ->
-#    $.extend @emoji, emoji
-#
-#  # Converts an emoji array to [{code: "moji_code", img_url: "http://cdn...moji_code.png}] format
-#  simplify: (emoji = @results, size_code = @size_code) ->
-#    ({code: @Util.escape_term(moji.code), img_url: "#{@cdn_url}/#{size_code}/#{@Util.escape_term(moji.code)}.png"} \
-#      for moji in emoji)
-#
-#  # Combines opts against common defaults
-#  _combine_opts: (opts) ->
-#    $.extend {}, { page: 1, limit: @limit, detailed: @detailed }, opts
-#
-#  # fills in @results, @cur_page, and @count and calls callback
-#  _succeed: (response, callback) ->
-#    @results = response.emoji
-#    @cur_page = response.meta.page
-#    @count = response.meta.count
-#    @combine_emoji(response.emoji)
-#    callback(response.emoji) if callback

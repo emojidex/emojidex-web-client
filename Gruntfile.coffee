@@ -91,7 +91,8 @@ module.exports = (grunt) ->
     jasmine:
       all:
         src: [
-          'dist/js/*.min.js'
+          'dist/js/jquery.storageapi.min.js',
+          'dist/js/emojidex-client.js'
         ]
         options:
           keepRunner: true
