@@ -14,12 +14,9 @@
 
   this.EmojidexClient = (function() {
     function EmojidexClient(opts) {
-      var test;
       if (opts == null) {
         opts = {};
       }
-      test = new Test;
-      test.log("test test test");
       this._init_base_opts(opts);
       this._auto_login();
       this.next = function() {
@@ -120,7 +117,7 @@
         }));
       };
       opts = this._combine_opts(opts);
-      if (term.length >= this.min_query_len && !this.closed_net) {
+      if (term.length >= this.defaults.min_query_len && !this.closed_net) {
         $.getJSON(this.api_url + 'search/emoji?' + $.param($.extend({}, {
           code_cont: this._escape_term(term)
         }, opts))).error(function(response) {

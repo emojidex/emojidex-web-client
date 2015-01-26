@@ -5,30 +5,41 @@ describe "EmojidexClient", ->
     expect(EmojidexClient).toBeDefined()
 
   describe "Mthods: emoji info", ->
-    it "search", (done) ->
-      ec.search "", (emoji_data) ->
-        expect(emoji_data.length).toBeTruthy()
-        done()
+    describe "for search", ->
+      it "search", (done) ->
+        ec.search "kiss", (emoji_data) ->
+          expect(emoji_data.length).toBeTruthy()
+          done()
 
-    it "search_sw", (done) ->
-      ec.search_sw "", (emoji_data) ->
-        expect(emoji_data.length).toBeTruthy()
-        done()
+      it "search: check data", ->
+        kiss =
+          code: 'kiss'
+          moji: '💋'
+          unicode: '1f48b'
+          category: 'objects'
+          tags: []
 
-    it "search_ew", (done) ->
-      ec.search_ew "", (emoji_data) ->
-        expect(emoji_data.length).toBeTruthy()
-        done()
+        expect(ec.results).toContain(kiss)
 
-    it "tag_search", (done) ->
-      ec.tag_search "", (emoji_data) ->
-        expect(emoji_data).toBeTruthy()
-        done()
+      it "search_sw", (done) ->
+        ec.search_sw "", (emoji_data) ->
+          expect(emoji_data.length).toBeTruthy()
+          done()
 
-    it "advanced_search", (done) ->
-      ec.advanced_search "", [], [], (emoji_data) ->
-        expect(emoji_data.length).toBeTruthy()
-        done()
+      it "search_ew", (done) ->
+        ec.search_ew "", (emoji_data) ->
+          expect(emoji_data.length).toBeTruthy()
+          done()
+
+      it "tag_search", (done) ->
+        ec.tag_search "", (emoji_data) ->
+          expect(emoji_data).toBeTruthy()
+          done()
+
+      it "advanced_search", (done) ->
+        ec.advanced_search "", [], [], (emoji_data) ->
+          expect(emoji_data.length).toBeTruthy()
+          done()
 
     it "user_emoji", (done) ->
       ec.user_emoji "emojidex", (emoji_data) ->
@@ -54,3 +65,5 @@ describe "EmojidexClient", ->
       ec.get_popular (emoji_data) ->
         expect(emoji_data.length).toBeTruthy()
         done()
+
+  describe "Mthods: user info", ->

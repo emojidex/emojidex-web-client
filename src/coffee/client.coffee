@@ -10,8 +10,8 @@
 class @EmojidexClient
   constructor: (opts = {}) ->
 
-    test = new Test
-    test.log "test test test"
+    # test = new Test
+    # test.log "test test test"
 
     @_init_base_opts(opts)
     @_auto_login()
@@ -101,7 +101,7 @@ class @EmojidexClient
     @next = () ->
       @search(term, callback, $.extend(opts, {page: opts.page + 1}))
     opts = @_combine_opts(opts)
-    if term.length >= @min_query_len && !@closed_net
+    if term.length >= @defaults.min_query_len && !@closed_net
       $.getJSON((@api_url +  'search/emoji?' + $.param(($.extend {}, \
           {code_cont: @_escape_term(term)}, opts))))
         .error (response) =>
