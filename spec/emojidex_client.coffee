@@ -76,6 +76,10 @@ describe 'EmojidexClient', ->
       code: 'emojidex'
       category: 'symbols'
 
+    emoji =
+      code: 'emoji'
+      category: 'symbols'
+
     ec._set_auth_from_response(test)
 
     describe 'for favorites', ->
@@ -85,3 +89,18 @@ describe 'EmojidexClient', ->
             jasmine.objectContaining(emojidex)
           )
           done()
+
+      # it 'set_favorites', (done) ->
+      #   ec.set_favorites 'emoji', (favorites)->
+      #     expect(ec.favorites).toContain(
+      #       jasmine.objectContaining(emoji)
+      #     )
+      #     done()
+
+      # Not working on PhantomJS, browser is OK.
+      # it 'unset_favorites', (done) ->
+      #   ec.unset_favorites 'emoji', (favorites)->
+      #     expect(ec.favorites).not.toContain(
+      #       jasmine.objectContaining(emoji)
+      #     )
+      #     done()

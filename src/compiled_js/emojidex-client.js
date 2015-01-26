@@ -452,16 +452,18 @@
             emoji_code: emoji_code
           },
           success: function(response) {
-            _this.get_favorites();
-            if (callback != null) {
-              return callback(_this.favorites);
-            }
+            return _this.get_favorites(function(favorites) {
+              if (callback != null) {
+                return callback(favorites);
+              }
+            });
           }
         });
       }
     };
 
-    EmojidexClient.prototype.unset_favorites = function(emoji_code) {
+    EmojidexClient.prototype.unset_favorites = function(emoji_code, callback) {
+      var _this = this;
       if (this.auth_token != null) {
         return $.ajax({
           type: 'DELETE',
@@ -470,7 +472,13 @@
             auth_token: this.auth_token,
             emoji_code: emoji_code
           },
-          success: function(response) {}
+          success: function(response) {
+            return _this.get_favorites(function(favorites) {
+              if (callback != null) {
+                return callback(favorites);
+              }
+            });
+          }
         });
       }
     };

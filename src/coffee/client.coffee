@@ -316,10 +316,11 @@ class @EmojidexClient
           emoji_code: emoji_code
 
         success: (response) =>
-          @get_favorites() # re-obtain favorites
-          callback(@favorites) if callback?
+          # re-obtain favorites
+          @get_favorites (favorites)->
+            callback(favorites) if callback?
 
-  unset_favorites: (emoji_code) ->
+  unset_favorites: (emoji_code, callback) ->
     if @auth_token?
       $.ajax
         type: 'DELETE'
@@ -328,8 +329,10 @@ class @EmojidexClient
           auth_token: @auth_token
           emoji_code: emoji_code
 
-        success: (response) ->
-          # @get_favorites()
+        success: (response) =>
+          # re-obtain favorites
+          @get_favorites (favorites)->
+            callback(favorites) if callback?
 
   # Concatenates and flattens the given emoji array into the @emoji array
   combine_emoji: (emoji) ->
