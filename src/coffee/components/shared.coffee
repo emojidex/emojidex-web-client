@@ -29,7 +29,8 @@ class EmojidexShared
     @limit = opts.limit
     @locale = opts.locale
 
-    @Data = new EmojidexData(@)
+    @Data = new EmojidexData(@, opts)
     @Emoji = new EmojidexEmoji(@)
     @Categories = new EmojidexCategories(@)
+    @User = new EmojidexUser(@)
     @Indexes = new EmojidexIndexes(@)

@@ -1,9 +1,12 @@
 class EmojidexSearch
-  constructor: (shared, data) ->
+  constructor: (shared) ->
     @S = shared || new EmojidexShared
-    @Data = data || new EmojidexData
     @Util = new EmojidexUtil
     @results = []
+    @cur_page = 1
+    @cur_limit = @S.limit
+    @count = 0
+
     # short-circuit next()
     @next = () ->
       null
@@ -12,8 +15,8 @@ class EmojidexSearch
   search: (term, callback = null, opts) ->
     @next = () ->
       @search(term, callback, $.extend(opts, {page: opts.page + 1}))
-    opts = @_combine_opts(opts)
-    if term.length >= @min_query_len && !@closed_net
+    if !@S.closed_net
+      opts = @_combine_opts(opts)
       $.getJSON((@S.api_url +  'search/emoji?' + $.param(($.extend {}, \
           {code_cont: @Util.escape_term(term)}, opts))))
         .error (response) =>
@@ -28,13 +31,17 @@ class EmojidexSearch
   starting: (term, callback = null, opts) ->
     @next = () ->
       @starting(term, callback, $.extend(opts, {page: opts.page + 1}))
-    opts = @_combine_opts(opts)
-    $.getJSON((@S.api_url +  'search/emoji?' + $.param(($.extend {}, \
-        {code_sw: @Util.escape_term(term)}, opts))))
-      .error (response) =>
-        @results = []
-      .success (response) =>
-        @_succeed(response, callback)
+    if !@S.closed_net
+      opts = @_combine_opts(opts)
+      $.getJSON((@S.api_url +  'search/emoji?' + $.param(($.extend {}, \
+          {code_sw: @Util.escape_term(term)}, opts))))
+        .error (response) =>
+          @results = []
+        .success (response) =>
+          @_succeed(response, callback)
+    else
+      @S.Emoji.starting(term, callback)
+    @S.Emoji.starting(term)
 
   # Executes a search ending with the given term
   ending: (term, callback = null, opts) ->

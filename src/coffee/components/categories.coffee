@@ -1,5 +1,5 @@
 class EmojidexCategories
-  constructor: (shared = null, opts) ->
+  constructor: (shared = null) ->
     @S = shared || new EmojidexShared
     @_categories = @S.Data.categories()
 
