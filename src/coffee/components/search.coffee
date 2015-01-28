@@ -47,39 +47,51 @@ class EmojidexSearch
   ending: (term, callback = null, opts) ->
     @next = () ->
       @ending(term, callback, $.extend(opts, {page: opts.page + 1}))
-    opts = @_combine_opts(opts)
-    $.getJSON((@S.api_url +  'search/emoji?' + $.param(($.extend {}, \
-        {code_ew: @Util.escape_term(term)}, opts))))
-      .error (response) =>
-        @results = []
-      .success (response) =>
-        @_succeed(response, callback)
+    if !@S.closed_net
+      opts = @_combine_opts(opts)
+      $.getJSON((@S.api_url +  'search/emoji?' + $.param(($.extend {}, \
+          {code_ew: @Util.escape_term(term)}, opts))))
+        .error (response) =>
+          @results = []
+        .success (response) =>
+          @_succeed(response, callback)
+    else
+      @S.Emoji.ending(term, callback)
+    @S.Emoji.ending(term)
 
   # Searches by tags
   tags: (tags, callback = null, opts) ->
     @next = () ->
       @tags(term, callback, $.extend(opts, {page: opts.page + 1}))
-    opts = @_combine_opts(opts)
-    $.getJSON((@S.api_url +  'search/emoji?' + $.param(($.extend {}, \
-        {"tags[]": @Util.breakout(tags)}, opts))))
-      .error (response) =>
-        @results = []
-      .success (response) =>
-        @_succeed(response, callback)
+    if !@S.closed_net
+      opts = @_combine_opts(opts)
+      $.getJSON((@S.api_url +  'search/emoji?' + $.param(($.extend {}, \
+          {"tags[]": @Util.breakout(tags)}, opts))))
+        .error (response) =>
+          @results = []
+        .success (response) =>
+          @_succeed(response, callback)
+    else
+      @S.Emoji.tags(tags, callback)
+    @S.Emoji.tags(tags)
 
   # Searches using an array of keys and an array of tags
   advanced: (term, tags = [], categories = [], callback = null, opts) ->
     @next = () ->
       @advanced(term, tags, categories, callback, $.extend(opts, {page: opts.page + 1}))
-    opts = @_combine_opts(opts)
-    params = {code_cont: @Util.escape_term(term)}
-    params = $.extend(params, {"tags[]": @Util.breakout(tags)}) if tags.length > 0
-    params = $.extend(params, {"categories[]": @Util.breakout(categories)}) if categories.length > 0
-    $.getJSON((@S.api_url +  'search/emoji?' + $.param(($.extend params, opts))))
-      .error (response) =>
-        @results = []
-      .success (response) =>
-        @_succeed(response, callback)
+    if !@S.closed_net
+      opts = @_combine_opts(opts)
+      params = {code_cont: @Util.escape_term(term)}
+      params = $.extend(params, {"tags[]": @Util.breakout(tags)}) if tags.length > 0
+      params = $.extend(params, {"categories[]": @Util.breakout(categories)}) if categories.length > 0
+      $.getJSON((@S.api_url +  'search/emoji?' + $.param(($.extend params, opts))))
+        .error (response) =>
+          @results = []
+        .success (response) =>
+          @_succeed(response, callback)
+    else
+      @S.Emoji.advanced(term, tags, categories, callback)
+    @S.Emoji.advanced(term, tags, categories)
 
   # Combines opts against common defaults
   _combine_opts: (opts) ->

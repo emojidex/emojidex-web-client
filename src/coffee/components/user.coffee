@@ -67,9 +67,9 @@ class EmojidexUser
       token: response.auth_token,
       user: response.auth_user
     })
-    @History.token = @Favorites.token = @auth_info['token']
     @sync_user_data()
 
   sync_user_data: () ->
+    @History.token = @Favorites.token = @auth_info['token']
     @Favorites.sync()
     @History.sync()
