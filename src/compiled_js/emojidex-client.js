@@ -1,5 +1,5 @@
 (function() {
-  var EmojidexCategories, EmojidexData, EmojidexEmoji, EmojidexIndexes, EmojidexSearch, EmojidexShared, EmojidexUser, EmojidexUserFavorites, EmojidexUserHistory, EmojidexUtil, Test,
+  var EmojidexCategories, EmojidexData, EmojidexEmoji, EmojidexIndexes, EmojidexSearch, EmojidexShared, EmojidexUser, EmojidexUserFavorites, EmojidexUserHistory, EmojidexUtil,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   this.EmojidexClient = (function() {
@@ -651,19 +651,6 @@
     }
 
     return EmojidexShared;
-
-  })();
-
-  Test = (function() {
-    function Test() {
-      console.log("Test Class");
-    }
-
-    Test.prototype.log = function(log) {
-      return console.log(log);
-    };
-
-    return Test;
 
   })();
 
