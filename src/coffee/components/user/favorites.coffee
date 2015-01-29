@@ -12,6 +12,8 @@ class EmojidexUserFavorites
       $.getJSON((@S.api_url +  'users/favorites?' + $.param({auth_token: @token})))
         .success (response) =>
           @_favorites = @S.Data.favorites(response)
+      return true
+    return false
 
   set: (emoji_code) ->
     if @token?
@@ -22,8 +24,10 @@ class EmojidexUserFavorites
           auth_token: @token
           emoji_code: emoji_code
         success: (response) =>
-          @_favorites.push(emoji_code)
+          @_favorites.push(response)
           @S.Data.favorites(@_favorites)
+      return true
+    return false
 
   unset: (emoji_code) ->
     if @token?
@@ -33,12 +37,10 @@ class EmojidexUserFavorites
         data:
           auth_token: @token
           emoji_code: emoji_code
-
-        success: (response) ->
-          # @get_favorites()
+        success: (response) =>
+          @sync()
+      return true
+    return false
 
   sync: () ->
-    if @token?
-      $.getJSON((@S.api_url +  'users/history?' + $.param({auth_token: @token})))
-        .success (response) =>
-          # TODO ローカルにあってリモートに無いのを送信する
+    @get() # persistant favorites currently require an account

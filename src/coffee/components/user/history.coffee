@@ -12,6 +12,8 @@ class EmojidexUserHistory
       $.getJSON((@S.api_url +  'users/history?' + $.param({auth_token: @token})))
         .success (response) =>
           @_history = @S.Data.history(response)
+      return true
+    return false
 
   set: (emoji_code) ->
     if @token?
@@ -22,13 +24,13 @@ class EmojidexUserHistory
           auth_token: @token
           emoji_code: emoji_code
         success: (response) =>
-          @_history.push(emoji_code)
-          @S.Data.history(@_history)
+          for entry, i in @_history
+            if entry.emoji_code == response.emoji_code
+              @_history[i] = response
+              @S.Data.history(@_history)
+              return response
+      return true
+    return false
 
   sync: () ->
-    if @token?
-      $.getJSON((@S.api_url +  'users/history?' + $.param({auth_token: @token})))
-        .success (response) =>
-          # diff = @S.Data.history().filter(response)
-          # TODO ローカルにあってリモートに無いのを送信する
-
+    @get() # history currently can't be saved locally, so only get will work
