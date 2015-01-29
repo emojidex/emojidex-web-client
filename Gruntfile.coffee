@@ -1,14 +1,10 @@
 module.exports = (grunt) ->
   grunt.getLicense = (licenses_json) ->
     licenses = grunt.file.readJSON licenses_json
-    remove_string = ['\n', ' ', '*']
     info = ''
     for license in licenses
-      license = license.slice(1) until remove_string.indexOf(license.slice(0, 1)) is -1
-      license = license.slice(0, -1) until remove_string.indexOf(license.slice(-1)) is -1
-      info += '\n * '
-      info += license
-      info += '\n * --------------------------------'
+      info += license.replace /[ \n\*]+(.+) +\n/gi , "\n * $1"
+      info += '* --------------------------------'
     return info
 
   grunt.initConfig
