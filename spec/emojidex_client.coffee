@@ -18,7 +18,7 @@ describe 'EmojidexClient', ->
           unicode: '1f48b'
           category: 'objects'
 
-        expect(ec.results).toContain(
+        expect(ec.Search.results).toContain(
           jasmine.objectContaining(kiss)
         )
 
