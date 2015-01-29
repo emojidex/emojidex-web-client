@@ -63,22 +63,6 @@ module.exports = (grunt) ->
         src: ['dist/js/emojidex-client.js']
         dest: 'dist/js/emojidex-client.min.js'
 
-    copy:
-      img:
-        expand: true,
-        cwd: 'src/img/'
-        src: '**/*'
-        dest: 'dist/img/'
-      lib:
-        files: [
-          {
-            expand: true,
-            cwd: 'bower_components/jquery.storageapi/'
-            src: 'jquery.storageapi.min.js'
-            dest: 'dist/js/'
-          }
-        ]
-
     connect:
       site: {}
 
@@ -120,9 +104,9 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-contrib-uglify'
   grunt.loadNpmTasks 'grunt-contrib-connect'
   grunt.loadNpmTasks 'grunt-contrib-watch'
-  grunt.loadNpmTasks 'grunt-contrib-copy'
   grunt.loadNpmTasks 'grunt-contrib-jasmine'
   grunt.loadNpmTasks 'grunt-license-saver'
+  # grunt.loadNpmTasks 'grunt-contrib-copy'
 
-  grunt.registerTask 'default', ['save_license', 'coffee', 'concat:compiled_js', 'uglify', 'copy', 'jasmine']
+  grunt.registerTask 'default', ['save_license', 'coffee', 'concat:compiled_js', 'uglify', 'jasmine']
   grunt.registerTask 'dev', ['connect', 'watch']
