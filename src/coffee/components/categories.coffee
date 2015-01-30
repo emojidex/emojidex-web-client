@@ -7,12 +7,17 @@ class EmojidexCategories
       @sync()
 
   # Gets the full list of caetgories available
-  sync: (callback = null, locale = null) ->
-    locale = @S.locale unless locale
-    $.getJSON((@S.api_url +  'categories?' + $.param({locale: locale})))
-      .success (response) =>
+  sync: (callback, locale) ->
+    locale = @S.locale unless locale?
+    $.ajax
+      url: @S.api_url +  'categories'
+      dataType: 'json'
+      data:
+        locale: locale
+
+      success: (response) =>
         @_categories = @S.Data.categories(response.categories)
-        callback(response.categories) if callback
+        callback(response.categories) if callback?
 
   all: () ->
     @_categories

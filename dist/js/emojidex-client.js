@@ -501,21 +501,20 @@
 
     EmojidexCategories.prototype.sync = function(callback, locale) {
       var _this = this;
-      if (callback == null) {
-        callback = null;
-      }
       if (locale == null) {
-        locale = null;
-      }
-      if (!locale) {
         locale = this.S.locale;
       }
-      return $.getJSON(this.S.api_url + 'categories?' + $.param({
-        locale: locale
-      })).success(function(response) {
-        _this._categories = _this.S.Data.categories(response.categories);
-        if (callback) {
-          return callback(response.categories);
+      return $.ajax({
+        url: this.S.api_url + 'categories',
+        dataType: 'json',
+        data: {
+          locale: locale
+        },
+        success: function(response) {
+          _this._categories = _this.S.Data.categories(response.categories);
+          if (callback != null) {
+            return callback(response.categories);
+          }
         }
       });
     };

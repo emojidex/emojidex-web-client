@@ -65,12 +65,11 @@ describe 'EmojidexIndexes', ->
       )
       done()
 
-# describe 'EmojidexCategories', ->
-#   it 'sync', (done) ->
-#     ec.get_categories (categories) ->
-#       expect(categories.length).toBeTruthy()
-#       done()
-
+describe 'EmojidexCategories', ->
+  it 'sync', (done) ->
+    ec.Categories.sync (categories) ->
+      expect(categories.length).toBeTruthy()
+      done()
 
 #    it 'get_index', (done) ->
 #      ec.get_index (emoji_data) ->
