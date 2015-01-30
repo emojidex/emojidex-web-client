@@ -7,11 +7,17 @@ class EmojidexUserFavorites
   all: () ->
     @_favorites
 
-  get: () ->
+  get: (callback) ->
     if @token?
-      $.getJSON((@S.api_url +  'users/favorites?' + $.param({auth_token: @token})))
-        .success (response) =>
+      $.ajax
+        url: @S.api_url + 'users/favorites'
+        data:
+          auth_token: @token
+
+        success: (response) =>
           @_favorites = @S.Data.favorites(response)
+          callback @_favorites if callback?
+
       return true
     return false
 
@@ -37,8 +43,10 @@ class EmojidexUserFavorites
         data:
           auth_token: @token
           emoji_code: emoji_code
+
         success: (response) =>
           @sync()
+
       return true
     return false
 

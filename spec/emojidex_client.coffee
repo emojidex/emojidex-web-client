@@ -67,40 +67,41 @@ describe 'EmojidexClient', ->
 #        expect(emoji_data.length).toBeTruthy()
 #        done()
 #
-#  describe 'Mthods: user info', ->
-#    test =
-#      auth_user: 'test'
-#      auth_token: '1798909355d57c9a93e3b82d275594e7c7c000db05021138'
-#
-#    emojidex =
-#      code: 'emojidex'
-#      category: 'symbols'
-#
-#    emoji =
-#      code: 'emoji'
-#      category: 'symbols'
-#
-#    ec._set_auth_from_response(test)
-#
-#    describe 'for favorites', ->
-#      it 'get_favorites', (done) ->
-#        ec.get_favorites (favorites)->
-#          expect(ec.favorites).toContain(
-#            jasmine.objectContaining(emojidex)
-#          )
-#          done()
-#
-#      # it 'set_favorites', (done) ->
-#      #   ec.set_favorites 'emoji', (favorites)->
-#      #     expect(ec.favorites).toContain(
-#      #       jasmine.objectContaining(emoji)
-#      #     )
-#      #     done()
-#
-#      # Not working on PhantomJS, browser is OK.
-#      # it 'unset_favorites', (done) ->
-#      #   ec.unset_favorites 'emoji', (favorites)->
-#      #     expect(ec.favorites).not.toContain(
-#      #       jasmine.objectContaining(emoji)
-#      #     )
-#      #     done()
+
+describe 'Mthods: user info', ->
+  user_info =
+    auth_user: 'test'
+    auth_token: '1798909355d57c9a93e3b82d275594e7c7c000db05021138'
+
+  emoji_info_emojidex =
+    code: 'emojidex'
+    category: 'symbols'
+
+  emoji_info_emoji =
+    code: 'emoji'
+    category: 'symbols'
+
+  ec.User._set_auth_from_response(user_info)
+
+  describe 'for favorites', ->
+    it 'get_favorites', (done) ->
+      ec.User.Favorites.get (favorites)->
+        expect(favorites).toContain(
+          jasmine.objectContaining(emoji_info_emojidex)
+        )
+        done()
+
+  # it 'set_favorites', (done) ->
+  #   ec.set_favorites 'emoji', (favorites)->
+  #     expect(ec.favorites).toContain(
+  #       jasmine.objectContaining(emoji)
+  #     )
+  #     done()
+
+  # Not working on PhantomJS, browser is OK.
+  # it 'unset_favorites', (done) ->
+  #   ec.unset_favorites 'emoji', (favorites)->
+  #     expect(ec.favorites).not.toContain(
+  #       jasmine.objectContaining(emoji)
+  #     )
+  #     done()

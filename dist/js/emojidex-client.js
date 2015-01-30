@@ -1235,13 +1235,20 @@
       return this._favorites;
     };
 
-    EmojidexUserFavorites.prototype.get = function() {
+    EmojidexUserFavorites.prototype.get = function(callback) {
       var _this = this;
       if (this.token != null) {
-        $.getJSON(this.S.api_url + 'users/favorites?' + $.param({
-          auth_token: this.token
-        })).success(function(response) {
-          return _this._favorites = _this.S.Data.favorites(response);
+        $.ajax({
+          url: this.S.api_url + 'users/favorites',
+          data: {
+            auth_token: this.token
+          },
+          success: function(response) {
+            _this._favorites = _this.S.Data.favorites(response);
+            if (callback != null) {
+              return callback(_this._favorites);
+            }
+          }
         });
         return true;
       }
