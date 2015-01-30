@@ -11,6 +11,7 @@ class EmojidexUserFavorites
     if @token?
       $.ajax
         url: @S.api_url + 'users/favorites'
+        dataType: 'json'
         data:
           auth_token: @token
 

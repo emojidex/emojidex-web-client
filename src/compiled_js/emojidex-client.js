@@ -774,6 +774,7 @@
       if (this.token != null) {
         $.ajax({
           url: this.S.api_url + 'users/favorites',
+          dataType: 'json',
           data: {
             auth_token: this.token
           },
