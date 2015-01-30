@@ -408,9 +408,6 @@
 
     EmojidexIndexes.prototype.user = function(username, callback, opts) {
       var _this = this;
-      if (callback == null) {
-        callback = null;
-      }
       opts = this._combine_opts(opts);
       return $.ajax({
         url: this.S.api_url + ("users/" + username + "/emoji"),
@@ -438,7 +435,7 @@
       this.cur_page = response.meta.page;
       this.count = response.meta.count;
       this.S.Emoji.combine(response.emoji);
-      if (callback) {
+      if (callback != null) {
         return callback(response.emoji);
       }
     };
@@ -616,7 +613,7 @@
       this.cur_page = response.meta.page;
       this.count = response.meta.count;
       this.S.Emoji.combine(response.emoji);
-      if (callback) {
+      if (callback != null) {
         return callback(response.emoji);
       }
     };

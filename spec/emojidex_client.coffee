@@ -65,27 +65,26 @@ describe 'EmojidexIndexes', ->
       )
       done()
 
+  it 'index', (done) ->
+    ec.Indexes.index (emoji_data) ->
+      expect(emoji_data.length).toBeTruthy()
+      done()
+
+  it 'newest', (done) ->
+    ec.Indexes.newest (emoji_data) ->
+      expect(emoji_data.length).toBeTruthy()
+      done()
+
+  it 'popular', (done) ->
+    ec.Indexes.popular (emoji_data) ->
+      expect(emoji_data.length).toBeTruthy()
+      done()
+
 describe 'EmojidexCategories', ->
   it 'sync', (done) ->
     ec.Categories.sync (categories) ->
       expect(categories.length).toBeTruthy()
       done()
-
-#    it 'get_index', (done) ->
-#      ec.get_index (emoji_data) ->
-#        expect(emoji_data.length).toBeTruthy()
-#        done()
-#
-#    it 'get_newest', (done) ->
-#      ec.get_newest (emoji_data) ->
-#        expect(emoji_data.length).toBeTruthy()
-#        done()
-#
-#    it 'get_popular', (done) ->
-#      ec.get_popular (emoji_data) ->
-#        expect(emoji_data.length).toBeTruthy()
-#        done()
-#
 
 describe 'EmojidexUserFavorites', ->
   it 'get', (done) ->

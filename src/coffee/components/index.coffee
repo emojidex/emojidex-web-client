@@ -36,7 +36,7 @@ class EmojidexIndexes
       .success (response) =>
         @_succeed(response, callback)
 
-  user: (username, callback = null, opts) ->
+  user: (username, callback, opts) ->
     opts = @_combine_opts(opts)
     $.ajax
       url: @S.api_url +  "users/#{username}/emoji"
@@ -59,4 +59,4 @@ class EmojidexIndexes
     @cur_page = response.meta.page
     @count = response.meta.count
     @S.Emoji.combine(response.emoji)
-    callback(response.emoji) if callback
+    callback(response.emoji) if callback?
