@@ -30,9 +30,11 @@ class EmojidexUserFavorites
         data:
           auth_token: @token
           emoji_code: emoji_code
+
         success: (response) =>
           @_favorites.push(response)
           @S.Data.favorites(@_favorites)
+
       return true
     return false
 

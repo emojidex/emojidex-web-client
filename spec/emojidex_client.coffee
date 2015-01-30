@@ -84,12 +84,17 @@ describe 'Mthods: user info', ->
   ec.User._set_auth_from_response(user_info)
 
   describe 'for favorites', ->
-    it 'get_favorites', (done) ->
+    it 'get', (done) ->
       ec.User.Favorites.get (favorites)->
         expect(favorites).toContain(
           jasmine.objectContaining(emoji_info_emojidex)
         )
         done()
+
+    it 'all', ->
+      expect(ec.User.Favorites.all()).toContain(
+        jasmine.objectContaining(emoji_info_emojidex)
+      )
 
   # it 'set_favorites', (done) ->
   #   ec.set_favorites 'emoji', (favorites)->
