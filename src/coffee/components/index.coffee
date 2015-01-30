@@ -38,11 +38,16 @@ class EmojidexIndexes
 
   user: (username, callback = null, opts) ->
     opts = @_combine_opts(opts)
-    $.getJSON((@S.api_url +  'users/' + username + '/emoji?' + $.param(opts)))
-      .error (response) =>
-        @results = []
-      .success (response) =>
+    $.ajax
+      url: @S.api_url +  "users/#{username}/emoji"
+      dataType: 'json'
+      data: opts
+
+      success: (response) =>
         @_succeed(response, callback)
+
+      error: (response) =>
+        @results = []
 
   # Combines opts against common defaults
   _combine_opts: (opts) ->

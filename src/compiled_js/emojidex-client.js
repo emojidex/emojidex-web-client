@@ -413,10 +413,16 @@
         callback = null;
       }
       opts = this._combine_opts(opts);
-      return $.getJSON(this.S.api_url + 'users/' + username + '/emoji?' + $.param(opts)).error(function(response) {
-        return _this.results = [];
-      }).success(function(response) {
-        return _this._succeed(response, callback);
+      return $.ajax({
+        url: this.S.api_url + ("users/" + username + "/emoji"),
+        dataType: 'json',
+        data: opts,
+        success: function(response) {
+          return _this._succeed(response, callback);
+        },
+        error: function(response) {
+          return _this.results = [];
+        }
       });
     };
 

@@ -1,57 +1,77 @@
-describe 'EmojidexClient', ->
-  window.ec = new EmojidexClient
+emoji_kiss =
+  code: 'kiss'
+  moji: '💋'
+  unicode: '1f48b'
+  category: 'objects'
 
+emoji_emojidex =
+  code: 'emojidex'
+  category: 'symbols'
+
+emoji_emoji =
+  code: 'emoji'
+  category: 'symbols'
+
+user_info =
+  auth_user: 'test'
+  auth_token: '1798909355d57c9a93e3b82d275594e7c7c000db05021138'
+
+window.ec = new EmojidexClient
+ec.User._set_auth_from_response(user_info)
+
+describe 'EmojidexClient', ->
   it 'Defined EmojidexClient ?', ->
     expect(EmojidexClient).toBeDefined()
 
-  describe 'Mthods: emoji info', ->
-    describe 'for search', ->
-      it 'searches', (done) ->
-        ec.Search.search 'kiss', (emoji_data) ->
-          expect(emoji_data.length).toBeTruthy()
-          done()
+describe 'EmojidexSearch', ->
+  it 'search', (done) ->
+    ec.Search.search 'kiss', (emoji_data) ->
+      expect(emoji_data).toContain(
+        jasmine.objectContaining emoji_kiss
+      )
+      done()
 
-      it 'searches (containing)', ->
-        kiss =
-          code: 'kiss'
-          moji: '💋'
-          unicode: '1f48b'
-          category: 'objects'
+  it 'starting', (done) ->
+    ec.Search.starting 'kiss', (emoji_data) ->
+      expect(emoji_data).toContain(
+        jasmine.objectContaining emoji_kiss
+      )
+      done()
 
-        expect(ec.Search.results).toContain(
-          jasmine.objectContaining(kiss)
-        )
+  it 'ending', (done) ->
+    ec.Search.ending 'kiss', (emoji_data) ->
+      expect(emoji_data).toContain(
+        jasmine.objectContaining emoji_kiss
+      )
+      done()
 
-      it 'searches starting with', (done) ->
-        ec.Search.starting '', (emoji_data) ->
-          expect(emoji_data.length).toBeTruthy()
-          done()
+  it 'tags', (done) ->
+    ec.Search.tags '', (emoji_data) ->
+      expect(emoji_data).toBeTruthy()
+      done()
 
-      it 'searches ending with', (done) ->
-        ec.Search.ending '', (emoji_data) ->
-          expect(emoji_data.length).toBeTruthy()
-          done()
+  it 'padvanced', (done) ->
+    ec.Search.advanced 'kiss', [], [], (emoji_data) ->
+      expect(emoji_data).toContain(
+        jasmine.objectContaining emoji_kiss
+      )
+      done()
 
-      it 'searches tags', (done) ->
-        ec.Search.tags '', (emoji_data) ->
-          expect(emoji_data).toBeTruthy()
-          done()
+describe 'EmojidexIndexes', ->
+  it 'user', (done) ->
+    ec.Indexes.user 'emojidex', (emoji_data) ->
+      expect(emoji_data).toContain(
+        jasmine.objectContaining emoji_emojidex
+      )
+      done()
 
-      it 'performs and advanced search', (done) ->
-        ec.Search.advanced '', [], [], (emoji_data) ->
-          expect(emoji_data.length).toBeTruthy()
-          done()
+# describe 'EmojidexCategories', ->
+#   it 'sync', (done) ->
+#     ec.get_categories (categories) ->
+#       expect(categories.length).toBeTruthy()
+#       done()
 
-#    it 'user_emoji', (done) ->
-#      ec.user_emoji 'emojidex', (emoji_data) ->
-#        expect(emoji_data.length).toBeTruthy()
-#        done()
-#
-#    it 'get_categories', (done) ->
-#      ec.get_categories (categories) ->
-#        expect(categories.length).toBeTruthy()
-#        done()
-#
+
 #    it 'get_index', (done) ->
 #      ec.get_index (emoji_data) ->
 #        expect(emoji_data.length).toBeTruthy()
@@ -68,33 +88,18 @@ describe 'EmojidexClient', ->
 #        done()
 #
 
-describe 'Mthods: user info', ->
-  user_info =
-    auth_user: 'test'
-    auth_token: '1798909355d57c9a93e3b82d275594e7c7c000db05021138'
-
-  emoji_info_emojidex =
-    code: 'emojidex'
-    category: 'symbols'
-
-  emoji_info_emoji =
-    code: 'emoji'
-    category: 'symbols'
-
-  ec.User._set_auth_from_response(user_info)
-
-  describe 'for favorites', ->
-    it 'get', (done) ->
-      ec.User.Favorites.get (favorites)->
-        expect(favorites).toContain(
-          jasmine.objectContaining(emoji_info_emojidex)
-        )
-        done()
-
-    it 'all', ->
-      expect(ec.User.Favorites.all()).toContain(
-        jasmine.objectContaining(emoji_info_emojidex)
+describe 'EmojidexUserFavorites', ->
+  it 'get', (done) ->
+    ec.User.Favorites.get (favorites)->
+      expect(favorites).toContain(
+        jasmine.objectContaining(emoji_emojidex)
       )
+      done()
+
+  it 'all', ->
+    expect(ec.User.Favorites.all()).toContain(
+      jasmine.objectContaining(emoji_emojidex)
+    )
 
   # it 'set_favorites', (done) ->
   #   ec.set_favorites 'emoji', (favorites)->
