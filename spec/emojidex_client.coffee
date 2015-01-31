@@ -1,23 +1,23 @@
-emoji_kiss =
+@emoji_kiss =
   code: 'kiss'
   moji: '💋'
   unicode: '1f48b'
   category: 'objects'
 
-emoji_emojidex =
+@emoji_emojidex =
   code: 'emojidex'
   category: 'symbols'
 
-emoji_emoji =
+@emoji_emoji =
   code: 'emoji'
   category: 'symbols'
 
-user_info =
+@user_info =
   auth_user: 'test'
   auth_token: '1798909355d57c9a93e3b82d275594e7c7c000db05021138'
 
-window.ec = new EmojidexClient
-ec.User._set_auth_from_response(user_info)
+@ec = new EmojidexClient
+@ec.User._set_auth_from_response(user_info)
 
 describe 'EmojidexClient', ->
   it 'Defined EmojidexClient ?', ->
