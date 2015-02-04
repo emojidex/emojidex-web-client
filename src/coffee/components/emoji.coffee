@@ -1,22 +1,21 @@
 class EmojidexEmoji
-  constructor: (shared = null) ->
-    @S = shared || new EmojidexShared
-    @_emoji = @S.Data.emoji()
+  constructor: (@EC) ->
+    @_emoji = @EC.Data.emoji()
     @util = new EmojidexUtil
 
-    if @S.Data.emoji().length == 0
+    if @EC.Data.emoji().length == 0
       @seed()
 
   # Gets the full list of caetgories available
   seed: (locale) ->
-    locale = @S.locale unless locale != null
+    locale = @EC.locale unless locale != null
     switch locale
       when 'en'
-        @S.Indexes.user('emoji', @combine)
-        @S.Indexes.user('emojidex', @combine)
+        @EC.Indexes.user('emoji', @combine)
+        @EC.Indexes.user('emojidex', @combine)
       when 'ja'
-        @S.Indexes.user('絵文字', @combine)
-        @S.Indexes.user('絵文字デックス', @combine)
+        @EC.Indexes.user('絵文字', @combine)
+        @EC.Indexes.user('絵文字デックス', @combine)
 
   all: () ->
     @_emoji
@@ -62,9 +61,9 @@ class EmojidexEmoji
 
   # Concatenates and flattens the given emoji array into the @emoji array
   combine: (emoji) =>
-    @_emoji = @S.Data.emoji($.extend(@_emoji, emoji))
+    @_emoji = @EC.Data.emoji($.extend(@_emoji, emoji))
 
   # Clears the emoji array and emoji in storage.
   # DO NOT call this unless you have a really good reason!
   flush: () ->
-    @_emoji = @S.Data.emoji([])
+    @_emoji = @EC.Data.emoji([])

@@ -1,15 +1,14 @@
 class EmojidexUser
-  constructor: (shared = null, opts) ->
-    @S = shared || new EmojidexShared
-    @auth_info = @S.Data._def_auth_info()
-    @History = new EmojidexUserHistory(@S)
-    @Favorites = new EmojidexUserFavorites(@S)
+  constructor: (@EC) ->
+    @auth_info = @EC.Data._def_auth_info()
+    @History = new EmojidexUserHistory @EC
+    @Favorites = new EmojidexUserFavorites @EC
     @_auto_login()
 
   # Checks for local saved login data, and if present sets the username and api_key
   _auto_login: () ->
     return if @closed_net
-    @auth_info = @S.Data.auth_info()
+    @auth_info = @EC.Data.auth_info()
     if @auth_info['token'] != null
       @sync_user_data()
     else
@@ -35,14 +34,14 @@ class EmojidexUser
   # logout:
   # 'logs out' by clearing user data
   logout: () ->
-    @S.Data.auth_info(@S.Data._def_auth_info())
+    @EC.Data.auth_info(@EC.Data._def_auth_info())
 
   # regular login with username/email and password
   plain_auth: (username, password, callback = null) ->
-    url = @S.api_url + 'users/authenticate?' + $.param(username: username, password: password)
+    url = @EC.api_url + 'users/authenticate?' + $.param(username: username, password: password)
     $.getJSON(url)
       .error (response) =>
-        @auth_info = @S.Data.auth_info({
+        @auth_info = @EC.Data.auth_info({
           status: response.auth_status,
           token: null,
           user: ''
@@ -62,7 +61,7 @@ class EmojidexUser
 
   # directly set auth credentials
   set_auth: (user, token) ->
-    @auth_info = @S.Data.auth_info({
+    @auth_info = @EC.Data.auth_info({
       status: 'verified',
       token: token,
       user: user
@@ -71,7 +70,7 @@ class EmojidexUser
 
   # sets auth parameters from a successful auth request [login]
   _set_auth_from_response: (response) ->
-    @auth_info = @S.Data.auth_info({
+    @auth_info = @EC.Data.auth_info({
       status: response.auth_status,
       token: response.auth_token,
       user: response.auth_user
