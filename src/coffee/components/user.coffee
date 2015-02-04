@@ -61,7 +61,7 @@ class EmojidexUser
     return false
 
   # directly set auth credentials
-  set_auth: (user, token)
+  set_auth: (user, token) ->
     @auth_info = @S.Data.auth_info({
       status: 'verified',
       token: token,

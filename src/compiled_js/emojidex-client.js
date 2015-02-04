@@ -735,6 +735,15 @@
       return false;
     };
 
+    EmojidexUser.prototype.set_auth = function(user, token) {
+      this.auth_info = this.S.Data.auth_info({
+        status: 'verified',
+        token: token,
+        user: user
+      });
+      return this.sync_user_data();
+    };
+
     EmojidexUser.prototype._set_auth_from_response = function(response) {
       this.auth_info = this.S.Data.auth_info({
         status: response.auth_status,
