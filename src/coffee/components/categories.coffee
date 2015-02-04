@@ -2,7 +2,8 @@ class EmojidexCategories
   constructor: (@EC) ->
     @_categories = @EC.Data.categories()
 
-    if @EC.Data.categories().length == 0
+    cat = @EC.Data.categories()
+    if cat is 0
       @sync()
 
   # Gets the full list of caetgories available

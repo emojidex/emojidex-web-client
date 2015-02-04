@@ -1,8 +1,7 @@
 class EmojidexUserFavorites
-  constructor: (shared = null, token = null) ->
-    @S = shared || new EmojidexShared
+  constructor: (@EC, token = null) ->
     @token = token
-    @_favorites = @S.Data.favorites()
+    @_favorites = @EC.Data.favorites()
 
   all: () ->
     @_favorites
@@ -10,13 +9,13 @@ class EmojidexUserFavorites
   get: (callback) ->
     if @token?
       $.ajax
-        url: @S.api_url + 'users/favorites'
+        url: @EC.api_url + 'users/favorites'
         dataType: 'json'
         data:
           auth_token: @token
 
         success: (response) =>
-          @_favorites = @S.Data.favorites(response)
+          @_favorites = @EC.Data.favorites(response)
           callback @_favorites if callback?
 
       return true
@@ -26,14 +25,14 @@ class EmojidexUserFavorites
     if @token?
       $.ajax
         type: 'POST'
-        url: @S.api_url + 'users/favorites'
+        url: @EC.api_url + 'users/favorites'
         data:
           auth_token: @token
           emoji_code: emoji_code
 
         success: (response) =>
           @_favorites.push(response)
-          @S.Data.favorites(@_favorites)
+          @EC.Data.favorites(@_favorites)
 
       return true
     return false
@@ -42,7 +41,7 @@ class EmojidexUserFavorites
     if @token?
       $.ajax
         type: 'DELETE'
-        url: @S.api_url + 'users/favorites'
+        url: @EC.api_url + 'users/favorites'
         data:
           auth_token: @token
           emoji_code: emoji_code

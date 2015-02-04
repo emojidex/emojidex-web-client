@@ -17,7 +17,7 @@
   auth_token: '1798909355d57c9a93e3b82d275594e7c7c000db05021138'
 
 @ec = new EmojidexClient
-@ec.User._set_auth_from_response(user_info)
+@ec.User.set_auth user_info.auth_user, user_info.auth_token
 
 describe 'EmojidexClient', ->
   it 'Defined EmojidexClient ?', ->

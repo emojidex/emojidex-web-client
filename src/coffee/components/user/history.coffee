@@ -1,17 +1,16 @@
 class EmojidexUserHistory
-  constructor: (shared = null, token = null) ->
-    @S = shared || new EmojidexShared
+  constructor: (@EC, token = null) ->
     @token = token
-    @_history = @S.Data.history()
+    @_history = @EC.Data.history()
 
   all: () ->
     @_history
 
   get: (opts) ->
     if @token?
-      $.getJSON((@S.api_url +  'users/history?' + $.param({auth_token: @token})))
+      $.getJSON((@EC.api_url +  'users/history?' + $.param({auth_token: @token})))
         .success (response) =>
-          @_history = @S.Data.history(response)
+          @_history = @EC.Data.history(response)
       return true
     return false
 
@@ -19,7 +18,7 @@ class EmojidexUserHistory
     if @token?
       $.ajax
         type: 'POST'
-        url: @S.api_url + 'users/history'
+        url: @EC.api_url + 'users/history'
         data:
           auth_token: @token
           emoji_code: emoji_code
@@ -27,7 +26,7 @@ class EmojidexUserHistory
           for entry, i in @_history
             if entry.emoji_code == response.emoji_code
               @_history[i] = response
-              @S.Data.history(@_history)
+              @EC.Data.history(@_history)
               return response
       return true
     return false

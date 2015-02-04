@@ -1,6 +1,5 @@
 class EmojidexIndexes
   constructor: (@EC) ->
-    @EC = shared || new EmojidexShared
     @results = []
     @cur_page = 1
     @cur_limit = @EC.limit

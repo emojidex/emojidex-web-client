@@ -1,7 +1,6 @@
 class EmojidexData
   constructor: (@EC) ->
     @storage = $.localStorage
-    # @storage.removeAll()
     @storage.set "emojidex", {} unless @storage.isSet "emojidex"
     @storage.set "emojidex.emoji", @EC.options.emoji || [] unless @storage.isSet "emojidex.emoji"
     @storage.set "emojidex.history", @EC.options.history || [] unless @storage.isSet "emojidex.history"

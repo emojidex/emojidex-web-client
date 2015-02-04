@@ -11,17 +11,23 @@ class EmojidexSearch
       null
 
   # Executes a general search (code_cont)
-  search: (term, callback = null, opts) ->
+  search: (term, callback, opts) ->
     @next = () ->
       @search(term, callback, $.extend(opts, {page: opts.page + 1}))
-    if !@EC.closed_net
+    unless @EC.closed_net
       opts = @_combine_opts(opts)
-      $.getJSON((@EC.api_url +  'search/emoji?' + $.param(($.extend {}, \
-          {code_cont: @Util.escape_term(term)}, opts))))
-        .error (response) =>
+      opts = $.extend {}, code_cont: @EC.Util.escape_term(term), opts
+      $.ajax
+        url: @EC.api_url + 'search/emoji'
+        dataType: 'json'
+        data: opts
+
+        success: (response) =>
+          @_succeed response, callback
+
+        error: (response) =>
           @results = []
-        .success (response) =>
-          @_succeed(response, callback)
+
     else
       @EC.Emoji.search(term, callback)
     @EC.Emoji.search(term)
