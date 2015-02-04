@@ -1,20 +1,36 @@
 (function() {
-  var EmojidexCategories, EmojidexData, EmojidexEmoji, EmojidexIndexes, EmojidexSearch, EmojidexShared, EmojidexUser, EmojidexUserFavorites, EmojidexUserHistory, EmojidexUtil,
+  var EmojidexCategories, EmojidexData, EmojidexEmoji, EmojidexIndexes, EmojidexSearch, EmojidexUser, EmojidexUserFavorites, EmojidexUserHistory, EmojidexUtil,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   this.EmojidexClient = (function() {
-    function EmojidexClient(opts) {
-      if (opts == null) {
-        opts = {};
-      }
-      this.Util = new EmojidexUtil;
-      this.S = new EmojidexShared(opts);
-      this.Data = this.S.Data;
-      this.Emoji = this.S.Emoji;
-      this.Categories = this.S.Categories;
-      this.Indexes = this.S.Indexes;
-      this.User = this.S.User;
-      this.Search = new EmojidexSearch(this.S);
+    function EmojidexClient(options) {
+      var defaults;
+      this.options = options;
+      defaults = {
+        locale: 'en',
+        api_url: 'https://www.emojidex.com/api/v1/',
+        cdn_url: 'http://cdn.emojidex.com/emoji',
+        closed_net: false,
+        min_query_len: 4,
+        size_code: 'px32',
+        detailed: false,
+        limit: 32
+      };
+      this.options = $.extend({}, this.defaults, this.options);
+      this.closed_net = this.options.closed_net;
+      this.api_url = this.options.api_url;
+      this.cdn_url = this.options.cdn_url;
+      this.size_code = this.options.size_code;
+      this.detailed = this.options.detailed;
+      this.limit = this.options.limit;
+      this.locale = this.options.locale;
+      this.Data = new EmojidexData(this);
+      this.Emoji = new EmojidexEmoji(this);
+      this.Categories = new EmojidexCategories(this);
+      this.User = new EmojidexUser(this);
+      this.Indexes = new EmojidexIndexes(this);
+      this.Util = new EmojidexUtil(this);
+      this.Search = new EmojidexSearch(this);
     }
 
     return EmojidexClient;
@@ -23,11 +39,14 @@
 
   EmojidexCategories = (function() {
     function EmojidexCategories(shared) {
+      var cat;
       if (shared == null) {
         shared = null;
       }
       this.S = shared || new EmojidexShared;
       this._categories = this.S.Data.categories();
+      cat = this.S.Data.categories();
+      console.dir(cat);
       if (this.S.Data.categories().length === 0) {
         this.sync();
       }
@@ -62,22 +81,27 @@
   })();
 
   EmojidexData = (function() {
-    function EmojidexData(opts) {
+    function EmojidexData(EC) {
+      this.EC = EC;
       this.storage = $.localStorage;
+      this.storage.removeAll();
       if (!this.storage.isSet("emojidex")) {
         this.storage.set("emojidex", {});
       }
       if (!this.storage.isSet("emojidex.emoji")) {
-        this.storage.set("emojidex.emoji", opts.emoji || []);
+        this.storage.set("emojidex.emoji", this.EC.options.emoji || []);
       }
       if (!this.storage.isSet("emojidex.history")) {
-        this.storage.set("emojidex.history", opts.history || []);
+        this.storage.set("emojidex.history", this.EC.options.history || []);
       }
       if (!this.storage.isSet("emojidex.favorites")) {
-        this.storage.set("emojidex.favorites", opts.favorites || []);
+        this.storage.set("emojidex.favorites", this.EC.options.favorites || []);
       }
       if (!this.storage.isSet("emojidex.auth_info")) {
-        this.storage.set("emojidex.auth_info", opts.auth_info || this._def_auth_info());
+        this.storage.set("emojidex.categories", this.EC.options.categories || []);
+      }
+      if (!this.storage.isSet("emojidex.auth_info")) {
+        this.storage.set("emojidex.auth_info", this.EC.options.auth_info || this._def_auth_info());
       }
     }
 
@@ -619,40 +643,6 @@
     };
 
     return EmojidexSearch;
-
-  })();
-
-  EmojidexShared = (function() {
-    EmojidexShared.prototype.defaults = function() {
-      return {
-        locale: 'en',
-        api_url: 'https://www.emojidex.com/api/v1/',
-        cdn_url: 'http://cdn.emojidex.com/emoji',
-        closed_net: false,
-        min_query_len: 4,
-        size_code: 'px32',
-        detailed: false,
-        limit: 32
-      };
-    };
-
-    function EmojidexShared(opts) {
-      opts = $.extend({}, this.defaults(), opts);
-      this.closed_net = opts.closed_net;
-      this.api_url = opts.api_url;
-      this.cdn_url = opts.cdn_url;
-      this.size_code = opts.size_code;
-      this.detailed = opts.detailed;
-      this.limit = opts.limit;
-      this.locale = opts.locale;
-      this.Data = new EmojidexData(this, opts);
-      this.Emoji = new EmojidexEmoji(this);
-      this.Categories = new EmojidexCategories(this);
-      this.User = new EmojidexUser(this);
-      this.Indexes = new EmojidexIndexes(this);
-    }
-
-    return EmojidexShared;
 
   })();
 

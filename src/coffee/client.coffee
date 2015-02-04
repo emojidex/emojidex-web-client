@@ -10,12 +10,38 @@
 # Copyright 2013 Genshin Souzou Kabushiki Kaisha
 
 class @EmojidexClient
-  constructor: (opts = {}) ->
-    @Util = new EmojidexUtil
-    @S = new EmojidexShared(opts)
-    @Data = @S.Data
-    @Emoji = @S.Emoji
-    @Categories = @S.Categories
-    @Indexes = @S.Indexes
-    @User = @S.User
-    @Search = new EmojidexSearch(@S)
+  constructor: (@options) ->
+    # sets global default value
+    defaults =
+      locale: 'en'
+      api_url: 'https://www.emojidex.com/api/v1/'
+      cdn_url: 'http://cdn.emojidex.com/emoji'
+      closed_net: false
+      min_query_len: 4
+      size_code: 'px32'
+      detailed: false
+      limit: 32
+    @options = $.extend {}, @defaults, @options
+
+    # set closed network flag (for OSS distrobutions, intranet/private neworks, or closed license)
+    # DO NOT set to true unless permitted by an emojidex License
+    @closed_net = @options.closed_net
+
+    # set end points
+    @api_url = @options.api_url
+    @cdn_url = @options.cdn_url
+    @size_code = @options.size_code
+
+    # common @options
+    @detailed = @options.detailed
+    @limit = @options.limit
+    @locale = @options.locale
+
+    # new Emojidex modules
+    @Data = new EmojidexData @
+    @Emoji = new EmojidexEmoji @
+    @Categories = new EmojidexCategories @
+    @User = new EmojidexUser @
+    @Indexes = new EmojidexIndexes @
+    @Util = new EmojidexUtil @
+    @Search = new EmojidexSearch @

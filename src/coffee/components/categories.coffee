@@ -3,6 +3,9 @@ class EmojidexCategories
     @S = shared || new EmojidexShared
     @_categories = @S.Data.categories()
 
+    cat = @S.Data.categories()
+    console.dir cat
+
     if @S.Data.categories().length == 0
       @sync()
 
