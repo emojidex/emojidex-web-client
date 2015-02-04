@@ -8,25 +8,27 @@ class EmojidexData
     @storage.set "emojidex.categories", @EC.options.categories || [] unless @storage.isSet "emojidex.auth_info"
     @storage.set "emojidex.auth_info", @EC.options.auth_info || @_def_auth_info() unless @storage.isSet "emojidex.auth_info"
 
-  emoji: (emoji_set = null) ->
-    @storage.set("emojidex.emoji", emoji_set) if emoji_set != null
-    @storage.get("emojidex.emoji")
+  emoji: (emoji_set) ->
+    @storage.set "emojidex.emoji", emoji_set if emoji_set?
+    @storage.get "emojidex.emoji"
 
-  favorites: (favorites_set = null) ->
-    @storage.set("emojidex.favorites", favorites_set) if favorites_set != null
-    @storage.get("emojidex.favorites")
+  favorites: (favorites_set) ->
+    @storage.set "emojidex.favorites", favorites_set if favorites_set?
+    @storage.get "emojidex.favorites"
 
-  history: (history_set = null) ->
-    @storage.set("emojidex.history", history_set) if history_set != null
-    @storage.get("emojidex.history")
+  history: (history_set) ->
+    @storage.set "emojidex.history", history_set if history_set?
+    @storage.get "emojidex.history"
 
-  categories: (categories_set = null) ->
-    @storage.set("emojidex.categories", categories_set) if categories_set != null
-    @storage.get("emojidex.categories")
+  categories: (categories_set) ->
+    @storage.set "emojidex.categories", categories_set if categories_set?
+    @storage.get "emojidex.categories"
 
   _def_auth_info: () ->
-    {status: 'none', user: '', token: null}
+    status: 'none'
+    user: ''
+    token: null
 
-  auth_info: (auth_info_set = null) ->
-    @storage.set("emojidex.auth_info", auth_info_set) if auth_info_set != null
-    @storage.get("emojidex.auth_info")
+  auth_info: (auth_info_set) ->
+    @storage.set "emojidex.auth_info", auth_info_set if auth_info_set?
+    @storage.get "emojidex.auth_info"

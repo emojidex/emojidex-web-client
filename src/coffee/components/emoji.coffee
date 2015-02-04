@@ -3,12 +3,12 @@ class EmojidexEmoji
     @_emoji = @EC.Data.emoji()
     @util = new EmojidexUtil
 
-    if @EC.Data.emoji().length == 0
+    if @EC.Data.emoji().length is 0
       @seed()
 
   # Gets the full list of caetgories available
   seed: (locale) ->
-    locale = @EC.locale unless locale != null
+    locale = @EC.locale unless locale?
     switch locale
       when 'en'
         @EC.Indexes.user('emoji', @combine)
