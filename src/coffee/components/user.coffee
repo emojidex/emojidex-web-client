@@ -1,6 +1,6 @@
 class EmojidexUser
   constructor: (@EC) ->
-    @auth_info = @EC.Data._def_auth_info()
+    @auth_info = @EC.Data._def_auth_info
     @History = new EmojidexUserHistory @EC
     @Favorites = new EmojidexUserFavorites @EC
     @_auto_login()
@@ -34,7 +34,7 @@ class EmojidexUser
   # logout:
   # 'logs out' by clearing user data
   logout: () ->
-    @EC.Data.auth_info(@EC.Data._def_auth_info())
+    @EC.Data.auth_info @EC.Data._def_auth_info
 
   # regular login with username/email and password
   plain_auth: (username, password, callback = null) ->
