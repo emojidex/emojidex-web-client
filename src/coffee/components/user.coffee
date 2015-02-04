@@ -60,6 +60,15 @@ class EmojidexUser
   google_auth: (callback = null) ->
     return false
 
+  # directly set auth credentials
+  set_auth: (user, token)
+    @auth_info = @S.Data.auth_info({
+      status: 'verified',
+      token: token,
+      user: user
+    })
+    @sync_user_data()
+
   # sets auth parameters from a successful auth request [login]
   _set_auth_from_response: (response) ->
     @auth_info = @S.Data.auth_info({
