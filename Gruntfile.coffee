@@ -65,7 +65,8 @@ module.exports = (grunt) ->
     watch:
       coffee:
         files: ['src/coffee/**/*.coffee']
-        tasks: ['coffee:client', 'concat:compiled_js', 'uglify', 'jasmine']
+        tasks: ['coffee:client', 'concat:compiled_js', 'uglify']
+        # tasks: ['coffee:client', 'concat:compiled_js', 'uglify', 'jasmine']
       spec:
         files: ['spec/**/*.coffee']
         tasks: ['coffee:spec', 'jasmine']
