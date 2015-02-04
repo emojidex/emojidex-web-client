@@ -355,14 +355,12 @@
   })();
 
   EmojidexIndexes = (function() {
-    function EmojidexIndexes(shared, opts) {
-      if (shared == null) {
-        shared = null;
-      }
-      this.S = shared || new EmojidexShared;
+    function EmojidexIndexes(EC) {
+      this.EC = EC;
+      this.EC = shared || new EmojidexShared;
       this.results = [];
       this.cur_page = 1;
-      this.cur_limit = this.S.limit;
+      this.cur_limit = this.EC.limit;
       this.count = 0;
     }
 
@@ -377,7 +375,7 @@
         }));
       };
       opts = this._combine_opts(opts);
-      return $.getJSON(this.S.api_url + '/emoji?' + $.param(opts)).error(function(response) {
+      return $.getJSON(this.EC.api_url + '/emoji?' + $.param(opts)).error(function(response) {
         return _this.results = [];
       }).success(function(response) {
         return _this._succeed(response, callback);
@@ -395,7 +393,7 @@
         }));
       };
       opts = this._combine_opts(opts);
-      return $.getJSON(this.S.api_url + '/newest?' + $.param(opts)).error(function(response) {
+      return $.getJSON(this.EC.api_url + '/newest?' + $.param(opts)).error(function(response) {
         return _this.results = [];
       }).success(function(response) {
         return _this._succeed(response, callback);
@@ -413,7 +411,7 @@
         }));
       };
       opts = this._combine_opts(opts);
-      return $.getJSON(this.S.api_url + '/popular?' + $.param(opts)).error(function(response) {
+      return $.getJSON(this.EC.api_url + '/popular?' + $.param(opts)).error(function(response) {
         return _this.results = [];
       }).success(function(response) {
         return _this._succeed(response, callback);
@@ -424,7 +422,7 @@
       var _this = this;
       opts = this._combine_opts(opts);
       return $.ajax({
-        url: this.S.api_url + ("users/" + username + "/emoji"),
+        url: this.EC.api_url + ("users/" + username + "/emoji"),
         dataType: 'json',
         data: opts,
         success: function(response) {
@@ -439,8 +437,8 @@
     EmojidexIndexes.prototype._combine_opts = function(opts) {
       return $.extend({
         page: 1,
-        limit: this.S.limit,
-        detailed: this.S.detailed
+        limit: this.EC.limit,
+        detailed: this.EC.detailed
       }, opts);
     };
 
@@ -448,7 +446,7 @@
       this.results = response.emoji;
       this.cur_page = response.meta.page;
       this.count = response.meta.count;
-      this.S.Emoji.combine(response.emoji);
+      this.EC.Emoji.combine(response.emoji);
       if (callback != null) {
         return callback(response.emoji);
       }
@@ -459,12 +457,12 @@
   })();
 
   EmojidexSearch = (function() {
-    function EmojidexSearch(shared) {
-      this.S = shared || new EmojidexShared;
+    function EmojidexSearch(EC) {
+      this.EC = EC;
       this.Util = new EmojidexUtil;
       this.results = [];
       this.cur_page = 1;
-      this.cur_limit = this.S.limit;
+      this.cur_limit = this.EC.limit;
       this.count = 0;
       this.next = function() {
         return null;
@@ -481,9 +479,9 @@
           page: opts.page + 1
         }));
       };
-      if (!this.S.closed_net) {
+      if (!this.EC.closed_net) {
         opts = this._combine_opts(opts);
-        $.getJSON(this.S.api_url + 'search/emoji?' + $.param($.extend({}, {
+        $.getJSON(this.EC.api_url + 'search/emoji?' + $.param($.extend({}, {
           code_cont: this.Util.escape_term(term)
         }, opts))).error(function(response) {
           return _this.results = [];
@@ -491,9 +489,9 @@
           return _this._succeed(response, callback);
         });
       } else {
-        this.S.Emoji.search(term, callback);
+        this.EC.Emoji.search(term, callback);
       }
-      return this.S.Emoji.search(term);
+      return this.EC.Emoji.search(term);
     };
 
     EmojidexSearch.prototype.starting = function(term, callback, opts) {
@@ -506,9 +504,9 @@
           page: opts.page + 1
         }));
       };
-      if (!this.S.closed_net) {
+      if (!this.EC.closed_net) {
         opts = this._combine_opts(opts);
-        $.getJSON(this.S.api_url + 'search/emoji?' + $.param($.extend({}, {
+        $.getJSON(this.EC.api_url + 'search/emoji?' + $.param($.extend({}, {
           code_sw: this.Util.escape_term(term)
         }, opts))).error(function(response) {
           return _this.results = [];
@@ -516,9 +514,9 @@
           return _this._succeed(response, callback);
         });
       } else {
-        this.S.Emoji.starting(term, callback);
+        this.EC.Emoji.starting(term, callback);
       }
-      return this.S.Emoji.starting(term);
+      return this.EC.Emoji.starting(term);
     };
 
     EmojidexSearch.prototype.ending = function(term, callback, opts) {
@@ -531,9 +529,9 @@
           page: opts.page + 1
         }));
       };
-      if (!this.S.closed_net) {
+      if (!this.EC.closed_net) {
         opts = this._combine_opts(opts);
-        $.getJSON(this.S.api_url + 'search/emoji?' + $.param($.extend({}, {
+        $.getJSON(this.EC.api_url + 'search/emoji?' + $.param($.extend({}, {
           code_ew: this.Util.escape_term(term)
         }, opts))).error(function(response) {
           return _this.results = [];
@@ -541,9 +539,9 @@
           return _this._succeed(response, callback);
         });
       } else {
-        this.S.Emoji.ending(term, callback);
+        this.EC.Emoji.ending(term, callback);
       }
-      return this.S.Emoji.ending(term);
+      return this.EC.Emoji.ending(term);
     };
 
     EmojidexSearch.prototype.tags = function(tags, callback, opts) {
@@ -556,9 +554,9 @@
           page: opts.page + 1
         }));
       };
-      if (!this.S.closed_net) {
+      if (!this.EC.closed_net) {
         opts = this._combine_opts(opts);
-        $.getJSON(this.S.api_url + 'search/emoji?' + $.param($.extend({}, {
+        $.getJSON(this.EC.api_url + 'search/emoji?' + $.param($.extend({}, {
           "tags[]": this.Util.breakout(tags)
         }, opts))).error(function(response) {
           return _this.results = [];
@@ -566,9 +564,9 @@
           return _this._succeed(response, callback);
         });
       } else {
-        this.S.Emoji.tags(tags, callback);
+        this.EC.Emoji.tags(tags, callback);
       }
-      return this.S.Emoji.tags(tags);
+      return this.EC.Emoji.tags(tags);
     };
 
     EmojidexSearch.prototype.advanced = function(term, tags, categories, callback, opts) {
@@ -588,7 +586,7 @@
           page: opts.page + 1
         }));
       };
-      if (!this.S.closed_net) {
+      if (!this.EC.closed_net) {
         opts = this._combine_opts(opts);
         params = {
           code_cont: this.Util.escape_term(term)
@@ -603,22 +601,22 @@
             "categories[]": this.Util.breakout(categories)
           });
         }
-        $.getJSON(this.S.api_url + 'search/emoji?' + $.param($.extend(params, opts))).error(function(response) {
+        $.getJSON(this.EC.api_url + 'search/emoji?' + $.param($.extend(params, opts))).error(function(response) {
           return _this.results = [];
         }).success(function(response) {
           return _this._succeed(response, callback);
         });
       } else {
-        this.S.Emoji.advanced(term, tags, categories, callback);
+        this.EC.Emoji.advanced(term, tags, categories, callback);
       }
-      return this.S.Emoji.advanced(term, tags, categories);
+      return this.EC.Emoji.advanced(term, tags, categories);
     };
 
     EmojidexSearch.prototype._combine_opts = function(opts) {
       return $.extend({}, {
         page: 1,
-        limit: this.S.limit,
-        detailed: this.S.detailed
+        limit: this.EC.limit,
+        detailed: this.EC.detailed
       }, opts);
     };
 
@@ -626,7 +624,7 @@
       this.results = response.emoji;
       this.cur_page = response.meta.page;
       this.count = response.meta.count;
-      this.S.Emoji.combine(response.emoji);
+      this.EC.Emoji.combine(response.emoji);
       if (callback != null) {
         return callback(response.emoji);
       }
@@ -924,8 +922,8 @@
       for (_i = 0, _len = emoji.length; _i < _len; _i++) {
         moji = emoji[_i];
         _results.push({
-          code: this.Util.escape_term(moji.code),
-          img_url: "" + this.cdn_url + "/" + size_code + "/" + (this.Util.escape_term(moji.code)) + ".png"
+          code: this.escape_term(moji.code),
+          img_url: "" + this.cdn_url + "/" + size_code + "/" + (this.escape_term(moji.code)) + ".png"
         });
       }
       return _results;
