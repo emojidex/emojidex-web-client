@@ -53,12 +53,10 @@ the client in. If you have two separate pieces of code operating on the same vie
 module each piece of code should have a different client instance.
 
 The client is broken up into a set of nested modules:
-Client
-Client
+Client<br>
   ┣Emoji<br>
   ┣Categories<br>
   ┣Indexes<br>
-  ┣Shared<br>
   ┣User<br>
   ┃  ┣History<br>
   ┃  ┗Favorites<br>
@@ -66,7 +64,7 @@ Client
   ┣Data<br>
   ┗Util<br>
 
-The Shared and modules should usually be ignored unless you're doing something particularly
+The Data modules should usually be ignored unless you're doing something particularly
 hackish - but be warned that messing with these could be a quick way to break user data!
 The Emoji and Search modules will likely be of the most interest to most developers. If you're
 looking to play around with emoji these are good places to start.
