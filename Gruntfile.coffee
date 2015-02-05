@@ -1,4 +1,6 @@
 module.exports = (grunt) ->
+  path = require('path')
+
   grunt.getLicense = (licenses_json) ->
     licenses = grunt.file.readJSON licenses_json
     info = ''
@@ -89,15 +91,16 @@ module.exports = (grunt) ->
           'dist/js/jquery.storageapi.min.js',
           'dist/js/emojidex-client.js'
         ]
-        options:
-          keepRunner: true
-          outfile: 'build/_SpecRunner.html'
-          specs: [
-            'build/spec/*.js'
-          ]
-          vendor:[
-            'https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js'
-          ]
+
+      options:
+        keepRunner: true
+        outfile: 'build/_SpecRunner.html'
+        specs: [
+          'build/spec/*.js'
+        ]
+        vendor:[
+          'https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js'
+        ]
 
     # grunt dev --------------------------------
     connect:
