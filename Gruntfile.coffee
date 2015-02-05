@@ -102,7 +102,6 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-contrib-watch'
   grunt.loadNpmTasks 'grunt-contrib-jasmine'
   grunt.loadNpmTasks 'grunt-license-saver'
-  # grunt.loadNpmTasks 'grunt-contrib-copy'
 
   grunt.registerTask 'default', ['save_license', 'coffee', 'concat:compiled_js', 'uglify', 'jasmine']
   grunt.registerTask 'dev', ['connect', 'watch']

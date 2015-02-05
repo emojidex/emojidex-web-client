@@ -21,6 +21,7 @@ class @EmojidexClient
       size_code: 'px32'
       detailed: false
       limit: 32
+
     @options = $.extend {}, @defaults, @options
 
     # set closed network flag (for OSS distrobutions, intranet/private neworks, or closed license)
