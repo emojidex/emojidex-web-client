@@ -1,4 +1,6 @@
 module.exports = (grunt) ->
+  path = require('path')
+
   grunt.getLicense = (licenses_json) ->
     licenses = grunt.file.readJSON licenses_json
     info = ''
@@ -6,6 +8,22 @@ module.exports = (grunt) ->
       info += license.replace /[ \n\*]+(.+) +\n/gi , "\n * $1"
       info += '* --------------------------------'
     return info
+
+  getDefineUsePattern = (filepath, define_list) ->
+    for define_name in Object.keys define_list
+      path_patterns = define_list[define_name].pattern
+      path_patterns = [path_patterns] unless Array.isArray path_patterns
+      for path_pattern in path_patterns
+        if grunt.file.minimatch filepath, path_pattern
+          return define_list[define_name]
+          break
+
+  setGruntConfig_getTask = (define) ->
+    if define.config?
+      define.config = [define.config] unless Array.isArray define.config
+      for config in define.config
+        grunt.config config.prop, config.value
+    return define.task
 
   grunt.initConfig
     pkg: grunt.file.readJSON('package.json')
@@ -26,6 +44,14 @@ module.exports = (grunt) ->
         ' * Includes:\n' +
         ' * --------------------------------'
 
+    # grunt --------------------------------
+    save_license:
+      dist:
+        src: [
+          'bower_components/jquery.storageapi/jquery.storageapi.js'
+        ]
+        dest: 'build/licenses.json'
+
     coffee:
       client:
         options:
@@ -33,10 +59,11 @@ module.exports = (grunt) ->
         files:
           'src/compiled_js/emojidex-client.js': ['src/coffee/**/*.coffee']
       spec:
+        options:
+          bare: true
         expand: true
-        flatten: true
         cwd: 'spec/'
-        src: ['*.coffee']
+        src: ['**/*.coffee']
         dest: 'build/spec/'
         ext: '.js'
 
@@ -59,19 +86,6 @@ module.exports = (grunt) ->
         src: ['dist/js/emojidex-client.js']
         dest: 'dist/js/emojidex-client.min.js'
 
-    connect:
-      site: {}
-
-    watch:
-      coffee:
-        files: ['src/coffee/**/*.coffee']
-        tasks: ['coffee:client', 'concat:compiled_js', 'uglify', 'jasmine']
-      spec:
-        files: ['spec/**/*.coffee']
-        tasks: ['coffee:spec', 'jasmine']
-      options:
-        livereload: true
-
     jasmine:
       all:
         src: [
@@ -79,30 +93,105 @@ module.exports = (grunt) ->
           'dist/js/emojidex-client.js'
         ]
         options:
-          keepRunner: true
-          outfile: 'build/_SpecRunner.html'
           specs: [
             'build/spec/*.js'
           ]
-          vendor:[
-            'https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js'
-          ]
 
-    save_license:
-      dist:
-        src: [
-          'bower_components/jquery.storageapi/jquery.storageapi.js'
+      options:
+        keepRunner: true
+        outfile: 'build/_SpecRunner.html'
+        vendor:[
+          'https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js'
         ]
-        dest: 'build/licenses.json'
+        helpers:[
+          'build/spec/helpers/**/*.js'
+        ]
+
+    # grunt dev --------------------------------
+    connect:
+      site: {}
+
+    esteWatch:
+      options:
+        dirs: [
+          'src/coffee/**/'
+          'spec/**/'
+        ]
+        livereload:
+          enabled: true
+          port: 35729,
+          extensions: ['coffee']
+
+      'coffee': (filepath) ->
+        defaults =
+          coffee:
+            prop: ['coffee', 'esteWatch']
+
+          jasmine:
+            prop: ['jasmine', 'esteWatch']
+            value:
+              src: ['dist/js/*.min.js']
+
+
+        spec_file = ""
+        if path.basename(filepath, '.coffee')[0] is "_"
+          divided_path = path.dirname(filepath).split('/')
+          spec_file = divided_path[divided_path.length - 1]
+        else
+          spec_file = path.basename(filepath, '.coffee')
+
+        define_list =
+          client:
+            pattern: "src/coffee/**/*"
+            config:
+              prop: defaults.jasmine.prop
+              value:
+                src: defaults.jasmine.value.src
+                options:
+                  specs: [
+                    "build/spec/#{spec_file}.js"
+                  ]
+            task: [
+              "coffee:client"
+              'concat'
+              'uglify'
+              defaults.jasmine.prop.join(':')
+            ]
+
+          spec:
+            pattern: 'spec/**/*'
+            config: [
+              {
+                prop: defaults.coffee.prop
+                value:
+                  options:
+                    bare: true
+                  expand: true
+                  src: filepath
+                  dest: 'build/'
+                  ext: '.js'
+              }
+              {
+                prop: defaults.jasmine.prop
+                value:
+                  src: defaults.jasmine.value.src
+                  options:
+                    specs: [
+                      "build/#{path.dirname filepath}/#{path.basename filepath, '.coffee'}.js"
+                    ]
+              }
+            ]
+            task: [defaults.coffee.prop.join(':'), defaults.jasmine.prop.join(':')]
+
+        setGruntConfig_getTask(getDefineUsePattern filepath, define_list)
 
   grunt.loadNpmTasks 'grunt-contrib-coffee'
   grunt.loadNpmTasks 'grunt-contrib-concat'
   grunt.loadNpmTasks 'grunt-contrib-uglify'
   grunt.loadNpmTasks 'grunt-contrib-connect'
-  grunt.loadNpmTasks 'grunt-contrib-watch'
+  grunt.loadNpmTasks 'grunt-este-watch'
   grunt.loadNpmTasks 'grunt-contrib-jasmine'
   grunt.loadNpmTasks 'grunt-license-saver'
-  # grunt.loadNpmTasks 'grunt-contrib-copy'
 
-  grunt.registerTask 'default', ['save_license', 'coffee', 'concat:compiled_js', 'uglify', 'jasmine']
-  grunt.registerTask 'dev', ['connect', 'watch']
+  grunt.registerTask 'default', ['save_license', 'coffee', 'concat', 'uglify', 'jasmine']
+  grunt.registerTask 'dev', ['connect', 'esteWatch']

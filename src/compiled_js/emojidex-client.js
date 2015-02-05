@@ -4,9 +4,8 @@
 
   this.EmojidexClient = (function() {
     function EmojidexClient(options) {
-      var defaults;
       this.options = options;
-      defaults = {
+      this.defaults = {
         locale: 'en',
         api_url: 'https://www.emojidex.com/api/v1/',
         cdn_url: 'http://cdn.emojidex.com/emoji',
@@ -16,7 +15,7 @@
         detailed: false,
         limit: 32
       };
-      this.options = $.extend({}, defaults, this.options);
+      this.options = $.extend({}, this.defaults, this.options);
       this.closed_net = this.options.closed_net;
       this.api_url = this.options.api_url;
       this.cdn_url = this.options.cdn_url;
@@ -79,6 +78,11 @@
   EmojidexData = (function() {
     function EmojidexData(EC) {
       this.EC = EC;
+      this._def_auth_info = {
+        status: 'none',
+        user: '',
+        token: null
+      };
       this.storage = $.localStorage;
       if (!this.storage.isSet("emojidex")) {
         this.storage.set("emojidex", {});
@@ -96,63 +100,40 @@
         this.storage.set("emojidex.categories", this.EC.options.categories || []);
       }
       if (!this.storage.isSet("emojidex.auth_info")) {
-        this.storage.set("emojidex.auth_info", this.EC.options.auth_info || this._def_auth_info());
+        this.storage.set("emojidex.auth_info", this.EC.options.auth_info || this._def_auth_info);
       }
     }
 
     EmojidexData.prototype.emoji = function(emoji_set) {
-      if (emoji_set == null) {
-        emoji_set = null;
-      }
-      if (emoji_set !== null) {
+      if (emoji_set != null) {
         this.storage.set("emojidex.emoji", emoji_set);
       }
       return this.storage.get("emojidex.emoji");
     };
 
     EmojidexData.prototype.favorites = function(favorites_set) {
-      if (favorites_set == null) {
-        favorites_set = null;
-      }
-      if (favorites_set !== null) {
+      if (favorites_set != null) {
         this.storage.set("emojidex.favorites", favorites_set);
       }
       return this.storage.get("emojidex.favorites");
     };
 
     EmojidexData.prototype.history = function(history_set) {
-      if (history_set == null) {
-        history_set = null;
-      }
-      if (history_set !== null) {
+      if (history_set != null) {
         this.storage.set("emojidex.history", history_set);
       }
       return this.storage.get("emojidex.history");
     };
 
     EmojidexData.prototype.categories = function(categories_set) {
-      if (categories_set == null) {
-        categories_set = null;
-      }
-      if (categories_set !== null) {
+      if (categories_set != null) {
         this.storage.set("emojidex.categories", categories_set);
       }
       return this.storage.get("emojidex.categories");
     };
 
-    EmojidexData.prototype._def_auth_info = function() {
-      return {
-        status: 'none',
-        user: '',
-        token: null
-      };
-    };
-
     EmojidexData.prototype.auth_info = function(auth_info_set) {
-      if (auth_info_set == null) {
-        auth_info_set = null;
-      }
-      if (auth_info_set !== null) {
+      if (auth_info_set != null) {
         this.storage.set("emojidex.auth_info", auth_info_set);
       }
       return this.storage.get("emojidex.auth_info");
@@ -174,7 +155,7 @@
     }
 
     EmojidexEmoji.prototype.seed = function(locale) {
-      if (locale === null) {
+      if (locale == null) {
         locale = this.EC.locale;
       }
       switch (locale) {
@@ -642,7 +623,7 @@
   EmojidexUser = (function() {
     function EmojidexUser(EC) {
       this.EC = EC;
-      this.auth_info = this.EC.Data._def_auth_info();
+      this.auth_info = this.EC.Data._def_auth_info;
       this.History = new EmojidexUserHistory(this.EC);
       this.Favorites = new EmojidexUserFavorites(this.EC);
       this._auto_login();
@@ -674,7 +655,7 @@
     };
 
     EmojidexUser.prototype.logout = function() {
-      return this.EC.Data.auth_info(this.EC.Data._def_auth_info());
+      return this.EC.Data.auth_info(this.EC.Data._def_auth_info);
     };
 
     EmojidexUser.prototype.plain_auth = function(username, password, callback) {
