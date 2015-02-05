@@ -27,9 +27,24 @@ describe 'EmojidexSearch', ->
       expect(emoji_data).toBeTruthy()
       done()
 
-  it 'advanced', (done) ->
+  it 'advanced: term', (done) ->
     @EC.Search.advanced 'kiss', [], [], (emoji_data) ->
       expect(emoji_data).toContain(
         jasmine.objectContaining emoji_kiss
       )
       done()
+
+  it 'advanced: categories', (done) ->
+    @EC.Search.advanced 'kiss', [], ["objects"], (emoji_data) ->
+      expect(emoji_data).toContain(
+        jasmine.objectContaining emoji_kiss
+      )
+      done()
+
+  # it 'advanced: tags', (done) ->
+  #   @EC.Search.advanced '', ["Star Trek"], [], (emoji_data) ->
+  #     console.dir emoji_data
+  #     expect(emoji_data).toContain(
+  #       jasmine.objectContaining emoji_kiss
+  #     )
+  #     done()

@@ -240,7 +240,7 @@
       collect = [];
       for (_i = 0, _len = categories.length; _i < _len; _i++) {
         category = categories[_i];
-        $.extend(collect, (function() {
+        collect.concat((function() {
           var _j, _len1, _results;
           _results = [];
           for (_j = 0, _len1 = source.length; _j < _len1; _j++) {
@@ -502,22 +502,12 @@
     EmojidexSearch.prototype.advanced = function(term, tags, categories, callback, opts) {
       var params,
         _this = this;
-      if (tags == null) {
-        tags = [];
-      }
-      if (categories == null) {
-        categories = [];
-      }
-      if (callback == null) {
-        callback = null;
-      }
       this.next = function() {
         return this.advanced(term, tags, categories, callback, $.extend(opts, {
           page: opts.page + 1
         }));
       };
       if (!this.EC.closed_net) {
-        opts = this._combine_opts(opts);
         params = {
           code_cont: this.Util.escape_term(term)
         };
@@ -531,15 +521,22 @@
             "categories[]": this.Util.breakout(categories)
           });
         }
-        $.getJSON(this.EC.api_url + 'search/emoji?' + $.param($.extend(params, opts))).error(function(response) {
-          return _this.results = [];
-        }).success(function(response) {
-          return _this._succeed(response, callback);
+        opts = this._combine_opts(opts);
+        opts = $.extend(params, opts);
+        return $.ajax({
+          url: this.EC.api_url + 'search/emoji',
+          dataType: 'json',
+          data: opts,
+          success: function(response) {
+            return _this._succeed(response, callback);
+          },
+          error: function(response) {
+            return _this.results = [];
+          }
         });
       } else {
-        this.EC.Emoji.advanced(term, tags, categories, callback);
+        return this.EC.Emoji.advanced(term, tags, categories, callback);
       }
-      return this.EC.Emoji.advanced(term, tags, categories);
     };
 
     EmojidexSearch.prototype._combine_opts = function(opts) {

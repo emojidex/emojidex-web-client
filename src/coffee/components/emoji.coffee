@@ -52,14 +52,14 @@ class EmojidexEmoji
     source = opts.selection || @_emoji
     collect = []
     for category in categories
-      $.extend collect, (moji for moji in source when moji.category == category)
+      collect.concat (moji for moji in source when moji.category == category)
     collect
 
   # searches by term (regex OK), containing the tags given, in any of the given categories
   advanced: (term, tags, categories) ->
     @categories(
       categories
-      selection: @tags tags, selection: @search term
+      selection: @tags(tags, selection: @search term)
     )
 
   # Concatenates and flattens the given emoji array into the @emoji array
