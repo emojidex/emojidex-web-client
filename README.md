@@ -52,7 +52,7 @@ _ALWAYS_ create a separate instance of the client for each widget or component y
 the client in. If you have two separate pieces of code operating on the same view or in the same
 module each piece of code should have a different client instance.
 
-The client is broken up into a set of nested modules:
+The client is broken up into a set of nested modules:<br>
 Client<br>
   ┣Emoji<br>
   ┣Categories<br>
