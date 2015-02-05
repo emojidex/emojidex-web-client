@@ -59,10 +59,11 @@ module.exports = (grunt) ->
         files:
           'src/compiled_js/emojidex-client.js': ['src/coffee/**/*.coffee']
       spec:
+        options:
+          bare: true
         expand: true
-        flatten: true
         cwd: 'spec/'
-        src: ['*.coffee']
+        src: ['**/*.coffee']
         dest: 'build/spec/'
         ext: '.js'
 
@@ -91,15 +92,19 @@ module.exports = (grunt) ->
           'dist/js/jquery.storageapi.min.js',
           'dist/js/emojidex-client.js'
         ]
+        options:
+          specs: [
+            'build/spec/*.js'
+          ]
 
       options:
         keepRunner: true
         outfile: 'build/_SpecRunner.html'
-        specs: [
-          'build/spec/*.js'
-        ]
         vendor:[
           'https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js'
+        ]
+        helpers:[
+          'build/spec/helpers/**/*.js'
         ]
 
     # grunt dev --------------------------------
@@ -121,8 +126,7 @@ module.exports = (grunt) ->
         defaults =
           coffee:
             prop: ['coffee', 'esteWatch']
-            options:
-              join: true
+
           jasmine:
             prop: ['jasmine', 'esteWatch']
             value:
@@ -160,6 +164,8 @@ module.exports = (grunt) ->
               {
                 prop: defaults.coffee.prop
                 value:
+                  options:
+                    bare: true
                   expand: true
                   src: filepath
                   dest: 'build/'
