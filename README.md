@@ -54,15 +54,17 @@ module each piece of code should have a different client instance.
 
 The client is broken up into a set of nested modules:
 Client
-  ┣Emoji
-  ┣Categories
-  ┣Indexes
-  ┣User
-  ┃  ┣History
-  ┃  ┗Favorites
-  ┣Search
-  ┣Data
-  ┗Util
+Client
+  ┣Emoji<br>
+  ┣Categories<br>
+  ┣Indexes<br>
+  ┣Shared<br>
+  ┣User<br>
+  ┃  ┣History<br>
+  ┃  ┗Favorites<br>
+  ┣Search<br>
+  ┣Data<br>
+  ┗Util<br>
 
 The Shared and modules should usually be ignored unless you're doing something particularly
 hackish - but be warned that messing with these could be a quick way to break user data!
