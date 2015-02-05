@@ -22,19 +22,19 @@ class EmojidexEmoji
 
   # internal collection search
   search: (term, callback) ->
-    results = moji for moji in @_emoji when moji.code.match term
+    results = (moji for moji in @_emoji when moji.code.match term)
     callback results if callback?
     results
 
   # internal collection search (starting with)
   starting: (term, callback) ->
-    results = moji for moji in @_emoji when moji.code.match '^' + term
+    results = (moji for moji in @_emoji when moji.code.match '^' + term)
     callback results if callback?
     results
 
   # internal collection search (starting with)
   ending: (term, callback) ->
-    results = moji for moji in @_emoji when moji.code.match term + '$'
+    results = (moji for moji in @_emoji when moji.code.match term + '$')
     callback results if callback?
     results
 
@@ -43,7 +43,7 @@ class EmojidexEmoji
     tags = @util.breakout tags
     selection = opts.selection || @_emoji
     for tag in tags
-      collect = moji for moji in selection when $.inArray(tag, moji.tags) >= 0
+      collect = (moji for moji in selection when $.inArray(tag, moji.tags) >= 0)
     collect
 
   # gets emoji in any of the given categories
@@ -52,7 +52,7 @@ class EmojidexEmoji
     source = opts.selection || @_emoji
     collect = []
     for category in categories
-      collect.concat (moji for moji in source when moji.category == category)
+      collect.concat (moji for moji in source when moji.category is category)
     collect
 
   # searches by term (regex OK), containing the tags given, in any of the given categories
