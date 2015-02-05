@@ -9,8 +9,8 @@ accordingly.
 
 Building
 --------
-You will need node with a usable npm, grunt, bower. In general grunt and bower should be 
-installed globally or should be present and usable in your path. We'll assume you have a 
+You will need node with a usable npm, grunt, bower. In general grunt and bower should be
+installed globally or should be present and usable in your path. We'll assume you have a
 working node/npm that you either installed using your package manager or built yourself.
 
 ### Get the source
@@ -36,7 +36,7 @@ For development mode with dynamic compilation and dev server:
 ```shell
 grunt dev
 ```
-The jasmin spec runner page is left after each run at 
+The jasmin spec runner page is left after each run at
 [http://localhost:8000/build/_SpecRunner.html](http://localhost:8000/build/_SpecRunner.html).
 You can open that file and play with the client in the javascript/debug terminal.
 
@@ -52,22 +52,21 @@ _ALWAYS_ create a separate instance of the client for each widget or component y
 the client in. If you have two separate pieces of code operating on the same view or in the same
 module each piece of code should have a different client instance.
 
-The client is broken up into a set of nested modules:  
-Client  
-  ┣Emoji  
-  ┣Categories  
-  ┣Indexes  
-  ┣Shared  
-  ┣User  
-  ┃  ┣History  
-  ┃  ┗Favorites  
-  ┣Search  
-  ┣Data  
-  ┗Util  
-  
-The Shared and Data modules should usually be ignored unless you're doing something particularly 
-hackish - but be warned that messing with these could be a quick way to break user data! 
-The Emoji and Search modules will likely be of the most interest to most developers. If you're 
+The client is broken up into a set of nested modules:
+Client
+  ┣Emoji
+  ┣Categories
+  ┣Indexes
+  ┣User
+  ┃  ┣History
+  ┃  ┗Favorites
+  ┣Search
+  ┣Data
+  ┗Util
+
+The Shared and modules should usually be ignored unless you're doing something particularly
+hackish - but be warned that messing with these could be a quick way to break user data!
+The Emoji and Search modules will likely be of the most interest to most developers. If you're
 looking to play around with emoji these are good places to start.
 
 Argument Layout
