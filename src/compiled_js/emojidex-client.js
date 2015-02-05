@@ -172,119 +172,69 @@
       return this._emoji;
     };
 
-    EmojidexEmoji.prototype.search = function(term, callback, opts) {
-      var moji, results;
-      if (callback == null) {
-        callback = null;
-      }
-      if (opts == null) {
-        opts = {};
-      }
-      results = (function() {
-        var _i, _len, _ref, _results;
-        _ref = this._emoji;
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          moji = _ref[_i];
-          if (moji.code.match(term)) {
-            _results.push(moji);
-          }
+    EmojidexEmoji.prototype.search = function(term, callback) {
+      var moji, results, _i, _len, _ref;
+      _ref = this._emoji;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        moji = _ref[_i];
+        if (moji.code.match(term)) {
+          results = moji;
         }
-        return _results;
-      }).call(this);
-      if (callback) {
+      }
+      if (callback != null) {
         callback(results);
       }
       return results;
     };
 
-    EmojidexEmoji.prototype.starting = function(term, callback, opts) {
-      var moji, results;
-      if (callback == null) {
-        callback = null;
-      }
-      if (opts == null) {
-        opts = {};
-      }
-      results = (function() {
-        var _i, _len, _ref, _results;
-        _ref = this._emoji;
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          moji = _ref[_i];
-          if (moji.code.match('^' + term)) {
-            _results.push(moji);
-          }
+    EmojidexEmoji.prototype.starting = function(term, callback) {
+      var moji, results, _i, _len, _ref;
+      _ref = this._emoji;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        moji = _ref[_i];
+        if (moji.code.match('^' + term)) {
+          results = moji;
         }
-        return _results;
-      }).call(this);
-      if (callback) {
+      }
+      if (callback != null) {
         callback(results);
       }
       return results;
     };
 
-    EmojidexEmoji.prototype.ending = function(term, callback, opts) {
-      var moji, results;
-      if (callback == null) {
-        callback = null;
-      }
-      if (opts == null) {
-        opts = {};
-      }
-      results = (function() {
-        var _i, _len, _ref, _results;
-        _ref = this._emoji;
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          moji = _ref[_i];
-          if (moji.code.match(term + '$')) {
-            _results.push(moji);
-          }
+    EmojidexEmoji.prototype.ending = function(term, callback) {
+      var moji, results, _i, _len, _ref;
+      _ref = this._emoji;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        moji = _ref[_i];
+        if (moji.code.match(term + '$')) {
+          results = moji;
         }
-        return _results;
-      }).call(this);
-      if (callback) {
+      }
+      if (callback != null) {
         callback(results);
       }
       return results;
     };
 
-    EmojidexEmoji.prototype.tags = function(tags, callback, opts) {
-      var collect, moji, selection, tag, _i, _len;
-      if (callback == null) {
-        callback = null;
-      }
-      if (opts == null) {
-        opts = {};
-      }
+    EmojidexEmoji.prototype.tags = function(tags, opts) {
+      var collect, moji, selection, tag, _i, _j, _len, _len1;
       tags = this.util.breakout(tags);
       selection = opts.selection || this._emoji;
       for (_i = 0, _len = tags.length; _i < _len; _i++) {
         tag = tags[_i];
-        collect = (function() {
-          var _j, _len1, _results;
-          _results = [];
-          for (_j = 0, _len1 = selection.length; _j < _len1; _j++) {
-            moji = selection[_j];
-            if ($.inArray(tag, moji.tags) >= 0) {
-              _results.push(moji);
-            }
+        for (_j = 0, _len1 = selection.length; _j < _len1; _j++) {
+          moji = selection[_j];
+          if ($.inArray(tag, moji.tags) >= 0) {
+            collect = moji;
           }
-          return _results;
-        })();
+        }
       }
       return collect;
     };
 
-    EmojidexEmoji.prototype.categories = function(categories, callback, opts) {
+    EmojidexEmoji.prototype.categories = function(categories, opts) {
       var category, collect, moji, source, _i, _len;
-      if (callback == null) {
-        callback = null;
-      }
-      if (opts == null) {
-        opts = {};
-      }
       categories = this.util.breakout(categories);
       source = opts.selection || this._emoji;
       collect = [];
@@ -305,21 +255,9 @@
       return collect;
     };
 
-    EmojidexEmoji.prototype.advanced = function(term, tags, categories, callback, opts) {
-      if (tags == null) {
-        tags = [];
-      }
-      if (categories == null) {
-        categories = [];
-      }
-      if (callback == null) {
-        callback = null;
-      }
-      if (opts == null) {
-        opts = {};
-      }
-      return this.categories(categories, null, {
-        selection: this.tags(tags, null, {
+    EmojidexEmoji.prototype.advanced = function(term, tags, categories) {
+      return this.categories(categories, {
+        selection: this.tags(tags, {
           selection: this.search(term)
         })
       });
@@ -542,17 +480,23 @@
       };
       if (!this.EC.closed_net) {
         opts = this._combine_opts(opts);
-        $.getJSON(this.EC.api_url + 'search/emoji?' + $.param($.extend({}, {
+        opts = $.extend({}, {
           "tags[]": this.Util.breakout(tags)
-        }, opts))).error(function(response) {
-          return _this.results = [];
-        }).success(function(response) {
-          return _this._succeed(response, callback);
+        }, opts);
+        return $.ajax({
+          url: this.EC.api_url + 'search/emoji',
+          dataType: 'json',
+          data: opts,
+          success: function(response) {
+            return _this._succeed(response, callback);
+          },
+          error: function(response) {
+            return _this.results = [];
+          }
         });
       } else {
-        this.EC.Emoji.tags(tags, callback);
+        return this.EC.Emoji.tags(tags);
       }
-      return this.EC.Emoji.tags(tags);
     };
 
     EmojidexSearch.prototype.advanced = function(term, tags, categories, callback, opts) {

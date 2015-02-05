@@ -67,18 +67,21 @@ class EmojidexSearch
   # Searches by tags
   tags: (tags, callback = null, opts) ->
     @next = () ->
-      @tags(term, callback, $.extend(opts, {page: opts.page + 1}))
-    if !@EC.closed_net
+      @tags term, callback, $.extend(opts, {page: opts.page + 1})
+
+    unless @EC.closed_net
       opts = @_combine_opts(opts)
-      $.getJSON((@EC.api_url +  'search/emoji?' + $.param(($.extend {}, \
-          {"tags[]": @Util.breakout(tags)}, opts))))
-        .error (response) =>
-          @results = []
-        .success (response) =>
+      opts = $.extend {}, "tags[]": @Util.breakout(tags), opts
+      $.ajax
+        url: @EC.api_url + 'search/emoji'
+        dataType: 'json'
+        data: opts
+        success: (response) =>
           @_succeed(response, callback)
+        error: (response) =>
+          @results = []
     else
-      @EC.Emoji.tags(tags, callback)
-    @EC.Emoji.tags(tags)
+      @EC.Emoji.tags tags
 
   # Searches using an array of keys and an array of tags
   advanced: (term, tags = [], categories = [], callback = null, opts) ->

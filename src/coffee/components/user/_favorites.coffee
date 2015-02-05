@@ -13,7 +13,6 @@ class EmojidexUserFavorites
         dataType: 'json'
         data:
           auth_token: @token
-
         success: (response) =>
           @_favorites = @EC.Data.favorites(response)
           callback @_favorites if callback?

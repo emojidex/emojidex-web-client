@@ -27,7 +27,7 @@ describe 'EmojidexSearch', ->
       expect(emoji_data).toBeTruthy()
       done()
 
-  it 'padvanced', (done) ->
+  it 'advanced', (done) ->
     @EC.Search.advanced 'kiss', [], [], (emoji_data) ->
       expect(emoji_data).toContain(
         jasmine.objectContaining emoji_kiss
