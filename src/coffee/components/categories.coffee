@@ -10,11 +10,10 @@ class EmojidexCategories
   sync: (callback, locale) ->
     locale ?= @EC.locale
     $.ajax
-      url: @EC.api_url +  'categories'
+      url: @EC.api_url + 'categories'
       dataType: 'json'
       data:
         locale: locale
-
       success: (response) =>
         @_categories
         callback? response.categories

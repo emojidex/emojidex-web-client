@@ -304,55 +304,64 @@
 
     EmojidexIndexes.prototype.index = function(callback, opts) {
       var _this = this;
-      if (callback == null) {
-        callback = null;
-      }
       this.next = function() {
-        return this.get_index(callback, $.extend(opts, {
+        return this.index(callback, $.extend(opts, {
           page: opts.page + 1
         }));
       };
       opts = this._combine_opts(opts);
-      return $.getJSON(this.EC.api_url + '/emoji?' + $.param(opts)).error(function(response) {
-        return _this.results = [];
-      }).success(function(response) {
-        return _this._succeed(response, callback);
+      return $.ajax({
+        url: this.EC.api_url + 'emoji',
+        dataType: 'json',
+        data: opts,
+        success: function(response) {
+          return _this._succeed(response, callback);
+        },
+        error: function(response) {
+          return _this.results = [];
+        }
       });
     };
 
     EmojidexIndexes.prototype.newest = function(callback, opts) {
       var _this = this;
-      if (callback == null) {
-        callback = null;
-      }
       this.next = function() {
-        return this.get_newest(callback, $.extend(opts, {
+        return this.newest(callback, $.extend(opts, {
           page: opts.page + 1
         }));
       };
       opts = this._combine_opts(opts);
-      return $.getJSON(this.EC.api_url + '/newest?' + $.param(opts)).error(function(response) {
-        return _this.results = [];
-      }).success(function(response) {
-        return _this._succeed(response, callback);
+      return $.ajax({
+        url: this.EC.api_url + 'newest',
+        dataType: 'json',
+        data: opts,
+        success: function(response) {
+          return _this._succeed(response, callback);
+        },
+        error: function(response) {
+          return _this.results = [];
+        }
       });
     };
 
     EmojidexIndexes.prototype.popular = function(callback, opts) {
       var _this = this;
-      if (callback == null) {
-        callback = null;
-      }
       this.next = function() {
-        return this.get_popular(callback, $.extend(opts, {
+        return this.popular(callback, $.extend(opts, {
           page: opts.page + 1
         }));
       };
       opts = this._combine_opts(opts);
-      return $.getJSON(this.EC.api_url + '/popular?' + $.param(opts)).error(function(response) {
-        return _this.results = [];
-      }).success(function(response) {
-        return _this._succeed(response, callback);
+      return $.ajax({
+        url: this.EC.api_url + 'popular',
+        dataType: 'json',
+        data: opts,
+        success: function(response) {
+          return _this._succeed(response, callback);
+        },
+        error: function(response) {
+          return _this.results = [];
+        }
       });
     };
 
