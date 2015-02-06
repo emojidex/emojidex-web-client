@@ -48,7 +48,7 @@ class EmojidexEmoji
 
   # gets emoji in any of the given categories
   categories: (categories, opts) ->
-    categories = @util.breakout(categories)
+    categories = @util.breakout categories
     source = opts.selection || @_emoji
     collect = []
     for category in categories

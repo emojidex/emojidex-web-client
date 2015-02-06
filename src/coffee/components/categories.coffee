@@ -18,5 +18,5 @@ class EmojidexCategories
         @_categories
         callback? response.categories
 
-  all: () ->
+  all: ->
     @_categories

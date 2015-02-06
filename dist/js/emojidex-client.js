@@ -833,10 +833,44 @@
       this.cur_page = 1;
       this.cur_limit = this.EC.limit;
       this.count = 0;
-      this.next = function() {
-        return null;
-      };
     }
+
+    EmojidexSearch.prototype._getEmojiUseAjax_setNextAndPrev = function(query, callback, opts, func) {
+      var default_params,
+        _this = this;
+      if (func != null) {
+        this.next = function() {
+          opts.page++;
+          return func(callback, opts);
+        };
+        this.prev = function() {
+          if (opts.page > 1) {
+            opts.page--;
+          }
+          return func(callback, opts);
+        };
+      }
+      default_params = {
+        page: 1,
+        limit: this.EC.limit,
+        detailed: this.EC.detailed
+      };
+      return $.ajax({
+        url: this.EC.api_url + query,
+        dataType: 'json',
+        data: $.extend({}, default_params, opts),
+        success: function(response) {
+          _this.results = response.emoji;
+          _this.cur_page = response.meta.page;
+          _this.count = response.meta.count;
+          _this.EC.Emoji.combine(response.emoji);
+          return typeof callback === "function" ? callback(response.emoji) : void 0;
+        },
+        error: function(response) {
+          return _this.results = [];
+        }
+      });
+    };
 
     EmojidexSearch.prototype.search = function(term, callback, opts) {
       var _this = this;
@@ -850,7 +884,7 @@
         opts = $.extend({}, {
           code_cont: this.EC.Util.escape_term(term)
         }, opts);
-        $.ajax({
+        return $.ajax({
           url: this.EC.api_url + 'search/emoji',
           dataType: 'json',
           data: opts,
@@ -862,9 +896,8 @@
           }
         });
       } else {
-        this.EC.Emoji.search(term, callback);
+        return this.EC.Emoji.search(term, callback);
       }
-      return this.EC.Emoji.search(term);
     };
 
     EmojidexSearch.prototype.starting = function(term, callback, opts) {
@@ -879,17 +912,23 @@
       };
       if (!this.EC.closed_net) {
         opts = this._combine_opts(opts);
-        $.getJSON(this.EC.api_url + 'search/emoji?' + $.param($.extend({}, {
+        opts = $.extend({}, {
           code_sw: this.Util.escape_term(term)
-        }, opts))).error(function(response) {
-          return _this.results = [];
-        }).success(function(response) {
-          return _this._succeed(response, callback);
+        }, opts);
+        return $.ajax({
+          url: this.EC.api_url + 'search/emoji',
+          dataType: 'json',
+          data: opts,
+          success: function(response) {
+            return _this._succeed(response, callback);
+          },
+          error: function(response) {
+            return _this.results = [];
+          }
         });
       } else {
-        this.EC.Emoji.starting(term, callback);
+        return this.EC.Emoji.starting(term, callback);
       }
-      return this.EC.Emoji.starting(term);
     };
 
     EmojidexSearch.prototype.ending = function(term, callback, opts) {
@@ -904,17 +943,23 @@
       };
       if (!this.EC.closed_net) {
         opts = this._combine_opts(opts);
-        $.getJSON(this.EC.api_url + 'search/emoji?' + $.param($.extend({}, {
+        opts = $.extend({}, {
           code_ew: this.Util.escape_term(term)
-        }, opts))).error(function(response) {
-          return _this.results = [];
-        }).success(function(response) {
-          return _this._succeed(response, callback);
+        }, opts);
+        return $.ajax({
+          url: this.EC.api_url + 'search/emoji',
+          dataType: 'json',
+          data: opts,
+          success: function(response) {
+            return _this._succeed(response, callback);
+          },
+          error: function(response) {
+            return _this.results = [];
+          }
         });
       } else {
-        this.EC.Emoji.ending(term, callback);
+        return this.EC.Emoji.ending(term, callback);
       }
-      return this.EC.Emoji.ending(term);
     };
 
     EmojidexSearch.prototype.tags = function(tags, callback, opts) {
