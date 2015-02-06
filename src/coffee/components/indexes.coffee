@@ -2,7 +2,6 @@ class EmojidexIndexes
   constructor: (@EC) ->
     @results = []
     @cur_page = 1
-    @cur_limit = @EC.limit
     @count = 0
 
   _getEmojiUseAjax_setNextAndPrev: (query, callback, opts, func) ->

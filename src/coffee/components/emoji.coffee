@@ -56,10 +56,10 @@ class EmojidexEmoji
     collect
 
   # searches by term (regex OK), containing the tags given, in any of the given categories
-  advanced: (term, tags, categories) ->
+  advanced: (searchs) ->
     @categories(
-      categories
-      selection: @tags(tags, selection: @search term)
+      searchs.categories
+      selection: @tags(searchs.tags, selection: @search searchs.term)
     )
 
   # Concatenates and flattens the given emoji array into the @emoji array
