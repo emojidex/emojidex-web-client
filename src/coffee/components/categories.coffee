@@ -8,7 +8,7 @@ class EmojidexCategories
 
   # Gets the full list of caetgories available
   sync: (callback, locale) ->
-    locale = @EC.locale unless locale?
+    locale ?= @EC.locale
     $.ajax
       url: @EC.api_url +  'categories'
       dataType: 'json'
@@ -17,7 +17,7 @@ class EmojidexCategories
 
       success: (response) =>
         @_categories
-        callback(response.categories) if callback?
+        callback? response.categories
 
   all: () ->
     @_categories

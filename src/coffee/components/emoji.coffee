@@ -8,7 +8,7 @@ class EmojidexEmoji
 
   # Gets the full list of caetgories available
   seed: (locale) ->
-    locale = @EC.locale unless locale?
+    locale ?= @EC.locale
     switch locale
       when 'en'
         @EC.Indexes.user 'emoji', @combine
@@ -23,19 +23,19 @@ class EmojidexEmoji
   # internal collection search
   search: (term, callback) ->
     results = (moji for moji in @_emoji when moji.code.match term)
-    callback results if callback?
+    callback? results
     results
 
   # internal collection search (starting with)
   starting: (term, callback) ->
     results = (moji for moji in @_emoji when moji.code.match '^' + term)
-    callback results if callback?
+    callback? results
     results
 
   # internal collection search (starting with)
   ending: (term, callback) ->
     results = (moji for moji in @_emoji when moji.code.match term + '$')
-    callback results if callback?
+    callback? results
     results
 
   # search for emoji with the given tags

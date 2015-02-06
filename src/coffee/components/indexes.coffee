@@ -58,4 +58,4 @@ class EmojidexIndexes
     @cur_page = response.meta.page
     @count = response.meta.count
     @EC.Emoji.combine(response.emoji)
-    callback(response.emoji) if callback?
+    callback? response.emoji

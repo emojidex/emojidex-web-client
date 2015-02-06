@@ -526,9 +526,7 @@
         },
         success: function(response) {
           _this._categories;
-          if (callback != null) {
-            return callback(response.categories);
-          }
+          return typeof callback === "function" ? callback(response.categories) : void 0;
         }
       });
     };
@@ -652,7 +650,7 @@
         }
         return _results;
       }).call(this);
-      if (callback != null) {
+      if (typeof callback === "function") {
         callback(results);
       }
       return results;
@@ -672,7 +670,7 @@
         }
         return _results;
       }).call(this);
-      if (callback != null) {
+      if (typeof callback === "function") {
         callback(results);
       }
       return results;
@@ -692,7 +690,7 @@
         }
         return _results;
       }).call(this);
-      if (callback != null) {
+      if (typeof callback === "function") {
         callback(results);
       }
       return results;
@@ -853,9 +851,7 @@
       this.cur_page = response.meta.page;
       this.count = response.meta.count;
       this.EC.Emoji.combine(response.emoji);
-      if (callback != null) {
-        return callback(response.emoji);
-      }
+      return typeof callback === "function" ? callback(response.emoji) : void 0;
     };
 
     return EmojidexIndexes;
