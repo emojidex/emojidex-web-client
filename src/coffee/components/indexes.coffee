@@ -5,71 +5,43 @@ class EmojidexIndexes
     @cur_limit = @EC.limit
     @count = 0
 
-  index: (callback, opts) ->
-    @next = ->
-      @index callback, $.extend(opts, page: opts.page + 1)
+  _getEmojiUseAjax_setNextAndPrev: (query, callback, opts, func) ->
+    if func?
+      @next = ->
+        opts.page++
+        func callback, opts
+      @prev = ->
+        opts.page-- if opts.page > 1
+        func callback, opts
 
-    opts = @_combine_opts(opts)
-    $.ajax
-      url: @EC.api_url + 'emoji'
-      dataType: 'json'
-      data: opts
-      success: (response) =>
-        @_succeed response, callback
-      error: (response) =>
-        @results = []
-
-  newest: (callback, opts) ->
-    @next = ->
-      @newest callback, $.extend(opts, page: opts.page + 1)
-
-    opts = @_combine_opts(opts)
-    $.ajax
-      url: @EC.api_url + 'newest'
-      dataType: 'json'
-      data: opts
-      success: (response) =>
-        @_succeed response, callback
-      error: (response) =>
-        @results = []
-
-  popular: (callback, opts) ->
-    @next = ->
-      @popular callback, $.extend(opts, page: opts.page + 1)
-
-    opts = @_combine_opts(opts)
-    $.ajax
-      url: @EC.api_url + 'popular'
-      dataType: 'json'
-      data: opts
-      success: (response) =>
-        @_succeed response, callback
-      error: (response) =>
-        @results = []
-
-  user: (username, callback, opts) ->
-    opts = @_combine_opts(opts)
-    $.ajax
-      url: @EC.api_url +  "users/#{username}/emoji"
-      dataType: 'json'
-      data: opts
-      success: (response) =>
-        @_succeed response, callback
-      error: (response) =>
-        @results = []
-
-  # Combines opts against common defaults
-  _combine_opts: (opts) ->
-    $.extend
+    default_params =
       page: 1
       limit: @EC.limit
       detailed: @EC.detailed
-      opts
 
-  # fills in @results, @cur_page, and @count and calls callback
-  _succeed: (response, callback) ->
-    @results = response.emoji
-    @cur_page = response.meta.page
-    @count = response.meta.count
-    @EC.Emoji.combine response.emoji
-    callback? response.emoji
+    $.ajax
+      url: @EC.api_url + query
+      dataType: 'json'
+      data: $.extend {}, default_params, opts
+
+      success: (response) =>
+        @results = response.emoji
+        @cur_page = response.meta.page
+        @count = response.meta.count
+        @EC.Emoji.combine response.emoji
+        callback? response.emoji
+
+      error: (response) =>
+        @results = []
+
+  index: (callback, opts) ->
+    @_getEmojiUseAjax_setNextAndPrev 'emoji', callback, opts, @index
+
+  newest: (callback, opts) ->
+    @_getEmojiUseAjax_setNextAndPrev 'newest', callback, opts, @newest
+
+  popular: (callback, opts) ->
+    @_getEmojiUseAjax_setNextAndPrev 'popular', callback, opts, @popular
+
+  user: (username, callback, opts) ->
+    @_getEmojiUseAjax_setNextAndPrev "users/#{username}/emoji", callback, opts
