@@ -5,7 +5,7 @@ class EmojidexSearch
     @cur_page = 1
     @count = 0
 
-  _getEmojiData: (search_data, callback, opts, func) ->
+  _searchAPI: (search_data, callback, opts, func) ->
     param =
       page: 1
       limit: @EC.limit
@@ -38,22 +38,22 @@ class EmojidexSearch
   # Executes a general search (code_cont)
   search: (term, callback, opts) ->
     opts = $.extend code_cont: @EC.Util.escape_term(term), opts
-    @_getEmojiData term, callback, opts, ajax: @search, storage: @EC.Emoji.search
+    @_searchAPI term, callback, opts, ajax: @search, storage: @EC.Emoji.search
 
   # Executes a search starting with the given term
   starting: (term, callback, opts) ->
     opts = $.extend code_sw: @Util.escape_term(term), opts
-    @_getEmojiData term, callback, opts, ajax: @starting, storage: @EC.Emoji.starting
+    @_searchAPI term, callback, opts, ajax: @starting, storage: @EC.Emoji.starting
 
   # Executes a search ending with the given term
   ending: (term, callback, opts) ->
     opts = $.extend code_ew: @Util.escape_term(term), opts
-    @_getEmojiData term, callback, opts, ajax: @ending, storage: @EC.Emoji.ending
+    @_searchAPI term, callback, opts, ajax: @ending, storage: @EC.Emoji.ending
 
   # Searches by tags
   tags: (tags, callback, opts) ->
     opts = $.extend "tags[]": @Util.breakout(tags), opts
-    @_getEmojiData tags, callback, opts, ajax: @tags, storage: @EC.Emoji.tags
+    @_searchAPI tags, callback, opts, ajax: @tags, storage: @EC.Emoji.tags
 
   # Searches using an array of keys and an array of tags
   advanced: (searchs, callback, opts) ->
@@ -62,7 +62,7 @@ class EmojidexSearch
       "tags[]": @Util.breakout searchs.tags
       "categories[]": @Util.breakout searchs.categories
     $.extend param, opts
-    @_getEmojiData searchs, callback, param, ajax: @advanced, storage: @EC.Emoji.advanced
+    @_searchAPI searchs, callback, param, ajax: @advanced, storage: @EC.Emoji.advanced
 
   next: ->
     @searched.param.page++ if @count is @searched.param.limit

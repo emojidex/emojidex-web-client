@@ -42,8 +42,9 @@ class EmojidexEmoji
   tags: (tags, opts) ->
     tags = @util.breakout tags
     selection = opts.selection || @_emoji
+    collect = []
     for tag in tags
-      collect = (moji for moji in selection when $.inArray(tag, moji.tags) >= 0)
+      collect.concat (moji for moji in selection when $.inArray(tag, moji.tags) >= 0)
     collect
 
   # gets emoji in any of the given categories

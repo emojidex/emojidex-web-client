@@ -3,7 +3,7 @@ class EmojidexUserHistory
     @token = token
     @_history = @EC.Data.history()
 
-  _historyApi: (options) ->
+  _historyAPI: (options) ->
     if @token?
       $.ajax
         url: @EC.api_url + 'users/history'
@@ -17,7 +17,7 @@ class EmojidexUserHistory
       data: auth_token: @token
       success: (response) =>
         @_history = @EC.Data.history(response)
-    @_historyApi options
+    @_historyAPI options
 
   set: (emoji_code) ->
     options =
@@ -31,7 +31,7 @@ class EmojidexUserHistory
             @_history[i] = response
             @EC.Data.history @_history
             return response
-    @_historyApi options
+    @_historyAPI options
 
   sync: ->
     @get() # history currently can't be saved locally, so only get will work

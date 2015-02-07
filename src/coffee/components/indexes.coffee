@@ -4,7 +4,7 @@ class EmojidexIndexes
     @cur_page = 1
     @count = 0
 
-  _getEmojiUseAjax: (query, callback, opts, func) ->
+  _indexesAPI: (query, callback, opts, func) ->
     param =
       page: 1
       limit: @EC.limit
@@ -32,16 +32,16 @@ class EmojidexIndexes
         @results = []
 
   index: (callback, opts) ->
-    @_getEmojiUseAjax 'emoji', callback, opts, @index
+    @_indexesAPI 'emoji', callback, opts, @index
 
   newest: (callback, opts) ->
-    @_getEmojiUseAjax 'newest', callback, opts, @newest
+    @_indexesAPI 'newest', callback, opts, @newest
 
   popular: (callback, opts) ->
-    @_getEmojiUseAjax 'popular', callback, opts, @popular
+    @_indexesAPI 'popular', callback, opts, @popular
 
   user: (username, callback, opts) ->
-    @_getEmojiUseAjax "users/#{username}/emoji", callback, opts
+    @_indexesAPI "users/#{username}/emoji", callback, opts
 
   next: ->
     @indexed.param.page++ if @count is @indexed.param.limit

@@ -3,7 +3,7 @@ class EmojidexUserFavorites
     @token = token
     @_favorites = @EC.Data.favorites()
 
-  _favoritesApi: (options) ->
+  _favoritesAPI: (options) ->
     if @token?
       $.ajax
         url: @EC.api_url + 'users/favorites'
@@ -18,7 +18,7 @@ class EmojidexUserFavorites
       success: (response) =>
         @_favorites = @EC.Data.favorites response
         callback? @_favorites
-    @_favoritesApi options
+    @_favoritesAPI options
 
   set: (emoji_code) ->
     options =
@@ -29,7 +29,7 @@ class EmojidexUserFavorites
       success: (response) =>
         @_favorites.push response
         @EC.Data.favorites @_favorites
-    @_favoritesApi options
+    @_favoritesAPI options
 
   unset: (emoji_code) ->
     options =
@@ -39,7 +39,7 @@ class EmojidexUserFavorites
         emoji_code: emoji_code
       success: (response) =>
         @sync()
-    @_favoritesApi options
+    @_favoritesAPI options
 
   sync: ->
     @get() # persistant favorites currently require an account
