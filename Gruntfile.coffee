@@ -132,7 +132,6 @@ module.exports = (grunt) ->
             value:
               src: ['dist/js/emojidex-client.js']
 
-
         spec_file = ""
         if path.basename(filepath, '.coffee')[0] is "_"
           divided_path = path.dirname(filepath).split('/')
