@@ -148,9 +148,9 @@ Advanced code search:
 *note that more tags will yeiled fewer results (AND) and more categories will yield more results (OR)*
 ```coffee
 # coffee signature
-advanced: (term, tags = [], categories = [], callback = null, opts) ->
+advanced: (searchs, callback = null, opts) ->
 # usage
-emojidex.Search.advanced("smile", ["happy"], ["faces", "people"])
+emojidex.Search.advanced({term: "smile", tags: ["happy"], categories: ["faces", "people"]})
 ```
 
 Tag search:

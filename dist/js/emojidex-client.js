@@ -1068,72 +1068,72 @@
       this._favorites = this.EC.Data.favorites();
     }
 
-    EmojidexUserFavorites.prototype.all = function() {
-      return this._favorites;
+    EmojidexUserFavorites.prototype._favoritesApi = function(options) {
+      if (this.token != null) {
+        return $.ajax({
+          url: this.EC.api_url + 'users/favorites',
+          type: options.type != null ? options.type : 'GET',
+          dataType: 'json',
+          data: options.data,
+          success: options.success
+        });
+      }
     };
 
     EmojidexUserFavorites.prototype.get = function(callback) {
-      var _this = this;
-      if (this.token != null) {
-        $.ajax({
-          url: this.EC.api_url + 'users/favorites',
-          dataType: 'json',
-          data: {
-            auth_token: this.token
-          },
-          success: function(response) {
-            _this._favorites = _this.EC.Data.favorites(response);
-            if (callback != null) {
-              return callback(_this._favorites);
-            }
-          }
-        });
-        return true;
-      }
-      return false;
+      var options,
+        _this = this;
+      options = {
+        data: {
+          auth_token: this.token
+        },
+        success: function(response) {
+          _this._favorites = _this.EC.Data.favorites(response);
+          return typeof callback === "function" ? callback(_this._favorites) : void 0;
+        }
+      };
+      return this._favoritesApi(options);
     };
 
     EmojidexUserFavorites.prototype.set = function(emoji_code) {
-      var _this = this;
-      if (this.token != null) {
-        $.ajax({
-          type: 'POST',
-          url: this.EC.api_url + 'users/favorites',
-          data: {
-            auth_token: this.token,
-            emoji_code: emoji_code
-          },
-          success: function(response) {
-            _this._favorites.push(response);
-            return _this.EC.Data.favorites(_this._favorites);
-          }
-        });
-        return true;
-      }
-      return false;
+      var options,
+        _this = this;
+      options = {
+        type: 'POST',
+        data: {
+          auth_token: this.token,
+          emoji_code: emoji_code
+        },
+        success: function(response) {
+          _this._favorites.push(response);
+          return _this.EC.Data.favorites(_this._favorites);
+        }
+      };
+      return this._favoritesApi(options);
     };
 
     EmojidexUserFavorites.prototype.unset = function(emoji_code) {
-      var _this = this;
-      if (this.token != null) {
-        $.ajax({
-          type: 'DELETE',
-          url: this.EC.api_url + 'users/favorites',
-          data: {
-            auth_token: this.token,
-            emoji_code: emoji_code
-          },
-          success: function(response) {
-            return _this.sync();
-          }
-        });
-        return true;
-      }
-      return false;
+      var options,
+        _this = this;
+      options = {
+        type: 'DELETE',
+        data: {
+          auth_token: this.token,
+          emoji_code: emoji_code
+        },
+        success: function(response) {
+          return _this.sync();
+        }
+      };
+      return this._favoritesApi(options);
     };
 
     EmojidexUserFavorites.prototype.sync = function() {
       return this.get();
+    };
+
+    EmojidexUserFavorites.prototype.all = function() {
+      return this._favorites;
     };
 
     return EmojidexUserFavorites;
@@ -1150,53 +1150,63 @@
       this._history = this.EC.Data.history();
     }
 
-    EmojidexUserHistory.prototype.all = function() {
-      return this._history;
+    EmojidexUserHistory.prototype._historyApi = function(options) {
+      if (this.token != null) {
+        return $.ajax({
+          url: this.EC.api_url + 'users/history',
+          type: options.type != null ? options.type : 'GET',
+          dataType: 'json',
+          data: options.data,
+          success: options.success
+        });
+      }
     };
 
-    EmojidexUserHistory.prototype.get = function(opts) {
-      var _this = this;
-      if (this.token != null) {
-        $.getJSON(this.EC.api_url + 'users/history?' + $.param({
+    EmojidexUserHistory.prototype.get = function() {
+      var options,
+        _this = this;
+      options = {
+        data: {
           auth_token: this.token
-        })).success(function(response) {
+        },
+        success: function(response) {
           return _this._history = _this.EC.Data.history(response);
-        });
-        return true;
-      }
-      return false;
+        }
+      };
+      return this._historyApi(options);
     };
 
     EmojidexUserHistory.prototype.set = function(emoji_code) {
-      var _this = this;
-      if (this.token != null) {
-        $.ajax({
-          type: 'POST',
-          url: this.EC.api_url + 'users/history',
-          data: {
-            auth_token: this.token,
-            emoji_code: emoji_code
-          },
-          success: function(response) {
-            var entry, i, _i, _len, _ref;
-            _ref = _this._history;
-            for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
-              entry = _ref[i];
-              if (entry.emoji_code === response.emoji_code) {
-                _this._history[i] = response;
-                _this.EC.Data.history(_this._history);
-                return response;
-              }
+      var options,
+        _this = this;
+      options = {
+        type: 'POST',
+        data: {
+          auth_token: this.token,
+          emoji_code: emoji_code
+        },
+        success: function(response) {
+          var entry, i, _i, _len, _ref;
+          _ref = _this._history;
+          for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
+            entry = _ref[i];
+            if (entry.emoji_code === response.emoji_code) {
+              _this._history[i] = response;
+              _this.EC.Data.history(_this._history);
+              return response;
             }
           }
-        });
-        return true;
-      }
-      return false;
+        }
+      };
+      return this._historyApi(options);
     };
 
     EmojidexUserHistory.prototype.sync = function() {
       return this.get();
+    };
+
+    EmojidexUserHistory.prototype.all = function() {
+      return this._history;
     };
 
     return EmojidexUserHistory;
