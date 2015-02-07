@@ -301,30 +301,27 @@
       this.count = 0;
     }
 
-    EmojidexIndexes.prototype._getEmojiUseAjax_setNextAndPrev = function(query, callback, opts, func) {
-      var default_params,
+    EmojidexIndexes.prototype._getEmojiUseAjax = function(query, callback, opts, func) {
+      var param,
         _this = this;
-      if (func != null) {
-        this.next = function() {
-          opts.page++;
-          return func(callback, opts);
-        };
-        this.prev = function() {
-          if (opts.page > 1) {
-            opts.page--;
-          }
-          return func(callback, opts);
-        };
-      }
-      default_params = {
+      param = {
         page: 1,
         limit: this.EC.limit,
         detailed: this.EC.detailed
       };
+      $.extend(param, opts);
+      if (func != null) {
+        this.indexed_func = func;
+        this.indexed = {
+          query: query,
+          callback: callback,
+          param: param
+        };
+      }
       return $.ajax({
         url: this.EC.api_url + query,
         dataType: 'json',
-        data: $.extend({}, default_params, opts),
+        data: param,
         success: function(response) {
           _this.results = response.emoji;
           _this.cur_page = response.meta.page;
@@ -339,19 +336,33 @@
     };
 
     EmojidexIndexes.prototype.index = function(callback, opts) {
-      return this._getEmojiUseAjax_setNextAndPrev('emoji', callback, opts, this.index);
+      return this._getEmojiUseAjax('emoji', callback, opts, this.index);
     };
 
     EmojidexIndexes.prototype.newest = function(callback, opts) {
-      return this._getEmojiUseAjax_setNextAndPrev('newest', callback, opts, this.newest);
+      return this._getEmojiUseAjax('newest', callback, opts, this.newest);
     };
 
     EmojidexIndexes.prototype.popular = function(callback, opts) {
-      return this._getEmojiUseAjax_setNextAndPrev('popular', callback, opts, this.popular);
+      return this._getEmojiUseAjax('popular', callback, opts, this.popular);
     };
 
     EmojidexIndexes.prototype.user = function(username, callback, opts) {
-      return this._getEmojiUseAjax_setNextAndPrev("users/" + username + "/emoji", callback, opts);
+      return this._getEmojiUseAjax("users/" + username + "/emoji", callback, opts);
+    };
+
+    EmojidexIndexes.prototype.next = function() {
+      if (this.count === this.indexed.param.limit) {
+        this.indexed.param.page++;
+      }
+      return this.indexed_func(this.indexed.data, this.indexed.callback, this.indexed.param, this.indexed_func);
+    };
+
+    EmojidexIndexes.prototype.prev = function() {
+      if (this.indexed.param.page > 1) {
+        this.indexed.param.page--;
+      }
+      return this.indexed_func(this.indexed.data, this.indexed.callback, this.indexed.param, this.indexed_func);
     };
 
     return EmojidexIndexes;
