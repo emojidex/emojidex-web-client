@@ -378,7 +378,7 @@
       this.count = 0;
     }
 
-    EmojidexSearch.prototype._getEmojiUseAjax = function(search_data, callback, opts, func) {
+    EmojidexSearch.prototype._getEmojiData = function(search_data, callback, opts, func) {
       var param,
         _this = this;
       param = {
@@ -418,7 +418,7 @@
       opts = $.extend({
         code_cont: this.EC.Util.escape_term(term)
       }, opts);
-      return this._getEmojiUseAjax(term, callback, opts, {
+      return this._getEmojiData(term, callback, opts, {
         ajax: this.search,
         storage: this.EC.Emoji.search
       });
@@ -428,27 +428,27 @@
       opts = $.extend({
         code_sw: this.Util.escape_term(term)
       }, opts);
-      return this._getEmojiUseAjax(term, callback, opts, {
+      return this._getEmojiData(term, callback, opts, {
         ajax: this.starting,
         storage: this.EC.Emoji.starting
       });
     };
 
     EmojidexSearch.prototype.ending = function(term, callback, opts) {
-      opts = $.extend({}, {
+      opts = $.extend({
         code_ew: this.Util.escape_term(term)
       }, opts);
-      return this._getEmojiUseAjax(term, callback, opts, {
+      return this._getEmojiData(term, callback, opts, {
         ajax: this.ending,
         storage: this.EC.Emoji.ending
       });
     };
 
     EmojidexSearch.prototype.tags = function(tags, callback, opts) {
-      opts = $.extend({}, {
+      opts = $.extend({
         "tags[]": this.Util.breakout(tags)
       }, opts);
-      return this._getEmojiUseAjax(tags, callback, opts, {
+      return this._getEmojiData(tags, callback, opts, {
         ajax: this.tags,
         storage: this.EC.Emoji.tags
       });
@@ -458,11 +458,11 @@
       var param;
       param = {
         code_cont: this.Util.escape_term(searchs.term),
-        "tags[]": searchs.tags != null ? this.Util.breakout(searchs.tags) : void 0,
-        "categories[]": searchs.categories != null ? this.Util.breakout(searchs.categories) : void 0
+        "tags[]": this.Util.breakout(searchs.tags),
+        "categories[]": this.Util.breakout(searchs.categories)
       };
       $.extend(param, opts);
-      return this._getEmojiUseAjax(searchs, callback, param, {
+      return this._getEmojiData(searchs, callback, param, {
         ajax: this.advanced,
         storage: this.EC.Emoji.advanced
       });
@@ -500,7 +500,7 @@
         return;
       }
       this.auth_info = this.EC.Data.auth_info();
-      if (this.auth_info['token'] !== null) {
+      if (this.auth_info['token'] != null) {
         return this.sync_user_data();
       } else {
         return this.logout();
@@ -525,25 +525,27 @@
     };
 
     EmojidexUser.prototype.plain_auth = function(username, password, callback) {
-      var url,
-        _this = this;
+      var _this = this;
       if (callback == null) {
         callback = null;
       }
-      url = this.EC.api_url + 'users/authenticate?' + $.param({
-        username: username,
-        password: password
-      });
-      return $.getJSON(url).error(function(response) {
-        return _this.auth_info = _this.EC.Data.auth_info({
-          status: response.auth_status,
-          token: null,
-          user: ''
-        });
-      }).success(function(response) {
-        _this._set_auth_from_response(response);
-        if (callback) {
-          return callback(_this.auth_info);
+      return $.ajax({
+        url: this.EC.api_url + 'users/authenticate',
+        dataType: 'json',
+        data: {
+          username: username,
+          password: password
+        },
+        success: function(response) {
+          _this._set_auth_from_response(response);
+          return typeof callback === "function" ? callback(_this.auth_info) : void 0;
+        },
+        error: function(response) {
+          return _this.auth_info = _this.EC.Data.auth_info({
+            status: response.auth_status,
+            token: null,
+            user: ''
+          });
         }
       });
     };
@@ -739,21 +741,20 @@
     function EmojidexUtil() {}
 
     EmojidexUtil.prototype.escape_term = function(term) {
-      return term.split(' ').join('_');
+      return term.replace(/\s/g, '_');
     };
 
     EmojidexUtil.prototype.de_escape_term = function(term) {
-      return term.split('_').join(' ');
+      return term.replace(/_/g, ' ');
     };
 
     EmojidexUtil.prototype.breakout = function(items) {
-      if (items === null) {
+      if (items == null) {
         return [];
       }
       if (!(items instanceof Array)) {
-        items = [items];
+        return items = [items];
       }
-      return items;
     };
 
     EmojidexUtil.prototype.simplify = function(emoji, size_code) {

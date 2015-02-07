@@ -22,14 +22,12 @@ class EmojidexIndexes
       url: @EC.api_url + query
       dataType: 'json'
       data: param
-
       success: (response) =>
         @results = response.emoji
         @cur_page = response.meta.page
         @count = response.meta.count
         @EC.Emoji.combine response.emoji
         callback? response.emoji
-
       error: (response) =>
         @results = []
 

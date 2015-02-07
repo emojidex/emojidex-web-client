@@ -9,10 +9,7 @@ class EmojidexUser
   _auto_login: () ->
     return if @closed_net
     @auth_info = @EC.Data.auth_info()
-    if @auth_info['token'] != null
-      @sync_user_data()
-    else
-      @logout()
+    if @auth_info['token']? then @sync_user_data() else @logout()
 
   # login
   # takes a hash with one of the following combinations:
@@ -23,11 +20,11 @@ class EmojidexUser
   login: (params) ->
     switch params.authtype
       when 'plain'
-        @plain_auth(params.username, params.password, params.callback)
+        @plain_auth params.username, params.password, params.callback
       when 'basic'
-        @basic_auth(params.user, params.pass, params.callback)
+        @basic_auth params.user, params.pass, params.callback
       when 'google'
-        @google_auth(params.callback)
+        @google_auth params.callback
       else
         @_auto_login()
 
@@ -38,17 +35,20 @@ class EmojidexUser
 
   # regular login with username/email and password
   plain_auth: (username, password, callback = null) ->
-    url = @EC.api_url + 'users/authenticate?' + $.param(username: username, password: password)
-    $.getJSON(url)
-      .error (response) =>
-        @auth_info = @EC.Data.auth_info({
-          status: response.auth_status,
-          token: null,
+    $.ajax
+      url: @EC.api_url + 'users/authenticate'
+      dataType: 'json'
+      data:
+        username: username
+        password: password
+      success: (response) =>
+        @_set_auth_from_response response
+        callback? @auth_info
+      error: (response) =>
+        @auth_info = @EC.Data.auth_info
+          status: response.auth_status
+          token: null
           user: ''
-        })
-      .success (response) =>
-        @_set_auth_from_response(response)
-        callback(@auth_info) if callback
 
   # auth with HTTP basic auth
   basic_auth: (user, pass, callback = null) ->
@@ -61,20 +61,18 @@ class EmojidexUser
 
   # directly set auth credentials
   set_auth: (user, token) ->
-    @auth_info = @EC.Data.auth_info({
-      status: 'verified',
-      token: token,
+    @auth_info = @EC.Data.auth_info
+      status: 'verified'
+      token: token
       user: user
-    })
     @sync_user_data()
 
   # sets auth parameters from a successful auth request [login]
   _set_auth_from_response: (response) ->
-    @auth_info = @EC.Data.auth_info({
-      status: response.auth_status,
-      token: response.auth_token,
+    @auth_info = @EC.Data.auth_info
+      status: response.auth_status
+      token: response.auth_token
       user: response.auth_user
-    })
     @sync_user_data()
 
   sync_user_data: () ->

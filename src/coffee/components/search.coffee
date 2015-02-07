@@ -5,7 +5,7 @@ class EmojidexSearch
     @cur_page = 1
     @count = 0
 
-  _getEmojiUseAjax: (search_data, callback, opts, func) ->
+  _getEmojiData: (search_data, callback, opts, func) ->
     param =
       page: 1
       limit: @EC.limit
@@ -24,14 +24,12 @@ class EmojidexSearch
         url: @EC.api_url + 'search/emoji'
         dataType: 'json'
         data: param
-
         success: (response) =>
           @results = response.emoji
           @cur_page = response.meta.page
           @count = response.meta.count
           @EC.Emoji.combine response.emoji
           callback? response.emoji
-
         error: (response) =>
           @results = []
     else
@@ -40,31 +38,31 @@ class EmojidexSearch
   # Executes a general search (code_cont)
   search: (term, callback, opts) ->
     opts = $.extend code_cont: @EC.Util.escape_term(term), opts
-    @_getEmojiUseAjax term, callback, opts, ajax: @search, storage: @EC.Emoji.search
+    @_getEmojiData term, callback, opts, ajax: @search, storage: @EC.Emoji.search
 
   # Executes a search starting with the given term
   starting: (term, callback, opts) ->
     opts = $.extend code_sw: @Util.escape_term(term), opts
-    @_getEmojiUseAjax term, callback, opts, ajax: @starting, storage: @EC.Emoji.starting
+    @_getEmojiData term, callback, opts, ajax: @starting, storage: @EC.Emoji.starting
 
   # Executes a search ending with the given term
   ending: (term, callback, opts) ->
-    opts = $.extend {}, {code_ew: @Util.escape_term(term)}, opts
-    @_getEmojiUseAjax term, callback, opts, ajax: @ending, storage: @EC.Emoji.ending
+    opts = $.extend code_ew: @Util.escape_term(term), opts
+    @_getEmojiData term, callback, opts, ajax: @ending, storage: @EC.Emoji.ending
 
   # Searches by tags
   tags: (tags, callback, opts) ->
-    opts = $.extend {}, "tags[]": @Util.breakout(tags), opts
-    @_getEmojiUseAjax tags, callback, opts, ajax: @tags, storage: @EC.Emoji.tags
+    opts = $.extend "tags[]": @Util.breakout(tags), opts
+    @_getEmojiData tags, callback, opts, ajax: @tags, storage: @EC.Emoji.tags
 
   # Searches using an array of keys and an array of tags
   advanced: (searchs, callback, opts) ->
     param =
       code_cont: @Util.escape_term searchs.term
-      "tags[]": if searchs.tags? then @Util.breakout searchs.tags
-      "categories[]": if searchs.categories? then @Util.breakout searchs.categories
+      "tags[]": @Util.breakout searchs.tags
+      "categories[]": @Util.breakout searchs.categories
     $.extend param, opts
-    @_getEmojiUseAjax searchs, callback, param, ajax: @advanced, storage: @EC.Emoji.advanced
+    @_getEmojiData searchs, callback, param, ajax: @advanced, storage: @EC.Emoji.advanced
 
   next: ->
     @searched.param.page++ if @count is @searched.param.limit
