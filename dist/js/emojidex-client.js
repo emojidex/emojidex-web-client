@@ -1070,14 +1070,13 @@
     }
 
     EmojidexUserFavorites.prototype._favoritesAPI = function(options) {
+      var ajax_obj;
       if (this.token != null) {
-        return $.ajax({
+        ajax_obj = {
           url: this.EC.api_url + 'users/favorites',
-          type: options.type != null ? options.type : 'GET',
-          dataType: 'json',
-          data: options.data,
-          success: options.success
-        });
+          dataType: 'json'
+        };
+        return $.ajax($.extend(ajax_obj, options));
       }
     };
 
@@ -1152,14 +1151,13 @@
     }
 
     EmojidexUserHistory.prototype._historyAPI = function(options) {
+      var ajax_obj;
       if (this.token != null) {
-        return $.ajax({
+        ajax_obj = {
           url: this.EC.api_url + 'users/history',
-          type: options.type != null ? options.type : 'GET',
-          dataType: 'json',
-          data: options.data,
-          success: options.success
-        });
+          dataType: 'json'
+        };
+        return $.ajax($.extend(ajax_obj, options));
       }
     };
 

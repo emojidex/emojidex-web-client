@@ -5,12 +5,10 @@ class EmojidexUserFavorites
 
   _favoritesAPI: (options) ->
     if @token?
-      $.ajax
+      ajax_obj =
         url: @EC.api_url + 'users/favorites'
-        type: if options.type? then options.type else 'GET'
         dataType: 'json'
-        data: options.data
-        success: options.success
+      $.ajax $.extend ajax_obj, options
 
   get: (callback) ->
     options =
