@@ -1,5 +1,5 @@
 describe 'EmojidexCategories', ->
-  beforeEach for_beforeEach
+  beforeEach helperBefore
 
   it 'sync', (done) ->
     @EC.Categories.sync (categories) ->

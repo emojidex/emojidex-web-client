@@ -1,5 +1,5 @@
 describe 'EmojidexUtil', ->
-  beforeEach for_beforeEach
+  beforeEach helperBefore
 
   it 'Client have Util?', ->
     expect(@EC.Util).toBeDefined()

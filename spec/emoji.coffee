@@ -1,5 +1,5 @@
 describe 'EmojidexEmoji', ->
-  beforeEach for_beforeEach
+  beforeEach helperBefore
 
   it 'Client have Emoji?', ->
     expect(@EC.Emoji).toBeDefined()

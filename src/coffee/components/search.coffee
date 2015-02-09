@@ -12,6 +12,7 @@ class EmojidexSearch
       detailed: @EC.detailed
     $.extend param, opts
 
+    # TODO -------
     # @searched_func = unless @EC.closed_net then funx.ajax else func.storage
     @searched_func = func.ajax
     @searched =
@@ -33,7 +34,7 @@ class EmojidexSearch
         error: (response) =>
           @results = []
     else
-      func.storage search_data, callback
+      func.storage? search_data, callback
 
   # Executes a general search (code_cont)
   search: (term, callback, opts) ->
@@ -66,8 +67,8 @@ class EmojidexSearch
 
   next: ->
     @searched.param.page++ if @count is @searched.param.limit
-    @searched_func @searched.data, @searched.callback, @searched.param, @searched_func
+    @searched_func @searched.data, @searched.callback, @searched.param, ajax: @searched_func
 
   prev: ->
     @searched.param.page-- if @searched.param.page > 1
-    @searched_func @searched.data, @searched.callback, @searched.param, @searched_func
+    @searched_func @searched.data, @searched.callback, @searched.param, ajax: @searched_func

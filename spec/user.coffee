@@ -1,5 +1,5 @@
 describe 'EmojidexUser', ->
-  beforeEach for_beforeEach
+  beforeEach helperBefore
 
   describe 'Favorites', ->
     it 'get', (done) ->

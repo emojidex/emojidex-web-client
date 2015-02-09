@@ -877,7 +877,7 @@
           }
         });
       } else {
-        return func.storage(search_data, callback);
+        return typeof func.storage === "function" ? func.storage(search_data, callback) : void 0;
       }
     };
 
@@ -939,14 +939,18 @@
       if (this.count === this.searched.param.limit) {
         this.searched.param.page++;
       }
-      return this.searched_func(this.searched.data, this.searched.callback, this.searched.param, this.searched_func);
+      return this.searched_func(this.searched.data, this.searched.callback, this.searched.param, {
+        ajax: this.searched_func
+      });
     };
 
     EmojidexSearch.prototype.prev = function() {
       if (this.searched.param.page > 1) {
         this.searched.param.page--;
       }
-      return this.searched_func(this.searched.data, this.searched.callback, this.searched.param, this.searched_func);
+      return this.searched_func(this.searched.data, this.searched.callback, this.searched.param, {
+        ajax: this.searched_func
+      });
     };
 
     return EmojidexSearch;
