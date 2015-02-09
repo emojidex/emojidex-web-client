@@ -2,60 +2,51 @@ class EmojidexIndexes
   constructor: (@EC) ->
     @results = []
     @cur_page = 1
-    @cur_limit = @EC.limit
     @count = 0
 
-  index: (callback = null, opts) ->
-    @next = () ->
-      @get_index(callback, $.extend(opts, {page: opts.page + 1}))
-    opts = @_combine_opts(opts)
-    $.getJSON((@EC.api_url + '/emoji?' + $.param(opts)))
-      .error (response) =>
-        @results = []
-      .success (response) =>
-        @_succeed(response, callback)
+  _indexesAPI: (query, callback, opts, func) ->
+    param =
+      page: 1
+      limit: @EC.limit
+      detailed: @EC.detailed
+    $.extend param, opts
 
-  newest: (callback = null, opts) ->
-    @next = () ->
-      @get_newest(callback, $.extend(opts, {page: opts.page + 1}))
-    opts = @_combine_opts(opts)
-    $.getJSON((@EC.api_url + '/newest?' + $.param(opts)))
-      .error (response) =>
-        @results = []
-      .success (response) =>
-        @_succeed(response, callback)
+    if func?
+      @indexed_func = func
+      @indexed =
+        query: query
+        callback: callback
+        param: param
 
-  popular: (callback = null, opts) ->
-    @next = () ->
-      @get_popular(callback, $.extend(opts, {page: opts.page + 1}))
-    opts = @_combine_opts(opts)
-    $.getJSON((@EC.api_url + '/popular?' + $.param(opts)))
-      .error (response) =>
-        @results = []
-      .success (response) =>
-        @_succeed(response, callback)
-
-  user: (username, callback, opts) ->
-    opts = @_combine_opts(opts)
     $.ajax
-      url: @EC.api_url +  "users/#{username}/emoji"
+      url: @EC.api_url + query
       dataType: 'json'
-      data: opts
-
+      data: param
       success: (response) =>
-        @_succeed(response, callback)
-
+        @results = response.emoji
+        @cur_page = response.meta.page
+        @count = response.meta.count
+        @EC.Emoji.combine response.emoji
+        callback? response.emoji
       error: (response) =>
         @results = []
 
-  # Combines opts against common defaults
-  _combine_opts: (opts) ->
-    $.extend { page: 1, limit: @EC.limit, detailed: @EC.detailed }, opts
+  index: (callback, opts) ->
+    @_indexesAPI 'emoji', callback, opts, @index
 
-  # fills in @results, @cur_page, and @count and calls callback
-  _succeed: (response, callback) ->
-    @results = response.emoji
-    @cur_page = response.meta.page
-    @count = response.meta.count
-    @EC.Emoji.combine(response.emoji)
-    callback(response.emoji) if callback?
+  newest: (callback, opts) ->
+    @_indexesAPI 'newest', callback, opts, @newest
+
+  popular: (callback, opts) ->
+    @_indexesAPI 'popular', callback, opts, @popular
+
+  user: (username, callback, opts) ->
+    @_indexesAPI "users/#{username}/emoji", callback, opts
+
+  next: ->
+    @indexed.param.page++ if @count is @indexed.param.limit
+    @indexed_func @indexed.data, @indexed.callback, @indexed.param, @indexed_func
+
+  prev: ->
+    @indexed.param.page-- if @indexed.param.page > 1
+    @indexed_func @indexed.data, @indexed.callback, @indexed.param, @indexed_func

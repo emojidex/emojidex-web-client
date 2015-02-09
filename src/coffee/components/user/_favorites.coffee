@@ -3,54 +3,44 @@ class EmojidexUserFavorites
     @token = token
     @_favorites = @EC.Data.favorites()
 
-  all: () ->
-    @_favorites
-
-  get: (callback) ->
+  _favoritesAPI: (options) ->
     if @token?
-      $.ajax
+      ajax_obj =
         url: @EC.api_url + 'users/favorites'
         dataType: 'json'
-        data:
-          auth_token: @token
+      $.ajax $.extend ajax_obj, options
 
-        success: (response) =>
-          @_favorites = @EC.Data.favorites(response)
-          callback @_favorites if callback?
-
-      return true
-    return false
+  get: (callback) ->
+    options =
+      data: auth_token: @token
+      success: (response) =>
+        @_favorites = @EC.Data.favorites response
+        callback? @_favorites
+    @_favoritesAPI options
 
   set: (emoji_code) ->
-    if @token?
-      $.ajax
-        type: 'POST'
-        url: @EC.api_url + 'users/favorites'
-        data:
-          auth_token: @token
-          emoji_code: emoji_code
-
-        success: (response) =>
-          @_favorites.push(response)
-          @EC.Data.favorites(@_favorites)
-
-      return true
-    return false
+    options =
+      type: 'POST'
+      data:
+        auth_token: @token
+        emoji_code: emoji_code
+      success: (response) =>
+        @_favorites.push response
+        @EC.Data.favorites @_favorites
+    @_favoritesAPI options
 
   unset: (emoji_code) ->
-    if @token?
-      $.ajax
-        type: 'DELETE'
-        url: @EC.api_url + 'users/favorites'
-        data:
-          auth_token: @token
-          emoji_code: emoji_code
+    options =
+      type: 'DELETE'
+      data:
+        auth_token: @token
+        emoji_code: emoji_code
+      success: (response) =>
+        @sync()
+    @_favoritesAPI options
 
-        success: (response) =>
-          @sync()
-
-      return true
-    return false
-
-  sync: () ->
+  sync: ->
     @get() # persistant favorites currently require an account
+
+  all: ->
+    @_favorites

@@ -3,109 +3,72 @@ class EmojidexSearch
     @Util = new EmojidexUtil
     @results = []
     @cur_page = 1
-    @cur_limit = @EC.limit
     @count = 0
 
-    # short-circuit next()
-    @next = () ->
-      null
+  _searchAPI: (search_data, callback, opts, func) ->
+    param =
+      page: 1
+      limit: @EC.limit
+      detailed: @EC.detailed
+    $.extend param, opts
 
-  # Executes a general search (code_cont)
-  search: (term, callback, opts) ->
-    @next = () ->
-      @search(term, callback, $.extend(opts, {page: opts.page + 1}))
+    # TODO -------
+    # @searched_func = unless @EC.closed_net then funx.ajax else func.storage
+    @searched_func = func.ajax
+    @searched =
+      data: search_data
+      callback: callback
+      param: param
+
     unless @EC.closed_net
-      opts = @_combine_opts(opts)
-      opts = $.extend {}, code_cont: @EC.Util.escape_term(term), opts
       $.ajax
         url: @EC.api_url + 'search/emoji'
         dataType: 'json'
-        data: opts
-
+        data: param
         success: (response) =>
-          @_succeed response, callback
-
+          @results = response.emoji
+          @cur_page = response.meta.page
+          @count = response.meta.count
+          @EC.Emoji.combine response.emoji
+          callback? response.emoji
         error: (response) =>
           @results = []
-
     else
-      @EC.Emoji.search(term, callback)
-    @EC.Emoji.search(term)
+      func.storage? search_data, callback
+
+  # Executes a general search (code_cont)
+  search: (term, callback, opts) ->
+    opts = $.extend code_cont: @EC.Util.escape_term(term), opts
+    @_searchAPI term, callback, opts, ajax: @search, storage: @EC.Emoji.search
 
   # Executes a search starting with the given term
-  starting: (term, callback = null, opts) ->
-    @next = () ->
-      @starting(term, callback, $.extend(opts, {page: opts.page + 1}))
-    if !@EC.closed_net
-      opts = @_combine_opts(opts)
-      $.getJSON((@EC.api_url +  'search/emoji?' + $.param(($.extend {}, \
-          {code_sw: @Util.escape_term(term)}, opts))))
-        .error (response) =>
-          @results = []
-        .success (response) =>
-          @_succeed(response, callback)
-    else
-      @EC.Emoji.starting(term, callback)
-    @EC.Emoji.starting(term)
+  starting: (term, callback, opts) ->
+    opts = $.extend code_sw: @Util.escape_term(term), opts
+    @_searchAPI term, callback, opts, ajax: @starting, storage: @EC.Emoji.starting
 
   # Executes a search ending with the given term
-  ending: (term, callback = null, opts) ->
-    @next = () ->
-      @ending(term, callback, $.extend(opts, {page: opts.page + 1}))
-    if !@EC.closed_net
-      opts = @_combine_opts(opts)
-      $.getJSON((@EC.api_url +  'search/emoji?' + $.param(($.extend {}, \
-          {code_ew: @Util.escape_term(term)}, opts))))
-        .error (response) =>
-          @results = []
-        .success (response) =>
-          @_succeed(response, callback)
-    else
-      @EC.Emoji.ending(term, callback)
-    @EC.Emoji.ending(term)
+  ending: (term, callback, opts) ->
+    opts = $.extend code_ew: @Util.escape_term(term), opts
+    @_searchAPI term, callback, opts, ajax: @ending, storage: @EC.Emoji.ending
 
   # Searches by tags
-  tags: (tags, callback = null, opts) ->
-    @next = () ->
-      @tags(term, callback, $.extend(opts, {page: opts.page + 1}))
-    if !@EC.closed_net
-      opts = @_combine_opts(opts)
-      $.getJSON((@EC.api_url +  'search/emoji?' + $.param(($.extend {}, \
-          {"tags[]": @Util.breakout(tags)}, opts))))
-        .error (response) =>
-          @results = []
-        .success (response) =>
-          @_succeed(response, callback)
-    else
-      @EC.Emoji.tags(tags, callback)
-    @EC.Emoji.tags(tags)
+  tags: (tags, callback, opts) ->
+    opts = $.extend "tags[]": @Util.breakout(tags), opts
+    @_searchAPI tags, callback, opts, ajax: @tags, storage: @EC.Emoji.tags
 
   # Searches using an array of keys and an array of tags
-  advanced: (term, tags = [], categories = [], callback = null, opts) ->
-    @next = () ->
-      @advanced(term, tags, categories, callback, $.extend(opts, {page: opts.page + 1}))
-    if !@EC.closed_net
-      opts = @_combine_opts(opts)
-      params = {code_cont: @Util.escape_term(term)}
-      params = $.extend(params, {"tags[]": @Util.breakout(tags)}) if tags.length > 0
-      params = $.extend(params, {"categories[]": @Util.breakout(categories)}) if categories.length > 0
-      $.getJSON((@EC.api_url +  'search/emoji?' + $.param(($.extend params, opts))))
-        .error (response) =>
-          @results = []
-        .success (response) =>
-          @_succeed(response, callback)
-    else
-      @EC.Emoji.advanced(term, tags, categories, callback)
-    @EC.Emoji.advanced(term, tags, categories)
+  advanced: (searchs, callback, opts) ->
+    param =
+      code_cont: @Util.escape_term searchs.term
+      "tags[]": @Util.breakout searchs.tags
+      "categories[]": @Util.breakout searchs.categories
+    $.extend param, opts
+    @_searchAPI searchs, callback, param, ajax: @advanced, storage: @EC.Emoji.advanced
 
-  # Combines opts against common defaults
-  _combine_opts: (opts) ->
-    $.extend {}, { page: 1, limit: @EC.limit, detailed: @EC.detailed }, opts
+  next: ->
+    @searched.param.page++ if @count is @searched.param.limit
+    @searched_func @searched.data, @searched.callback, @searched.param, ajax: @searched_func
 
-  # fills in @results, @cur_page, and @count and calls callback
-  _succeed: (response, callback) ->
-    @results = response.emoji
-    @cur_page = response.meta.page
-    @count = response.meta.count
-    @EC.Emoji.combine(response.emoji)
-    callback(response.emoji) if callback?
+  prev: ->
+    @searched.param.page-- if @searched.param.page > 1
+    @searched_func @searched.data, @searched.callback, @searched.param, ajax: @searched_func

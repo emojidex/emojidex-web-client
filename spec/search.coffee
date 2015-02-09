@@ -1,6 +1,5 @@
 describe 'EmojidexSearch', ->
-  beforeEach for_beforeEach
-
+  beforeEach helperBefore
   it 'search', (done) ->
     @EC.Search.search 'kiss', (emoji_data) ->
       expect(emoji_data).toContain(
@@ -27,9 +26,24 @@ describe 'EmojidexSearch', ->
       expect(emoji_data).toBeTruthy()
       done()
 
-  it 'padvanced', (done) ->
-    @EC.Search.advanced 'kiss', [], [], (emoji_data) ->
+  it 'advanced: term', (done) ->
+    @EC.Search.advanced term: 'kiss', (emoji_data) ->
       expect(emoji_data).toContain(
         jasmine.objectContaining emoji_kiss
       )
       done()
+
+  it 'advanced: categories', (done) ->
+    @EC.Search.advanced term: 'kiss', categories: ["objects"], (emoji_data) ->
+      expect(emoji_data).toContain(
+        jasmine.objectContaining emoji_kiss
+      )
+      done()
+
+  # it 'advanced: tags', (done) ->
+  #   @EC.Search.advanced '', ["Star Trek"], [], (emoji_data) ->
+  #     console.dir emoji_data
+  #     expect(emoji_data).toContain(
+  #       jasmine.objectContaining emoji_kiss
+  #     )
+  #     done()

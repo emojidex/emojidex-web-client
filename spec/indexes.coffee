@@ -1,5 +1,5 @@
 describe 'EmojidexIndexes', ->
-  beforeEach for_beforeEach
+  beforeEach helperBefore
 
   it 'user', (done) ->
     @EC.Indexes.user 'emojidex', (emoji_data) ->

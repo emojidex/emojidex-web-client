@@ -81,7 +81,7 @@ module.exports = (grunt) ->
     uglify:
       client:
         options:
-          manglet: true
+          # manglet: true
           banner: '<%= meta.banner %><%= grunt.getLicense("build/licenses.json") %>\n */\n'
         src: ['dist/js/emojidex-client.js']
         dest: 'dist/js/emojidex-client.min.js'
@@ -130,8 +130,7 @@ module.exports = (grunt) ->
           jasmine:
             prop: ['jasmine', 'esteWatch']
             value:
-              src: ['dist/js/*.min.js']
-
+              src: ['dist/js/emojidex-client.js']
 
         spec_file = ""
         if path.basename(filepath, '.coffee')[0] is "_"
