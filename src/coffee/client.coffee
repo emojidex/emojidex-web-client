@@ -40,9 +40,9 @@ class @EmojidexClient
 
     # new Emojidex modules
     @Data = new EmojidexData @
-    @Emoji = new EmojidexEmoji @
     @Categories = new EmojidexCategories @
     @User = new EmojidexUser @
     @Indexes = new EmojidexIndexes @
     @Util = new EmojidexUtil @
     @Search = new EmojidexSearch @
+    @Emoji = new EmojidexEmoji @

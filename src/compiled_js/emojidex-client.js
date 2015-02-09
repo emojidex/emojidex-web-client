@@ -24,12 +24,12 @@
       this.limit = this.options.limit;
       this.locale = this.options.locale;
       this.Data = new EmojidexData(this);
-      this.Emoji = new EmojidexEmoji(this);
       this.Categories = new EmojidexCategories(this);
       this.User = new EmojidexUser(this);
       this.Indexes = new EmojidexIndexes(this);
       this.Util = new EmojidexUtil(this);
       this.Search = new EmojidexSearch(this);
+      this.Emoji = new EmojidexEmoji(this);
     }
 
     return EmojidexClient;
@@ -158,6 +158,8 @@
       }
       switch (locale) {
         case 'en':
+          console.log(this);
+          console.log(111);
           this.EC.Indexes.user('emoji', this.combine);
           return this.EC.Indexes.user('emojidex', this.combine);
         case 'ja':

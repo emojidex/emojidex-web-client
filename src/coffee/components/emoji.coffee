@@ -11,6 +11,8 @@ class EmojidexEmoji
     locale ?= @EC.locale
     switch locale
       when 'en'
+        console.log @
+        console.log 111
         @EC.Indexes.user 'emoji', @combine
         @EC.Indexes.user 'emojidex', @combine
       when 'ja'
