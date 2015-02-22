@@ -43,6 +43,9 @@ class EmojidexIndexes
   user: (username, callback, opts) ->
     @_indexesAPI "users/#{username}/emoji", callback, opts
 
+  select: (code, callback, opts) ->
+    @EC.Search.find(code, callback, opts)
+
   next: ->
     @indexed.param.page++ if @count is @indexed.param.limit
     @indexed_func @indexed.data, @indexed.callback, @indexed.param, @indexed_func

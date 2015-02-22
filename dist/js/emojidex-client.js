@@ -305,10 +305,10 @@
       return false;
     }
   }
-
+  
   // Check if storages are natively available on browser
   var storage_available=_testStorage('localStorage');
-
+  
   // Namespace object
   var storage={
     _type:'',
@@ -820,6 +820,10 @@
       return this._indexesAPI("users/" + username + "/emoji", callback, opts);
     };
 
+    EmojidexIndexes.prototype.select = function(code, callback, opts) {
+      return this.EC.Search.find(code, callback, opts);
+    };
+
     EmojidexIndexes.prototype.next = function() {
       if (this.count === this.indexed.param.limit) {
         this.indexed.param.page++;
@@ -923,18 +927,40 @@
       });
     };
 
-    EmojidexSearch.prototype.advanced = function(searchs, callback, opts) {
+    EmojidexSearch.prototype.advanced = function(search_details, callback, opts) {
       var param;
       param = {
-        code_cont: this.Util.escape_term(searchs.term),
-        "tags[]": this.Util.breakout(searchs.tags),
-        "categories[]": this.Util.breakout(searchs.categories)
+        code_cont: this.Util.escape_term(search_details.term),
+        "tags[]": this.Util.breakout(search_details.tags),
+        "categories[]": this.Util.breakout(search_details.categories)
       };
       $.extend(param, opts);
-      return this._searchAPI(searchs, callback, param, {
+      return this._searchAPI(search_details, callback, param, {
         ajax: this.advanced,
         storage: this.EC.Emoji.advanced
       });
+    };
+
+    EmojidexSearch.prototype.find = function(code, callback, opts) {
+      var param,
+        _this = this;
+      param = {
+        detailed: this.EC.detailed
+      };
+      $.extend(param, opts);
+      if (!this.EC.closed_net) {
+        return $.ajax({
+          url: this.EC.api_url + ("/emoji/" + code),
+          dataType: 'json',
+          data: param,
+          success: function(response) {
+            _this.EC.Emoji.combine([response]);
+            return typeof callback === "function" ? callback(response) : void 0;
+          }
+        });
+      } else {
+
+      }
     };
 
     EmojidexSearch.prototype.next = function() {

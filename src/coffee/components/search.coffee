@@ -57,13 +57,30 @@ class EmojidexSearch
     @_searchAPI tags, callback, opts, ajax: @tags, storage: @EC.Emoji.tags
 
   # Searches using an array of keys and an array of tags
-  advanced: (searchs, callback, opts) ->
+  advanced: (search_details, callback, opts) ->
     param =
-      code_cont: @Util.escape_term searchs.term
-      "tags[]": @Util.breakout searchs.tags
-      "categories[]": @Util.breakout searchs.categories
+      code_cont: @Util.escape_term search_details.term
+      "tags[]": @Util.breakout search_details.tags
+      "categories[]": @Util.breakout search_details.categories
     $.extend param, opts
-    @_searchAPI searchs, callback, param, ajax: @advanced, storage: @EC.Emoji.advanced
+    @_searchAPI search_details, callback, param, ajax: @advanced, storage: @EC.Emoji.advanced
+
+  # Not an actual search, just gets information on the given emoji
+  find: (code, callback, opts) ->
+    param =
+      detailed: @EC.detailed
+    $.extend param, opts
+
+    if !@EC.closed_net
+      $.ajax
+        url: @EC.api_url + "/emoji/#{code}"
+        dataType: 'json'
+        data: param
+        success: (response) =>
+          @EC.Emoji.combine [response]
+          callback? response
+    else
+      # TODO
 
   next: ->
     @searched.param.page++ if @count is @searched.param.limit
