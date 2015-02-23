@@ -146,7 +146,6 @@
       this.EC = EC;
       this.combine = __bind(this.combine, this);
       this._emoji = this.EC.Data.emoji();
-      this.util = new EmojidexUtil;
       if (this.EC.Data.emoji().length === 0) {
         this.seed();
       }
@@ -158,8 +157,6 @@
       }
       switch (locale) {
         case 'en':
-          console.log(this);
-          console.log(111);
           this.EC.Indexes.user('emoji', this.combine);
           return this.EC.Indexes.user('emojidex', this.combine);
         case 'ja':
@@ -234,7 +231,7 @@
 
     EmojidexEmoji.prototype.tags = function(tags, opts) {
       var collect, moji, selection, tag, _i, _len;
-      tags = this.util.breakout(tags);
+      tags = this.EC.Util.breakout(tags);
       selection = opts.selection || this._emoji;
       collect = [];
       for (_i = 0, _len = tags.length; _i < _len; _i++) {
@@ -256,7 +253,7 @@
 
     EmojidexEmoji.prototype.categories = function(categories, opts) {
       var category, collect, moji, source, _i, _len;
-      categories = this.util.breakout(categories);
+      categories = this.EC.Util.breakout(categories);
       source = opts.selection || this._emoji;
       collect = [];
       for (_i = 0, _len = categories.length; _i < _len; _i++) {
@@ -385,7 +382,7 @@
       this.count = 0;
     }
 
-    EmojidexSearch.prototype._searchAPI = function(search_data, callback, opts, func) {
+    EmojidexSearch.prototype._searchAPI = function(search_data, callback, opts, call_func) {
       var param,
         _this = this;
       param = {
@@ -394,7 +391,7 @@
         detailed: this.EC.detailed
       };
       $.extend(param, opts);
-      this.searched_func = func.ajax;
+      this.searched_func = call_func.ajax;
       this.searched = {
         data: search_data,
         callback: callback,
@@ -417,7 +414,7 @@
           }
         });
       } else {
-        return typeof func.storage === "function" ? func.storage(search_data, callback) : void 0;
+        return typeof call_func.storage === "function" ? call_func.storage(search_data, callback) : void 0;
       }
     };
 
@@ -482,7 +479,9 @@
         detailed: this.EC.detailed
       };
       $.extend(param, opts);
-      if (!this.EC.closed_net) {
+      if (this.EC.closed_net) {
+
+      } else {
         return $.ajax({
           url: this.EC.api_url + ("/emoji/" + code),
           dataType: 'json',
@@ -492,8 +491,6 @@
             return typeof callback === "function" ? callback(response) : void 0;
           }
         });
-      } else {
-
       }
     };
 

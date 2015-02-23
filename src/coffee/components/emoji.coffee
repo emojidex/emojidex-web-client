@@ -1,7 +1,6 @@
 class EmojidexEmoji
   constructor: (@EC) ->
     @_emoji = @EC.Data.emoji()
-    @util = new EmojidexUtil
 
     if @EC.Data.emoji().length is 0
       @seed()
@@ -11,8 +10,6 @@ class EmojidexEmoji
     locale ?= @EC.locale
     switch locale
       when 'en'
-        console.log @
-        console.log 111
         @EC.Indexes.user 'emoji', @combine
         @EC.Indexes.user 'emojidex', @combine
       when 'ja'
@@ -42,7 +39,7 @@ class EmojidexEmoji
 
   # search for emoji with the given tags
   tags: (tags, opts) ->
-    tags = @util.breakout tags
+    tags = @EC.Util.breakout tags
     selection = opts.selection || @_emoji
     collect = []
     for tag in tags
@@ -51,7 +48,7 @@ class EmojidexEmoji
 
   # gets emoji in any of the given categories
   categories: (categories, opts) ->
-    categories = @util.breakout categories
+    categories = @EC.Util.breakout categories
     source = opts.selection || @_emoji
     collect = []
     for category in categories
