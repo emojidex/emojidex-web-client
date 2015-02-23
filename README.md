@@ -148,7 +148,7 @@ Advanced code search:
 *note that more tags will yeiled fewer results (AND) and more categories will yield more results (OR)*
 ```coffee
 # coffee signature
-advanced: (searchs, callback = null, opts) ->
+advanced: (search_details, callback = null, opts) ->
 # usage
 emojidex.Search.advanced({term: "smile", tags: ["happy"], categories: ["faces", "people"]})
 ```
@@ -196,10 +196,10 @@ Remove an emoji from user favorites:
 emojidex.User.Favorites.unset("combat_knife")
 ```
 
-The Magic "next" Method
+The Magic "next" and "prev" Method
 -----------------------
-All search methods will set the "next" method to get the next page of that search.
-You can call a search, then later simply call next() and get the next page.
+All search methods will set the "next" and "prev" method to get the next or prev page of that search.
+You can call a search, then later simply call next() or prev() and get the page.
 *When next is called and there are no more results an empty array will be returned*
 
 ```coffee
@@ -207,6 +207,8 @@ You can call a search, then later simply call next() and get the next page.
 emojidex.Search.search("face")
 // next 32 results are returned and put in .results
 emojidex.Search.next()
+// prev 32 results are returned and put in .results
+emojidex.Search.prev()
 ```
 
 Utility Methods
