@@ -1,5 +1,5 @@
 describe 'EmojidexEmoji', ->
   beforeEach helperBefore
 
-  it 'Client have Emoji?', ->
+  it 'has the Emoji class defined', ->
     expect(@EC.Emoji).toBeDefined()

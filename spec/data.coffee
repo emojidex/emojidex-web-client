@@ -1,5 +1,5 @@
 describe 'EmojidexData', ->
   beforeEach helperBefore
 
-  it 'Client have Data?', ->
+  it 'has the Data class defined', ->
     expect(@EC.Data).toBeDefined()
