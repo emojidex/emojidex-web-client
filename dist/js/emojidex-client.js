@@ -305,10 +305,10 @@
       return false;
     }
   }
-  
+
   // Check if storages are natively available on browser
   var storage_available=_testStorage('localStorage');
-  
+
   // Namespace object
   var storage={
     _type:'',
@@ -1245,7 +1245,7 @@
     function EmojidexUtil() {}
 
     EmojidexUtil.prototype.escape_term = function(term) {
-      return term.replace(/\s/g, '_');
+      return term.replace(/\s/g, '_').replace(/(\(|\))/, '\\$1');
     };
 
     EmojidexUtil.prototype.de_escape_term = function(term) {
