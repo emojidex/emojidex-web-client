@@ -1,7 +1,7 @@
 class EmojidexUtil
   # Escapes spaces to underscore
   escape_term: (term) ->
-    term.replace(/\s/g, '_').replace(/(\(|\))/, '\\$1')
+    term.replace(/\s/g, '_').replace(/(\(|\))/g, '\\$1')
 
   # De-Escapes underscores to spaces
   de_escape_term: (term) ->

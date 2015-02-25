@@ -1245,7 +1245,7 @@
     function EmojidexUtil() {}
 
     EmojidexUtil.prototype.escape_term = function(term) {
-      return term.replace(/\s/g, '_').replace(/(\(|\))/, '\\$1');
+      return term.replace(/\s/g, '_').replace(/(\(|\))/g, '\\$1');
     };
 
     EmojidexUtil.prototype.de_escape_term = function(term) {
