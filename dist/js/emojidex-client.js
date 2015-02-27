@@ -305,10 +305,10 @@
       return false;
     }
   }
-
+  
   // Check if storages are natively available on browser
   var storage_available=_testStorage('localStorage');
-
+  
   // Namespace object
   var storage={
     _type:'',
@@ -470,11 +470,19 @@
 
   this.EmojidexClient = (function() {
     function EmojidexClient(options) {
+      var _this = this;
       this.options = options;
+      this.env = {
+        api_ver: 1,
+        cdn_addr: 'cdn.emojidex.com',
+        s_cdn_addr: '',
+        asset_addr: 'assets.emojidex.com',
+        s_asset_addr: ''
+      };
       this.defaults = {
         locale: 'en',
         api_url: 'https://www.emojidex.com/api/v1/',
-        cdn_url: 'http://cdn.emojidex.com/emoji',
+        cdn_url: 'http://' + this.env.cdn_addr + '/emoji/',
         closed_net: false,
         min_query_len: 4,
         size_code: 'px32',
@@ -496,6 +504,16 @@
       this.Util = new EmojidexUtil(this);
       this.Search = new EmojidexSearch(this);
       this.Emoji = new EmojidexEmoji(this);
+      if (this.cdn_url === this.defaults.cdn_url && this.closed_net === false) {
+        $.ajax({
+          url: this.api_url + "/env",
+          dataType: 'json',
+          success: function(response) {
+            _this.env = response;
+            return _this.cdn_url = 'https://' + _this.env.s_cdn_addr + '/emoji/';
+          }
+        });
+      }
     }
 
     return EmojidexClient;
