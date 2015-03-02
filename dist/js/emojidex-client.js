@@ -305,10 +305,10 @@
       return false;
     }
   }
-  
+
   // Check if storages are natively available on browser
   var storage_available=_testStorage('localStorage');
-  
+
   // Namespace object
   var storage={
     _type:'',
@@ -482,7 +482,7 @@
       this.defaults = {
         locale: 'en',
         api_url: 'https://www.emojidex.com/api/v1/',
-        cdn_url: 'http://' + this.env.cdn_addr + '/emoji/',
+        cdn_url: "http://" + this.env.cdn_addr + "/emoji/",
         closed_net: false,
         min_query_len: 4,
         size_code: 'px32',
@@ -510,7 +510,8 @@
           dataType: 'json',
           success: function(response) {
             _this.env = response;
-            return _this.cdn_url = 'https://' + _this.env.s_cdn_addr + '/emoji/';
+            _this.cdn_url = "https://" + _this.env.s_cdn_addr + "/emoji/";
+            return _this.Data.storage.set('emojidex.cdn_url', _this.cdn_url);
           }
         });
       }
@@ -559,6 +560,7 @@
 
   EmojidexData = (function() {
     function EmojidexData(EC) {
+      var _base;
       this.EC = EC;
       this._def_auth_info = {
         status: 'none',
@@ -583,6 +585,9 @@
       }
       if (!this.storage.isSet("emojidex.auth_info")) {
         this.storage.set("emojidex.auth_info", this.EC.options.auth_info || this._def_auth_info);
+      }
+      if ((_base = this.EC).cdn_url == null) {
+        _base.cdn_url = this.storage.get('emojidex.cdn_url');
       }
     }
 
@@ -1260,7 +1265,9 @@
   })();
 
   EmojidexUtil = (function() {
-    function EmojidexUtil() {}
+    function EmojidexUtil(EC) {
+      this.EC = EC;
+    }
 
     EmojidexUtil.prototype.escape_term = function(term) {
       return term.replace(/\s/g, '_').replace(/(\(|\))/g, '\\$1');
@@ -1285,14 +1292,14 @@
         emoji = this.results;
       }
       if (size_code == null) {
-        size_code = this.size_code;
+        size_code = this.EC.size_code;
       }
       _results = [];
       for (_i = 0, _len = emoji.length; _i < _len; _i++) {
         moji = emoji[_i];
         _results.push({
           code: this.escape_term(moji.code),
-          img_url: "" + this.cdn_url + "/" + size_code + "/" + (this.escape_term(moji.code)) + ".png"
+          img_url: "" + this.EC.cdn_url + "/" + size_code + "/" + (this.escape_term(moji.code)) + ".png"
         });
       }
       return _results;

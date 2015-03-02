@@ -12,17 +12,17 @@
 class @EmojidexClient
   constructor: (@options) ->
     @env =
-      api_ver: 1,
-      cdn_addr: 'cdn.emojidex.com',
-      s_cdn_addr: '',
-      asset_addr: 'assets.emojidex.com',
+      api_ver: 1
+      cdn_addr: 'cdn.emojidex.com'
+      s_cdn_addr: ''
+      asset_addr: 'assets.emojidex.com'
       s_asset_addr: ''
 
     # sets global default value
     @defaults =
       locale: 'en'
       api_url: 'https://www.emojidex.com/api/v1/'
-      cdn_url: 'http://' + @env.cdn_addr + '/emoji/'
+      cdn_url: "http://#{@env.cdn_addr}/emoji/"
       closed_net: false
       min_query_len: 4
       size_code: 'px32'
@@ -56,10 +56,11 @@ class @EmojidexClient
 
     # if the CDN URL has not been overridden
     # attempt to get it from the api env
-    if @cdn_url == @defaults.cdn_url && @closed_net == false
+    if @cdn_url is @defaults.cdn_url and @closed_net is false
       $.ajax
         url: @api_url + "/env"
         dataType: 'json'
         success: (response) =>
           @env = response
-          @cdn_url = 'https://' + @env.s_cdn_addr + '/emoji/'
+          @cdn_url = "https://#{@env.s_cdn_addr}/emoji/"
+          @Data.storage.set 'emojidex.cdn_url', @cdn_url

@@ -13,6 +13,8 @@ class EmojidexData
     @storage.set "emojidex.categories", @EC.options.categories || [] unless @storage.isSet "emojidex.auth_info"
     @storage.set "emojidex.auth_info", @EC.options.auth_info || @_def_auth_info unless @storage.isSet "emojidex.auth_info"
 
+    @EC.cdn_url ?= @storage.get 'emojidex.cdn_url'
+
   emoji: (emoji_set) ->
     @storage.set "emojidex.emoji", emoji_set if emoji_set?
     @storage.get "emojidex.emoji"
