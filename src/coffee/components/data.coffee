@@ -13,7 +13,19 @@ class EmojidexData
     @storage.set "emojidex.categories", @EC.options.categories || [] unless @storage.isSet "emojidex.auth_info"
     @storage.set "emojidex.auth_info", @EC.options.auth_info || @_def_auth_info unless @storage.isSet "emojidex.auth_info"
 
-    @EC.cdn_url ?= @storage.get 'emojidex.cdn_url'
+    if @storage.get 'emojidex.cdn_url'
+      @EC.cdn_url = @storage.get 'emojidex.cdn_url'
+    else
+      # if the CDN URL has not been overridden
+      # attempt to get it from the api env
+      if @EC.cdn_url is @EC.defaults.cdn_url and @EC.closed_net is false
+        $.ajax
+          url: @EC.api_url + "/env"
+          dataType: 'json'
+          success: (response) =>
+            @EC.env = response
+            @EC.cdn_url = "https://#{@EC.env.s_cdn_addr}/emoji/"
+            @EC.Data.storage.set 'emojidex.cdn_url', @EC.cdn_url
 
   emoji: (emoji_set) ->
     @storage.set "emojidex.emoji", emoji_set if emoji_set?

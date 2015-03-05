@@ -53,14 +53,3 @@ class @EmojidexClient
     @Util = new EmojidexUtil @
     @Search = new EmojidexSearch @
     @Emoji = new EmojidexEmoji @
-
-    # if the CDN URL has not been overridden
-    # attempt to get it from the api env
-    if @cdn_url is @defaults.cdn_url and @closed_net is false
-      $.ajax
-        url: @api_url + "/env"
-        dataType: 'json'
-        success: (response) =>
-          @env = response
-          @cdn_url = "https://#{@env.s_cdn_addr}/emoji/"
-          @Data.storage.set 'emojidex.cdn_url', @cdn_url

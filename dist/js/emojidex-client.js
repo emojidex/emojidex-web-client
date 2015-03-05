@@ -1,5 +1,5 @@
 /*
- * emojidex client - v0.3.4
+ * emojidex client - v0.3.5
  * * Provides search, index caching and combining and asset URI resolution
  * https://github.com/emojidex/emojidex-web-client
  *
@@ -470,7 +470,6 @@
 
   this.EmojidexClient = (function() {
     function EmojidexClient(options) {
-      var _this = this;
       this.options = options;
       this.env = {
         api_ver: 1,
@@ -504,17 +503,6 @@
       this.Util = new EmojidexUtil(this);
       this.Search = new EmojidexSearch(this);
       this.Emoji = new EmojidexEmoji(this);
-      if (this.cdn_url === this.defaults.cdn_url && this.closed_net === false) {
-        $.ajax({
-          url: this.api_url + "/env",
-          dataType: 'json',
-          success: function(response) {
-            _this.env = response;
-            _this.cdn_url = "https://" + _this.env.s_cdn_addr + "/emoji/";
-            return _this.Data.storage.set('emojidex.cdn_url', _this.cdn_url);
-          }
-        });
-      }
     }
 
     return EmojidexClient;
@@ -560,7 +548,7 @@
 
   EmojidexData = (function() {
     function EmojidexData(EC) {
-      var _base;
+      var _this = this;
       this.EC = EC;
       this._def_auth_info = {
         status: 'none',
@@ -586,8 +574,20 @@
       if (!this.storage.isSet("emojidex.auth_info")) {
         this.storage.set("emojidex.auth_info", this.EC.options.auth_info || this._def_auth_info);
       }
-      if ((_base = this.EC).cdn_url == null) {
-        _base.cdn_url = this.storage.get('emojidex.cdn_url');
+      if (this.storage.get('emojidex.cdn_url')) {
+        this.EC.cdn_url = this.storage.get('emojidex.cdn_url');
+      } else {
+        if (this.EC.cdn_url === this.EC.defaults.cdn_url && this.EC.closed_net === false) {
+          $.ajax({
+            url: this.EC.api_url + "/env",
+            dataType: 'json',
+            success: function(response) {
+              _this.EC.env = response;
+              _this.EC.cdn_url = "https://" + _this.EC.env.s_cdn_addr + "/emoji/";
+              return _this.EC.Data.storage.set('emojidex.cdn_url', _this.EC.cdn_url);
+            }
+          });
+        }
       }
     }
 
