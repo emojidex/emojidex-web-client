@@ -43,6 +43,13 @@ class EmojidexIndexes
   user: (username, callback, opts) ->
     @_indexesAPI "users/#{username}/emoji", callback, opts
 
+  static: (username, callback) ->
+    $.ajax
+      url: @EC.api_url + username
+      dataType: 'json'
+      success: (response) =>
+        @EC.Emoji.combine response
+
   select: (code, callback, opts) ->
     @EC.Search.find(code, callback, opts)
 

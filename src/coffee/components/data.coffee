@@ -28,7 +28,11 @@ class EmojidexData
             @EC.Data.storage.set 'emojidex.cdn_url', @EC.cdn_url
 
   emoji: (emoji_set) ->
-    @storage.set "emojidex.emoji", emoji_set if emoji_set?
+    if @storage.isEmpty 'emojidex.emoji'
+      @storage.set 'emojidex.emoji', emoji_set
+    else
+      @storage.set 'emojidex.emoji', @storage.get('emojidex.emoji').concat emoji_set
+    @EC.Emoji._emoji = @storage.get "emojidex.emoji"
     @storage.get "emojidex.emoji"
 
   favorites: (favorites_set) ->

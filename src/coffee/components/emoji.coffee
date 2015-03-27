@@ -1,20 +1,27 @@
 class EmojidexEmoji
   constructor: (@EC) ->
-    @_emoji = @EC.Data.emoji()
+    if @checkUpdate()
+      @_emoji = @EC.Data.storage.get 'emojidex.emoji'
+    else
+      @EC.Data.storage.set 'emojidex.seedUpdated', new Date().toString()
+      @EC.Data.storage.remove 'emojidex.emoji'
+      @seed @set_emoji_data
 
-    if @EC.Data.emoji().length is 0
-      @seed()
+  checkUpdate: ->
+    if @EC.Data.storage.isSet 'emojidex.seedUpdated'
+      current = new Date
+      updated = new Date @EC.Data.storage.get 'emojidex.seedUpdated'
+      if current - updated <= 3600000 * 48
+        return true
+      else
+        return false
+    else
+      return false
 
   # Gets the full list of caetgories available
-  seed: (locale) ->
-    locale ?= @EC.locale
-    switch locale
-      when 'en'
-        @EC.Indexes.user 'emoji', @combine
-        @EC.Indexes.user 'emojidex', @combine
-      when 'ja'
-        @EC.Indexes.user '絵文字', @combine
-        @EC.Indexes.user '絵文字デックス', @combine
+  seed: (callback) ->
+    @EC.Indexes.static 'utf_emoji', callback
+    @EC.Indexes.static 'extended_emoji', callback
 
   all: ->
     @_emoji
@@ -64,7 +71,7 @@ class EmojidexEmoji
 
   # Concatenates and flattens the given emoji array into the @emoji array
   combine: (emoji) =>
-    @_emoji = @EC.Data.emoji $.extend @_emoji, emoji
+    @_emoji = @EC.Data.emoji emoji
 
   # Clears the emoji array and emoji in storage.
   # DO NOT call this unless you have a really good reason!

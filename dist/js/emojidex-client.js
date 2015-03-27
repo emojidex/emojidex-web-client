@@ -592,9 +592,12 @@
     }
 
     EmojidexData.prototype.emoji = function(emoji_set) {
-      if (emoji_set != null) {
-        this.storage.set("emojidex.emoji", emoji_set);
+      if (this.storage.isEmpty('emojidex.emoji')) {
+        this.storage.set('emojidex.emoji', emoji_set);
+      } else {
+        this.storage.set('emojidex.emoji', this.storage.get('emojidex.emoji').concat(emoji_set));
       }
+      this.EC.Emoji._emoji = this.storage.get("emojidex.emoji");
       return this.storage.get("emojidex.emoji");
     };
 
@@ -634,24 +637,33 @@
     function EmojidexEmoji(EC) {
       this.EC = EC;
       this.combine = __bind(this.combine, this);
-      this._emoji = this.EC.Data.emoji();
-      if (this.EC.Data.emoji().length === 0) {
-        this.seed();
+      if (this.checkUpdate()) {
+        this._emoji = this.EC.Data.storage.get('emojidex.emoji');
+      } else {
+        this.EC.Data.storage.set('emojidex.seedUpdated', new Date().toString());
+        this.EC.Data.storage.remove('emojidex.emoji');
+        this.seed(this.set_emoji_data);
       }
     }
 
-    EmojidexEmoji.prototype.seed = function(locale) {
-      if (locale == null) {
-        locale = this.EC.locale;
+    EmojidexEmoji.prototype.checkUpdate = function() {
+      var current, updated;
+      if (this.EC.Data.storage.isSet('emojidex.seedUpdated')) {
+        current = new Date;
+        updated = new Date(this.EC.Data.storage.get('emojidex.seedUpdated'));
+        if (current - updated <= 3600000 * 48) {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
       }
-      switch (locale) {
-        case 'en':
-          this.EC.Indexes.user('emoji', this.combine);
-          return this.EC.Indexes.user('emojidex', this.combine);
-        case 'ja':
-          this.EC.Indexes.user('絵文字', this.combine);
-          return this.EC.Indexes.user('絵文字デックス', this.combine);
-      }
+    };
+
+    EmojidexEmoji.prototype.seed = function(callback) {
+      this.EC.Indexes["static"]('utf_emoji', callback);
+      return this.EC.Indexes["static"]('extended_emoji', callback);
     };
 
     EmojidexEmoji.prototype.all = function() {
@@ -771,7 +783,7 @@
     };
 
     EmojidexEmoji.prototype.combine = function(emoji) {
-      return this._emoji = this.EC.Data.emoji($.extend(this._emoji, emoji));
+      return this._emoji = this.EC.Data.emoji(emoji);
     };
 
     EmojidexEmoji.prototype.flush = function() {
@@ -838,6 +850,17 @@
 
     EmojidexIndexes.prototype.user = function(username, callback, opts) {
       return this._indexesAPI("users/" + username + "/emoji", callback, opts);
+    };
+
+    EmojidexIndexes.prototype["static"] = function(username, callback) {
+      var _this = this;
+      return $.ajax({
+        url: this.EC.api_url + username,
+        dataType: 'json',
+        success: function(response) {
+          return _this.EC.Emoji.combine(response);
+        }
+      });
     };
 
     EmojidexIndexes.prototype.select = function(code, callback, opts) {
