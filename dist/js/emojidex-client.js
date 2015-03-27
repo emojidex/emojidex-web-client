@@ -305,10 +305,10 @@
       return false;
     }
   }
-
+  
   // Check if storages are natively available on browser
   var storage_available=_testStorage('localStorage');
-
+  
   // Namespace object
   var storage={
     _type:'',
