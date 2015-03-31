@@ -305,10 +305,10 @@
       return false;
     }
   }
-  
+
   // Check if storages are natively available on browser
   var storage_available=_testStorage('localStorage');
-  
+
   // Namespace object
   var storage={
     _type:'',
@@ -597,7 +597,6 @@
       } else {
         this.storage.set('emojidex.emoji', this.storage.get('emojidex.emoji').concat(emoji_set));
       }
-      this.EC.Emoji._emoji = this.storage.get("emojidex.emoji");
       return this.storage.get("emojidex.emoji");
     };
 

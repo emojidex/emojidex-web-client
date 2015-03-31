@@ -131,7 +131,6 @@
       } else {
         this.storage.set('emojidex.emoji', this.storage.get('emojidex.emoji').concat(emoji_set));
       }
-      this.EC.Emoji._emoji = this.storage.get("emojidex.emoji");
       return this.storage.get("emojidex.emoji");
     };
 

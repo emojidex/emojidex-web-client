@@ -32,7 +32,6 @@ class EmojidexData
       @storage.set 'emojidex.emoji', emoji_set
     else
       @storage.set 'emojidex.emoji', @storage.get('emojidex.emoji').concat emoji_set
-    @EC.Emoji._emoji = @storage.get "emojidex.emoji"
     @storage.get "emojidex.emoji"
 
   favorites: (favorites_set) ->
