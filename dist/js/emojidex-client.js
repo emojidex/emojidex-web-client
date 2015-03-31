@@ -637,14 +637,20 @@
     function EmojidexEmoji(EC) {
       this.EC = EC;
       this.combine = __bind(this.combine, this);
+      this._emoji_instance = null;
+    }
+
+    EmojidexEmoji._emoji = function() {
+      if (this._emoji_instance !== null) {
+        return this._emoji_instance;
+      }
       if (this.checkUpdate()) {
-        this._emoji = this.EC.Data.storage.get('emojidex.emoji');
+        return this._emoji_instance = this.EC.Data.storage.get('emojidex.emoji');
       } else {
         this.EC.Data.storage.set('emojidex.seedUpdated', new Date().toString());
-        this.EC.Data.storage.remove('emojidex.emoji');
-        this.seed(this.set_emoji_data);
+        return this.seed(this.combine);
       }
-    }
+    };
 
     EmojidexEmoji.prototype.checkUpdate = function() {
       var current, updated;
@@ -783,11 +789,11 @@
     };
 
     EmojidexEmoji.prototype.combine = function(emoji) {
-      return this._emoji = this.EC.Data.emoji(emoji);
+      return this._emoji_instance = this.EC.Data.emoji(emoji);
     };
 
     EmojidexEmoji.prototype.flush = function() {
-      return this._emoji = this.EC.Data.emoji([]);
+      return this._emoji_instance = this.EC.Data.emoji([]);
     };
 
     return EmojidexEmoji;

@@ -1,11 +1,16 @@
 class EmojidexEmoji
   constructor: (@EC) ->
+    @_emoji_instance = null
+
+  @_emoji: ->
+    return @_emoji_instance if @_emoji_instance != null
+
     if @checkUpdate()
-      @_emoji = @EC.Data.storage.get 'emojidex.emoji'
+      @_emoji_instance = @EC.Data.storage.get 'emojidex.emoji'
     else
       @EC.Data.storage.set 'emojidex.seedUpdated', new Date().toString()
-      @EC.Data.storage.remove 'emojidex.emoji'
-      @seed @set_emoji_data
+      # @EC.Data.storage.remove 'emojidex.emoji'
+      @seed @combine
 
   checkUpdate: ->
     if @EC.Data.storage.isSet 'emojidex.seedUpdated'
@@ -71,9 +76,9 @@ class EmojidexEmoji
 
   # Concatenates and flattens the given emoji array into the @emoji array
   combine: (emoji) =>
-    @_emoji = @EC.Data.emoji emoji
+    @_emoji_instance = @EC.Data.emoji emoji
 
   # Clears the emoji array and emoji in storage.
   # DO NOT call this unless you have a really good reason!
   flush: ->
-    @_emoji = @EC.Data.emoji []
+    @_emoji_instance = @EC.Data.emoji []
