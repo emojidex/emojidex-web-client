@@ -592,10 +592,24 @@
     }
 
     EmojidexData.prototype.emoji = function(emoji_set) {
+      var emoji, ls_emoji, new_emoji, _i, _j, _len, _len1;
       if (this.storage.isEmpty('emojidex.emoji')) {
         this.storage.set('emojidex.emoji', emoji_set);
       } else {
-        this.storage.set('emojidex.emoji', this.storage.get('emojidex.emoji').concat(emoji_set));
+        ls_emoji = this.storage.get('emojidex.emoji');
+        for (_i = 0, _len = emoji_set.length; _i < _len; _i++) {
+          new_emoji = emoji_set[_i];
+          for (_j = 0, _len1 = ls_emoji.length; _j < _len1; _j++) {
+            emoji = ls_emoji[_j];
+            if (new_emoji.code === emoji.code) {
+              ls_emoji.splice(ls_emoji.indexOf(emoji), 1, new_emoji);
+              break;
+            } else if (emoji === ls_emoji[ls_emoji.length - 1]) {
+              ls_emoji.push(new_emoji);
+            }
+          }
+        }
+        this.storage.set('emojidex.emoji', ls_emoji);
       }
       return this.storage.get("emojidex.emoji");
     };
@@ -639,7 +653,7 @@
       this._emoji_instance = null;
     }
 
-    EmojidexEmoji._emoji = function() {
+    EmojidexEmoji.prototype._emoji = function() {
       if (this._emoji_instance !== null) {
         return this._emoji_instance;
       }
@@ -672,14 +686,14 @@
     };
 
     EmojidexEmoji.prototype.all = function() {
-      return this._emoji;
+      return this._emoji();
     };
 
     EmojidexEmoji.prototype.search = function(term, callback) {
       var moji, results;
       results = (function() {
         var _i, _len, _ref, _results;
-        _ref = this._emoji;
+        _ref = this._emoji();
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           moji = _ref[_i];
@@ -699,7 +713,7 @@
       var moji, results;
       results = (function() {
         var _i, _len, _ref, _results;
-        _ref = this._emoji;
+        _ref = this._emoji();
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           moji = _ref[_i];
@@ -719,7 +733,7 @@
       var moji, results;
       results = (function() {
         var _i, _len, _ref, _results;
-        _ref = this._emoji;
+        _ref = this._emoji();
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           moji = _ref[_i];
@@ -738,7 +752,7 @@
     EmojidexEmoji.prototype.tags = function(tags, opts) {
       var collect, moji, selection, tag, _i, _len;
       tags = this.EC.Util.breakout(tags);
-      selection = opts.selection || this._emoji;
+      selection = opts.selection || this._emoji();
       collect = [];
       for (_i = 0, _len = tags.length; _i < _len; _i++) {
         tag = tags[_i];
@@ -760,7 +774,7 @@
     EmojidexEmoji.prototype.categories = function(categories, opts) {
       var category, collect, moji, source, _i, _len;
       categories = this.EC.Util.breakout(categories);
-      source = opts.selection || this._emoji;
+      source = opts.selection || this._emoji();
       collect = [];
       for (_i = 0, _len = categories.length; _i < _len; _i++) {
         category = categories[_i];
@@ -857,7 +871,7 @@
       return this._indexesAPI("users/" + username + "/emoji", callback, opts);
     };
 
-    EmojidexIndexes.prototype["static"] = function(username, callback) {
+    EmojidexIndexes.prototype["static"] = function(static_type, callback) {
       var _this = this;
       return $.ajax({
         url: this.EC.api_url + username,
