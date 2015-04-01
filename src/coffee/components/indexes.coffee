@@ -43,7 +43,7 @@ class EmojidexIndexes
   user: (username, callback, opts) ->
     @_indexesAPI "users/#{username}/emoji", callback, opts
 
-  static: (username, callback) ->
+  static: (static_type, callback) ->
     $.ajax
       url: @EC.api_url + username
       dataType: 'json'

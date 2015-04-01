@@ -2,7 +2,7 @@ class EmojidexEmoji
   constructor: (@EC) ->
     @_emoji_instance = null
 
-  @_emoji: ->
+  _emoji: ->
     return @_emoji_instance if @_emoji_instance != null
 
     if @checkUpdate()
@@ -29,30 +29,30 @@ class EmojidexEmoji
     @EC.Indexes.static 'extended_emoji', callback
 
   all: ->
-    @_emoji
+    @_emoji()
 
   # internal collection search
   search: (term, callback) ->
-    results = (moji for moji in @_emoji when moji.code.match term)
+    results = (moji for moji in @_emoji() when moji.code.match term)
     callback? results
     results
 
   # internal collection search (starting with)
   starting: (term, callback) ->
-    results = (moji for moji in @_emoji when moji.code.match '^' + term)
+    results = (moji for moji in @_emoji() when moji.code.match '^' + term)
     callback? results
     results
 
   # internal collection search (starting with)
   ending: (term, callback) ->
-    results = (moji for moji in @_emoji when moji.code.match term + '$')
+    results = (moji for moji in @_emoji() when moji.code.match term + '$')
     callback? results
     results
 
   # search for emoji with the given tags
   tags: (tags, opts) ->
     tags = @EC.Util.breakout tags
-    selection = opts.selection || @_emoji
+    selection = opts.selection || @_emoji()
     collect = []
     for tag in tags
       collect.concat (moji for moji in selection when $.inArray(tag, moji.tags) >= 0)
@@ -61,7 +61,7 @@ class EmojidexEmoji
   # gets emoji in any of the given categories
   categories: (categories, opts) ->
     categories = @EC.Util.breakout categories
-    source = opts.selection || @_emoji
+    source = opts.selection || @_emoji()
     collect = []
     for category in categories
       collect.concat (moji for moji in source when moji.category is category)

@@ -31,7 +31,16 @@ class EmojidexData
     if @storage.isEmpty 'emojidex.emoji'
       @storage.set 'emojidex.emoji', emoji_set
     else
-      @storage.set 'emojidex.emoji', @storage.get('emojidex.emoji').concat emoji_set
+      ls_emoji = @storage.get 'emojidex.emoji'
+      for new_emoji in emoji_set
+        for emoji in ls_emoji
+          if new_emoji.code is emoji.code
+            ls_emoji.splice ls_emoji.indexOf(emoji), 1, new_emoji
+            break
+          else if emoji is ls_emoji[ls_emoji.length - 1]
+            ls_emoji.push new_emoji
+      @storage.set 'emojidex.emoji', ls_emoji
+
     @storage.get "emojidex.emoji"
 
   favorites: (favorites_set) ->
