@@ -43,12 +43,25 @@ class EmojidexIndexes
   user: (username, callback, opts) ->
     @_indexesAPI "users/#{username}/emoji", callback, opts
 
-  static: (static_type, callback) ->
-    $.ajax
-      url: @EC.api_url + username
-      dataType: 'json'
-      success: (response) =>
-        @EC.Emoji.combine response
+  static: (static_type, language, callback) ->
+    onLoaded = () =>
+      if ++loaded_num is static_type.length
+        callback()
+    loadStatic = (url_string) =>
+      $.ajax
+        url: url_string
+        dataType: 'json'
+        success: (response) =>
+          console.count()
+          @EC.Emoji.combine response
+          onLoaded()
+
+    loaded_num = 0
+    for type in static_type
+      if language
+        loadStatic "#{@EC.api_url + type}?locale=#{language}"
+      else
+        loadStatic "#{@EC.api_url + type}"
 
   select: (code, callback, opts) ->
     @EC.Search.find(code, callback, opts)

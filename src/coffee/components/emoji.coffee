@@ -3,14 +3,13 @@ class EmojidexEmoji
     @_emoji_instance = null
 
   _emoji: ->
-    return @_emoji_instance if @_emoji_instance != null
+    return @_emoji_instance if @_emoji_instanc?
 
     if @checkUpdate()
       @_emoji_instance = @EC.Data.storage.get 'emojidex.emoji'
     else
       @EC.Data.storage.set 'emojidex.seedUpdated', new Date().toString()
-      # @EC.Data.storage.remove 'emojidex.emoji'
-      @seed @combine
+      @seed()
 
   checkUpdate: ->
     if @EC.Data.storage.isSet 'emojidex.seedUpdated'
@@ -25,8 +24,8 @@ class EmojidexEmoji
 
   # Gets the full list of caetgories available
   seed: (callback) ->
-    @EC.Indexes.static 'utf_emoji', callback
-    @EC.Indexes.static 'extended_emoji', callback
+    lang = navigator.language || navigator.userLanguage
+    @EC.Indexes.static ['utf_emoji', 'extended_emoji'], lang, callback
 
   all: ->
     @_emoji()

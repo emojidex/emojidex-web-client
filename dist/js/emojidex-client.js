@@ -593,23 +593,25 @@
 
     EmojidexData.prototype.emoji = function(emoji_set) {
       var emoji, ls_emoji, new_emoji, _i, _j, _len, _len1;
-      if (this.storage.isEmpty('emojidex.emoji')) {
-        this.storage.set('emojidex.emoji', emoji_set);
-      } else {
-        ls_emoji = this.storage.get('emojidex.emoji');
-        for (_i = 0, _len = emoji_set.length; _i < _len; _i++) {
-          new_emoji = emoji_set[_i];
-          for (_j = 0, _len1 = ls_emoji.length; _j < _len1; _j++) {
-            emoji = ls_emoji[_j];
-            if (new_emoji.code === emoji.code) {
-              ls_emoji.splice(ls_emoji.indexOf(emoji), 1, new_emoji);
-              break;
-            } else if (emoji === ls_emoji[ls_emoji.length - 1]) {
-              ls_emoji.push(new_emoji);
+      if (emoji_set != null) {
+        if (this.storage.isEmpty('emojidex.emoji')) {
+          this.storage.set('emojidex.emoji', emoji_set);
+        } else {
+          ls_emoji = this.storage.get('emojidex.emoji');
+          for (_i = 0, _len = emoji_set.length; _i < _len; _i++) {
+            new_emoji = emoji_set[_i];
+            for (_j = 0, _len1 = ls_emoji.length; _j < _len1; _j++) {
+              emoji = ls_emoji[_j];
+              if (new_emoji.code === emoji.code) {
+                ls_emoji.splice(ls_emoji.indexOf(emoji), 1, new_emoji);
+                break;
+              } else if (emoji === ls_emoji[ls_emoji.length - 1]) {
+                ls_emoji.push(new_emoji);
+              }
             }
           }
+          this.storage.set('emojidex.emoji', ls_emoji);
         }
-        this.storage.set('emojidex.emoji', ls_emoji);
       }
       return this.storage.get("emojidex.emoji");
     };
@@ -654,14 +656,14 @@
     }
 
     EmojidexEmoji.prototype._emoji = function() {
-      if (this._emoji_instance !== null) {
+      if (this._emoji_instanc != null) {
         return this._emoji_instance;
       }
       if (this.checkUpdate()) {
         return this._emoji_instance = this.EC.Data.storage.get('emojidex.emoji');
       } else {
         this.EC.Data.storage.set('emojidex.seedUpdated', new Date().toString());
-        return this.seed(this.combine);
+        return this.seed();
       }
     };
 
@@ -681,8 +683,9 @@
     };
 
     EmojidexEmoji.prototype.seed = function(callback) {
-      this.EC.Indexes["static"]('utf_emoji', callback);
-      return this.EC.Indexes["static"]('extended_emoji', callback);
+      var lang;
+      lang = navigator.language || navigator.userLanguage;
+      return this.EC.Indexes["static"](['utf_emoji', 'extended_emoji'], lang, callback);
     };
 
     EmojidexEmoji.prototype.all = function() {
@@ -871,15 +874,36 @@
       return this._indexesAPI("users/" + username + "/emoji", callback, opts);
     };
 
-    EmojidexIndexes.prototype["static"] = function(static_type, callback) {
-      var _this = this;
-      return $.ajax({
-        url: this.EC.api_url + username,
-        dataType: 'json',
-        success: function(response) {
-          return _this.EC.Emoji.combine(response);
+    EmojidexIndexes.prototype["static"] = function(static_type, language, callback) {
+      var loadStatic, loaded_num, onLoaded, type, _i, _len, _results,
+        _this = this;
+      onLoaded = function() {
+        if (++loaded_num === static_type.length) {
+          return callback();
         }
-      });
+      };
+      loadStatic = function(url_string) {
+        return $.ajax({
+          url: url_string,
+          dataType: 'json',
+          success: function(response) {
+            console.count();
+            _this.EC.Emoji.combine(response);
+            return onLoaded();
+          }
+        });
+      };
+      loaded_num = 0;
+      _results = [];
+      for (_i = 0, _len = static_type.length; _i < _len; _i++) {
+        type = static_type[_i];
+        if (language) {
+          _results.push(loadStatic("" + (this.EC.api_url + type) + "?locale=" + language));
+        } else {
+          _results.push(loadStatic("" + (this.EC.api_url + type)));
+        }
+      }
+      return _results;
     };
 
     EmojidexIndexes.prototype.select = function(code, callback, opts) {
