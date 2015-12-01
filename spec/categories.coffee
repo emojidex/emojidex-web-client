@@ -1,7 +1,8 @@
 describe 'EmojidexCategories', ->
-  beforeEach helperBefore
+  beforeEach (done)->
+    helperBefore done
 
   it 'sync', (done) ->
-    @EC.Categories.sync (categories) ->
+    EC.Categories.sync (categories) ->
       expect(categories.length).toBeTruthy()
       done()

@@ -1,24 +1,23 @@
 describe 'EmojidexIndexes', ->
-  beforeEach helperBefore
+  beforeEach (done)->
+    helperBefore done
 
   it 'user', (done) ->
-    @EC.Indexes.user 'emojidex', (emoji_data) ->
-      expect(emoji_data).toContain(
-        jasmine.objectContaining emoji_emojidex
-      )
+    EC.Indexes.user 'emojidex', (emoji_data) =>
+      expect(emoji_data).toContain(jasmine.objectContaining emoji_emojidex[0])
       done()
 
   it 'index', (done) ->
-    @EC.Indexes.index (emoji_data) ->
+    EC.Indexes.index (emoji_data) ->
       expect(emoji_data.length).toBeTruthy()
       done()
 
   it 'newest', (done) ->
-    @EC.Indexes.newest (emoji_data) ->
+    EC.Indexes.newest (emoji_data) ->
       expect(emoji_data.length).toBeTruthy()
       done()
 
   it 'popular', (done) ->
-    @EC.Indexes.popular (emoji_data) ->
+    EC.Indexes.popular (emoji_data) ->
       expect(emoji_data.length).toBeTruthy()
       done()

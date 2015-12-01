@@ -1,5 +1,6 @@
 describe 'EmojidexUtil', ->
-  beforeEach helperBefore
+  beforeEach (done)->
+    helperBefore done
 
   it 'has the Util class defined and instantiated', ->
-    expect(@EC.Util).toBeDefined()
+    expect(EC.Util).toBeDefined()
