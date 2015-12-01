@@ -22,7 +22,7 @@
  * Project home:
  * https://github.com/julien-maurel/jQuery-Storage-API
  *
- * Version: 1.7.3
+ * Version: 1.7.5
  *
  * --------------------------------
  */
@@ -256,7 +256,7 @@
     }else{
       o=s;
     }
-    if(o._cookie){
+    if(o && o._cookie){
       // If storage is a cookie, use $.cookie to retrieve keys
       for(var key in $.cookie()){
         if(key!='') {
@@ -295,9 +295,9 @@
 
   // Test if storage is natively available on browser
   function _testStorage(name){
-    if(!window[name]) return false;
     var foo='jsapi';
     try{
+      if(!window[name]) return false;
       window[name].setItem(foo,foo);
       window[name].removeItem(foo);
       return true;
@@ -305,10 +305,10 @@
       return false;
     }
   }
-
+  
   // Check if storages are natively available on browser
   var storage_available=_testStorage('localStorage');
-
+  
   // Namespace object
   var storage={
     _type:'',
