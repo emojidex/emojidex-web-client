@@ -3,9 +3,9 @@ describe 'EmojidexSearch', ->
     helperBefore done
 
   it 'search', (done) ->
-    EC.Search.search 'kiss', (emoji_data) ->
+    EC.Search.search 'kissing', (emoji_data) ->
       expect(emoji_data).toContain(
-        jasmine.objectContaining emoji_kiss
+        jasmine.objectContaining emoji_kissing
       )
       done()
 
@@ -29,9 +29,9 @@ describe 'EmojidexSearch', ->
       done()
 
   it 'advanced: term', (done) ->
-    EC.Search.advanced term: 'kiss', (emoji_data) ->
+    EC.Search.advanced term: 'kissing', (emoji_data) ->
       expect(emoji_data).toContain(
-        jasmine.objectContaining emoji_kiss
+        jasmine.objectContaining emoji_kissing
       )
       done()
 

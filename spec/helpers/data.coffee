@@ -4,6 +4,12 @@
   unicode: '1f48b'
   category: 'objects'
 
+@emoji_kissing =
+  code: 'kissing'
+  moji: '😗'
+  unicode: '1f617'
+  category: 'faces'
+
 @emoji_emojidex =
   code: 'emojidex'
   category: 'symbols'

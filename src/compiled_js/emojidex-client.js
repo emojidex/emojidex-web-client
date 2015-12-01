@@ -878,11 +878,14 @@
     };
 
     EmojidexUtil.prototype.breakout = function(items) {
-      if (items == null) {
+      if (items != null) {
+        if (items instanceof Array) {
+          return items;
+        } else {
+          return [items];
+        }
+      } else {
         return [];
-      }
-      if (!(items instanceof Array)) {
-        return items = [items];
       }
     };
 

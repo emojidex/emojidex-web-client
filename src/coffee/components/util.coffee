@@ -11,8 +11,13 @@ class EmojidexUtil
 
   # Breakout into an array
   breakout: (items) ->
-    return [] unless items?
-    items = [items] unless items instanceof Array
+    if items?
+      if items instanceof Array
+        return items
+      else
+        return [items]
+    else
+      return []
 
   # Converts an emoji array to [{code: "moji_code", img_url: "http://cdn...moji_code.png}] format
   simplify: (emoji = @results, size_code = @EC.size_code) ->
