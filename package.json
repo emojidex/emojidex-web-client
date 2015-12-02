@@ -27,7 +27,8 @@
     "grunt-contrib-watch": "~0.5.3",
     "grunt-este-watch": "^0.1.18",
     "grunt-license-saver": "0.0.0",
-    "jquery": "^2.1.4"
+    "jquery": "^2.1.4",
+    "cross-storage": "^0.8.1"
   },
   "scripts": {
     "test": "grunt && grunt jasmine"
