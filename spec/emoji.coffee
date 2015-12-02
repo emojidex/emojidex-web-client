@@ -1,7 +1,7 @@
 describe 'EmojidexEmoji', ->
   beforeEach (done) ->
     helperChains
-      chains: [helperBefore]
+      functions: [helperBefore]
       end: done
 
   it 'has the Emoji class defined', ->

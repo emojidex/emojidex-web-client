@@ -1,7 +1,7 @@
 describe 'EmojidexData', ->
   beforeEach (done) ->
     helperChains
-      chains: [helperBefore]
+      functions: [helperBefore]
       end: done
 
   it 'has the Data class defined', ->

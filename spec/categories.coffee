@@ -1,7 +1,7 @@
 describe 'EmojidexCategories', ->
   beforeEach (done) ->
     helperChains
-      chains: [helperBefore]
+      functions: [helperBefore]
       end: done
 
   it 'sync', (done) ->

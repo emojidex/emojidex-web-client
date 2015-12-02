@@ -1,7 +1,7 @@
 describe 'EmojidexUser', ->
   beforeEach (done) ->
     helperChains
-      chains: [helperBefore]
+      functions: [helperBefore]
       end: done
 
   describe 'Favorites', ->

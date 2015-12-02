@@ -1,9 +1,9 @@
 helperChains = (chains_data) ->
-  if chains_data.chains.length is 0
+  if chains_data.functions.length is 0
     chains_data.end()
   else
-    current_chain = chains_data.chains.shift()
-    current_chain chains_data
+    chain_function = chains_data.functions.shift()
+    chain_function chains_data
 
 helperBefore = (chains_data) ->
   @EC = new EmojidexClient

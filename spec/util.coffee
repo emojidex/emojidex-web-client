@@ -1,7 +1,7 @@
 describe 'EmojidexUtil', ->
   beforeEach (done) ->
     helperChains
-      chains: [helperBefore]
+      functions: [helperBefore]
       end: done
 
   it 'has the Util class defined and instantiated', ->
