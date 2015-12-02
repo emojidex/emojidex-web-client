@@ -74,6 +74,8 @@ module.exports = (grunt) ->
           banner: '<%= meta.banner %><%= grunt.getLicense("build/licenses.json") %>\n */\n'
         src: [
           'bower_components/jquery.storageapi/jquery.storageapi.js'
+          'node_modules/cross-storage/client.min.js'
+          'node_modules/cross-storage/hub.min.js'
           'src/compiled_js/**/*.js'
         ]
         dest: 'dist/js/emojidex-client.js'
