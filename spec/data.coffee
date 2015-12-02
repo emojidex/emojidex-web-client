@@ -1,6 +1,8 @@
 describe 'EmojidexData', ->
-  beforeEach (done)->
-    helperBefore done
+  beforeEach (done) ->
+    helperChains
+      chains: [helperBefore]
+      end: done
 
   it 'has the Data class defined', ->
     expect(EC.Data).toBeDefined()

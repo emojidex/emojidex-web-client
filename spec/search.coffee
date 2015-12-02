@@ -1,6 +1,8 @@
 describe 'EmojidexSearch', ->
-  beforeEach (done)->
-    helperBefore done
+  beforeEach (done) ->
+    helperChains
+      chains: [helperBefore]
+      end: done
 
   it 'search', (done) ->
     EC.Search.search 'kissing', (emoji_data) ->

@@ -1,6 +1,8 @@
 describe 'EmojidexCategories', ->
-  beforeEach (done)->
-    helperBefore done
+  beforeEach (done) ->
+    helperChains
+      chains: [helperBefore]
+      end: done
 
   it 'sync', (done) ->
     EC.Categories.sync (categories) ->

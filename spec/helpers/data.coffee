@@ -10,10 +10,6 @@
   unicode: '1f617'
   category: 'faces'
 
-@emoji_emojidex =
-  code: 'emojidex'
-  category: 'symbols'
-
 @emoji_emoji =
   code: 'emoji'
   category: 'symbols'

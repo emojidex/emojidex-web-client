@@ -1,18 +1,20 @@
 describe 'EmojidexUser', ->
-  beforeEach (done)->
-    helperBefore done
+  beforeEach (done) ->
+    helperChains
+      chains: [helperBefore]
+      end: done
 
   describe 'Favorites', ->
     it 'get', (done) ->
       EC.User.Favorites.get (favorites)->
         expect(favorites).toContain(
-          jasmine.objectContaining(emoji_emojidex)
+          jasmine.objectContaining(emoji_emoji)
         )
         done()
 
     it 'all', ->
       expect(EC.User.Favorites.all()).toContain(
-        jasmine.objectContaining(emoji_emojidex)
+        jasmine.objectContaining(emoji_emoji)
       )
 
     # it 'set_favorites', (done) ->

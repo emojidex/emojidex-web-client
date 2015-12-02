@@ -1,6 +1,8 @@
 describe 'EmojidexIndexes', ->
-  beforeEach (done)->
-    helperBefore done
+  beforeEach (done) ->
+    helperChains
+      chains: [helperBefore, helperGetDataUseAjax]
+      end: done
 
   it 'user', (done) ->
     EC.Indexes.user 'emojidex', (emoji_data) =>
