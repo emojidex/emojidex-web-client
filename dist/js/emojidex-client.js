@@ -1,5 +1,5 @@
 /*
- * emojidex client - v0.3.8
+ * emojidex client - v0.4.0
  * * Provides search, index caching and combining and asset URI resolution
  * https://github.com/emojidex/emojidex-web-client
  *
@@ -520,6 +520,72 @@
       }
     }
 
+    EmojidexCategories.prototype._categoriesAPI = function(category_name, callback, opts, called_func) {
+      var param,
+        _this = this;
+      param = {
+        page: 1,
+        limit: this.EC.limit,
+        detailed: this.EC.detailed
+      };
+      $.extend(param, opts);
+      this.called_func = called_func;
+      this.called_data = {
+        category_name: category_name,
+        callback: callback,
+        param: param
+      };
+      return $.ajax({
+        url: "" + this.EC.api_url + "categories/" + category_name + "/" + param.type,
+        dataType: 'json',
+        data: param,
+        success: function(response) {
+          _this.meta = response.meta;
+          _this.results = response.emoji;
+          _this.cur_page = response.meta.page;
+          _this.count = response.meta.count;
+          _this.EC.Emoji.combine(response.emoji);
+          return typeof callback === "function" ? callback(response.emoji) : void 0;
+        }
+      });
+    };
+
+    EmojidexCategories.prototype.getEmoji = function(category_name, callback, opts) {
+      var param;
+      param = {
+        type: 'emoji'
+      };
+      $.extend(param, opts);
+      return this._categoriesAPI(category_name, callback, param, this.getEmoji);
+    };
+
+    EmojidexCategories.prototype.getNewest = function(category_name, callback, opts) {
+      var param;
+      param = {
+        type: 'newest'
+      };
+      $.extend(param, opts);
+      return this._categoriesAPI(category_name, callback, param, this.getNewest);
+    };
+
+    EmojidexCategories.prototype.next = function() {
+      if (this.count === this.called_data.param.limit) {
+        this.called_data.param.page++;
+      }
+      return this.called_func(this.called_data.category_name, this.called_data.callback, this.called_data.param, {
+        ajax: this.called_func
+      });
+    };
+
+    EmojidexCategories.prototype.prev = function() {
+      if (this.called_data.param.page > 1) {
+        this.called_data.param.page--;
+      }
+      return this.called_func(this.called_data.category_name, this.called_data.callback, this.called_data.param, {
+        ajax: this.called_func
+      });
+    };
+
     EmojidexCategories.prototype.sync = function(callback, locale) {
       var _this = this;
       if (locale == null) {
@@ -958,6 +1024,7 @@
           dataType: 'json',
           data: param,
           success: function(response) {
+            _this.meta = response.meta;
             _this.results = response.emoji;
             _this.cur_page = response.meta.page;
             _this.count = response.meta.count;

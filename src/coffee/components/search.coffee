@@ -26,6 +26,7 @@ class EmojidexSearch
         dataType: 'json'
         data: param
         success: (response) =>
+          @meta = response.meta
           @results = response.emoji
           @cur_page = response.meta.page
           @count = response.meta.count

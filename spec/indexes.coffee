@@ -1,7 +1,7 @@
 describe 'EmojidexIndexes', ->
   beforeEach (done) ->
     helperChains
-      functions: [helperBefore, helperGetDataUseAjax]
+      functions: [helperBefore, helperExtendedEmojiData]
       end: done
 
   it 'user', (done) ->
