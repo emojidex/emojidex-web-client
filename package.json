@@ -16,6 +16,7 @@
     "copyright": "Copyright 2013 Genshin Souzou Kabushiki Kaisha"
   },
   "devDependencies": {
+    "cross-storage": "^0.8.1",
     "grunt": "~0.4.1",
     "grunt-cli": "~0.1.7",
     "grunt-contrib-coffee": "~0.7.0",
@@ -27,8 +28,9 @@
     "grunt-contrib-watch": "~0.5.3",
     "grunt-este-watch": "^0.1.18",
     "grunt-license-saver": "0.0.0",
+    "grunt-slim": "^0.1.0",
     "jquery": "^2.1.4",
-    "cross-storage": "^0.8.1"
+    "promise-polyfill": "^2.1.0"
   },
   "scripts": {
     "test": "grunt && grunt jasmine"

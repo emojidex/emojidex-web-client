@@ -74,8 +74,7 @@ module.exports = (grunt) ->
           banner: '<%= meta.banner %><%= grunt.getLicense("build/licenses.json") %>\n */\n'
         src: [
           'bower_components/jquery.storageapi/jquery.storageapi.js'
-          'node_modules/cross-storage/client.min.js'
-          'node_modules/cross-storage/hub.min.js'
+          'node_modules/cross-storage/dist/client.min.js'
           'src/compiled_js/**/*.js'
         ]
         dest: 'dist/js/emojidex-client.js'
@@ -104,15 +103,30 @@ module.exports = (grunt) ->
         outfile: 'build/_SpecRunner.html'
         vendor:[
           'node_modules/jquery/dist/jquery.min.js'
+          'node_modules/promise-polyfill/Promise.min.js'
         ]
         helpers:[
           'build/spec/helpers/**/*.js'
         ]
 
+    slim:
+      options:
+        pretty: true
+      dsit:
+        files: [
+          expand: true
+          cwd: 'src/slim/'
+          src: '*.slim'
+          dest: 'build/'
+          ext: '.html'
+        ]
+
     # grunt dev --------------------------------
     connect:
-      site: {}
-
+      client: {}
+      hub:
+        options:
+          port: 8001
     esteWatch:
       options:
         dirs: [
@@ -193,6 +207,7 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-este-watch'
   grunt.loadNpmTasks 'grunt-contrib-jasmine'
   grunt.loadNpmTasks 'grunt-license-saver'
+  grunt.loadNpmTasks 'grunt-slim'
 
-  grunt.registerTask 'default', ['save_license', 'coffee', 'concat', 'uglify', 'jasmine']
+  grunt.registerTask 'default', ['save_license', 'coffee', 'concat', 'uglify', 'jasmine', 'slim']
   grunt.registerTask 'dev', ['connect', 'esteWatch']

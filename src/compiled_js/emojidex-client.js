@@ -4,7 +4,6 @@
 
   this.EmojidexClient = (function() {
     function EmojidexClient(options) {
-      this.options = options;
       this.env = {
         api_ver: 1,
         cdn_addr: 'cdn.emojidex.com',
@@ -22,7 +21,7 @@
         detailed: false,
         limit: 32
       };
-      this.options = $.extend({}, this.defaults, this.options);
+      this.options = $.extend({}, this.defaults, options);
       this.closed_net = this.options.closed_net;
       this.api_url = this.options.api_url;
       this.cdn_url = this.options.cdn_url;
@@ -155,49 +154,65 @@
         user: '',
         token: null
       };
-      this.storage = $.localStorage;
-      if (!this.storage.isSet("emojidex")) {
-        this.storage.set("emojidex", {});
-      }
-      if (!this.storage.isSet("emojidex.emoji")) {
-        this.storage.set("emojidex.emoji", this.EC.options.emoji || []);
-      }
-      if (!this.storage.isSet("emojidex.history")) {
-        this.storage.set("emojidex.history", this.EC.options.history || []);
-      }
-      if (!this.storage.isSet("emojidex.favorites")) {
-        this.storage.set("emojidex.favorites", this.EC.options.favorites || []);
-      }
-      if (!this.storage.isSet("emojidex.auth_info")) {
-        this.storage.set("emojidex.categories", this.EC.options.categories || []);
-      }
-      if (!this.storage.isSet("emojidex.auth_info")) {
-        this.storage.set("emojidex.auth_info", this.EC.options.auth_info || this._def_auth_info);
-      }
-      if (this.storage.get('emojidex.cdn_url')) {
-        this.EC.cdn_url = this.storage.get('emojidex.cdn_url');
-      } else {
-        if (this.EC.cdn_url === this.EC.defaults.cdn_url && this.EC.closed_net === false) {
-          $.ajax({
-            url: this.EC.api_url + "/env",
-            dataType: 'json',
-            success: function(response) {
-              _this.EC.env = response;
-              _this.EC.cdn_url = "https://" + _this.EC.env.s_cdn_addr + "/emoji/";
-              return _this.EC.Data.storage.set('emojidex.cdn_url', _this.EC.cdn_url);
-            }
-          });
+      this.emojidex_data = {};
+      this.storage = new CrossStorageClient('http://localhost:8001/build/hub.html');
+      this.storage.onConnect().then(function() {
+        return _this.storage.getKeys();
+      }).then(function(keys) {
+        if (keys.indexOf('emojidex') !== -1) {
+          return _this.get_hub_emojidex();
+        } else {
+          _this.emojidex_data = {
+            emoji: _this.EC.options.emoji || [],
+            history: _this.EC.options.history || [],
+            favorites: _this.EC.options.favorites || [],
+            categories: _this.EC.options.categories || [],
+            auth_info: _this.EC.options.auth_info || _this._def_auth_info
+          };
+          return _this.storage.set('emojidex', _this.emojidex_data);
         }
-      }
+      }).then(function() {
+        if (_this.emojidex_data.cdn_url != null) {
+          return _this.EC.cdn_url = _this.emojidex_data.cdn_url;
+        } else {
+          if (_this.EC.cdn_url === _this.EC.defaults.cdn_url && _this.EC.closed_net === false) {
+            return $.ajax({
+              url: _this.EC.api_url + "/env",
+              dataType: 'json',
+              success: function(response) {
+                _this.EC.env = response;
+                _this.EC.cdn_url = "https://" + _this.EC.env.s_cdn_addr + "/emoji/";
+                return _this.EC.Data.update_hub_data({
+                  cdn_url: _this.EC.cdn_url
+                });
+              }
+            });
+          }
+        }
+      });
     }
+
+    EmojidexData.prototype.update_hub_data = function(data) {
+      $.extend(this.emojidex_data, data);
+      return this.storage.set('emojidex', this.emojidex_data);
+    };
+
+    EmojidexData.prototype.get_hub_emojidex = function() {
+      var _this = this;
+      return this.storage.get('emojidex').then(function(data) {
+        return _this.emojidex_data = data;
+      });
+    };
 
     EmojidexData.prototype.emoji = function(emoji_set) {
       var emoji, ls_emoji, new_emoji, _i, _j, _len, _len1;
       if (emoji_set != null) {
-        if (this.storage.isEmpty('emojidex.emoji')) {
-          this.storage.set('emojidex.emoji', emoji_set);
+        if (this.emojidex_data.emoji != null) {
+          this.update_hub_data({
+            emoji: emoji_set
+          });
         } else {
-          ls_emoji = this.storage.get('emojidex.emoji');
+          ls_emoji = this.emojidex_data.emoji;
           for (_i = 0, _len = emoji_set.length; _i < _len; _i++) {
             new_emoji = emoji_set[_i];
             for (_j = 0, _len1 = ls_emoji.length; _j < _len1; _j++) {
@@ -210,38 +225,48 @@
               }
             }
           }
-          this.storage.set('emojidex.emoji', ls_emoji);
+          this.update_hub_data({
+            emoji: ls_emoji
+          });
         }
       }
-      return this.storage.get("emojidex.emoji");
+      return this.emojidex_data.emoji;
     };
 
     EmojidexData.prototype.favorites = function(favorites_set) {
       if (favorites_set != null) {
-        this.storage.set("emojidex.favorites", favorites_set);
+        this.update_hub_data({
+          favorites: favorites_set
+        });
       }
-      return this.storage.get("emojidex.favorites");
+      return this.emojidex_data.favorites;
     };
 
     EmojidexData.prototype.history = function(history_set) {
       if (history_set != null) {
-        this.storage.set("emojidex.history", history_set);
+        this.update_hub_data({
+          history: history_set
+        });
       }
-      return this.storage.get("emojidex.history");
+      return this.emojidex_data.history;
     };
 
     EmojidexData.prototype.categories = function(categories_set) {
       if (categories_set != null) {
-        this.storage.set("emojidex.categories", categories_set);
+        this.update_hub_data({
+          categories: categories_set
+        });
       }
-      return this.storage.get("emojidex.categories");
+      return this.emojidex_data.categories;
     };
 
     EmojidexData.prototype.auth_info = function(auth_info_set) {
       if (auth_info_set != null) {
-        this.storage.set("emojidex.auth_info", auth_info_set);
+        this.update_hub_data({
+          auth_info: auth_info_set
+        });
       }
-      return this.storage.get("emojidex.auth_info");
+      return this.emojidex_data.auth_info;
     };
 
     return EmojidexData;

@@ -1,0 +1,9 @@
+doctype html
+html
+  head
+    script src="../node_modules/cross-storage/dist/hub.min.js"
+    coffee:
+      CrossStorageHub.init [
+        origin: /.+/
+        allow: ['get', 'set', 'del', 'getKeys', 'clear']
+      ]
