@@ -9,7 +9,7 @@ class EmojidexUser
   _auto_login: () ->
     return if @closed_net
     @auth_info = @EC.Data.auth_info()
-    if @auth_info['token']? then @sync_user_data() else @logout()
+    if @auth_info?.token? then @sync_user_data() else @logout()
 
   # login
   # takes a hash with one of the following combinations:

@@ -1174,11 +1174,12 @@
     }
 
     EmojidexUser.prototype._auto_login = function() {
+      var _ref;
       if (this.closed_net) {
         return;
       }
       this.auth_info = this.EC.Data.auth_info();
-      if (this.auth_info['token'] != null) {
+      if (((_ref = this.auth_info) != null ? _ref.token : void 0) != null) {
         return this.sync_user_data();
       } else {
         return this.logout();
