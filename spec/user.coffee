@@ -6,14 +6,14 @@ describe 'EmojidexUser', ->
 
   describe 'Favorites', ->
     it 'get', (done) ->
-      EC.User.Favorites.get (favorites)->
-        expect(favorites).toContain(
+      EC.User.Favorites.get (favorites) ->
+        expect(favorites.emoji).toContain(
           jasmine.objectContaining(emoji_emoji)
         )
         done()
 
     it 'all', ->
-      expect(EC.User.Favorites.all()).toContain(
+      expect(EC.User.Favorites.all().emoji).toContain(
         jasmine.objectContaining(emoji_emoji)
       )
 
