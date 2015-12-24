@@ -93,15 +93,6 @@
       return this._categoriesAPI(category_name, callback, param, this.getEmoji);
     };
 
-    EmojidexCategories.prototype.getNewest = function(category_name, callback, opts) {
-      var param;
-      param = {
-        type: 'newest'
-      };
-      $.extend(param, opts);
-      return this._categoriesAPI(category_name, callback, param, this.getNewest);
-    };
-
     EmojidexCategories.prototype.next = function() {
       if (this.count === this.called_data.param.limit) {
         this.called_data.param.page++;

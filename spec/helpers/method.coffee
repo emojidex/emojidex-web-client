@@ -28,7 +28,7 @@ getCosmosEmoji = (chains_data) ->
 
 getCosmosNewest = (chains_data) ->
   $.ajax
-    url: 'https://www.emojidex.com/api/v1/categories/cosmos/newest'
+    url: 'https://www.emojidex.com/api/v1/newest?category=cosmos'
     dataType: 'json'
     success: (response) =>
       @cosmos_newest = response.emoji
