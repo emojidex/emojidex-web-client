@@ -919,14 +919,6 @@
       return this._indexesAPI('emoji', callback, opts, this.index);
     };
 
-    EmojidexIndexes.prototype.newest = function(callback, opts) {
-      return this._indexesAPI('newest', callback, opts, this.newest);
-    };
-
-    EmojidexIndexes.prototype.popular = function(callback, opts) {
-      return this._indexesAPI('popular', callback, opts, this.popular);
-    };
-
     EmojidexIndexes.prototype.user = function(username, callback, opts) {
       return this._indexesAPI("users/" + username + "/emoji", callback, opts);
     };

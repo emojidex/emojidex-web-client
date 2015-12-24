@@ -1,7 +1,7 @@
 describe 'EmojidexIndexes', ->
   beforeEach (done) ->
     helperChains
-      functions: [helperBefore, helperExtendedEmojiData]
+      functions: [helperBefore, getExtendedEmojiData]
       end: done
 
   it 'user', (done) ->
@@ -11,15 +11,5 @@ describe 'EmojidexIndexes', ->
 
   it 'index', (done) ->
     EC.Indexes.index (emoji_data) ->
-      expect(emoji_data.length).toBeTruthy()
-      done()
-
-  it 'newest', (done) ->
-    EC.Indexes.newest (emoji_data) ->
-      expect(emoji_data.length).toBeTruthy()
-      done()
-
-  it 'popular', (done) ->
-    EC.Indexes.popular (emoji_data) ->
       expect(emoji_data.length).toBeTruthy()
       done()

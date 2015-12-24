@@ -34,12 +34,6 @@ class EmojidexIndexes
   index: (callback, opts) ->
     @_indexesAPI 'emoji', callback, opts, @index
 
-  newest: (callback, opts) ->
-    @_indexesAPI 'newest', callback, opts, @newest
-
-  popular: (callback, opts) ->
-    @_indexesAPI 'popular', callback, opts, @popular
-
   user: (username, callback, opts) ->
     @_indexesAPI "users/#{username}/emoji", callback, opts
 
