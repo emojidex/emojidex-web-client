@@ -23,7 +23,7 @@ describe 'EmojidexUser', ->
     #       jasmine.objectContaining(emoji)
     #     )
     #     done()
-
+    #
     # Not working on PhantomJS, browser is OK.
     # it 'unset_favorites', (done) ->
     #   EC.unset_favorites 'emoji', (favorites)->
@@ -31,3 +31,12 @@ describe 'EmojidexUser', ->
     #       jasmine.objectContaining(emoji)
     #     )
     #     done()
+
+  describe 'History', ->
+    it 'get', (done) ->
+      EC.User.History.get (history_info) ->
+        expect(history_info.history.length).toBeTruthy()
+        done()
+
+    it 'all', ->
+      expect(EC.User.History.all().history.length).toBeTruthy()

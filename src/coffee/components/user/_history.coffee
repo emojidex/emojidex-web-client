@@ -10,11 +10,13 @@ class EmojidexUserHistory
         dataType: 'json'
       $.ajax $.extend ajax_obj, options
 
-  get: ->
+  get: (callback) ->
     options =
-      data: auth_token: @token
+      data:
+        auth_token: @token
       success: (response) =>
-        @_history = @EC.Data.history(response)
+        @_history = @EC.Data.history response
+        callback? @_history
     @_historyAPI options
 
   set: (emoji_code) ->

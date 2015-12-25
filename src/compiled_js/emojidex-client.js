@@ -869,7 +869,7 @@
       }
     };
 
-    EmojidexUserHistory.prototype.get = function() {
+    EmojidexUserHistory.prototype.get = function(callback) {
       var options,
         _this = this;
       options = {
@@ -877,7 +877,8 @@
           auth_token: this.token
         },
         success: function(response) {
-          return _this._history = _this.EC.Data.history(response);
+          _this._history = _this.EC.Data.history(response);
+          return typeof callback === "function" ? callback(_this._history) : void 0;
         }
       };
       return this._historyAPI(options);
