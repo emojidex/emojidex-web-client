@@ -710,11 +710,17 @@
           return typeof callback === "function" ? callback(_this.auth_info) : void 0;
         },
         error: function(response) {
-          return _this.auth_info = _this.EC.Data.auth_info({
-            status: response.auth_status,
+          var status;
+          status = JSON.parse(response.responseText);
+          _this.auth_info = _this.EC.Data.auth_info({
+            status: status.auth_status,
             token: null,
             user: ''
           });
+          return typeof callback === "function" ? callback({
+            auth_info: _this.auth_info,
+            error_info: response
+          }) : void 0;
         }
       });
     };

@@ -45,10 +45,12 @@ class EmojidexUser
         @_set_auth_from_response response
         callback? @auth_info
       error: (response) =>
+        status = JSON.parse response.responseText
         @auth_info = @EC.Data.auth_info
-          status: response.auth_status
+          status: status.auth_status
           token: null
           user: ''
+        callback? { auth_info: @auth_info, error_info: response }
 
   # auth with HTTP basic auth
   basic_auth: (user, pass, callback = null) ->
