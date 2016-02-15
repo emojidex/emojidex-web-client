@@ -40,3 +40,17 @@ describe 'EmojidexUser', ->
 
     it 'all', ->
       expect(EC.User.History.all().history.length).toBeTruthy()
+
+  describe '[Premium User Only] Newest Emoji', ->
+    it 'get', (done) ->
+      setPremiumUser()
+      EC.User.Newest.get (newest_info) ->
+        expect(newest_info.emoji.length).toBeTruthy()
+        done()
+
+  describe '[Premium User Only] Popular Emoji', ->
+    it 'get', (done) ->
+      setPremiumUser()
+      EC.User.Popular.get (popular_info) ->
+        expect(popular_info.emoji.length).toBeTruthy()
+        done()

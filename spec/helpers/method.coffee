@@ -33,3 +33,6 @@ getCosmosNewest = (chains_data) ->
     success: (response) =>
       @cosmos_newest = response.emoji
       helperChains chains_data
+
+setPremiumUser = ->
+  @EC.User.set_auth premium_user_info.auth_user, premium_user_info.auth_token

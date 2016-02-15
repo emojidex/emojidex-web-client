@@ -465,7 +465,7 @@
 }));
 
 (function() {
-  var EmojidexCategories, EmojidexData, EmojidexEmoji, EmojidexIndexes, EmojidexSearch, EmojidexUser, EmojidexUserFavorites, EmojidexUserHistory, EmojidexUtil,
+  var EmojidexCategories, EmojidexData, EmojidexEmoji, EmojidexIndexes, EmojidexSearch, EmojidexUser, EmojidexUserFavorites, EmojidexUserHistory, EmojidexUserNewest, EmojidexUserPopular, EmojidexUtil,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   this.EmojidexClient = (function() {
@@ -1127,6 +1127,8 @@
       this.auth_info = this.EC.Data._def_auth_info;
       this.History = new EmojidexUserHistory(this.EC);
       this.Favorites = new EmojidexUserFavorites(this.EC);
+      this.Newest = new EmojidexUserNewest(this.EC);
+      this.Popular = new EmojidexUserPopular(this.EC);
       this._auto_login();
     }
 
@@ -1146,8 +1148,10 @@
       switch (params.authtype) {
         case 'plain':
           return this.plain_auth(params.username, params.password, params.callback);
+        case 'token':
+          return this.token_auth(params.username, params.auth_token, params.callback);
         case 'basic':
-          return this.basic_auth(params.user, params.pass, params.callback);
+          return this.basic_auth(params.user, params.password, params.callback);
         case 'google':
           return this.google_auth(params.callback);
         default:
@@ -1159,18 +1163,12 @@
       return this.EC.Data.auth_info(this.EC.Data._def_auth_info);
     };
 
-    EmojidexUser.prototype.plain_auth = function(username, password, callback) {
-      var _this = this;
-      if (callback == null) {
-        callback = null;
-      }
-      return $.ajax({
+    EmojidexUser.prototype._authenticateAPI = function(options, callback) {
+      var ajax_obj,
+        _this = this;
+      ajax_obj = {
         url: this.EC.api_url + 'users/authenticate',
         dataType: 'json',
-        data: {
-          username: username,
-          password: password
-        },
         success: function(response) {
           _this._set_auth_from_response(response);
           return typeof callback === "function" ? callback(_this.auth_info) : void 0;
@@ -1188,7 +1186,32 @@
             error_info: response
           }) : void 0;
         }
-      });
+      };
+      return $.ajax($.extend(ajax_obj, options));
+    };
+
+    EmojidexUser.prototype.plain_auth = function(username, password, callback) {
+      if (callback == null) {
+        callback = null;
+      }
+      return this._authenticateAPI({
+        data: {
+          username: username,
+          password: password
+        }
+      }, callback);
+    };
+
+    EmojidexUser.prototype.token_auth = function(username, token, callback) {
+      if (callback == null) {
+        callback = null;
+      }
+      return this._authenticateAPI({
+        data: {
+          username: username,
+          token: token
+        }
+      }, callback);
     };
 
     EmojidexUser.prototype.basic_auth = function(user, pass, callback) {
@@ -1224,7 +1247,7 @@
     };
 
     EmojidexUser.prototype.sync_user_data = function() {
-      this.History.token = this.Favorites.token = this.auth_info['token'];
+      this.History.token = this.Favorites.token = this.Newest.token = this.Popular.token = this.auth_info.token;
       this.Favorites.sync();
       return this.History.sync();
     };
@@ -1384,6 +1407,82 @@
     };
 
     return EmojidexUserHistory;
+
+  })();
+
+  EmojidexUserNewest = (function() {
+    function EmojidexUserNewest(EC, token) {
+      this.EC = EC;
+      if (token == null) {
+        token = null;
+      }
+      this.token = token;
+    }
+
+    EmojidexUserNewest.prototype._newestAPI = function(options) {
+      var ajax_obj;
+      if (this.token != null) {
+        ajax_obj = {
+          url: this.EC.api_url + 'newest',
+          dataType: 'json'
+        };
+        return $.ajax($.extend(ajax_obj, options));
+      }
+    };
+
+    EmojidexUserNewest.prototype.get = function(callback) {
+      var options,
+        _this = this;
+      options = {
+        data: {
+          auth_token: this.token
+        },
+        success: function(response) {
+          return typeof callback === "function" ? callback(response) : void 0;
+        }
+      };
+      return this._newestAPI(options);
+    };
+
+    return EmojidexUserNewest;
+
+  })();
+
+  EmojidexUserPopular = (function() {
+    function EmojidexUserPopular(EC, token) {
+      this.EC = EC;
+      if (token == null) {
+        token = null;
+      }
+      this.token = token;
+    }
+
+    EmojidexUserPopular.prototype._popularAPI = function(options) {
+      var ajax_obj;
+      if (this.token != null) {
+        ajax_obj = {
+          url: this.EC.api_url + 'popular',
+          dataType: 'json'
+        };
+        return $.ajax($.extend(ajax_obj, options));
+      }
+    };
+
+    EmojidexUserPopular.prototype.get = function(callback) {
+      var options,
+        _this = this;
+      options = {
+        data: {
+          auth_token: this.token
+        },
+        success: function(response) {
+          return typeof callback === "function" ? callback(response) : void 0;
+        }
+      };
+      return this._popularAPI(options);
+    };
+
+    return EmojidexUserPopular;
 
   })();
 

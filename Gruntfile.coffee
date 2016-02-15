@@ -1,5 +1,13 @@
 module.exports = (grunt) ->
-  path = require('path')
+  path = require 'path'
+
+  dotenv = require 'dotenv'
+  dotenv.config()
+
+  data_path = process.env.DATA_PATH
+  unless data_path?
+    data_path = 'build/spec/helpers/data.js'
+  console.log data_path
 
   grunt.getLicense = (licenses_json) ->
     licenses = grunt.file.readJSON licenses_json
@@ -104,7 +112,8 @@ module.exports = (grunt) ->
           'node_modules/jquery/dist/jquery.min.js'
         ]
         helpers:[
-          'build/spec/helpers/**/*.js'
+          'build/spec/helpers/method.js'
+          data_path
         ]
 
     # grunt dev --------------------------------
