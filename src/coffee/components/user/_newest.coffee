@@ -15,4 +15,6 @@ class EmojidexUserNewest
         auth_token: @token
       success: (response) =>
         callback? response
+      error: (response) =>
+        callback? response
     @_newestAPI options

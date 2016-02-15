@@ -1444,6 +1444,9 @@
         },
         success: function(response) {
           return typeof callback === "function" ? callback(response) : void 0;
+        },
+        error: function(response) {
+          return typeof callback === "function" ? callback(response) : void 0;
         }
       };
       return this._newestAPI(options);
@@ -1481,6 +1484,9 @@
           auth_token: this.token
         },
         success: function(response) {
+          return typeof callback === "function" ? callback(response) : void 0;
+        },
+        error: function(response) {
           return typeof callback === "function" ? callback(response) : void 0;
         }
       };
