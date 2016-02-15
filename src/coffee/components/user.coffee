@@ -71,12 +71,16 @@ class EmojidexUser
       callback
 
   # auth with HTTP basic auth
-  basic_auth: (user, pass, callback = null) ->
-    # TODO
-    return false
+  basic_auth: (user, password, callback = null) ->
+    @_authenticateAPI
+      data:
+        user: user
+        password: password,
+      callback
 
   # auth with google oauth2
   google_auth: (callback = null) ->
+    # TODO
     return false
 
   # directly set auth credentials

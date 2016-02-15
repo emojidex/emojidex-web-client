@@ -1214,11 +1214,16 @@
       }, callback);
     };
 
-    EmojidexUser.prototype.basic_auth = function(user, pass, callback) {
+    EmojidexUser.prototype.basic_auth = function(user, password, callback) {
       if (callback == null) {
         callback = null;
       }
-      return false;
+      return this._authenticateAPI({
+        data: {
+          user: user,
+          password: password
+        }
+      }, callback);
     };
 
     EmojidexUser.prototype.google_auth = function(callback) {
