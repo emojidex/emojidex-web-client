@@ -95,15 +95,27 @@ module.exports = (grunt) ->
         dest: 'dist/js/emojidex-client.min.js'
 
     jasmine:
-      all:
+      coverage:
         src: [
-          'dist/js/jquery.storageapi.min.js',
+          'dist/js/jquery.storageapi.min.js'
           'dist/js/emojidex-client.js'
         ]
         options:
-          specs: [
-            'build/spec/*.js'
-          ]
+          specs: 'build/spec/*.js'
+          template: require('grunt-template-jasmine-istanbul')
+          templateOptions:
+            coverage: 'build/spec/coverage/coverage.json'
+            report: [
+              {
+                type: 'html'
+                options: dir: 'build/spec/coverage/html'
+              }
+              {
+                type: 'cobertura'
+                options: dir: 'build/spec/coverage/cobertura'
+              }
+              { type: 'text-summary' }
+            ]
 
       options:
         keepRunner: true
@@ -160,7 +172,7 @@ module.exports = (grunt) ->
                     "build/spec/#{spec_file}.js"
                   ]
             task: [
-              "coffee:client"
+              'coffee:client'
               'concat'
               'uglify'
               defaults.jasmine.prop.join(':')
@@ -184,9 +196,21 @@ module.exports = (grunt) ->
                 value:
                   src: defaults.jasmine.value.src
                   options:
-                    specs: [
-                      "build/#{path.dirname filepath}/#{path.basename filepath, '.coffee'}.js"
-                    ]
+                    specs: "build/#{path.dirname filepath}/#{path.basename filepath, '.coffee'}.js"
+                    # template: require('grunt-template-jasmine-istanbul')
+                    # templateOptions:
+                    #   coverage: 'build/spec/coverage/coverage.json'
+                    #   report: [
+                    #     {
+                    #       type: 'html'
+                    #       options: dir: 'build/spec/coverage/html'
+                    #     }
+                    #     {
+                    #       type: 'cobertura'
+                    #       options: dir: 'build/spec/coverage/cobertura'
+                    #     }
+                    #     { type: 'text-summary' }
+                    #   ]
               }
             ]
             task: [defaults.coffee.prop.join(':'), defaults.jasmine.prop.join(':')]
