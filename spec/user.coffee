@@ -4,6 +4,27 @@ describe 'EmojidexUser', ->
       functions: [helperBefore]
       end: done
 
+  describe 'Login', ->
+    it 'token login', (done) ->
+      EC.User.login authtype: 'token', username: user_info.auth_user, auth_token: user_info.auth_token, callback: () ->
+        expect(EC.User.auth_info.status).toEqual('verified')
+        done()
+
+    describe '[Require user info]', ->
+      pending() unless user_info.password?
+      it 'plain login', (done) ->
+        EC.User.login authtype: 'plain', username: user_info.auth_user, password: user_info.password, callback: () ->
+          expect(EC.User.auth_info.status).toEqual('verified')
+          done()
+
+      it 'basic login', (done) ->
+        EC.User.login authtype: 'basic', user: user_info.email, password: user_info.password, callback: () ->
+          expect(EC.User.auth_info.status).toEqual('verified')
+          done()
+
+      # it 'google login', ->
+      #   TODO:
+
   describe 'Favorites', ->
     it 'get', (done) ->
       EC.User.Favorites.get (favorites) ->
@@ -41,16 +62,18 @@ describe 'EmojidexUser', ->
     it 'all', ->
       expect(EC.User.History.all().history.length).toBeTruthy()
 
-  describe '[Premium User Only] Newest Emoji', ->
-    it 'get', (done) ->
-      setPremiumUser()
-      EC.User.Newest.get (newest_info) ->
-        expect(newest_info.emoji.length).toBeTruthy()
-        done()
+  describe '[Premium user only]', ->
+    pending() unless premium_user_info?
+    describe 'Newest Emoji', ->
+      it 'get', (done) ->
+        setPremiumUser()
+        EC.User.Newest.get (newest_info) ->
+          expect(newest_info.emoji.length).toBeTruthy()
+          done()
 
-  describe '[Premium User Only] Popular Emoji', ->
-    it 'get', (done) ->
-      setPremiumUser()
-      EC.User.Popular.get (popular_info) ->
-        expect(popular_info.emoji.length).toBeTruthy()
-        done()
+    describe 'Popular Emoji', ->
+      it 'get', (done) ->
+        setPremiumUser()
+        EC.User.Popular.get (popular_info) ->
+          expect(popular_info.emoji.length).toBeTruthy()
+          done()
