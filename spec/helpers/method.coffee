@@ -18,20 +18,12 @@ getExtendedEmojiData = (chains_data) ->
       @emoji_emojidex = response
       helperChains chains_data
 
-getCosmosEmoji = (chains_data) ->
+getFacesEmoji = (chains_data) ->
   $.ajax
-    url: 'https://www.emojidex.com/api/v1/categories/cosmos/emoji'
+    url: 'https://www.emojidex.com/api/v1/categories/faces/emoji'
     dataType: 'json'
     success: (response) =>
-      @cosmos_emoji = response.emoji
-      helperChains chains_data
-
-getCosmosNewest = (chains_data) ->
-  $.ajax
-    url: 'https://www.emojidex.com/api/v1/newest?category=cosmos'
-    dataType: 'json'
-    success: (response) =>
-      @cosmos_newest = response.emoji
+      @faces_emoji = response.emoji
       helperChains chains_data
 
 setPremiumUser = ->
