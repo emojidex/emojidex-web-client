@@ -38,19 +38,19 @@ class EmojidexIndexes
     @_indexesAPI "users/#{username}/emoji", callback, opts
 
   static: (static_type, language, callback) ->
-    onLoaded = () =>
-      if ++loaded_num is static_type.length
-        callback()
+    loaded_num = 0
+    loaded_emoji = []
+
     loadStatic = (url_string) =>
       $.ajax
         url: url_string
         dataType: 'json'
         success: (response) =>
-          console.count()
+          loaded_emoji = loaded_emoji.concat response
           @EC.Emoji.combine response
-          onLoaded()
+          if ++loaded_num is static_type.length
+            callback loaded_emoji
 
-    loaded_num = 0
     for type in static_type
       if language
         loadStatic "#{@EC.api_url + type}?locale=#{language}"
@@ -62,8 +62,8 @@ class EmojidexIndexes
 
   next: ->
     @indexed.param.page++ if @count is @indexed.param.limit
-    @indexed_func @indexed.data, @indexed.callback, @indexed.param, @indexed_func
+    @indexed_func @indexed.callback, @indexed.param, @indexed_func
 
   prev: ->
     @indexed.param.page-- if @indexed.param.page > 1
-    @indexed_func @indexed.data, @indexed.callback, @indexed.param, @indexed_func
+    @indexed_func @indexed.callback, @indexed.param, @indexed_func

@@ -3,7 +3,7 @@ class EmojidexEmoji
     @_emoji_instance = null
 
   _emoji: ->
-    return @_emoji_instance if @_emoji_instanc?
+    return @_emoji_instance if @_emoji_instance?
 
     if @checkUpdate()
       @_emoji_instance = @EC.Data.storage.get 'emojidex.emoji'

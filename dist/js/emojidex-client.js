@@ -713,7 +713,7 @@
     }
 
     EmojidexEmoji.prototype._emoji = function() {
-      if (this._emoji_instanc != null) {
+      if (this._emoji_instance != null) {
         return this._emoji_instance;
       }
       if (this.checkUpdate()) {
@@ -924,25 +924,23 @@
     };
 
     EmojidexIndexes.prototype["static"] = function(static_type, language, callback) {
-      var loadStatic, loaded_num, onLoaded, type, _i, _len, _results,
+      var loadStatic, loaded_emoji, loaded_num, type, _i, _len, _results,
         _this = this;
-      onLoaded = function() {
-        if (++loaded_num === static_type.length) {
-          return callback();
-        }
-      };
+      loaded_num = 0;
+      loaded_emoji = [];
       loadStatic = function(url_string) {
         return $.ajax({
           url: url_string,
           dataType: 'json',
           success: function(response) {
-            console.count();
+            loaded_emoji = loaded_emoji.concat(response);
             _this.EC.Emoji.combine(response);
-            return onLoaded();
+            if (++loaded_num === static_type.length) {
+              return callback(loaded_emoji);
+            }
           }
         });
       };
-      loaded_num = 0;
       _results = [];
       for (_i = 0, _len = static_type.length; _i < _len; _i++) {
         type = static_type[_i];
@@ -963,14 +961,14 @@
       if (this.count === this.indexed.param.limit) {
         this.indexed.param.page++;
       }
-      return this.indexed_func(this.indexed.data, this.indexed.callback, this.indexed.param, this.indexed_func);
+      return this.indexed_func(this.indexed.callback, this.indexed.param, this.indexed_func);
     };
 
     EmojidexIndexes.prototype.prev = function() {
       if (this.indexed.param.page > 1) {
         this.indexed.param.page--;
       }
-      return this.indexed_func(this.indexed.data, this.indexed.callback, this.indexed.param, this.indexed_func);
+      return this.indexed_func(this.indexed.callback, this.indexed.param, this.indexed_func);
     };
 
     return EmojidexIndexes;

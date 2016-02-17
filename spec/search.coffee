@@ -36,7 +36,7 @@ describe 'EmojidexSearch', ->
 
   it 'find', (done) ->
     EC.Search.find 'kiss', (emoji_data) ->
-      expect(emoji_data.code).toEqual 'kiss'
+      expect(emoji_data).toEqual(jasmine.objectContaining emoji_kiss)
       done()
 
   describe 'Search and page transition', ->
