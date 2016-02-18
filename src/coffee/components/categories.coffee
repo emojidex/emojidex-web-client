@@ -37,12 +37,6 @@ class EmojidexCategories
     $.extend param, opts
     @_categoriesAPI category_name, callback, param, @getEmoji
 
-  getNewest: (category_name, callback, opts)->
-    param =
-      type: 'newest'
-    $.extend param, opts
-    @_categoriesAPI category_name, callback, param, @getNewest
-
   next: ->
     @called_data.param.page++ if @count is @called_data.param.limit
     @called_func @called_data.category_name, @called_data.callback, @called_data.param, ajax: @called_func

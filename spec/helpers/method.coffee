@@ -10,7 +10,7 @@ helperBefore = (chains_data) ->
   @EC.User.set_auth user_info.auth_user, user_info.auth_token
   helperChains chains_data
 
-helperExtendedEmojiData = (chains_data) ->
+getExtendedEmojiData = (chains_data) ->
   $.ajax
     url: 'https://www.emojidex.com/api/v1/extended_emoji'
     dataType: 'json'
@@ -18,18 +18,13 @@ helperExtendedEmojiData = (chains_data) ->
       @emoji_emojidex = response
       helperChains chains_data
 
-getCosmosEmoji = (chains_data) ->
+getFacesEmoji = (chains_data) ->
   $.ajax
-    url: 'https://www.emojidex.com/api/v1/categories/cosmos/emoji'
+    url: 'https://www.emojidex.com/api/v1/categories/faces/emoji'
     dataType: 'json'
     success: (response) =>
-      @cosmos_emoji = response.emoji
+      @faces_emoji = response.emoji
       helperChains chains_data
 
-getCosmosNewest = (chains_data) ->
-  $.ajax
-    url: 'https://www.emojidex.com/api/v1/categories/cosmos/newest'
-    dataType: 'json'
-    success: (response) =>
-      @cosmos_newest = response.emoji
-      helperChains chains_data
+setPremiumUser = ->
+  @EC.User.set_auth premium_user_info.auth_user, premium_user_info.auth_token

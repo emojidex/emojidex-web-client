@@ -3,6 +3,8 @@ class EmojidexUser
     @auth_info = @EC.Data._def_auth_info
     @History = new EmojidexUserHistory @EC
     @Favorites = new EmojidexUserFavorites @EC
+    @Newest = new EmojidexUserNewest @EC
+    @Popular = new EmojidexUserPopular @EC
     @_auto_login()
 
   # Checks for local saved login data, and if present sets the username and api_key
@@ -13,16 +15,19 @@ class EmojidexUser
 
   # login
   # takes a hash with one of the following combinations:
-  # 1. { authtype: 'plain', username: 'username-or-email', password: '****'}
-  # 1. { authtype: 'basic', user: 'username-or-email', pass: '****'}
-  # 3. { authtype: 'google', #TODO
+  # 1. {authtype: 'plain', username: 'username', password: '****'}
+  # 2. {authtype: 'token', username: 'username', auth_token: '****'}
+  # 3. {authtype: 'basic', user: 'username-or-email', password: '****'}
+  # 4. {authtype: 'google', #TODO
   # * if no hash is given auto login is attempted
   login: (params) ->
     switch params.authtype
       when 'plain'
         @plain_auth params.username, params.password, params.callback
+      when 'token'
+        @token_auth params.username, params.auth_token, params.callback
       when 'basic'
-        @basic_auth params.user, params.pass, params.callback
+        @basic_auth params.user, params.password, params.callback
       when 'google'
         @google_auth params.callback
       else
@@ -33,30 +38,49 @@ class EmojidexUser
   logout: () ->
     @EC.Data.auth_info @EC.Data._def_auth_info
 
-  # regular login with username/email and password
-  plain_auth: (username, password, callback = null) ->
-    $.ajax
+  _authenticateAPI: (options, callback) ->
+    ajax_obj =
       url: @EC.api_url + 'users/authenticate'
       dataType: 'json'
-      data:
-        username: username
-        password: password
       success: (response) =>
         @_set_auth_from_response response
         callback? @auth_info
       error: (response) =>
+        status = JSON.parse response.responseText
         @auth_info = @EC.Data.auth_info
-          status: response.auth_status
+          status: status.auth_status
           token: null
           user: ''
+        callback? { auth_info: @auth_info, error_info: response }
+
+    $.ajax $.extend ajax_obj, options
+
+  # regular login with username/email and password
+  plain_auth: (username, password, callback = null) ->
+    @_authenticateAPI
+      data:
+        username: username
+        password: password,
+      callback
+
+  token_auth: (username, token, callback = null) ->
+    @_authenticateAPI
+      data:
+        username: username
+        token: token,
+      callback
 
   # auth with HTTP basic auth
-  basic_auth: (user, pass, callback = null) ->
-    # TODO
-    return false
+  basic_auth: (user, password, callback = null) ->
+    @_authenticateAPI
+      data:
+        user: user
+        password: password,
+      callback
 
   # auth with google oauth2
   google_auth: (callback = null) ->
+    # TODO
     return false
 
   # directly set auth credentials
@@ -76,6 +100,6 @@ class EmojidexUser
     @sync_user_data()
 
   sync_user_data: () ->
-    @History.token = @Favorites.token = @auth_info['token']
+    @History.token = @Favorites.token = @Newest.token = @Popular.token = @auth_info.token
     @Favorites.sync()
     @History.sync()

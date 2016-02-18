@@ -12,7 +12,8 @@ class EmojidexUserFavorites
 
   get: (callback) ->
     options =
-      data: auth_token: @token
+      data:
+        auth_token: @token
       success: (response) =>
         @_favorites = @EC.Data.favorites response
         callback? @_favorites
