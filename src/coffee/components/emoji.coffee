@@ -49,21 +49,21 @@ class EmojidexEmoji
     results
 
   # search for emoji with the given tags
-  tags: (tags, opts) ->
+  tags: (tags, opts = null) ->
     tags = @EC.Util.breakout tags
-    selection = opts.selection || @_emoji()
+    selection = opts?.selection || @_emoji()
     collect = []
     for tag in tags
       collect.concat (moji for moji in selection when $.inArray(tag, moji.tags) >= 0)
     collect
 
   # gets emoji in any of the given categories
-  categories: (categories, opts) ->
+  categories: (categories, opts = null) ->
     categories = @EC.Util.breakout categories
-    source = opts.selection || @_emoji()
+    source = opts?.selection || @_emoji()
     collect = []
     for category in categories
-      collect.concat (moji for moji in source when moji.category is category)
+      collect = collect.concat (moji for moji in source when moji.category is category)
     collect
 
   # searches by term (regex OK), containing the tags given, in any of the given categories

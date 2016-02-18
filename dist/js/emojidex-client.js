@@ -811,8 +811,11 @@
 
     EmojidexEmoji.prototype.tags = function(tags, opts) {
       var collect, moji, selection, tag, _i, _len;
+      if (opts == null) {
+        opts = null;
+      }
       tags = this.EC.Util.breakout(tags);
-      selection = opts.selection || this._emoji();
+      selection = (opts != null ? opts.selection : void 0) || this._emoji();
       collect = [];
       for (_i = 0, _len = tags.length; _i < _len; _i++) {
         tag = tags[_i];
@@ -833,12 +836,15 @@
 
     EmojidexEmoji.prototype.categories = function(categories, opts) {
       var category, collect, moji, source, _i, _len;
+      if (opts == null) {
+        opts = null;
+      }
       categories = this.EC.Util.breakout(categories);
-      source = opts.selection || this._emoji();
+      source = (opts != null ? opts.selection : void 0) || this._emoji();
       collect = [];
       for (_i = 0, _len = categories.length; _i < _len; _i++) {
         category = categories[_i];
-        collect.concat((function() {
+        collect = collect.concat((function() {
           var _j, _len1, _results;
           _results = [];
           for (_j = 0, _len1 = source.length; _j < _len1; _j++) {
