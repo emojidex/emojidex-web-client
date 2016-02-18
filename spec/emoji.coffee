@@ -27,26 +27,24 @@ describe 'EmojidexEmoji', ->
       done()
 
   it 'starting', (done) ->
-    EC.Emoji.search 'kiss', (emoji_data) ->
+    EC.Emoji.starting 'kiss', (emoji_data) ->
       expect(emoji_data).toContain(jasmine.objectContaining emoji_kiss)
       done()
 
   it 'ending', (done) ->
-    EC.Emoji.search 'kiss', (emoji_data) ->
+    EC.Emoji.ending 'kiss', (emoji_data) ->
       expect(emoji_data).toContain(jasmine.objectContaining emoji_kiss)
       done()
 
   it 'tags', ->
-    expect(EC.Emoji.tags '', '').toBeTruthy()
+    expect(EC.Emoji.tags('weapon').length).toBeTruthy()
 
   it 'categories', ->
-    expect(EC.Emoji.categories ['cosmos']).toBeTruthy()
+    expect(EC.Emoji.categories('cosmos').length).toBeTruthy()
 
-  # it 'advenced', (done) ->
-  #   done()
-  #
-  # it 'combine', (done) ->
-  #   done()
-  #
-  # it 'flush', (done) ->
-  #   done()
+  it 'advenced', ->
+    searchs = categories: 'tools', tags: 'weapon', term: 'rifle'
+    expect(EC.Emoji.advanced(searchs).length).toBeTruthy()
+
+  it 'flush', ->
+    expect(EC.Emoji.flush().length).toBe(0)

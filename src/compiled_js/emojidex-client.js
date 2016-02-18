@@ -353,7 +353,7 @@
       collect = [];
       for (_i = 0, _len = tags.length; _i < _len; _i++) {
         tag = tags[_i];
-        collect.concat((function() {
+        collect = collect.concat((function() {
           var _j, _len1, _results;
           _results = [];
           for (_j = 0, _len1 = selection.length; _j < _len1; _j++) {
@@ -406,7 +406,8 @@
     };
 
     EmojidexEmoji.prototype.flush = function() {
-      return this._emoji_instance = this.EC.Data.emoji([]);
+      this.EC.Data.storage.remove('emojidex.emoji');
+      return this._emoji_instance = [];
     };
 
     return EmojidexEmoji;
