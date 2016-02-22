@@ -10,7 +10,7 @@ class EmojidexData
     @storage.set "emojidex.emoji", @EC.options.emoji || [] unless @storage.isSet "emojidex.emoji"
     @storage.set "emojidex.history", @EC.options.history || [] unless @storage.isSet "emojidex.history"
     @storage.set "emojidex.favorites", @EC.options.favorites || [] unless @storage.isSet "emojidex.favorites"
-    @storage.set "emojidex.categories", @EC.options.categories || [] unless @storage.isSet "emojidex.auth_info"
+    @storage.set "emojidex.categories", @EC.options.categories || [] unless @storage.isSet "emojidex.categories"
     @storage.set "emojidex.auth_info", @EC.options.auth_info || @_def_auth_info unless @storage.isSet "emojidex.auth_info"
 
     if @storage.get 'emojidex.cdn_url'

@@ -1,5 +1,5 @@
 class EmojidexUserPopular
-  constructor: (@EC, token = null) ->
+  constructor: (@EC, token) ->
     @token = token
 
   _popularAPI: (options) ->

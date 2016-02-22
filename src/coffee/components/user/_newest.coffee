@@ -1,5 +1,5 @@
 class EmojidexUserNewest
-  constructor: (@EC, token = null) ->
+  constructor: (@EC, token) ->
     @token = token
 
   _newestAPI: (options) ->

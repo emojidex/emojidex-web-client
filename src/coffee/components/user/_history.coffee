@@ -1,5 +1,5 @@
 class EmojidexUserHistory
-  constructor: (@EC, token = null) ->
+  constructor: (@EC, token) ->
     @token = token
     @_history = @EC.Data.history()
 

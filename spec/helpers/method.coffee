@@ -10,6 +10,11 @@ helperBefore = (chains_data) ->
   @EC.User.set_auth user_info.auth_user, user_info.auth_token
   helperChains chains_data
 
+helperBeforeForEmojidexData = (chains_data) ->
+  $.localStorage.removeAll()
+  @EC = new EmojidexClient
+  helperChains chains_data
+
 getExtendedEmojiData = (chains_data) ->
   $.ajax
     url: 'https://www.emojidex.com/api/v1/extended_emoji'

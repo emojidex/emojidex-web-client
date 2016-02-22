@@ -25,3 +25,6 @@ describe 'EmojidexCategories', ->
     EC.Categories.sync (categories) ->
       expect(categories.length).toBeTruthy()
       done()
+
+  it 'all', ->
+    expect(EC.Categories.all().length).toBeTruthy()

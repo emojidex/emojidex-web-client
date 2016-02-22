@@ -56,14 +56,14 @@ class EmojidexUser
     $.ajax $.extend ajax_obj, options
 
   # regular login with username/email and password
-  plain_auth: (username, password, callback = null) ->
+  plain_auth: (username, password, callback) ->
     @_authenticateAPI
       data:
         username: username
         password: password,
       callback
 
-  token_auth: (username, token, callback = null) ->
+  token_auth: (username, token, callback) ->
     @_authenticateAPI
       data:
         username: username
@@ -71,7 +71,7 @@ class EmojidexUser
       callback
 
   # auth with HTTP basic auth
-  basic_auth: (user, password, callback = null) ->
+  basic_auth: (user, password, callback) ->
     @_authenticateAPI
       data:
         user: user
@@ -79,7 +79,7 @@ class EmojidexUser
       callback
 
   # auth with google oauth2
-  google_auth: (callback = null) ->
+  google_auth: (callback) ->
     # TODO
     return false
 

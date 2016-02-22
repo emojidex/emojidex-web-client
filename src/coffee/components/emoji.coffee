@@ -49,7 +49,7 @@ class EmojidexEmoji
     results
 
   # search for emoji with the given tags
-  tags: (tags, opts = null) ->
+  tags: (tags, opts) ->
     tags = @EC.Util.breakout tags
     selection = opts?.selection || @_emoji()
     collect = []
@@ -58,7 +58,7 @@ class EmojidexEmoji
     collect
 
   # gets emoji in any of the given categories
-  categories: (categories, opts = null) ->
+  categories: (categories, opts) ->
     categories = @EC.Util.breakout categories
     source = opts?.selection || @_emoji()
     collect = []
