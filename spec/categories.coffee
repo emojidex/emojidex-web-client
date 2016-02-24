@@ -5,26 +5,26 @@ describe 'EmojidexCategories', ->
       end: done
 
   it 'getEmoji', (done) ->
-    EC.Categories.getEmoji 'faces', (emojis) ->
+    EC_spec.Categories.getEmoji 'faces', (emojis) ->
       expect(emojis).toContain(jasmine.objectContaining faces_emoji[0])
       done()
 
   it 'next', (done) ->
-    EC.Categories.called_data.callback = ->
-      expect(EC.Categories.cur_page).toEqual 2
+    EC_spec.Categories.called_data.callback = ->
+      expect(EC_spec.Categories.cur_page).toEqual 2
       done()
-    EC.Categories.next()
+    EC_spec.Categories.next()
 
   it 'prev', (done) ->
-    EC.Categories.called_data.callback = ->
-      expect(EC.Categories.cur_page).toEqual 1
+    EC_spec.Categories.called_data.callback = ->
+      expect(EC_spec.Categories.cur_page).toEqual 1
       done()
-    EC.Categories.prev()
+    EC_spec.Categories.prev()
 
   it 'sync', (done) ->
-    EC.Categories.sync (categories) ->
+    EC_spec.Categories.sync (categories) ->
       expect(categories.length).toBeTruthy()
       done()
 
   it 'all', ->
-    expect(EC.Categories.all().length).toBeTruthy()
+    expect(EC_spec.Categories.all().length).toBeTruthy()

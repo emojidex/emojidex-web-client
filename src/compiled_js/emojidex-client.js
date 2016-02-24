@@ -121,8 +121,8 @@
           locale: locale
         },
         success: function(response) {
-          _this._categories = EC.Data.categories(response.categories);
-          return typeof callback === "function" ? callback(response.categories) : void 0;
+          _this._categories = _this.EC.Data.categories(response.categories);
+          return typeof callback === "function" ? callback(_this._categories) : void 0;
         }
       });
     };

@@ -51,8 +51,8 @@ class EmojidexCategories
       data:
         locale: locale
       success: (response) =>
-        @_categories = EC.Data.categories response.categories
-        callback? response.categories
+        @_categories = @EC.Data.categories response.categories
+        callback? @_categories
 
   all: ->
     @_categories
