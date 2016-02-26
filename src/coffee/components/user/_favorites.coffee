@@ -1,5 +1,5 @@
 class EmojidexUserFavorites
-  constructor: (@EC, token = null) ->
+  constructor: (@EC, token) ->
     @token = token
     @_favorites = @EC.Data.favorites()
 

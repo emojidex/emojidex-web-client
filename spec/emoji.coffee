@@ -6,47 +6,45 @@ describe 'EmojidexEmoji', ->
 
   describe 'check update', ->
     it 'need update', ->
-      EC.Data.storage.set 'emojidex.seedUpdated', new Date('1/1/2016').toString()
-      expect(EC.Emoji.checkUpdate()).toBe(false)
+      EC_spec.Data.storage.set 'emojidex.seedUpdated', new Date('1/1/2016').toString()
+      expect(EC_spec.Emoji.checkUpdate()).toBe(false)
     it 'unnecessary update', ->
-      EC.Data.storage.set 'emojidex.seedUpdated', new Date().toString()
-      expect(EC.Emoji.checkUpdate()).toBe(true)
+      EC_spec.Data.storage.set 'emojidex.seedUpdated', new Date().toString()
+      expect(EC_spec.Emoji.checkUpdate()).toBe(true)
 
   it 'seed', (done) ->
-    EC.Emoji.seed (emoji_data) ->
-      expect(EC.Emoji._emoji_instance).toEqual(jasmine.arrayContaining [emoji_data[0], emoji_data[emoji_data.length - 1]])
+    EC_spec.Emoji.seed (emoji_data) ->
+      expect(EC_spec.Emoji._emoji_instance).toEqual(jasmine.arrayContaining [emoji_data[0], emoji_data[emoji_data.length - 1]])
       done()
 
   it 'all', (done) ->
-    expect(EC.Emoji.all().length).toBeTruthy()
+    expect(EC_spec.Emoji.all().length).toBeTruthy()
     done()
 
   it 'search', (done) ->
-    EC.Emoji.search 'kissing', (emoji_data) ->
+    EC_spec.Emoji.search 'kissing', (emoji_data) ->
       expect(emoji_data).toContain(jasmine.objectContaining emoji_kissing)
       done()
 
   it 'starting', (done) ->
-    EC.Emoji.search 'kiss', (emoji_data) ->
+    EC_spec.Emoji.starting 'kiss', (emoji_data) ->
       expect(emoji_data).toContain(jasmine.objectContaining emoji_kiss)
       done()
 
   it 'ending', (done) ->
-    EC.Emoji.search 'kiss', (emoji_data) ->
+    EC_spec.Emoji.ending 'kiss', (emoji_data) ->
       expect(emoji_data).toContain(jasmine.objectContaining emoji_kiss)
       done()
 
   it 'tags', ->
-    expect(EC.Emoji.tags '', '').toBeTruthy()
+    expect(EC_spec.Emoji.tags('weapon').length).toBeTruthy()
 
   it 'categories', ->
-    expect(EC.Emoji.categories ['cosmos']).toBeTruthy()
+    expect(EC_spec.Emoji.categories('cosmos').length).toBeTruthy()
 
-  # it 'advenced', (done) ->
-  #   done()
-  #
-  # it 'combine', (done) ->
-  #   done()
-  #
-  # it 'flush', (done) ->
-  #   done()
+  it 'advenced', ->
+    searchs = categories: 'tools', tags: 'weapon', term: 'rifle'
+    expect(EC_spec.Emoji.advanced(searchs).length).toBeTruthy()
+
+  it 'flush', ->
+    expect(EC_spec.Emoji.flush().length).toBe(0)

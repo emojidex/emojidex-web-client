@@ -1,8 +1,22 @@
 describe 'EmojidexData', ->
-  beforeEach (done) ->
+  beforeAll (done) ->
     helperChains
-      functions: [helperBefore]
+      functions: [helperBeforeForEmojidexData]
       end: done
 
   it 'has the Data class defined', ->
-    expect(EC.Data).toBeDefined()
+    expect(EC_spec.Data).toBeDefined()
+
+  describe 'initialize', ->
+    it 'first access to storage', ->
+      expect(EC_spec.Data.storage.isEmpty 'emojidex').toBe(false)
+      expect(EC_spec.Data.storage.get 'emojidex.emoji').toEqual([])
+      expect(EC_spec.Data.storage.get 'emojidex.history').toEqual([])
+      expect(EC_spec.Data.storage.get 'emojidex.favorites').toEqual([])
+      expect(EC_spec.Data.storage.get 'emojidex.categories').toEqual([])
+      expect(EC_spec.Data.storage.get 'emojidex.auth_info').toEqual({status: 'none', user: '', token: null})
+
+    it 'after', ->
+      EC_spec = new EmojidexClient
+      expect(EC_spec.Data.storage.isEmpty 'emojidex').toBe(false)
+      expect(EC_spec.Data.storage.keys 'emojidex').toEqual(['emoji', 'history', 'favorites', 'categories', 'auth_info'])

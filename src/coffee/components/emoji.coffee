@@ -49,16 +49,16 @@ class EmojidexEmoji
     results
 
   # search for emoji with the given tags
-  tags: (tags, opts = null) ->
+  tags: (tags, opts) ->
     tags = @EC.Util.breakout tags
     selection = opts?.selection || @_emoji()
     collect = []
     for tag in tags
-      collect.concat (moji for moji in selection when $.inArray(tag, moji.tags) >= 0)
+      collect = collect.concat (moji for moji in selection when $.inArray(tag, moji.tags) >= 0)
     collect
 
   # gets emoji in any of the given categories
-  categories: (categories, opts = null) ->
+  categories: (categories, opts) ->
     categories = @EC.Util.breakout categories
     source = opts?.selection || @_emoji()
     collect = []
@@ -80,4 +80,5 @@ class EmojidexEmoji
   # Clears the emoji array and emoji in storage.
   # DO NOT call this unless you have a really good reason!
   flush: ->
-    @_emoji_instance = @EC.Data.emoji []
+    @EC.Data.storage.remove 'emojidex.emoji'
+    @_emoji_instance = []
