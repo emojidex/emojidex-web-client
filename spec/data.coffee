@@ -10,7 +10,7 @@ describe 'EmojidexData', ->
   describe 'initialize', ->
     it 'first access to storage', (done)->
       EC_spec.Data.storage.isEmpty('emojidex').then((flag)->
-        expect(flag).toBe(true)
+        expect(flag).toBe(false)
         done()
 
       )

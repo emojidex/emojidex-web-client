@@ -16,7 +16,6 @@ class EmojidexData
     @storage.hub.onConnect().then(=>
       @storage.hub.getKeys()
     ).then((keys)=>
-      console.log keys
       if keys.indexOf('emojidex') isnt -1
         @storage.update_emojidex_data()
       else
@@ -27,7 +26,7 @@ class EmojidexData
           categories: @EC.options?.categories || []
           auth_info: @EC.options?.auth_info || @_def_auth_info
         @storage.set 'emojidex', @emojidex_data
-    ).then(=>
+    ).then =>
       if @emojidex_data?.cdn_url?
         @EC.cdn_url = @emojidex_data.cdn_url
       else
@@ -41,7 +40,6 @@ class EmojidexData
               @EC.env = response
               @EC.cdn_url = "https://#{@EC.env.s_cdn_addr}/emoji/"
               @storage.update 'emojidex', cdn_url: @EC.cdn_url
-    )
 
   emoji: (emoji_set) ->
     if emoji_set?
