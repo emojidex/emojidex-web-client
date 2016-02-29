@@ -30,7 +30,9 @@
       this.limit = this.options.limit;
       this.locale = this.options.locale;
       this.Data = new EmojidexData(this);
+      this.Categories = new EmojidexCategories(this);
       this.User = new EmojidexUser(this);
+      this.Emoji = new EmojidexEmoji(this);
     }
 
     return EmojidexClient;
@@ -41,9 +43,6 @@
     function EmojidexCategories(EC) {
       this.EC = EC;
       this._categories = this.EC.Data.categories();
-      if (!this._categories.length) {
-        this.sync();
-      }
     }
 
     EmojidexCategories.prototype._categoriesAPI = function(category_name, callback, opts, called_func) {
@@ -70,7 +69,6 @@
           _this.results = response.emoji;
           _this.cur_page = response.meta.page;
           _this.count = response.meta.count;
-          _this.EC.Emoji.combine(response.emoji);
           return typeof callback === "function" ? callback(response.emoji) : void 0;
         }
       });

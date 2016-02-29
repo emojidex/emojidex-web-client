@@ -1,7 +1,7 @@
 class EmojidexCategories
   constructor: (@EC) ->
     @_categories = @EC.Data.categories()
-    @sync() unless @_categories.length
+    # @sync() unless @_categories.length
 
   _categoriesAPI: (category_name, callback, opts, called_func) ->
     param =
@@ -25,7 +25,7 @@ class EmojidexCategories
         @results = response.emoji
         @cur_page = response.meta.page
         @count = response.meta.count
-        @EC.Emoji.combine response.emoji
+        # @EC.Emoji.combine response.emoj/i
         callback? response.emoji
 
   getEmoji: (category_name, callback, opts)->

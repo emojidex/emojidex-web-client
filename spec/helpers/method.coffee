@@ -1,5 +1,6 @@
 helperChains = (chains_data) ->
   if chains_data.functions.length is 0
+    console.log 'chain end -----'
     chains_data.end()
   else
     chain_function = chains_data.functions.shift()
@@ -26,11 +27,13 @@ getExtendedEmojiData = (chains_data) ->
       helperChains chains_data
 
 getFacesEmoji = (chains_data) ->
+  console.log 'getFacesEmoji-----'
   $.ajax
     url: 'https://www.emojidex.com/api/v1/categories/faces/emoji'
     dataType: 'json'
     success: (response) =>
       @faces_emoji = response.emoji
+      console.log @faces_emoji
       helperChains chains_data
 
 setPremiumUser = ->
