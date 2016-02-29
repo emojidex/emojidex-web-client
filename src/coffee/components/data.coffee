@@ -8,40 +8,40 @@ class EmojidexData
     @emojidex_data = {}
 
     # for dist --------
-    # @storage = new CrossStorageClient 'https://www.emojidex.com/hub'
+    # @storage = new EmojidexDataStorage @
 
     # for dev --------
-    @storage = new CrossStorageClient 'http://localhost:8001/build/hub.html'
+    @storage = new EmojidexDataStorage @, 'http://localhost:8001/build/hub.html'
 
-    @storage.onConnect().then(=>
-      @storage.getKeys()
-    ).then((keys)=>
-      if keys.indexOf('emojidex') isnt -1
-        @get_hub_emojidex()
-      else
-        @emojidex_data =
-          emoji: @EC.options.emoji || []
-          history: @EC.options.history || []
-          favorites: @EC.options.favorites || []
-          categories: @EC.options.categories || []
-          auth_info: @EC.options.auth_info || @_def_auth_info
-        @storage.set 'emojidex', @emojidex_data
-    ).then(=>
-      if @emojidex_data.cdn_url?
-        @EC.cdn_url = @emojidex_data.cdn_url
-      else
-        # if the CDN URL has not been overridden
-        # attempt to get it from the api env
-        if @EC.cdn_url is @EC.defaults.cdn_url and @EC.closed_net is false
-          $.ajax
-            url: @EC.api_url + "/env"
-            dataType: 'json'
-            success: (response) =>
-              @EC.env = response
-              @EC.cdn_url = "https://#{@EC.env.s_cdn_addr}/emoji/"
-              @EC.Data.update_hub_data
-                cdn_url: @EC.cdn_url
-    )
+    # @storage.hub.onConnect().then(=>
+    #   @storage.hub.getKeys()
+    # ).then((keys)=>
+    #   if keys.indexOf('emojidex') isnt -1
+    #     @storage.update_emojidex_data()
+    #   else
+    #     @emojidex_data =
+    #       emoji: @EC.options.emoji || []
+    #       history: @EC.options.history || []
+    #       favorites: @EC.options.favorites || []
+    #       categories: @EC.options.categories || []
+    #       auth_info: @EC.options.auth_info || @_def_auth_info
+    #     @storage.set 'emojidex', @emojidex_data
+    # ).then(=>
+    #   if @emojidex_data.cdn_url?
+    #     @EC.cdn_url = @emojidex_data.cdn_url
+    #   else
+    #     # if the CDN URL has not been overridden
+    #     # attempt to get it from the api env
+    #     if @EC.cdn_url is @EC.defaults.cdn_url and @EC.closed_net is false
+    #       $.ajax
+    #         url: @EC.api_url + "/env"
+    #         dataType: 'json'
+    #         success: (response) =>
+    #           @EC.env = response
+    #           @EC.cdn_url = "https://#{@EC.env.s_cdn_addr}/emoji/"
+    #           @EC.Data.storage.set
+    #             cdn_url: @EC.cdn_url
+    # )
 
   update_hub_data: (data) ->
     $.extend @emojidex_data, data
