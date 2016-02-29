@@ -11,9 +11,11 @@ helperBefore = (chains_data) ->
   helperChains chains_data
 
 helperBeforeForEmojidexData = (chains_data) ->
-  $.localStorage.removeAll()
-  @EC_spec = new EmojidexClient
-  helperChains chains_data
+  CSC = new CrossStorageClient 'http://localhost:8001/build/hub.html'
+  CSC.onConnect().then =>
+    CSC.clear()
+    @EC_spec = new EmojidexClient()
+    helperChains chains_data
 
 getExtendedEmojiData = (chains_data) ->
   $.ajax

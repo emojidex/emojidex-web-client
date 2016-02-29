@@ -14,29 +14,36 @@ class EmojidexDataStorage
     return data
 
   get: (query) ->
-    console.log 'get---'
     query = query.split '.'
     @hub.onConnect().then(=>
-      console.log 'get2---'
-      @hub.get query[0]
-    ).then (res) =>
-      console.log res
-      # if query.length
-      #   for q in query
-      #     data = data[q]
-      # console.log data
-      return res
+      @hub.get query.shift()
+    ).then (hub_data)->
+      if query.length
+        for q in query
+          hub_data = hub_data[q]
+      console.log 'get --------'
+      console.log hub_data
+      return hub_data
 
   set: (query, data) ->
-    @hub.set query.split('.')[0], @_get_query_data query, data
+    @hub.onConnect().then =>
+      @hub.set query.split('.')[0], @_get_query_data query, data
 
   update: (query, data) ->
-    update_data = @hub.get query
-    $.extend update_data, @_get_query_data(query, data)
-    @hub.set query, update_data
+    @get query, (hub_data) =>
+      $.extend hub_data, @_get_query_data(query, data)
+      @set query, hub_data
 
   update_emojidex_data: ->
     @hub.get('emojidex').then (data) =>
       @ed.emojidex_data = data
 
-  isEmpty: (query) ->
+  clear: ->
+    @hub.onConnect().then =>
+      @hub.clear()
+
+  isEmpty: (query, callback) ->
+    @get(query).then (data)->
+      console.log 'isEmpty --------'
+      console.log data
+      if data then false else true
