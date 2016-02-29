@@ -154,7 +154,7 @@
             categories: ((_ref3 = _this.EC.options) != null ? _ref3.categories : void 0) || [],
             auth_info: ((_ref4 = _this.EC.options) != null ? _ref4.auth_info : void 0) || _this._def_auth_info
           };
-          return _this.storage.set('emojidex', _this.emojidex_data);
+          return _this.storage.update('emojidex', _this.emojidex_data);
         }
       }).then(function() {
         var _ref;
@@ -320,6 +320,24 @@
       return this.hub.onConnect().then(function() {
         return _this.hub.clear();
       });
+    };
+
+    EmojidexDataStorage.prototype.keys = function(query) {
+      var _this = this;
+      if (query) {
+        return this.get(query).then(function(hub_data) {
+          var data, keys;
+          keys = [];
+          for (data in hub_data) {
+            keys.push(data);
+          }
+          return keys;
+        });
+      } else {
+        return this.hub.onConnect().then(function() {
+          return _this.hub.getKeys();
+        });
+      }
     };
 
     EmojidexDataStorage.prototype.isEmpty = function(query, callback) {

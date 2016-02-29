@@ -25,7 +25,7 @@ class EmojidexData
           favorites: @EC.options?.favorites || []
           categories: @EC.options?.categories || []
           auth_info: @EC.options?.auth_info || @_def_auth_info
-        @storage.set 'emojidex', @emojidex_data
+        @storage.update 'emojidex', @emojidex_data
     ).then =>
       if @emojidex_data?.cdn_url?
         @EC.cdn_url = @emojidex_data.cdn_url

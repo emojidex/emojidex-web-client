@@ -35,3 +35,10 @@ getFacesEmoji = (chains_data) ->
 
 setPremiumUser = ->
   @EC_spec.User.set_auth premium_user_info.auth_user, premium_user_info.auth_token
+
+spec_timer = (option) ->
+  default_option =
+    time: 100
+    callback: undefined
+  $.extend default_option, option
+  setTimeout(default_option.callback, default_option.time) if default_option.callback?

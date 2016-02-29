@@ -47,6 +47,18 @@ class EmojidexDataStorage
     @hub.onConnect().then =>
       @hub.clear()
 
+  keys: (query) ->
+    if query
+      @get(query).then (hub_data)->
+        keys = []
+        for data of hub_data
+          keys.push data
+        return keys
+
+    else
+      @hub.onConnect().then =>
+        @hub.getKeys()
+
   isEmpty: (query, callback) ->
     @get(query).then (data)->
       if data then false else true
