@@ -8,8 +8,10 @@ helperChains = (chains_data) ->
 
 helperBefore = (chains_data) ->
   @EC_spec = new EmojidexClient
-  @EC_spec.User.set_auth user_info.auth_user, user_info.auth_token
-  helperChains chains_data
+  console.log user_info.auth_user, user_info.auth_token
+  @EC_spec.User.set_auth(user_info.auth_user, user_info.auth_token).then ->
+    console.log 11111111
+    helperChains chains_data
 
 helperBeforeForEmojidexData = (chains_data) ->
   CSC = new CrossStorageClient 'http://localhost:8001/build/hub.html'
@@ -33,7 +35,6 @@ getFacesEmoji = (chains_data) ->
     dataType: 'json'
     success: (response) =>
       @faces_emoji = response.emoji
-      console.log @faces_emoji
       helperChains chains_data
 
 setPremiumUser = ->

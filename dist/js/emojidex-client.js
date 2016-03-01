@@ -803,12 +803,12 @@
     };
 
     EmojidexData.prototype.auth_info = function(auth_info_set) {
+      console.log(auth_info_set);
       if (auth_info_set != null) {
-        this.storage.update('emojidex', {
+        return this.storage.update('emojidex', {
           auth_info: auth_info_set
         });
       }
-      return this.emojidex_data.auth_info;
     };
 
     return EmojidexData;
@@ -1345,7 +1345,6 @@
       this.Favorites = new EmojidexUserFavorites(this.EC);
       this.Newest = new EmojidexUserNewest(this.EC);
       this.Popular = new EmojidexUserPopular(this.EC);
-      this._auto_login();
     }
 
     EmojidexUser.prototype._auto_login = function() {
@@ -1439,12 +1438,16 @@
     };
 
     EmojidexUser.prototype.set_auth = function(user, token) {
-      this.auth_info = this.EC.Data.auth_info({
+      return this.EC.Data.auth_info({
         status: 'verified',
-        token: token,
-        user: user
+        user: user,
+        token: token
+      }).then(function(data) {
+        this.sync_user_data();
+        return data;
+      }).then(function(data) {
+        return console.log('set_auth -----', this, this);
       });
-      return this.sync_user_data();
     };
 
     EmojidexUser.prototype._set_auth_from_response = function(response) {

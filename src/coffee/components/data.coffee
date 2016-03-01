@@ -70,5 +70,6 @@ class EmojidexData
     @emojidex_data.categories
 
   auth_info: (auth_info_set) ->
+    console.log auth_info_set
     @storage.update('emojidex', auth_info: auth_info_set) if auth_info_set?
-    @emojidex_data.auth_info
+    # @emojidex_data.auth_info

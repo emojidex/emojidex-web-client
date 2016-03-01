@@ -5,7 +5,7 @@ class EmojidexUser
     @Favorites = new EmojidexUserFavorites @EC
     @Newest = new EmojidexUserNewest @EC
     @Popular = new EmojidexUserPopular @EC
-    @_auto_login()
+    # @_auto_login()
 
   # Checks for local saved login data, and if present sets the username and api_key
   _auto_login: () ->
@@ -85,11 +85,15 @@ class EmojidexUser
 
   # directly set auth credentials
   set_auth: (user, token) ->
-    @auth_info = @EC.Data.auth_info
+    @EC.Data.auth_info(
       status: 'verified'
-      token: token
       user: user
-    @sync_user_data()
+      token: token
+    ).then((data)->
+      @sync_user_data()
+      return data
+    ).then (data)->
+      console.log 'set_auth -----', @, this
 
   # sets auth parameters from a successful auth request [login]
   _set_auth_from_response: (response) ->

@@ -2,11 +2,12 @@ describe 'EmojidexCategories', ->
   beforeAll (done) ->
     helperChains
       functions: [helperBefore, getFacesEmoji]
+      # functions: [getFacesEmoji]
       end: done
 
   it 'getEmoji', (done) ->
     EC_spec.Categories.getEmoji 'faces', (emojis) ->
-      console.log emojis
+      # console.log emojis
       expect(emojis).toContain(jasmine.objectContaining faces_emoji[0])
       done()
 
@@ -14,7 +15,7 @@ describe 'EmojidexCategories', ->
   #   EC_spec.Categories.called_data.callback = ->
   #     expect(EC_spec.Categories.cur_page).toEqual 2
   #     done()
-  #   EC_spec.Categories.next()
+    #   EC_spec.Categories.next()
   #
   # it 'prev', (done) ->
   #   EC_spec.Categories.called_data.callback = ->
