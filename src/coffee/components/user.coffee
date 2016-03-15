@@ -89,19 +89,21 @@ class EmojidexUser
       status: 'verified'
       user: user
       token: token
-    ).then((data)->
+    ).then (data) =>
+      @auth_info = @EC.Data.emojidex_data.auth_info
       @sync_user_data()
       return data
-    ).then (data)->
-      console.log 'set_auth -----', @, this
 
   # sets auth parameters from a successful auth request [login]
   _set_auth_from_response: (response) ->
-    @auth_info = @EC.Data.auth_info
+    @EC.Data.auth_info(
       status: response.auth_status
       token: response.auth_token
       user: response.auth_user
-    @sync_user_data()
+    ).then (data)=>
+      @auth_info = @EC.Data.emojidex_data.auth_info
+      @sync_user_data()
+      retrun data
 
   sync_user_data: () ->
     @History.token = @Favorites.token = @Newest.token = @Popular.token = @auth_info.token

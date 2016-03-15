@@ -43,5 +43,10 @@ class EmojidexUserFavorites
   sync: ->
     @get() # persistant favorites currently require an account
 
-  all: ->
-    @_favorites
+  all: (callback) ->
+    if @_favorites?
+      callback? @_favorites
+    else
+      setTimeout (=>
+        @all callback
+      ), 500

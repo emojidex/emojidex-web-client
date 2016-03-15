@@ -36,5 +36,10 @@ class EmojidexUserHistory
   sync: ->
     @get() # history currently can't be saved locally, so only get will work
 
-  all: ->
-    @_history
+  all: (callback) ->
+    if @_history?
+      callback? @_history
+    else
+      setTimeout (=>
+        @all callback
+      ), 500

@@ -1,6 +1,6 @@
 helperChains = (chains_data) ->
   if chains_data.functions.length is 0
-    console.log 'chain end -----'
+    # console.log 'chain end --------'
     chains_data.end()
   else
     chain_function = chains_data.functions.shift()
@@ -8,9 +8,7 @@ helperChains = (chains_data) ->
 
 helperBefore = (chains_data) ->
   @EC_spec = new EmojidexClient
-  console.log user_info.auth_user, user_info.auth_token
   @EC_spec.User.set_auth(user_info.auth_user, user_info.auth_token).then ->
-    console.log 11111111
     helperChains chains_data
 
 helperBeforeForEmojidexData = (chains_data) ->
@@ -29,7 +27,6 @@ getExtendedEmojiData = (chains_data) ->
       helperChains chains_data
 
 getFacesEmoji = (chains_data) ->
-  console.log 'getFacesEmoji-----'
   $.ajax
     url: 'https://www.emojidex.com/api/v1/categories/faces/emoji'
     dataType: 'json'

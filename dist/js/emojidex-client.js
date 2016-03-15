@@ -803,11 +803,16 @@
     };
 
     EmojidexData.prototype.auth_info = function(auth_info_set) {
-      console.log(auth_info_set);
+      var promise;
       if (auth_info_set != null) {
-        return this.storage.update('emojidex', {
+        promise = this.storage.update('emojidex', {
           auth_info: auth_info_set
         });
+        if (auth_info_set.get_auth_info) {
+          return this.emojidex_data.auth_info;
+        } else {
+          return promise;
+        }
       }
     };
 
@@ -1438,25 +1443,29 @@
     };
 
     EmojidexUser.prototype.set_auth = function(user, token) {
+      var _this = this;
       return this.EC.Data.auth_info({
         status: 'verified',
         user: user,
         token: token
       }).then(function(data) {
-        this.sync_user_data();
+        _this.auth_info = _this.EC.Data.emojidex_data.auth_info;
+        _this.sync_user_data();
         return data;
-      }).then(function(data) {
-        return console.log('set_auth -----', this, this);
       });
     };
 
     EmojidexUser.prototype._set_auth_from_response = function(response) {
-      this.auth_info = this.EC.Data.auth_info({
+      var _this = this;
+      return this.EC.Data.auth_info({
         status: response.auth_status,
         token: response.auth_token,
         user: response.auth_user
+      }).then(function(data) {
+        _this.auth_info = _this.EC.Data.emojidex_data.auth_info;
+        _this.sync_user_data();
+        return retrun(data);
       });
-      return this.sync_user_data();
     };
 
     EmojidexUser.prototype.sync_user_data = function() {
@@ -1539,8 +1548,15 @@
       return this.get();
     };
 
-    EmojidexUserFavorites.prototype.all = function() {
-      return this._favorites;
+    EmojidexUserFavorites.prototype.all = function(callback) {
+      var _this = this;
+      if (this._favorites != null) {
+        return typeof callback === "function" ? callback(this._favorites) : void 0;
+      } else {
+        return setTimeout((function() {
+          return _this.all(callback);
+        }), 500);
+      }
     };
 
     return EmojidexUserFavorites;
@@ -1609,8 +1625,15 @@
       return this.get();
     };
 
-    EmojidexUserHistory.prototype.all = function() {
-      return this._history;
+    EmojidexUserHistory.prototype.all = function(callback) {
+      var _this = this;
+      if (this._history != null) {
+        return typeof callback === "function" ? callback(this._history) : void 0;
+      } else {
+        return setTimeout((function() {
+          return _this.all(callback);
+        }), 500);
+      }
     };
 
     return EmojidexUserHistory;
