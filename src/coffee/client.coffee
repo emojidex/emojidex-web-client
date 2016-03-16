@@ -49,7 +49,7 @@ class @EmojidexClient
     @Data = new EmojidexData @
     @Categories = new EmojidexCategories @
     @User = new EmojidexUser @
-    # @Indexes = new EmojidexIndexes @
+    @Indexes = new EmojidexIndexes @
     # @Util = new EmojidexUtil @
     # @Search = new EmojidexSearch @
     @Emoji = new EmojidexEmoji @

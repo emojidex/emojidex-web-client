@@ -602,6 +602,7 @@
       this.Data = new EmojidexData(this);
       this.Categories = new EmojidexCategories(this);
       this.User = new EmojidexUser(this);
+      this.Indexes = new EmojidexIndexes(this);
       this.Emoji = new EmojidexEmoji(this);
     }
 
