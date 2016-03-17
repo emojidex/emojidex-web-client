@@ -17,7 +17,7 @@ class EmojidexCategories
       param: param
 
     $.ajax
-      url: "#{@EC.api_url}categories/#{category_name}/#{param.type}"
+      url: "#{@EC.api_url}emoji"
       dataType: 'json'
       data: param
       success: (response) =>
@@ -30,7 +30,7 @@ class EmojidexCategories
 
   getEmoji: (category_name, callback, opts)->
     param =
-      type: 'emoji'
+      category: category_name
     $.extend param, opts
     @_categoriesAPI category_name, callback, param, @getEmoji
 
@@ -51,8 +51,14 @@ class EmojidexCategories
       data:
         locale: locale
       success: (response) =>
-        @_categories = @EC.Data.categories response.categories
+        @_categories = response.categories
+        @EC.Data.categories response.categories
         callback? @_categories
 
-  all: ->
-    @_categories
+  all: (callback) ->
+    if @_categories?
+      callback? @_categories
+    else
+      setTimeout (=>
+        @all callback
+      ), 500

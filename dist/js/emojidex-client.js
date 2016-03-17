@@ -632,7 +632,7 @@
         param: param
       };
       return $.ajax({
-        url: "" + this.EC.api_url + "categories/" + category_name + "/" + param.type,
+        url: "" + this.EC.api_url + "emoji",
         dataType: 'json',
         data: param,
         success: function(response) {
@@ -648,7 +648,7 @@
     EmojidexCategories.prototype.getEmoji = function(category_name, callback, opts) {
       var param;
       param = {
-        type: 'emoji'
+        category: category_name
       };
       $.extend(param, opts);
       return this._categoriesAPI(category_name, callback, param, this.getEmoji);
@@ -684,14 +684,22 @@
           locale: locale
         },
         success: function(response) {
-          _this._categories = _this.EC.Data.categories(response.categories);
+          _this._categories = response.categories;
+          _this.EC.Data.categories(response.categories);
           return typeof callback === "function" ? callback(_this._categories) : void 0;
         }
       });
     };
 
-    EmojidexCategories.prototype.all = function() {
-      return this._categories;
+    EmojidexCategories.prototype.all = function(callback) {
+      var _this = this;
+      if (this._categories != null) {
+        return typeof callback === "function" ? callback(this._categories) : void 0;
+      } else {
+        return setTimeout((function() {
+          return _this.all(callback);
+        }), 500);
+      }
     };
 
     return EmojidexCategories;
