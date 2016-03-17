@@ -11,7 +11,7 @@ describe 'EmojidexData', ->
     it 'first access to storage', (done)->
       timer_option =
         callback: ->
-          if EC_spec.Data.emojidex_data?.cdn_url?
+          if EC_spec.Data.hub_data?.cdn_url?
             EC_spec.Data.storage.isEmpty('emojidex').then (flag)->
               expect(flag).toBe false
               done()

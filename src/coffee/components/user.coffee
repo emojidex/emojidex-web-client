@@ -90,7 +90,7 @@ class EmojidexUser
       user: user
       token: token
     ).then (data) =>
-      @auth_info = @EC.Data.emojidex_data.auth_info
+      @auth_info = @EC.Data.hub_data.auth_info
       @sync_user_data()
       return data
 
@@ -101,7 +101,7 @@ class EmojidexUser
       token: response.auth_token
       user: response.auth_user
     ).then (data)=>
-      @auth_info = @EC.Data.emojidex_data.auth_info
+      @auth_info = @EC.Data.hub_data.auth_info
       @sync_user_data()
       retrun data
 

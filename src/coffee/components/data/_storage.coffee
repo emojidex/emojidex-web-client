@@ -32,16 +32,16 @@ class EmojidexDataStorage
   set: (query, data) ->
     @hub.onConnect().then =>
       @hub.set query.split('.')[0], @_get_query_data query, data
-      @update_emojidex_data()
+      @update_hub_data()
 
   update: (query, data) ->
     @get(query).then (hub_data) =>
       merged = $.extend true, {}, hub_data, @_get_query_data(query, data)
       @set query, merged
 
-  update_emojidex_data: ->
+  update_hub_data: ->
     @get('emojidex').then (hub_data) =>
-      @ed.emojidex_data = hub_data
+      @ed.hub_data = hub_data
 
   clear: ->
     @hub.onConnect().then =>

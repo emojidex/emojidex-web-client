@@ -5,7 +5,7 @@ class EmojidexData
       user: ''
       token: null
 
-    @emojidex_data = {}
+    @hub_data = {}
 
     # for dist --------
     # @storage = new EmojidexDataStorage @
@@ -17,18 +17,18 @@ class EmojidexData
       @storage.hub.getKeys()
     ).then((keys)=>
       if keys.indexOf('emojidex') isnt -1
-        @storage.update_emojidex_data()
+        @storage.update_hub_data()
       else
-        @emojidex_data =
+        @hub_data =
           emoji: @EC.options?.emoji || []
           history: @EC.options?.history || []
           favorites: @EC.options?.favorites || []
           categories: @EC.options?.categories || []
           auth_info: @EC.options?.auth_info || @_def_auth_info
-        @storage.update 'emojidex', @emojidex_data
+        @storage.update 'emojidex', @hub_data
     ).then =>
-      if @emojidex_data?.cdn_url?
-        @EC.cdn_url = @emojidex_data.cdn_url
+      if @hub_data?.cdn_url?
+        @EC.cdn_url = @hub_data.cdn_url
       else
         # if the CDN URL has not been overridden
         # attempt to get it from the api env
@@ -43,37 +43,37 @@ class EmojidexData
 
   emoji: (emoji_set) ->
     if emoji_set?
-      if @emojidex_data.emoji?
+      if @hub_data.emoji?
         @storage.update 'emojidex', emoji: emoji_set
       else
-        ls_emoji = @emojidex_data.emoji
+        hub_emoji = @hub_data.emoji
         for new_emoji in emoji_set
-          for emoji in ls_emoji
+          for emoji in hub_emoji
             if new_emoji.code is emoji.code
-              ls_emoji.splice ls_emoji.indexOf(emoji), 1, new_emoji
+              hub_emoji.splice hub_emoji.indexOf(emoji), 1, new_emoji
               break
-            else if emoji is ls_emoji[ls_emoji.length - 1]
-              ls_emoji.push new_emoji
-        @storage.update 'emojidex', emoji: ls_emoji
-    @emojidex_data.emoji
+            else if emoji is hub_emoji[hub_emoji.length - 1]
+              hub_emoji.push new_emoji
+        @storage.update 'emojidex', emoji: hub_emoji
+    @hub_data.emoji
 
   favorites: (favorites_set) ->
     @storage.update('emojidex', favorites: favorites_set) if favorites_set?
-    @emojidex_data.favorites
+    @hub_data.favorites
 
   history: (history_set) ->
     @storage.update('emojidex', history: history_set) if history_set?
-    @emojidex_data.history
+    @hub_data.history
 
   categories: (categories_set) ->
     @storage.update('emojidex', categories: categories_set) if categories_set?
-    @emojidex_data.categories
+    @hub_data.categories
 
   auth_info: (auth_info_set) ->
     if auth_info_set?
       promise = @storage.update('emojidex', auth_info: auth_info_set)
 
       if auth_info_set.get_auth_info
-        return @emojidex_data.auth_info
+        return @hub_data.auth_info
       else
         return promise
