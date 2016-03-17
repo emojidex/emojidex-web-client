@@ -1,6 +1,6 @@
 class EmojidexEmoji
   constructor: (@EC) ->
-    @_emoji_instance = null
+    @_emoji_instance = []
 
   _emoji: ->
     return @_emoji_instance if @_emoji_instance?

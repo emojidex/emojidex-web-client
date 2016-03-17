@@ -47,9 +47,8 @@ class EmojidexIndexes
         dataType: 'json'
         success: (response) =>
           loaded_emoji = loaded_emoji.concat response
-          @EC.Emoji.combine response
           if ++loaded_num is static_type.length
-            callback loaded_emoji
+            callback @EC.Emoji.combine loaded_emoji
 
     for type in static_type
       if language

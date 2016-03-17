@@ -603,6 +603,7 @@
       this.Categories = new EmojidexCategories(this);
       this.User = new EmojidexUser(this);
       this.Indexes = new EmojidexIndexes(this);
+      this.Search = new EmojidexSearch(this);
       this.Emoji = new EmojidexEmoji(this);
     }
 
@@ -759,10 +760,6 @@
       var emoji, hub_emoji, new_emoji, _i, _j, _len, _len1;
       if (emoji_set != null) {
         if (this.hub_data.emoji != null) {
-          this.storage.update('emojidex', {
-            emoji: emoji_set
-          });
-        } else {
           hub_emoji = this.hub_data.emoji;
           for (_i = 0, _len = emoji_set.length; _i < _len; _i++) {
             new_emoji = emoji_set[_i];
@@ -778,6 +775,10 @@
           }
           this.storage.update('emojidex', {
             emoji: hub_emoji
+          });
+        } else {
+          this.storage.update('emojidex', {
+            emoji: emoji_set
           });
         }
       }
@@ -940,7 +941,7 @@
     function EmojidexEmoji(EC) {
       this.EC = EC;
       this.combine = __bind(this.combine, this);
-      this._emoji_instance = null;
+      this._emoji_instance = [];
     }
 
     EmojidexEmoji.prototype._emoji = function() {
@@ -1166,9 +1167,8 @@
           dataType: 'json',
           success: function(response) {
             loaded_emoji = loaded_emoji.concat(response);
-            _this.EC.Emoji.combine(response);
             if (++loaded_num === static_type.length) {
-              return callback(loaded_emoji);
+              return callback(_this.EC.Emoji.combine(loaded_emoji));
             }
           }
         });

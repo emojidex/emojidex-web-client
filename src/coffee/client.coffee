@@ -51,5 +51,5 @@ class @EmojidexClient
     @User = new EmojidexUser @
     @Indexes = new EmojidexIndexes @
     # @Util = new EmojidexUtil @
-    # @Search = new EmojidexSearch @
+    @Search = new EmojidexSearch @
     @Emoji = new EmojidexEmoji @

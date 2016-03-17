@@ -44,8 +44,6 @@ class EmojidexData
   emoji: (emoji_set) ->
     if emoji_set?
       if @hub_data.emoji?
-        @storage.update 'emojidex', emoji: emoji_set
-      else
         hub_emoji = @hub_data.emoji
         for new_emoji in emoji_set
           for emoji in hub_emoji
@@ -55,6 +53,8 @@ class EmojidexData
             else if emoji is hub_emoji[hub_emoji.length - 1]
               hub_emoji.push new_emoji
         @storage.update 'emojidex', emoji: hub_emoji
+      else
+        @storage.update 'emojidex', emoji: emoji_set
     @hub_data.emoji
 
   favorites: (favorites_set) ->
