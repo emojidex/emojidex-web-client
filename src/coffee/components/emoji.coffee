@@ -12,20 +12,23 @@ class EmojidexEmoji
       @seed()
 
   checkUpdate: ->
-    if @EC.Data.storage.isSet 'emojidex.seedUpdated'
-      current = new Date
-      updated = new Date @EC.Data.storage.get 'emojidex.seedUpdated'
-      if current - updated <= 3600000 * 48
-        return true
+    @EC.Data.storage.isSet('emojidex.seedUpdated').then((flag) =>
+      if flag
+        current = new Date
+        @EC.Data.storage.get('emojidex.seedUpdated').then((date_string) =>
+          updated = new Date date_string
+          if current - updated <= 3600000 * 48
+            return true
+          else
+            return false
+        )
       else
         return false
-    else
-      return false
+    )
 
   # Gets the full list of caetgories available
   seed: (callback) ->
-    lang = navigator.language || navigator.userLanguage
-    @EC.Indexes.static ['utf_emoji', 'extended_emoji'], lang, callback
+    @EC.Indexes.static ['utf_emoji', 'extended_emoji'], null, callback
 
   all: ->
     @_emoji()
@@ -75,7 +78,8 @@ class EmojidexEmoji
 
   # Concatenates and flattens the given emoji array into the @emoji array
   combine: (emoji) =>
-    @_emoji_instance = @EC.Data.emoji emoji
+    @EC.Data.emoji(emoji).then (hub_data) =>
+      @_emoji_instance = hub_data.emoji
 
   # Clears the emoji array and emoji in storage.
   # DO NOT call this unless you have a really good reason!

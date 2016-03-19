@@ -17,7 +17,7 @@ class EmojidexData
       @storage.hub.getKeys()
     ).then((keys)=>
       if keys.indexOf('emojidex') isnt -1
-        @storage.update_hub_data()
+        @storage.update_cache()
       else
         @hub_data =
           emoji: @EC.options?.emoji || []
@@ -52,9 +52,9 @@ class EmojidexData
               break
             else if emoji is hub_emoji[hub_emoji.length - 1]
               hub_emoji.push new_emoji
-        @storage.update 'emojidex', emoji: hub_emoji
+        return @storage.update 'emojidex', emoji: hub_emoji
       else
-        @storage.update 'emojidex', emoji: emoji_set
+        return @storage.update 'emojidex', emoji: emoji_set
     @hub_data.emoji
 
   favorites: (favorites_set) ->
