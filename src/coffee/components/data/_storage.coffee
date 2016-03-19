@@ -51,7 +51,7 @@ class EmojidexDataStorage
       else
         return @hub.set first_query, @_get_chained_data query, data
     ).then =>
-      @update_cache query.first
+      @update_cache first_query
 
   update: (query, data) ->
     merged = $.extend true, {}, @get(query.split('.')[0]), @_get_chained_data(query, data, false)

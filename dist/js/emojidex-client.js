@@ -790,7 +790,7 @@
 
     EmojidexData.prototype.favorites = function(favorites_set) {
       if (favorites_set != null) {
-        this.storage.update('emojidex', {
+        return this.storage.update('emojidex', {
           favorites: favorites_set
         });
       }
@@ -799,7 +799,7 @@
 
     EmojidexData.prototype.history = function(history_set) {
       if (history_set != null) {
-        this.storage.update('emojidex', {
+        return this.storage.update('emojidex', {
           history: history_set
         });
       }
@@ -808,7 +808,7 @@
 
     EmojidexData.prototype.categories = function(categories_set) {
       if (categories_set != null) {
-        this.storage.update('emojidex', {
+        return this.storage.update('emojidex', {
           categories: categories_set
         });
       }
@@ -911,7 +911,7 @@
           return _this.hub.set(first_query, _this._get_chained_data(query, data));
         }
       }).then(function() {
-        return _this.update_cache(query.first);
+        return _this.update_cache(first_query);
       });
     };
 
@@ -1512,7 +1512,7 @@
         user: user,
         token: token
       }).then(function(data) {
-        _this.auth_info = _this.EC.Data.hub_data.auth_info;
+        _this.auth_info = _this.EC.Data.hub_data.emojidex.auth_info;
         _this.sync_user_data();
         return data;
       });
@@ -1525,9 +1525,9 @@
         token: response.auth_token,
         user: response.auth_user
       }).then(function(data) {
-        _this.auth_info = _this.EC.Data.hub_data.auth_info;
+        _this.auth_info = _this.EC.Data.hub_data.emojidex.auth_info;
         _this.sync_user_data();
-        return retrun(data);
+        return data;
       });
     };
 
@@ -1567,7 +1567,8 @@
           auth_token: this.token
         },
         success: function(response) {
-          _this._favorites = _this.EC.Data.favorites(response);
+          _this._favorites = response;
+          _this.EC.Data.favorites(response);
           return typeof callback === "function" ? callback(_this._favorites) : void 0;
         }
       };
@@ -1652,7 +1653,8 @@
           auth_token: this.token
         },
         success: function(response) {
-          _this._history = _this.EC.Data.history(response);
+          _this._history = response;
+          _this.EC.Data.history(response);
           return typeof callback === "function" ? callback(_this._history) : void 0;
         }
       };

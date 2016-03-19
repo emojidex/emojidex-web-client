@@ -1,6 +1,6 @@
 helperChains = (chains_data) ->
   if chains_data.functions.length is 0
-    console.log 'chain end --------'
+    # console.log 'chain end --------'
     chains_data.end()
   else
     chain_function = chains_data.functions.shift()
@@ -8,7 +8,6 @@ helperChains = (chains_data) ->
 
 helperBefore = (chains_data) ->
   @EC_spec = new EmojidexClient
-  console.log user_info
   @EC_spec.User.set_auth(user_info.auth_user, user_info.auth_token).then ->
     helperChains chains_data
 

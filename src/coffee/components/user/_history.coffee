@@ -15,7 +15,8 @@ class EmojidexUserHistory
       data:
         auth_token: @token
       success: (response) =>
-        @_history = @EC.Data.history response
+        @_history = response
+        @EC.Data.history response
         callback? @_history
     @_historyAPI options
 

@@ -58,15 +58,15 @@ class EmojidexData
     @hub_data.emoji
 
   favorites: (favorites_set) ->
-    @storage.update('emojidex', favorites: favorites_set) if favorites_set?
+    return @storage.update('emojidex', favorites: favorites_set) if favorites_set?
     @hub_data.favorites
 
   history: (history_set) ->
-    @storage.update('emojidex', history: history_set) if history_set?
+    return @storage.update('emojidex', history: history_set) if history_set?
     @hub_data.history
 
   categories: (categories_set) ->
-    @storage.update('emojidex', categories: categories_set) if categories_set?
+    return @storage.update('emojidex', categories: categories_set) if categories_set?
     @hub_data.categories
 
   auth_info: (auth_info_set) ->
