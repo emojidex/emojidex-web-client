@@ -262,14 +262,13 @@
   })();
 
   EmojidexDataStorage = (function() {
-    function EmojidexDataStorage(ED, hub_path) {
-      this.ED = ED;
+    function EmojidexDataStorage(ed, hub_path) {
+      this.ed = ed;
       hub_path = hub_path != null ? hub_path : 'https://www.emojidex.com/hub';
       this.hub = new CrossStorageClient(hub_path);
-      this.update_cache();
     }
 
-    EmojidexDataStorage.prototype._get_chained_data = function(query, data_obj) {
+    EmojidexDataStorage.prototype._get_filtered_data = function(query, data_obj) {
       var chain_obj;
       chain_obj = function(data, key) {
         if (query.length === 0) {
@@ -280,14 +279,16 @@
         }
         return data;
       };
-      if (query.length) {
+      query = query.split('.');
+      if (query.length === 1) {
         return data_obj;
       } else {
+        query.shift();
         return chain_obj({}, query.shift());
       }
     };
 
-    EmojidexDataStorage.prototype._get_hub_data = function(query) {
+    EmojidexDataStorage.prototype.get = function(query) {
       var _this = this;
       query = query.split('.');
       return this.hub.onConnect().then(function() {
@@ -304,49 +305,27 @@
       });
     };
 
-    EmojidexDataStorage.prototype.get = function(query) {
-      var cache, q, _i, _len;
-      cache = this.ED.hub_data;
-      query = query.split('.');
-      if (query.length) {
-        for (_i = 0, _len = query.length; _i < _len; _i++) {
-          q = query[_i];
-          cache = cache[q];
-        }
-      }
-      return cache;
-    };
-
-    EmojidexDataStorage.prototype._get_parsed_query = function(query) {
-      var parsed_query;
-      parsed_query = query.split('.');
-      return query = {
-        origin: query,
-        first: parsed_query.shift(),
-        array: parsed_query
-      };
-    };
-
     EmojidexDataStorage.prototype.set = function(query, data) {
       var _this = this;
-      query = this._get_parsed_query(query);
       return this.hub.onConnect().then(function() {
-        _this.hub.set(query.first, _this._get_chained_data(query.array, data));
+        _this.hub.set(query.split('.')[0], _this._get_filtered_data(query, data));
         return _this.update_cache();
       });
     };
 
     EmojidexDataStorage.prototype.update = function(query, data) {
-      var merged;
-      query = this._get_parsed_query(query);
-      merged = $.extend(true, {}, this.get(query.origin), this._get_chained_data(query.array, data));
-      return this.set(query, merged);
+      var _this = this;
+      return this.get(query).then(function(hub_data) {
+        var merged;
+        merged = $.extend(true, {}, hub_data, _this._get_filtered_data(query, data));
+        return _this.set(query, merged);
+      });
     };
 
     EmojidexDataStorage.prototype.update_cache = function() {
       var _this = this;
-      return this._get_hub_data('emojidex').then(function(hub_data) {
-        return _this.ED.hub_data = hub_data;
+      return this.get('emojidex').then(function(hub_data) {
+        return _this.ed.hub_data = hub_data;
       });
     };
 
@@ -362,14 +341,16 @@
     };
 
     EmojidexDataStorage.prototype.keys = function(query) {
-      var key, keys,
-        _this = this;
+      var _this = this;
       if (query) {
-        keys = [];
-        for (key in this.get(query)) {
-          keys.push(key);
-        }
-        return keys;
+        return this.get(query).then(function(hub_data) {
+          var data, keys;
+          keys = [];
+          for (data in hub_data) {
+            keys.push(data);
+          }
+          return keys;
+        });
       } else {
         return this.hub.onConnect().then(function() {
           return _this.hub.getKeys();
@@ -378,19 +359,23 @@
     };
 
     EmojidexDataStorage.prototype.isEmpty = function(query) {
-      if (this.get(query)) {
-        return false;
-      } else {
-        return true;
-      }
+      return this.get(query).then(function(data) {
+        if (data) {
+          return false;
+        } else {
+          return true;
+        }
+      });
     };
 
     EmojidexDataStorage.prototype.isSet = function(query) {
-      if (this.get(query)) {
-        return true;
-      } else {
-        return false;
-      }
+      return this.get(query).then(function(data) {
+        if (data) {
+          return true;
+        } else {
+          return false;
+        }
+      });
     };
 
     return EmojidexDataStorage;
