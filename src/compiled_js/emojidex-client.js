@@ -305,6 +305,17 @@
       });
     };
 
+    EmojidexDataStorage.prototype._get_parsed_query = function(query) {
+      var parsed_query;
+      parsed_query = query.split('.');
+      return query = {
+        code: query,
+        origin: parsed_query,
+        first: parsed_query[0],
+        after_first: parsed_query.slice(1)
+      };
+    };
+
     EmojidexDataStorage.prototype.get = function(query, wrap) {
       var cache, q, re, _i, _len;
       query = query instanceof Array ? query : query.split('.');
@@ -322,17 +333,6 @@
         re = cache;
       }
       return re;
-    };
-
-    EmojidexDataStorage.prototype._get_parsed_query = function(query) {
-      var parsed_query;
-      parsed_query = query.split('.');
-      return query = {
-        code: query,
-        origin: parsed_query,
-        first: parsed_query[0],
-        after_first: parsed_query.slice(1)
-      };
     };
 
     EmojidexDataStorage.prototype.set = function(query, data) {

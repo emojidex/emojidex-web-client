@@ -9,7 +9,6 @@ class EmojidexData
 
     # for dist --------
     # @storage = new EmojidexDataStorage @
-
     # for dev --------
     @storage = new EmojidexDataStorage @, 'http://localhost:8001/build/hub.html'
 

@@ -27,6 +27,14 @@ class EmojidexDataStorage
           hub_data = hub_data[q]
       return hub_data
 
+  _get_parsed_query: (query) ->
+    parsed_query = query.split '.'
+    query =
+      code: query
+      origin: parsed_query
+      first: parsed_query[0]
+      after_first: parsed_query.slice 1
+
   get: (query, wrap) ->
     query = if query instanceof Array then query else query.split('.')
     cache = @ED.hub_data
@@ -39,14 +47,6 @@ class EmojidexDataStorage
     else
       re = cache
     return re
-
-  _get_parsed_query: (query) ->
-    parsed_query = query.split '.'
-    query =
-      code: query
-      origin: parsed_query
-      first: parsed_query[0]
-      after_first: parsed_query.slice 1
 
   set: (query, data) ->
     query = @_get_parsed_query query
