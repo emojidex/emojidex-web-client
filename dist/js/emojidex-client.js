@@ -816,16 +816,10 @@
     };
 
     EmojidexData.prototype.auth_info = function(auth_info_set) {
-      var promise;
       if (auth_info_set != null) {
-        promise = this.storage.update('emojidex', {
+        return this.storage.update('emojidex', {
           auth_info: auth_info_set
         });
-        if (auth_info_set.get_auth_info) {
-          return this.hub_data.auth_info;
-        } else {
-          return promise;
-        }
       }
     };
 
@@ -1015,6 +1009,7 @@
     EmojidexEmoji.prototype.checkUpdate = function() {
       var current, updated;
       if (this.EC.Data.storage.isSet('emojidex.seedUpdated')) {
+        console.log('checkUpdate:seedUpdated', this.EC.Data.storage.get('emojidex.seedUpdated'));
         current = new Date;
         updated = new Date(this.EC.Data.storage.get('emojidex.seedUpdated'));
         if (current - updated <= 3600000 * 48) {

@@ -7,8 +7,9 @@ describe 'EmojidexEmoji', ->
   describe 'check update', ->
     it 'need update', ->
       console.log 1111111
-      EC_spec.Data.storage.update 'emojidex.seedUpdated', new Date('1/1/2016').toString()
+      console.log 'spec:need update', EC_spec.Data.storage.get 'emojidex'
       console.log 'spec:emoji:checkUpdate', EC_spec.Emoji.checkUpdate()
+      # EC_spec.Data.storage.update 'emojidex.seedUpdated', new Date('1/1/2016').toString()
       # expect(EC_spec.Emoji.checkUpdate()).toBe(false)
 
     # it 'unnecessary update', (done) ->

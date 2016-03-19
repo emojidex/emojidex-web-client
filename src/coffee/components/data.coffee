@@ -16,7 +16,7 @@ class EmojidexData
       @storage.hub.getKeys()
     ).then((keys)=>
       if keys.indexOf('emojidex') isnt -1
-        @storage.update_cache 'emojidex'
+        return @storage.update_cache 'emojidex'
       else
         @hub_data =
           emojidex:
@@ -25,7 +25,7 @@ class EmojidexData
             favorites: @EC.options?.favorites || []
             categories: @EC.options?.categories || []
             auth_info: @EC.options?.auth_info || @_def_auth_info
-        @storage.update 'emojidex', @hub_data.emojidex
+        return @storage.update 'emojidex', @hub_data.emojidex
     ).then =>
       if @hub_data?.emojidex?.cdn_url?
         @EC.cdn_url = @hub_data.emojidex.cdn_url
@@ -71,9 +71,4 @@ class EmojidexData
 
   auth_info: (auth_info_set) ->
     if auth_info_set?
-      promise = @storage.update('emojidex', auth_info: auth_info_set)
-
-      if auth_info_set.get_auth_info
-        return @hub_data.auth_info
-      else
-        return promise
+      @storage.update('emojidex', auth_info: auth_info_set)

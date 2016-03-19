@@ -64,9 +64,9 @@ class EmojidexDataStorage
       @hub.get keys
     ).then (hub_data) =>
       if key
-        @ED.hub_data[key] = hub_data[key]
+        return @ED.hub_data[key] = hub_data[key]
       else
-        @ED.hub_data = hub_data
+        return @ED.hub_data = hub_data
 
   remove: (query) ->
     console.log 'remove--------'
