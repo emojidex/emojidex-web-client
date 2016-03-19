@@ -3,19 +3,18 @@ class EmojidexDataStorage
     hub_path = hub_path ? 'https://www.emojidex.com/hub'
     @hub = new CrossStorageClient hub_path
 
-  _get_chained_data: (query, data_obj) ->
+  _get_chained_data: (query, data_obj, wrap=true) ->
+    query = @_get_parsed_query query
     chain_obj = (data, key) ->
-      if query.length is 0
+      if query.array.length is 0
         data[key] = data_obj
       else
         data[key] = {}
-        chain_obj data[key], query.shift()
+        chain_obj data[key], query.array.shift()
       return data
 
-    if query.length
-      return chain_obj {}, query.shift()
-    else
-      return data_obj
+    chained = chain_obj {}, query.array.shift()
+    return if wrap then chained else chained[query.first]
 
   _get_hub_data: (query) ->
     query = query.split '.'
@@ -31,34 +30,26 @@ class EmojidexDataStorage
     parsed_query = query.split '.'
     query =
       code: query
-      origin: parsed_query
+      array: parsed_query
       first: parsed_query[0]
-      after_first: parsed_query.slice 1
 
-  get: (query, wrap) ->
+  get: (query) ->
     query = if query instanceof Array then query else query.split('.')
     cache = @ED.hub_data
     if query.length
       for q in query
         cache = cache[q]
-    re = {}
-    if wrap
-      re[query[0]] = cache
-    else
-      re = cache
-    return re
+    return cache
 
   set: (query, data) ->
-    query = @_get_parsed_query query
     @hub.onConnect().then( =>
-      @hub.set query.first, @_get_chained_data query.after_first, data
+      @hub.set query.split('.')[0], @_get_chained_data query, data
     ).then =>
       @update_cache query.first
 
   update: (query, data) ->
-    query = @_get_parsed_query query
-    merged = $.extend true, {}, @get(query.origin, true), @_get_chained_data(query.origin, data)
-    @set query.code, merged
+    merged = $.extend true, {}, @get(query), @_get_chained_data(query, data, false)
+    @set query, merged
 
   update_cache: (key) ->
     @hub.onConnect().then( =>

@@ -4,19 +4,19 @@ describe 'EmojidexEmoji', ->
       functions: [helperBefore]
       end: done
 
-  # describe 'check update', ->
-  #   it 'need update', (done) ->
-  #     EC_spec.Data.storage.set 'emojidex.seedUpdated', new Date('1/1/2016').toString()
-  #     EC_spec.Emoji.checkUpdate().then (flag) ->
-  #       expect(flag).toBe(false)
-  #       done()
-  #
-  #   it 'unnecessary update', (done) ->
-  #     EC_spec.Data.storage.set 'emojidex.seedUpdated', new Date().toString()
-  #     EC_spec.Emoji.checkUpdate().then (flag) ->
-  #       expect(flag).toBe(true)
-  #       done()
-  #
+  describe 'check update', ->
+    it 'need update', ->
+      console.log 1111111
+      EC_spec.Data.storage.update 'emojidex.seedUpdated', new Date('1/1/2016').toString()
+      console.log 'spec:emoji:checkUpdate', EC_spec.Emoji.checkUpdate()
+      # expect(EC_spec.Emoji.checkUpdate()).toBe(false)
+
+    # it 'unnecessary update', (done) ->
+    #   EC_spec.Data.storage.set 'emojidex.seedUpdated', new Date().toString()
+    #   EC_spec.Emoji.checkUpdate().then (flag) ->
+    #     expect(flag).toBe(true)
+    #     done()
+
   # it 'seed', (done) ->
   #   EC_spec.Indexes.static ['utf_emoji', 'extended_emoji'], 'en', (emoji_data) ->
   #     expect(EC_spec.Emoji._emoji_instance).toEqual(jasmine.arrayContaining [emoji_data[0], emoji_data[emoji_data.length - 1]])
@@ -50,6 +50,6 @@ describe 'EmojidexEmoji', ->
   # it 'advenced', ->
   #   searchs = categories: 'tools', tags: 'weapon', term: 'rifle'
   #   expect(EC_spec.Emoji.advanced(searchs).length).toBeTruthy()
-
-  it 'flush', ->
-    expect(EC_spec.Emoji.flush().length).toBe(0)
+  #
+  # it 'flush', ->
+  #   expect(EC_spec.Emoji.flush().length).toBe(0)

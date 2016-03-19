@@ -12,19 +12,15 @@ class EmojidexEmoji
       @seed()
 
   checkUpdate: ->
-    @EC.Data.storage.isSet('emojidex.seedUpdated').then((flag) =>
-      if flag
-        current = new Date
-        @EC.Data.storage.get('emojidex.seedUpdated').then((date_string) =>
-          updated = new Date date_string
-          if current - updated <= 3600000 * 48
-            return true
-          else
-            return false
-        )
+    if @EC.Data.storage.isSet('emojidex.seedUpdated')
+      current = new Date
+      updated = new Date @EC.Data.storage.get('emojidex.seedUpdated')
+      if current - updated <= 3600000 * 48
+        return true
       else
         return false
-    )
+    else
+      return false
 
   # Gets the full list of caetgories available
   seed: (callback) ->
