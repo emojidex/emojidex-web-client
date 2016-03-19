@@ -41,15 +41,21 @@ class EmojidexDataStorage
         cache = cache[q]
     return cache
 
-  set: (query, data) ->
+  set: (query, data, update) ->
+    first_query = query.split('.')[0]
     @hub.onConnect().then( =>
-      @hub.set query.split('.')[0], @_get_chained_data query, data
+      if update
+        new_data = {}
+        new_data[first_query] = data
+        return @hub.set first_query, new_data
+      else
+        return @hub.set first_query, @_get_chained_data query, data
     ).then =>
       @update_cache query.first
 
   update: (query, data) ->
-    merged = $.extend true, {}, @get(query), @_get_chained_data(query, data, false)
-    @set query, merged
+    merged = $.extend true, {}, @get(query.split('.')[0]), @_get_chained_data(query, data, false)
+    @set query, merged, true
 
   update_cache: (key) ->
     @hub.onConnect().then( =>
