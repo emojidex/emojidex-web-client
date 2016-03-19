@@ -11,46 +11,20 @@ describe 'EmojidexData', ->
     it 'first access to storage', (done)->
       timer_option =
         callback: ->
-          if EC_spec.Data.hub_data?.cdn_url?
-            EC_spec.Data.storage.isEmpty('emojidex').then (flag)->
-              expect(flag).toBe false
-              done()
+          if EC_spec.Data.hub_data?.emojidex?.cdn_url?
+            expect(EC_spec.Data.storage.isEmpty('emojidex')).toBe false
+            done()
           else
             spec_timer timer_option
       spec_timer timer_option
 
-    it 'check initialize data', (done)->
-      EC_spec.Data.storage.get('emojidex.emoji').then((data)->
-        expect(data).toEqual([])
+    it 'check initialize data', ->
+      expect(EC_spec.Data.storage.get 'emojidex.emoji').toEqual([])
+      expect(EC_spec.Data.storage.get 'emojidex.history').toEqual([])
+      expect(EC_spec.Data.storage.get 'emojidex.favorites').toEqual([])
+      expect(EC_spec.Data.storage.get 'emojidex.categories').toEqual([])
+      expect(EC_spec.Data.storage.get 'emojidex.auth_info').toEqual({status: 'none', user: '', token: null})
 
-      ).then(->
-        EC_spec.Data.storage.get 'emojidex.history'
-      ).then((data)->
-        expect(data).toEqual([])
-
-      ).then(->
-        EC_spec.Data.storage.get 'emojidex.favorites'
-      ).then((data)->
-        expect(data).toEqual([])
-
-      ).then(->
-        EC_spec.Data.storage.get 'emojidex.categories'
-      ).then((data)->
-        expect(data).toEqual([])
-
-      ).then(->
-        EC_spec.Data.storage.get 'emojidex.auth_info'
-      ).then (data)->
-        expect(data).toEqual({status: 'none', user: '', token: null})
-        done()
-
-    it 'after', (done)->
-      EC_spec = new EmojidexClient
-      EC_spec.Data.storage.isEmpty('emojidex').then((flag)->
-        expect(flag).toBe false
-
-      ).then(->
-        EC_spec.Data.storage.keys('emojidex')
-      ).then (keys)->
-        expect(keys).toEqual(['emoji', 'history', 'favorites', 'categories', 'auth_info', 'cdn_url'])
-        done()
+    it 'after', ->
+      expect(EC_spec.Data.storage.isEmpty('emojidex')).toBe false
+      expect(EC_spec.Data.storage.keys('emojidex')).toEqual(['emoji', 'history', 'favorites', 'categories', 'auth_info', 'cdn_url'])
