@@ -1,7 +1,8 @@
 class EmojidexDataStorage
-  constructor: (@ED, hub_path) ->
+  constructor: (hub_path) ->
     hub_path = hub_path ? 'https://www.emojidex.com/hub'
     @hub = new CrossStorageClient hub_path
+    @hub_cache = {}
 
   _get_chained_data: (query, data_obj, wrap=true) ->
     query = @_get_parsed_query query
@@ -35,7 +36,7 @@ class EmojidexDataStorage
 
   get: (query) ->
     query = if query instanceof Array then query else query.split('.')
-    cache = @ED.hub_data
+    cache = @hub_cache
     if query.length
       for q in query
         cache = cache[q]
@@ -58,15 +59,17 @@ class EmojidexDataStorage
     @set query, merged, true
 
   update_cache: (key) ->
+    console.log 'update_cache:key', key
     @hub.onConnect().then( =>
       if key then key else @hub.getKeys()
     ).then((keys) =>
       @hub.get keys
     ).then (hub_data) =>
+      console.log 'update_cache', key, hub_data
       if key
-        return @ED.hub_data[key] = hub_data[key]
+        return @hub_cache[key] = hub_data[key]
       else
-        return @ED.hub_data = hub_data
+        return @hub_cache = hub_data
 
   remove: (query) ->
     console.log 'remove--------'

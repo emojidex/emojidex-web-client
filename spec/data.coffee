@@ -8,15 +8,8 @@ describe 'EmojidexData', ->
     expect(EC_spec.Data).toBeDefined()
 
   describe 'initialize', ->
-    it 'first access to storage', (done)->
-      timer_option =
-        callback: ->
-          if EC_spec.Data.hub_data?.emojidex?.cdn_url?
-            expect(EC_spec.Data.storage.isEmpty('emojidex')).toBe false
-            done()
-          else
-            spec_timer timer_option
-      spec_timer timer_option
+    it 'first access to storage', ->
+      expect(EC_spec.Data.storage.isEmpty('emojidex')).toBe false
 
     it 'check initialize data', ->
       expect(EC_spec.Data.storage.get 'emojidex.emoji').toEqual([])

@@ -1,22 +1,25 @@
 helperChains = (chains_data) ->
   if chains_data.functions.length is 0
-    # console.log 'chain end --------'
+    console.log 'chain end --------'
     chains_data.end()
   else
     chain_function = chains_data.functions.shift()
     chain_function chains_data
 
 helperBefore = (chains_data) ->
-  @EC_spec = new EmojidexClient
-  @EC_spec.User.set_auth(user_info.auth_user, user_info.auth_token).then ->
-    helperChains chains_data
+  @EC_spec = new EmojidexClient()
+  helperChains chains_data
+  # @EC_spec.User.set_auth(user_info.auth_user, user_info.auth_token).then ->
+  #   helperChains chains_data
 
 helperBeforeForEmojidexData = (chains_data) ->
   CSC = new CrossStorageClient 'http://localhost:8001/build/hub.html'
-  CSC.onConnect().then =>
+  CSC.onConnect().then( =>
     CSC.clear()
-    @EC_spec = new EmojidexClient()
-    helperChains chains_data
+  ).then =>
+    @EC_spec = new EmojidexClient
+      onReady: (EC) ->
+        helperChains chains_data
 
 getExtendedEmojiData = (chains_data) ->
   $.ajax

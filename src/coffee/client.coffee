@@ -47,9 +47,14 @@ class @EmojidexClient
 
     # new Emojidex modules
     @Data = new EmojidexData @
-    @Categories = new EmojidexCategories @
-    @User = new EmojidexUser @
-    @Indexes = new EmojidexIndexes @
-    @Util = new EmojidexUtil @
-    @Search = new EmojidexSearch @
-    @Emoji = new EmojidexEmoji @
+    @Data.then((Data)=>
+      @Data = Data
+    ).then =>
+      console.log 'onReady----------'
+      @options.onReady? @
+    # @Categories = new EmojidexCategories @
+    # @User = new EmojidexUser @
+    # @Indexes = new EmojidexIndexes @
+    # @Util = new EmojidexUtil @
+    # @Search = new EmojidexSearch @
+    # @Emoji = new EmojidexEmoji @

@@ -8,7 +8,7 @@ class EmojidexEmoji
     if @checkUpdate()
       @_emoji_instance = @EC.Data.storage.get 'emojidex.emoji'
     else
-      @EC.Data.storage.set 'emojidex.seedUpdated', new Date().toString()
+      @EC.Data.storage.update 'emojidex.seedUpdated', new Date().toString()
       @seed()
 
   checkUpdate: ->
