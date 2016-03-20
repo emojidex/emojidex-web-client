@@ -47,14 +47,13 @@ class @EmojidexClient
 
     # new Emojidex modules
     @Data = new EmojidexData @
-    @Data.then((Data)=>
-      @Data = Data
+    @Data.then((data)=>
+      @Categories = new EmojidexCategories @
+      @User = new EmojidexUser @
+      @Indexes = new EmojidexIndexes @
+      @Util = new EmojidexUtil @
+      @Search = new EmojidexSearch @
+      @Emoji = new EmojidexEmoji @
     ).then =>
-      console.log 'onReady----------'
+      console.log 'Client:Fin Init Classes', @
       @options.onReady? @
-    # @Categories = new EmojidexCategories @
-    # @User = new EmojidexUser @
-    # @Indexes = new EmojidexIndexes @
-    # @Util = new EmojidexUtil @
-    # @Search = new EmojidexSearch @
-    # @Emoji = new EmojidexEmoji @

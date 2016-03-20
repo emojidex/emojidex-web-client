@@ -13,10 +13,9 @@ class EmojidexEmoji
 
   checkUpdate: ->
     if @EC.Data.storage.isSet('emojidex.seedUpdated')
-      console.log 'checkUpdate:seedUpdated', @EC.Data.storage.get('emojidex.seedUpdated')
       current = new Date
       updated = new Date @EC.Data.storage.get('emojidex.seedUpdated')
-      if current - updated <= 3600000 * 48
+      if current - updated >= 3600000 * 48
         return true
       else
         return false

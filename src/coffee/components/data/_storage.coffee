@@ -59,13 +59,11 @@ class EmojidexDataStorage
     @set query, merged, true
 
   update_cache: (key) ->
-    console.log 'update_cache:key', key
     @hub.onConnect().then( =>
       if key then key else @hub.getKeys()
     ).then((keys) =>
       @hub.get keys
     ).then (hub_data) =>
-      console.log 'update_cache', key, hub_data
       if key
         return @hub_cache[key] = hub_data[key]
       else

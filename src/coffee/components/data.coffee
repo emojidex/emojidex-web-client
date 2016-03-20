@@ -1,5 +1,5 @@
 class EmojidexData
-  constructor: (@EC) ->
+  constructor: (@EC, @options) ->
     @_def_auth_info =
       status: 'none'
       user: ''
@@ -10,17 +10,9 @@ class EmojidexData
     # for dev --------
     @storage = new EmojidexDataStorage 'http://localhost:8001/build/hub.html'
 
-    return @storage.hub.onConnect().then(=>
+    return @storage.hub.onConnect().then( =>
       @storage.hub.getKeys()
-
-    ).then((keys)=>
-      console.log 'data:const:keys', keys
-      @storage.hub.get keys
-    ).then((data)=>
-      console.log 'data:const:get', data
-      @storage.hub.getKeys()
-
-    ).then((keys)=>
+    ).then((keys) =>
       if keys.indexOf('emojidex') isnt -1
         console.log 'aruyo-----'
         return @storage.update_cache 'emojidex'
@@ -33,10 +25,9 @@ class EmojidexData
             categories: @EC.options?.categories || []
             auth_info: @EC.options?.auth_info || @_def_auth_info
         return @storage.update 'emojidex', @storage.hub_cache.emojidex
-    ).then =>
+    ).then((data) =>
       if @storage.hub_cache?.emojidex?.cdn_url?
         @EC.cdn_url = @storage.hub_cache.emojidex.cdn_url
-        return @
       else
         # if the CDN URL has not been overridden
         # attempt to get it from the api env
@@ -47,9 +38,9 @@ class EmojidexData
           ).then (response) =>
             @EC.env = response
             @EC.cdn_url = "https://#{@EC.env.s_cdn_addr}/emoji/"
-            return @storage.update('emojidex', cdn_url: @EC.cdn_url).then =>
-              console.log 'data:success', @
-              return @
+            return @storage.update('emojidex', cdn_url: @EC.cdn_url)
+    ).then (data) =>
+      @EC.Data = @
 
 
   emoji: (emoji_set) ->
