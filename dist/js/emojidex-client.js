@@ -610,7 +610,6 @@
         return _this.Emoji = new EmojidexEmoji(_this);
       }).then(function() {
         var _base;
-        console.log('Client:Fin Init Classes', _this);
         return typeof (_base = _this.options).onReady === "function" ? _base.onReady(_this) : void 0;
       });
     }
@@ -731,7 +730,6 @@
       }).then(function(keys) {
         var _ref, _ref1, _ref2, _ref3, _ref4;
         if (keys.indexOf('emojidex') !== -1) {
-          console.log('aruyo-----');
           return _this.storage.update_cache('emojidex');
         } else {
           _this.storage.hub_cache = {
@@ -748,7 +746,7 @@
       }).then(function(data) {
         var _ref, _ref1;
         if (((_ref = _this.storage.hub_cache) != null ? (_ref1 = _ref.emojidex) != null ? _ref1.cdn_url : void 0 : void 0) != null) {
-          return _this.EC.cdn_url = _this.storage.hub_cache.emojidex.cdn_url;
+          return _this.EC.cdn_url = _this.storage.get('emojidex.cdn_url');
         } else {
           if (_this.EC.cdn_url === _this.EC.defaults.cdn_url && _this.EC.closed_net === false) {
             return $.ajax({

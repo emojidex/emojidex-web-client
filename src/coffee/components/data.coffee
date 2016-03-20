@@ -14,7 +14,6 @@ class EmojidexData
       @storage.hub.getKeys()
     ).then((keys) =>
       if keys.indexOf('emojidex') isnt -1
-        console.log 'aruyo-----'
         return @storage.update_cache 'emojidex'
       else
         @storage.hub_cache =
@@ -27,7 +26,7 @@ class EmojidexData
         return @storage.update 'emojidex', @storage.hub_cache.emojidex
     ).then((data) =>
       if @storage.hub_cache?.emojidex?.cdn_url?
-        @EC.cdn_url = @storage.hub_cache.emojidex.cdn_url
+        @EC.cdn_url = @storage.get 'emojidex.cdn_url'
       else
         # if the CDN URL has not been overridden
         # attempt to get it from the api env

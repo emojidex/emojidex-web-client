@@ -2,12 +2,10 @@ describe 'EmojidexCategories', ->
   beforeAll (done) ->
     helperChains
       functions: [helperBefore, getFacesEmoji]
-      # functions: [getFacesEmoji]
       end: done
 
   it 'getEmoji', (done) ->
     EC_spec.Categories.getEmoji 'faces', (emojis) ->
-      # console.log emojis
       expect(emojis).toContain(jasmine.objectContaining faces_emoji[0])
       done()
 

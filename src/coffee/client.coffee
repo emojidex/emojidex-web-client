@@ -55,5 +55,4 @@ class @EmojidexClient
       @Search = new EmojidexSearch @
       @Emoji = new EmojidexEmoji @
     ).then =>
-      console.log 'Client:Fin Init Classes', @
       @options.onReady? @

@@ -1,6 +1,5 @@
 helperChains = (chains_data) ->
   if chains_data.functions.length is 0
-    console.log 'chain end --------'
     chains_data.end()
   else
     chain_function = chains_data.functions.shift()
