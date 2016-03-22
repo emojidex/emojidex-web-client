@@ -1,6 +1,5 @@
 class EmojidexDataStorage
-  constructor: (hub_path) ->
-    hub_path = hub_path ? 'https://www.emojidex.com/hub'
+  constructor: (hub_path = 'https://www.emojidex.com/hub') ->
     @hub = new CrossStorageClient hub_path
     @hub_cache = {}
 
@@ -70,7 +69,14 @@ class EmojidexDataStorage
         return @hub_cache = hub_data
 
   remove: (query) ->
-    console.log 'remove--------'
+    query = @_get_parsed_query query
+    if query.array.length is 1
+      @hub.del query.code
+    else
+      target = @get query.first
+      console.log 'remove:target:raw', target
+      delete target[query.array[1]]
+      console.log 'remove:target:end', target
 
   clear: ->
     @hub.onConnect().then =>

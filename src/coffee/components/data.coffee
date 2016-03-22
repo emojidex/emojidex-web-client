@@ -6,7 +6,7 @@ class EmojidexData
       token: null
 
     # for dist --------
-    # @storage = new EmojidexDataStorage @
+    # @storage = new EmojidexDataStorage
     # for dev --------
     @storage = new EmojidexDataStorage 'http://localhost:8001/build/hub.html'
 
@@ -40,7 +40,6 @@ class EmojidexData
             return @storage.update('emojidex', cdn_url: @EC.cdn_url)
     ).then (data) =>
       @EC.Data = @
-
 
   emoji: (emoji_set) ->
     if emoji_set?

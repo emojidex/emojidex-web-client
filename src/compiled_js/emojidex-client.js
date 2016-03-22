@@ -266,7 +266,9 @@
 
   EmojidexDataStorage = (function() {
     function EmojidexDataStorage(hub_path) {
-      hub_path = hub_path != null ? hub_path : 'https://www.emojidex.com/hub';
+      if (hub_path == null) {
+        hub_path = 'https://www.emojidex.com/hub';
+      }
       this.hub = new CrossStorageClient(hub_path);
       this.hub_cache = {};
     }
@@ -378,7 +380,16 @@
     };
 
     EmojidexDataStorage.prototype.remove = function(query) {
-      return console.log('remove--------');
+      var target;
+      query = this._get_parsed_query(query);
+      if (query.array.length === 1) {
+        return this.hub.del(query.code);
+      } else {
+        target = this.get(query.first);
+        console.log('remove:target:raw', target);
+        delete target[query.array[1]];
+        return console.log('remove:target:end', target);
+      }
     };
 
     EmojidexDataStorage.prototype.clear = function() {
@@ -436,10 +447,10 @@
         return this._emoji_instance;
       }
       if (this.checkUpdate()) {
-        return this._emoji_instance = this.EC.Data.storage.get('emojidex.emoji');
-      } else {
         this.EC.Data.storage.update('emojidex.seedUpdated', new Date().toString());
         return this.seed();
+      } else {
+        return this._emoji_instance = this.EC.Data.storage.get('emojidex.emoji');
       }
     };
 

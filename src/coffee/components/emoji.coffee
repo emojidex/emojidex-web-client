@@ -6,10 +6,10 @@ class EmojidexEmoji
     return @_emoji_instance if @_emoji_instance?
 
     if @checkUpdate()
-      @_emoji_instance = @EC.Data.storage.get 'emojidex.emoji'
-    else
       @EC.Data.storage.update 'emojidex.seedUpdated', new Date().toString()
       @seed()
+    else
+      @_emoji_instance = @EC.Data.storage.get 'emojidex.emoji'
 
   checkUpdate: ->
     if @EC.Data.storage.isSet('emojidex.seedUpdated')
