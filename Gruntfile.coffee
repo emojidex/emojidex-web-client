@@ -241,5 +241,5 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-license-saver'
   grunt.loadNpmTasks 'grunt-slim'
 
-  grunt.registerTask 'default', ['save_license', 'coffee', 'concat', 'uglify', 'connect', 'jasmine', 'slim']
+  grunt.registerTask 'default', ['save_license', 'coffee', 'concat', 'uglify', 'slim', 'connect', 'jasmine']
   grunt.registerTask 'dev', ['connect', 'esteWatch']
