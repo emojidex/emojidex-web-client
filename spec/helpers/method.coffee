@@ -8,7 +8,7 @@ helperChains = (chains_data) ->
 helperBefore = (chains_data) ->
   @EC_spec = new EmojidexClient
     onReady: (EC) =>
-      @EC_spec.User.set_auth(user_info.auth_user, user_info.auth_token).then ->
+      @EC_spec.User.set_auth(test_user_info.auth_user, test_user_info.auth_token).then ->
         helperChains chains_data
 
 helperBeforeForEmojidexData = (chains_data) ->
@@ -38,8 +38,9 @@ getFacesEmoji = (chains_data) ->
       @faces_emoji = response.emoji
       helperChains chains_data
 
-setPremiumUser = ->
-  @EC_spec.User.set_auth premium_user_info.auth_user, premium_user_info.auth_token
+setPremiumUser = (chains_data) ->
+  @EC_spec.User.set_auth(premium_user_info.auth_user, premium_user_info.auth_token).then ->
+    helperChains chains_data
 
 spec_timer = (option) ->
   default_option =

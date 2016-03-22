@@ -8,14 +8,14 @@ describe 'EmojidexUser', ->
     it 'token login', (done) ->
       EC_spec.User.login
         authtype: 'token'
-        username: user_info.auth_user
-        auth_token: user_info.auth_token
+        username: test_user_info.auth_user
+        auth_token: test_user_info.auth_token
         callback: (auth_info) ->
           expect(EC_spec.User.auth_info.status).toEqual('verified')
           done()
 
     describe '[Require user info]', ->
-      pending() unless user_info.password?
+      pending() unless user_info?
       it 'plain login', (done) ->
         EC_spec.User.login authtype: 'plain', username: user_info.auth_user, password: user_info.password, callback: () ->
           expect(EC_spec.User.auth_info.status).toEqual('verified')
@@ -72,16 +72,19 @@ describe 'EmojidexUser', ->
 
   describe '[Premium user only]', ->
     pending() unless premium_user_info?
+    beforeEach (done) =>
+      helperChains
+        functions: [setPremiumUser]
+        end: done
+
     describe 'Newest Emoji', ->
       it 'get', (done) ->
-        setPremiumUser()
         EC_spec.User.Newest.get (newest_info) ->
           expect(newest_info.emoji.length).toBeTruthy()
           done()
 
     describe 'Popular Emoji', ->
       it 'get', (done) ->
-        setPremiumUser()
         EC_spec.User.Popular.get (popular_info) ->
           expect(popular_info.emoji.length).toBeTruthy()
           done()
