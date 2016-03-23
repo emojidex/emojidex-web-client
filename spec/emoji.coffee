@@ -16,7 +16,7 @@ describe 'EmojidexEmoji', ->
         done()
 
   it 'seed', (done) ->
-    EC_spec.Indexes.static ['utf_emoji', 'extended_emoji'], 'en', (emoji_data) ->
+    EC_spec.Indexes.static ['utf_emoji', 'extended_emoji'], 'en', (emoji_data) =>
       expect(EC_spec.Emoji._emoji_instance).toEqual(jasmine.arrayContaining [emoji_data[0], emoji_data[emoji_data.length - 1]])
       done()
 
@@ -49,5 +49,7 @@ describe 'EmojidexEmoji', ->
     searchs = categories: 'tools', tags: 'weapon', term: 'rifle'
     expect(EC_spec.Emoji.advanced(searchs).length).toBeTruthy()
 
-  # it 'flush', ->
-  #   expect(EC_spec.Emoji.flush().length).toBe(0)
+  it 'flush', (done) ->
+    EC_spec.Emoji.flush().then =>
+      expect(EC_spec.Emoji.all().length).toBe(0)
+      done()

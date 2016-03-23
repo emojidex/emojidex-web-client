@@ -950,15 +950,19 @@
     };
 
     EmojidexDataStorage.prototype.remove = function(query) {
-      var target;
+      var i, scope, target;
       query = this._get_parsed_query(query);
       if (query.array.length === 1) {
         return this.hub.del(query.code);
       } else {
-        target = this.get(query.first);
-        console.log('remove:target:raw', target);
-        delete target[query.array[1]];
-        return console.log('remove:target:end', target);
+        target = scope = this.get(query.array.shift());
+        i = 0;
+        while (i < query.array.length - 1) {
+          scope = scope[query.array[i]];
+          i++;
+        }
+        delete scope[query.array[i]];
+        return this.update(query.first, target);
       }
     };
 
@@ -1167,8 +1171,8 @@
     };
 
     EmojidexEmoji.prototype.flush = function() {
-      this.EC.Data.storage.remove('emojidex.emoji');
-      return this._emoji_instance = [];
+      this._emoji_instance = [];
+      return this.EC.Data.storage.remove('emojidex.emoji');
     };
 
     return EmojidexEmoji;

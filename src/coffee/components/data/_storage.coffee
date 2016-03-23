@@ -71,12 +71,15 @@ class EmojidexDataStorage
   remove: (query) ->
     query = @_get_parsed_query query
     if query.array.length is 1
-      @hub.del query.code
+      return @hub.del query.code
     else
-      target = @get query.first
-      console.log 'remove:target:raw', target
-      delete target[query.array[1]]
-      console.log 'remove:target:end', target
+      target = scope = @get query.array.shift()
+      i = 0
+      while i < query.array.length - 1
+        scope = scope[query.array[i]]
+        i++
+      delete scope[query.array[i]]
+      return @update query.first, target
 
   clear: ->
     @hub.onConnect().then =>

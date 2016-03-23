@@ -80,5 +80,5 @@ class EmojidexEmoji
   # Clears the emoji array and emoji in storage.
   # DO NOT call this unless you have a really good reason!
   flush: ->
-    @EC.Data.storage.remove 'emojidex.emoji'
     @_emoji_instance = []
+    return @EC.Data.storage.remove 'emojidex.emoji'
