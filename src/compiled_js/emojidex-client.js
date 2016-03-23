@@ -68,7 +68,7 @@
         param: param
       };
       return $.ajax({
-        url: "" + this.EC.api_url + "categories/" + category_name + "/" + param.type,
+        url: "" + this.EC.api_url + "emoji",
         dataType: 'json',
         data: param,
         success: function(response) {
@@ -76,7 +76,6 @@
           _this.results = response.emoji;
           _this.cur_page = response.meta.page;
           _this.count = response.meta.count;
-          _this.EC.Emoji.combine(response.emoji);
           return typeof callback === "function" ? callback(response.emoji) : void 0;
         }
       });
@@ -85,7 +84,7 @@
     EmojidexCategories.prototype.getEmoji = function(category_name, callback, opts) {
       var param;
       param = {
-        type: 'emoji'
+        category: category_name
       };
       $.extend(param, opts);
       return this._categoriesAPI(category_name, callback, param, this.getEmoji);

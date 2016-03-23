@@ -17,7 +17,7 @@ class EmojidexCategories
       param: param
 
     $.ajax
-      url: "#{@EC.api_url}categories/#{category_name}/#{param.type}"
+      url: "#{@EC.api_url}emoji"
       dataType: 'json'
       data: param
       success: (response) =>
@@ -25,12 +25,12 @@ class EmojidexCategories
         @results = response.emoji
         @cur_page = response.meta.page
         @count = response.meta.count
-        @EC.Emoji.combine response.emoji
+        # @EC.Emoji.combine response.emoj/i
         callback? response.emoji
 
   getEmoji: (category_name, callback, opts)->
     param =
-      type: 'emoji'
+      category: category_name
     $.extend param, opts
     @_categoriesAPI category_name, callback, param, @getEmoji
 

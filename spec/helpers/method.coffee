@@ -25,8 +25,10 @@ getExtendedEmojiData = (chains_data) ->
 
 getFacesEmoji = (chains_data) ->
   $.ajax
-    url: 'https://www.emojidex.com/api/v1/categories/faces/emoji'
+    url: 'https://www.emojidex.com/api/v1/emoji'
     dataType: 'json'
+    data:
+      category: 'faces'
     success: (response) =>
       @faces_emoji = response.emoji
       helperChains chains_data
