@@ -5,7 +5,7 @@ class EmojidexData
       user: ''
       token: null
 
-    if @options?.storageHubPath?
+    if @options.storageHubPath?
       @storage = new EmojidexDataStorage @options.storageHubPath
     else
       @storage = new EmojidexDataStorage()
