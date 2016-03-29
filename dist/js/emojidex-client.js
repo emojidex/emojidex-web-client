@@ -600,7 +600,7 @@
       this.detailed = this.options.detailed;
       this.limit = this.options.limit;
       this.locale = this.options.locale;
-      this.Data = new EmojidexData(this);
+      this.Data = new EmojidexData(this, this.options);
       this.Data.then(function(data) {
         _this.Categories = new EmojidexCategories(_this);
         _this.User = new EmojidexUser(_this);
@@ -716,7 +716,8 @@
 
   EmojidexData = (function() {
     function EmojidexData(EC, options) {
-      var _this = this;
+      var _ref,
+        _this = this;
       this.EC = EC;
       this.options = options;
       this._def_auth_info = {
@@ -724,28 +725,32 @@
         user: '',
         token: null
       };
-      this.storage = new EmojidexDataStorage('http://localhost:8001/build/hub.html');
+      if (((_ref = this.options) != null ? _ref.storageHubPath : void 0) != null) {
+        this.storage = new EmojidexDataStorage(this.options.storageHubPath);
+      } else {
+        this.storage = new EmojidexDataStorage();
+      }
       return this.storage.hub.onConnect().then(function() {
         return _this.storage.hub.getKeys();
       }).then(function(keys) {
-        var _ref, _ref1, _ref2, _ref3, _ref4;
+        var _ref1, _ref2, _ref3, _ref4, _ref5;
         if (keys.indexOf('emojidex') !== -1) {
           return _this.storage.update_cache('emojidex');
         } else {
           _this.storage.hub_cache = {
             emojidex: {
-              emoji: ((_ref = _this.EC.options) != null ? _ref.emoji : void 0) || [],
-              history: ((_ref1 = _this.EC.options) != null ? _ref1.history : void 0) || [],
-              favorites: ((_ref2 = _this.EC.options) != null ? _ref2.favorites : void 0) || [],
-              categories: ((_ref3 = _this.EC.options) != null ? _ref3.categories : void 0) || [],
-              auth_info: ((_ref4 = _this.EC.options) != null ? _ref4.auth_info : void 0) || _this._def_auth_info
+              emoji: ((_ref1 = _this.EC.options) != null ? _ref1.emoji : void 0) || [],
+              history: ((_ref2 = _this.EC.options) != null ? _ref2.history : void 0) || [],
+              favorites: ((_ref3 = _this.EC.options) != null ? _ref3.favorites : void 0) || [],
+              categories: ((_ref4 = _this.EC.options) != null ? _ref4.categories : void 0) || [],
+              auth_info: ((_ref5 = _this.EC.options) != null ? _ref5.auth_info : void 0) || _this._def_auth_info
             }
           };
           return _this.storage.update('emojidex', _this.storage.hub_cache.emojidex);
         }
       }).then(function(data) {
-        var _ref, _ref1;
-        if (((_ref = _this.storage.hub_cache) != null ? (_ref1 = _ref.emojidex) != null ? _ref1.cdn_url : void 0 : void 0) != null) {
+        var _ref1, _ref2;
+        if (((_ref1 = _this.storage.hub_cache) != null ? (_ref2 = _ref1.emojidex) != null ? _ref2.cdn_url : void 0 : void 0) != null) {
           return _this.EC.cdn_url = _this.storage.get('emojidex.cdn_url');
         } else {
           if (_this.EC.cdn_url === _this.EC.defaults.cdn_url && _this.EC.closed_net === false) {

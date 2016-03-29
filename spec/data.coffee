@@ -11,12 +11,17 @@ describe 'EmojidexData', ->
     it 'first access to storage', ->
       expect(EC_spec.Data.storage.isEmpty('emojidex')).toBe false
 
-    it 'check initialize data', ->
-      expect(EC_spec.Data.storage.get 'emojidex.emoji').toEqual([])
-      expect(EC_spec.Data.storage.get 'emojidex.history').toEqual([])
-      expect(EC_spec.Data.storage.get 'emojidex.favorites').toEqual([])
-      expect(EC_spec.Data.storage.get 'emojidex.categories').toEqual([])
-      expect(EC_spec.Data.storage.get 'emojidex.auth_info').toEqual({status: 'none', user: '', token: null})
+    describe 'check initialize data', ->
+      it 'emojidex.emoji', ->
+        expect(EC_spec.Data.storage.get 'emojidex.emoji').toEqual([])
+      it 'emojidex.history', ->
+        expect(EC_spec.Data.storage.get 'emojidex.history').toEqual([])
+      it 'emojidex.favorites', ->
+        expect(EC_spec.Data.storage.get 'emojidex.favorites').toEqual([])
+      it 'emojidex.categories', ->
+        expect(EC_spec.Data.storage.get 'emojidex.categories').toEqual([])
+      it 'emojidex.auth_info', ->
+        expect(EC_spec.Data.storage.get 'emojidex.auth_info').toEqual({status: 'none', user: '', token: null})
 
     it 'after', ->
       expect(EC_spec.Data.storage.isEmpty('emojidex')).toBe false

@@ -7,6 +7,7 @@ helperChains = (chains_data) ->
 
 helperBefore = (chains_data) ->
   @EC_spec = new EmojidexClient
+    storageHubPath: 'http://localhost:8001/build/hub.html'
     onReady: (EC) =>
       @EC_spec.User.set_auth(test_user_info.auth_user, test_user_info.auth_token).then ->
         helperChains chains_data
@@ -17,6 +18,7 @@ helperBeforeForEmojidexData = (chains_data) ->
     CSC.clear()
   ).then =>
     @EC_spec = new EmojidexClient
+      storageHubPath: 'http://localhost:8001/build/hub.html'
       onReady: (EC) ->
         helperChains chains_data
 

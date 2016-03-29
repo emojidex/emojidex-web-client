@@ -46,7 +46,7 @@ class @EmojidexClient
     @locale = @options.locale
 
     # new Emojidex modules
-    @Data = new EmojidexData @
+    @Data = new EmojidexData @, @options
     @Data.then((data)=>
       @Categories = new EmojidexCategories @
       @User = new EmojidexUser @

@@ -5,10 +5,10 @@ class EmojidexData
       user: ''
       token: null
 
-    # for dist --------
-    # @storage = new EmojidexDataStorage
-    # for dev --------
-    @storage = new EmojidexDataStorage 'http://localhost:8001/build/hub.html'
+    if @options?.storageHubPath?
+      @storage = new EmojidexDataStorage @options.storageHubPath
+    else
+      @storage = new EmojidexDataStorage()
 
     return @storage.hub.onConnect().then( =>
       @storage.hub.getKeys()
