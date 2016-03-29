@@ -6,7 +6,7 @@ module.exports = (grunt) ->
 
   data_path = process.env.DATA_PATH
   unless data_path?
-    data_path = 'build/spec/helpers/data.js'
+    data_path = ''
 
   grunt.getLicense = (licenses_json) ->
     licenses = grunt.file.readJSON licenses_json
@@ -126,6 +126,7 @@ module.exports = (grunt) ->
         ]
         helpers:[
           'build/spec/helpers/method.js'
+          'build/spec/helpers/data.js'
           data_path
         ]
 
