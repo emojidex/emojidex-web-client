@@ -5,15 +5,18 @@ describe 'EmojidexEmoji', ->
       end: done
 
   describe 'check update', ->
-    it 'need update', ->
-      EC_spec.Data.storage.set 'emojidex.seedUpdated', new Date('1/1/2016').toString()
-      expect(EC_spec.Emoji.checkUpdate()).toBe(false)
-    it 'unnecessary update', ->
-      EC_spec.Data.storage.set 'emojidex.seedUpdated', new Date().toString()
-      expect(EC_spec.Emoji.checkUpdate()).toBe(true)
+    it 'need update', (done) ->
+      EC_spec.Data.storage.update('emojidex.seedUpdated', new Date('1/1/2016').toString()).then =>
+        expect(EC_spec.Emoji.checkUpdate()).toBe(true)
+        done()
+
+    it 'unnecessary update', (done) ->
+      EC_spec.Data.storage.update('emojidex.seedUpdated', new Date().toString()).then =>
+        expect(EC_spec.Emoji.checkUpdate()).toBe(false)
+        done()
 
   it 'seed', (done) ->
-    EC_spec.Emoji.seed (emoji_data) ->
+    EC_spec.Indexes.static ['utf_emoji', 'extended_emoji'], 'en', (emoji_data) =>
       expect(EC_spec.Emoji._emoji_instance).toEqual(jasmine.arrayContaining [emoji_data[0], emoji_data[emoji_data.length - 1]])
       done()
 
@@ -46,5 +49,7 @@ describe 'EmojidexEmoji', ->
     searchs = categories: 'tools', tags: 'weapon', term: 'rifle'
     expect(EC_spec.Emoji.advanced(searchs).length).toBeTruthy()
 
-  it 'flush', ->
-    expect(EC_spec.Emoji.flush().length).toBe(0)
+  it 'flush', (done) ->
+    EC_spec.Emoji.flush().then =>
+      expect(EC_spec.Emoji.all().length).toBe(0)
+      done()

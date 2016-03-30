@@ -7,13 +7,20 @@ helperChains = (chains_data) ->
 
 helperBefore = (chains_data) ->
   @EC_spec = new EmojidexClient
-  @EC_spec.User.set_auth user_info.auth_user, user_info.auth_token
-  helperChains chains_data
+    storageHubPath: 'http://localhost:8001/build/hub.html'
+    onReady: (EC) =>
+      @EC_spec.User.set_auth(test_user_info.auth_user, test_user_info.auth_token).then ->
+        helperChains chains_data
 
 helperBeforeForEmojidexData = (chains_data) ->
-  $.localStorage.removeAll()
-  @EC_spec = new EmojidexClient
-  helperChains chains_data
+  CSC = new CrossStorageClient 'http://localhost:8001/build/hub.html'
+  CSC.onConnect().then( =>
+    CSC.clear()
+  ).then =>
+    @EC_spec = new EmojidexClient
+      storageHubPath: 'http://localhost:8001/build/hub.html'
+      onReady: (EC) ->
+        helperChains chains_data
 
 getExtendedEmojiData = (chains_data) ->
   $.ajax
@@ -33,5 +40,13 @@ getFacesEmoji = (chains_data) ->
       @faces_emoji = response.emoji
       helperChains chains_data
 
-setPremiumUser = ->
-  @EC_spec.User.set_auth premium_user_info.auth_user, premium_user_info.auth_token
+setPremiumUser = (chains_data) ->
+  @EC_spec.User.set_auth(premium_user_info.auth_user, premium_user_info.auth_token).then ->
+    helperChains chains_data
+
+spec_timer = (option) ->
+  default_option =
+    time: 100
+    callback: undefined
+  $.extend default_option, option
+  setTimeout(default_option.callback, default_option.time) if default_option.callback?

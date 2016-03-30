@@ -1,7 +1,7 @@
 class EmojidexCategories
   constructor: (@EC) ->
     @_categories = @EC.Data.categories()
-    @sync() unless @_categories.length
+    # @sync() unless @_categories.length
 
   _categoriesAPI: (category_name, callback, opts, called_func) ->
     param =
@@ -51,8 +51,14 @@ class EmojidexCategories
       data:
         locale: locale
       success: (response) =>
-        @_categories = @EC.Data.categories response.categories
+        @_categories = response.categories
+        @EC.Data.categories response.categories
         callback? @_categories
 
-  all: ->
-    @_categories
+  all: (callback) ->
+    if @_categories?
+      callback? @_categories
+    else
+      setTimeout (=>
+        @all callback
+      ), 500

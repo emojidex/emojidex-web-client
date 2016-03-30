@@ -26,5 +26,7 @@ describe 'EmojidexCategories', ->
       expect(categories.length).toBeTruthy()
       done()
 
-  it 'all', ->
-    expect(EC_spec.Categories.all().length).toBeTruthy()
+  it 'all', (done) ->
+    EC_spec.Categories.all (categories) ->
+      expect(categories).toBeTruthy()
+      done()

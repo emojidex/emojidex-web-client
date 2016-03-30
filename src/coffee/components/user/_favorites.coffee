@@ -15,7 +15,8 @@ class EmojidexUserFavorites
       data:
         auth_token: @token
       success: (response) =>
-        @_favorites = @EC.Data.favorites response
+        @_favorites = response
+        @EC.Data.favorites response
         callback? @_favorites
     @_favoritesAPI options
 
@@ -43,5 +44,10 @@ class EmojidexUserFavorites
   sync: ->
     @get() # persistant favorites currently require an account
 
-  all: ->
-    @_favorites
+  all: (callback) ->
+    if @_favorites?
+      callback? @_favorites
+    else
+      setTimeout (=>
+        @all callback
+      ), 500

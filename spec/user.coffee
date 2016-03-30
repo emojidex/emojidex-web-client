@@ -6,12 +6,16 @@ describe 'EmojidexUser', ->
 
   describe 'Login', ->
     it 'token login', (done) ->
-      EC_spec.User.login authtype: 'token', username: user_info.auth_user, auth_token: user_info.auth_token, callback: () ->
-        expect(EC_spec.User.auth_info.status).toEqual('verified')
-        done()
+      EC_spec.User.login
+        authtype: 'token'
+        username: test_user_info.auth_user
+        auth_token: test_user_info.auth_token
+        callback: (auth_info) ->
+          expect(EC_spec.User.auth_info.status).toEqual('verified')
+          done()
 
     describe '[Require user info]', ->
-      pending() unless user_info.password?
+      pending() unless user_info?
       it 'plain login', (done) ->
         EC_spec.User.login authtype: 'plain', username: user_info.auth_user, password: user_info.password, callback: () ->
           expect(EC_spec.User.auth_info.status).toEqual('verified')
@@ -33,10 +37,12 @@ describe 'EmojidexUser', ->
         )
         done()
 
-    it 'all', ->
-      expect(EC_spec.User.Favorites.all().emoji).toContain(
-        jasmine.objectContaining(emoji_emoji)
-      )
+    it 'all', (done) ->
+      EC_spec.User.Favorites.all (favorites) ->
+        expect(favorites.emoji).toContain(
+          jasmine.objectContaining(emoji_emoji)
+        )
+        done()
 
     # it 'set_favorites', (done) ->
     #   EC_spec.set_favorites 'emoji', (favorites)->
@@ -59,21 +65,26 @@ describe 'EmojidexUser', ->
         expect(history_info.history.length).toBeTruthy()
         done()
 
-    it 'all', ->
-      expect(EC_spec.User.History.all().history.length).toBeTruthy()
+    it 'all', (done) ->
+      EC_spec.User.History.all (history_data) ->
+        expect(history_data.history.length).toBeTruthy()
+        done()
 
   describe '[Premium user only]', ->
     pending() unless premium_user_info?
+    beforeEach (done) =>
+      helperChains
+        functions: [setPremiumUser]
+        end: done
+
     describe 'Newest Emoji', ->
       it 'get', (done) ->
-        setPremiumUser()
         EC_spec.User.Newest.get (newest_info) ->
           expect(newest_info.emoji.length).toBeTruthy()
           done()
 
     describe 'Popular Emoji', ->
       it 'get', (done) ->
-        setPremiumUser()
         EC_spec.User.Popular.get (popular_info) ->
           expect(popular_info.emoji.length).toBeTruthy()
           done()

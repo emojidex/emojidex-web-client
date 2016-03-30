@@ -15,7 +15,8 @@ class EmojidexUserHistory
       data:
         auth_token: @token
       success: (response) =>
-        @_history = @EC.Data.history response
+        @_history = response
+        @EC.Data.history response
         callback? @_history
     @_historyAPI options
 
@@ -36,5 +37,10 @@ class EmojidexUserHistory
   sync: ->
     @get() # history currently can't be saved locally, so only get will work
 
-  all: ->
-    @_history
+  all: (callback) ->
+    if @_history?
+      callback? @_history
+    else
+      setTimeout (=>
+        @all callback
+      ), 500

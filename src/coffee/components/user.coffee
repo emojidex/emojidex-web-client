@@ -5,13 +5,13 @@ class EmojidexUser
     @Favorites = new EmojidexUserFavorites @EC
     @Newest = new EmojidexUserNewest @EC
     @Popular = new EmojidexUserPopular @EC
-    @_auto_login()
+    # @_auto_login()
 
   # Checks for local saved login data, and if present sets the username and api_key
   _auto_login: () ->
     return if @closed_net
     @auth_info = @EC.Data.auth_info()
-    if @auth_info['token']? then @sync_user_data() else @logout()
+    if @auth_info?.token? then @sync_user_data() else @logout()
 
   # login
   # takes a hash with one of the following combinations:
@@ -85,19 +85,25 @@ class EmojidexUser
 
   # directly set auth credentials
   set_auth: (user, token) ->
-    @auth_info = @EC.Data.auth_info
+    @EC.Data.auth_info(
       status: 'verified'
-      token: token
       user: user
-    @sync_user_data()
+      token: token
+    ).then (data) =>
+      @auth_info = @EC.Data.storage.get 'emojidex.auth_info'
+      @sync_user_data()
+      return data
 
   # sets auth parameters from a successful auth request [login]
   _set_auth_from_response: (response) ->
-    @auth_info = @EC.Data.auth_info
+    @EC.Data.auth_info(
       status: response.auth_status
       token: response.auth_token
       user: response.auth_user
-    @sync_user_data()
+    ).then (data)=>
+      @auth_info = @EC.Data.storage.get 'emojidex.auth_info'
+      @sync_user_data()
+      return data
 
   sync_user_data: () ->
     @History.token = @Favorites.token = @Newest.token = @Popular.token = @auth_info.token
