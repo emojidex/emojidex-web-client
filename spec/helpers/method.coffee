@@ -1,3 +1,5 @@
+hub_path = 'http://localhost:8001/build/hub.html'
+# hub_path = 'https://www.emojidex.com/hub'
 helperChains = (chains_data) ->
   if chains_data.functions.length is 0
     chains_data.end()
@@ -7,18 +9,18 @@ helperChains = (chains_data) ->
 
 helperBefore = (chains_data) ->
   @EC_spec = new EmojidexClient
-    storageHubPath: 'http://localhost:8001/build/hub.html'
+    storageHubPath: hub_path
     onReady: (EC) =>
       @EC_spec.User.set_auth(test_user_info.auth_user, test_user_info.auth_token).then ->
         helperChains chains_data
 
 helperBeforeForEmojidexData = (chains_data) ->
-  CSC = new CrossStorageClient 'http://localhost:8001/build/hub.html'
+  CSC = new CrossStorageClient hub_path
   CSC.onConnect().then( =>
     CSC.clear()
   ).then =>
     @EC_spec = new EmojidexClient
-      storageHubPath: 'http://localhost:8001/build/hub.html'
+      storageHubPath: hub_path
       onReady: (EC) ->
         helperChains chains_data
 
