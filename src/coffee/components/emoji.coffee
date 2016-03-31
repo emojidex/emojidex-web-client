@@ -20,7 +20,7 @@ class EmojidexEmoji
       else
         return false
     else
-      return false
+      return true
 
   # Gets the full list of caetgories available
   seed: (callback) ->
