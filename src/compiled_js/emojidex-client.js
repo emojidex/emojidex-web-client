@@ -78,7 +78,7 @@
           _this.results = response.emoji;
           _this.cur_page = response.meta.page;
           _this.count = response.meta.count;
-          return typeof callback === "function" ? callback(response.emoji) : void 0;
+          return typeof callback === "function" ? callback(response.emoji, _this.called_data) : void 0;
         }
       });
     };

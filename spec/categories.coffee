@@ -5,7 +5,8 @@ describe 'EmojidexCategories', ->
       end: done
 
   it 'getEmoji', (done) ->
-    EC_spec.Categories.getEmoji 'faces', (emojis) ->
+    EC_spec.Categories.getEmoji 'faces', (emojis, called_data) ->
+      expect(called_data.category_name).toEqual 'faces'
       expect(emojis).toContain(jasmine.objectContaining faces_emoji[0])
       done()
 
