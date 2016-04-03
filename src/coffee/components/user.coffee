@@ -43,8 +43,8 @@ class EmojidexUser
       url: @EC.api_url + 'users/authenticate'
       dataType: 'json'
       success: (response) =>
-        @_set_auth_from_response response
-        callback? @auth_info
+        @_set_auth_from_response(response).then =>
+          callback? @auth_info
       error: (response) =>
         status = JSON.parse response.responseText
         @auth_info = @EC.Data.auth_info

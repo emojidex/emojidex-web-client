@@ -1481,8 +1481,9 @@
         url: this.EC.api_url + 'users/authenticate',
         dataType: 'json',
         success: function(response) {
-          _this._set_auth_from_response(response);
-          return typeof callback === "function" ? callback(_this.auth_info) : void 0;
+          return _this._set_auth_from_response(response).then(function() {
+            return typeof callback === "function" ? callback(_this.auth_info) : void 0;
+          });
         },
         error: function(response) {
           var status;

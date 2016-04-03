@@ -17,13 +17,13 @@ describe 'EmojidexUser', ->
     describe '[Require user info]', ->
       pending() unless user_info?
       it 'plain login', (done) ->
-        EC_spec.User.login authtype: 'plain', username: user_info.auth_user, password: user_info.password, callback: () ->
-          expect(EC_spec.User.auth_info.status).toEqual('verified')
+        EC_spec.User.login authtype: 'plain', username: user_info.auth_user, password: user_info.password, callback: (auth_info) ->
+          expect(auth_info.status).toEqual('verified')
           done()
 
       it 'basic login', (done) ->
-        EC_spec.User.login authtype: 'basic', user: user_info.email, password: user_info.password, callback: () ->
-          expect(EC_spec.User.auth_info.status).toEqual('verified')
+        EC_spec.User.login authtype: 'basic', user: user_info.email, password: user_info.password, callback: (auth_info) ->
+          expect(auth_info.status).toEqual('verified')
           done()
 
       # it 'google login', ->
