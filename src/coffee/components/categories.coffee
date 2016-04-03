@@ -26,7 +26,10 @@ class EmojidexCategories
         @cur_page = response.meta.page
         @count = response.meta.count
         # @EC.Emoji.combine response.emoji
-        callback? response.emoji, @called_data
+        callback? response.emoji,
+          category_name: category_name
+          callback: callback
+          param: param
 
   getEmoji: (category_name, callback, opts)->
     param =

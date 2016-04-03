@@ -1,5 +1,5 @@
 /*
- * emojidex client - v0.7.0-beta.6
+ * emojidex client - v0.7.0-beta.7
  * * Provides search, index caching and combining and asset URI resolution
  * https://github.com/emojidex/emojidex-web-client
  *
@@ -648,7 +648,11 @@
           _this.results = response.emoji;
           _this.cur_page = response.meta.page;
           _this.count = response.meta.count;
-          return typeof callback === "function" ? callback(response.emoji, _this.called_data) : void 0;
+          return typeof callback === "function" ? callback(response.emoji, {
+            category_name: category_name,
+            callback: callback,
+            param: param
+          }) : void 0;
         }
       });
     };
