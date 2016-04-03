@@ -11,7 +11,7 @@ class EmojidexData
       @storage = new EmojidexDataStorage()
 
     return @storage.hub.onConnect().then( =>
-      @storage.hub.getKeys()
+      return @storage.hub.getKeys()
     ).then((keys) =>
       if keys.indexOf('emojidex') isnt -1
         return @storage.update_cache 'emojidex'

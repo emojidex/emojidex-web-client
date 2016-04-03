@@ -273,7 +273,9 @@
       if (hub_path == null) {
         hub_path = 'https://www.emojidex.com/hub';
       }
-      this.hub = new CrossStorageClient(hub_path);
+      this.hub = new CrossStorageClient(hub_path, {
+        frameId: 'emojidex-client-storage-hub'
+      });
       this.hub_cache = {};
     }
 

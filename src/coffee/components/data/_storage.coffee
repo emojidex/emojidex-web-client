@@ -1,6 +1,8 @@
 class EmojidexDataStorage
   constructor: (hub_path = 'https://www.emojidex.com/hub') ->
-    @hub = new CrossStorageClient hub_path
+    @hub = new CrossStorageClient hub_path,
+      frameId: 'emojidex-client-storage-hub'
+
     @hub_cache = {}
 
   _get_chained_data: (query, data_obj, wrap=true) ->

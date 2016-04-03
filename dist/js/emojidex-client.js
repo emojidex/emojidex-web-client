@@ -1,5 +1,5 @@
 /*
- * emojidex client - v0.7.0-beta.2
+ * emojidex client - v0.7.0-beta.3
  * * Provides search, index caching and combining and asset URI resolution
  * https://github.com/emojidex/emojidex-web-client
  *
@@ -843,7 +843,9 @@
       if (hub_path == null) {
         hub_path = 'https://www.emojidex.com/hub';
       }
-      this.hub = new CrossStorageClient(hub_path);
+      this.hub = new CrossStorageClient(hub_path, {
+        frameId: 'emojidex-client-storage-hub'
+      });
       this.hub_cache = {};
     }
 

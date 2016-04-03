@@ -15,7 +15,8 @@ helperBefore = (chains_data) ->
         helperChains chains_data
 
 helperBeforeForEmojidexData = (chains_data) ->
-  CSC = new CrossStorageClient hub_path
+  CSC = new CrossStorageClient hub_path,
+    frameId: 'emojidex-client-storage-hub'
   CSC.onConnect().then( =>
     CSC.clear()
   ).then =>
