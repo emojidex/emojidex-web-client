@@ -918,15 +918,17 @@
         error: function(response) {
           var status;
           status = JSON.parse(response.responseText);
-          _this.auth_info = _this.EC.Data.auth_info({
+          _this.auth_info = {
             status: status.auth_status,
             token: null,
             user: ''
+          };
+          return _this.EC.Data.auth_info(_this.EC.Data.auth_info).then(function() {
+            return typeof callback === "function" ? callback({
+              auth_info: _this.auth_info,
+              error_info: response
+            }) : void 0;
           });
-          return typeof callback === "function" ? callback({
-            auth_info: _this.auth_info,
-            error_info: response
-          }) : void 0;
         }
       };
       return $.ajax($.extend(ajax_obj, options));

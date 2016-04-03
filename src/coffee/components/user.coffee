@@ -47,11 +47,12 @@ class EmojidexUser
           callback? @auth_info
       error: (response) =>
         status = JSON.parse response.responseText
-        @auth_info = @EC.Data.auth_info
+        @auth_info =
           status: status.auth_status
           token: null
           user: ''
-        callback? { auth_info: @auth_info, error_info: response }
+        @EC.Data.auth_info(@EC.Data.auth_info).then =>
+          callback? { auth_info: @auth_info, error_info: response }
 
     $.ajax $.extend ajax_obj, options
 
