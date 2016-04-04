@@ -86,7 +86,7 @@ class EmojidexUser
 
   # directly set auth credentials
   set_auth: (user, token) ->
-    @EC.Data.auth_info(
+    return @EC.Data.auth_info(
       status: 'verified'
       user: user
       token: token

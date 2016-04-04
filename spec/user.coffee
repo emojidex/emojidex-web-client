@@ -80,11 +80,11 @@ describe 'EmojidexUser', ->
     describe 'Newest Emoji', ->
       it 'get', (done) ->
         EC_spec.User.Newest.get (newest_info) ->
-          expect(newest_info.emoji.length).toBeTruthy()
+          expect(newest_info?.emoji?.length).toBeTruthy()
           done()
 
     describe 'Popular Emoji', ->
       it 'get', (done) ->
         EC_spec.User.Popular.get (popular_info) ->
-          expect(popular_info.emoji.length).toBeTruthy()
+          expect(popular_info?.emoji?.length).toBeTruthy()
           done()

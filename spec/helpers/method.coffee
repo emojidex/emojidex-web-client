@@ -1,5 +1,4 @@
 hub_path = 'http://localhost:8001/build/hub.html'
-# hub_path = 'https://www.emojidex.com/hub'
 helperChains = (chains_data) ->
   if chains_data.functions.length is 0
     chains_data.end()
@@ -11,7 +10,7 @@ helperBefore = (chains_data) ->
   @EC_spec = new EmojidexClient
     storageHubPath: hub_path
     onReady: (EC) =>
-      @EC_spec.User.set_auth(test_user_info.auth_user, test_user_info.auth_token).then ->
+      @EC_spec.User.set_auth(test_user_info.auth_user, test_user_info.auth_token).then =>
         helperChains chains_data
 
 helperBeforeForEmojidexData = (chains_data) ->
@@ -44,7 +43,7 @@ getFacesEmoji = (chains_data) ->
       helperChains chains_data
 
 setPremiumUser = (chains_data) ->
-  @EC_spec.User.set_auth(premium_user_info.auth_user, premium_user_info.auth_token).then ->
+  @EC_spec.User.set_auth(premium_user_info.auth_user, premium_user_info.auth_token).then =>
     helperChains chains_data
 
 spec_timer = (option) ->

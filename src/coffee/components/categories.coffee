@@ -1,7 +1,8 @@
 class EmojidexCategories
   constructor: (@EC) ->
     @_categories = @EC.Data.categories()
-    # @sync() unless @_categories.length
+    return @sync().then =>
+      @EC.Categories = @
 
   _categoriesAPI: (category_name, callback, opts, called_func) ->
     param =
@@ -47,15 +48,19 @@ class EmojidexCategories
 
   # Gets the full list of caetgories available
   sync: (callback, locale) ->
-    locale ?= @EC.locale
-    $.ajax
-      url: @EC.api_url + 'categories'
-      dataType: 'json'
-      data:
-        locale: locale
-      success: (response) =>
+    if @_categories?.length?
+      return new Promise =>
+        callback? @_categories
+    else
+      locale ?= @EC.locale
+      $.ajax(
+        url: @EC.api_url + 'categories'
+        dataType: 'json'
+        data:
+          locale: locale
+      ).then (response) =>
         @_categories = response.categories
-        @EC.Data.categories(response.categories).then =>
+        return @EC.Data.categories(response.categories).then =>
           callback? @_categories
 
   all: (callback) ->

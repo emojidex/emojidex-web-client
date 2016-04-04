@@ -26,7 +26,7 @@ class EmojidexData
         return @storage.update 'emojidex', @storage.hub_cache.emojidex
     ).then((data) =>
       if @storage.hub_cache?.emojidex?.cdn_url?
-        @EC.cdn_url = @storage.get 'emojidex.cdn_url'
+        return @EC.cdn_url = @storage.get 'emojidex.cdn_url'
       else
         # if the CDN URL has not been overridden
         # attempt to get it from the api env
@@ -71,4 +71,4 @@ class EmojidexData
 
   auth_info: (auth_info_set) ->
     if auth_info_set?
-      @storage.update('emojidex', auth_info: auth_info_set)
+      return @storage.update('emojidex', auth_info: auth_info_set)

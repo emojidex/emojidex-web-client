@@ -30,14 +30,13 @@
       this.detailed = this.options.detailed;
       this.limit = this.options.limit;
       this.locale = this.options.locale;
-      this.Data = new EmojidexData(this, this.options);
-      this.Data.then(function(data) {
-        _this.Categories = new EmojidexCategories(_this);
+      this.Data = new EmojidexData(this, this.options).then(function(data) {
         _this.User = new EmojidexUser(_this);
         _this.Indexes = new EmojidexIndexes(_this);
         _this.Util = new EmojidexUtil(_this);
         _this.Search = new EmojidexSearch(_this);
-        return _this.Emoji = new EmojidexEmoji(_this);
+        _this.Emoji = new EmojidexEmoji(_this);
+        return _this.Categories = new EmojidexCategories(_this);
       }).then(function() {
         var _base;
         return typeof (_base = _this.options).onReady === "function" ? _base.onReady(_this) : void 0;
@@ -50,8 +49,12 @@
 
   EmojidexCategories = (function() {
     function EmojidexCategories(EC) {
+      var _this = this;
       this.EC = EC;
       this._categories = this.EC.Data.categories();
+      return this.sync().then(function() {
+        return _this.EC.Categories = _this;
+      });
     }
 
     EmojidexCategories.prototype._categoriesAPI = function(category_name, callback, opts, called_func) {
@@ -117,23 +120,29 @@
     };
 
     EmojidexCategories.prototype.sync = function(callback, locale) {
-      var _this = this;
-      if (locale == null) {
-        locale = this.EC.locale;
-      }
-      return $.ajax({
-        url: this.EC.api_url + 'categories',
-        dataType: 'json',
-        data: {
-          locale: locale
-        },
-        success: function(response) {
+      var _ref,
+        _this = this;
+      if (((_ref = this._categories) != null ? _ref.length : void 0) != null) {
+        return new Promise(function() {
+          return typeof callback === "function" ? callback(_this._categories) : void 0;
+        });
+      } else {
+        if (locale == null) {
+          locale = this.EC.locale;
+        }
+        return $.ajax({
+          url: this.EC.api_url + 'categories',
+          dataType: 'json',
+          data: {
+            locale: locale
+          }
+        }).then(function(response) {
           _this._categories = response.categories;
           return _this.EC.Data.categories(response.categories).then(function() {
             return typeof callback === "function" ? callback(_this._categories) : void 0;
           });
-        }
-      });
+        });
+      }
     };
 
     EmojidexCategories.prototype.all = function(callback) {

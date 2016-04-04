@@ -51,7 +51,7 @@ class EmojidexDataStorage
         new_data[first_query] = data
         return @hub.set first_query, new_data
       else
-        return @hub.set first_query, @_get_chained_data query, data
+        return @hub.set first_query, @_get_chained_data(query, data)
     ).then =>
       @update_cache first_query
 
@@ -60,7 +60,7 @@ class EmojidexDataStorage
     @set query, merged, true
 
   update_cache: (key) ->
-    @hub.onConnect().then( =>
+    return @hub.onConnect().then( =>
       if key then key else @hub.getKeys()
     ).then((keys) =>
       @hub.get keys
