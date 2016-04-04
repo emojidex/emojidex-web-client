@@ -78,11 +78,13 @@
           _this.results = response.emoji;
           _this.cur_page = response.meta.page;
           _this.count = response.meta.count;
-          return typeof callback === "function" ? callback(response.emoji, {
-            category_name: category_name,
-            callback: callback,
-            param: param
-          }) : void 0;
+          return _this.EC.Emoji.combine(response.emoji).then(function() {
+            return typeof callback === "function" ? callback(response.emoji, {
+              category_name: category_name,
+              callback: callback,
+              param: param
+            }) : void 0;
+          });
         }
       });
     };
@@ -127,8 +129,9 @@
         },
         success: function(response) {
           _this._categories = response.categories;
-          _this.EC.Data.categories(response.categories);
-          return typeof callback === "function" ? callback(_this._categories) : void 0;
+          return _this.EC.Data.categories(response.categories).then(function() {
+            return typeof callback === "function" ? callback(_this._categories) : void 0;
+          });
         }
       });
     };

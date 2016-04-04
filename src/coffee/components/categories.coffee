@@ -25,11 +25,11 @@ class EmojidexCategories
         @results = response.emoji
         @cur_page = response.meta.page
         @count = response.meta.count
-        # @EC.Emoji.combine response.emoji
-        callback? response.emoji,
-          category_name: category_name
-          callback: callback
-          param: param
+        @EC.Emoji.combine(response.emoji).then =>
+          callback? response.emoji,
+            category_name: category_name
+            callback: callback
+            param: param
 
   getEmoji: (category_name, callback, opts)->
     param =
@@ -55,8 +55,8 @@ class EmojidexCategories
         locale: locale
       success: (response) =>
         @_categories = response.categories
-        @EC.Data.categories response.categories
-        callback? @_categories
+        @EC.Data.categories(response.categories).then =>
+          callback? @_categories
 
   all: (callback) ->
     if @_categories?
