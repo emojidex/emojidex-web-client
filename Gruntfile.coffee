@@ -55,7 +55,7 @@ module.exports = (grunt) ->
     save_license:
       dist:
         src: [
-          'bower_components/jquery.storageapi/jquery.storageapi.js'
+          'node_modules/cross-storage/dist/client.min.js'
         ]
         dest: 'build/licenses.json'
 
@@ -80,7 +80,6 @@ module.exports = (grunt) ->
           stripBanners: true
           banner: '<%= meta.banner %><%= grunt.getLicense("build/licenses.json") %>\n */\n'
         src: [
-          'bower_components/jquery.storageapi/jquery.storageapi.js'
           'node_modules/cross-storage/dist/client.min.js'
           'src/compiled_js/**/*.js'
         ]
@@ -97,7 +96,6 @@ module.exports = (grunt) ->
     jasmine:
       coverage:
         src: [
-          'dist/js/jquery.storageapi.min.js'
           'dist/js/emojidex-client.js'
         ]
         options:

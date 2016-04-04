@@ -1,6 +1,5 @@
 {
   "name": "emojidex-client",
   "devDependencies": {
-    "jquery.storageapi": "git@github.com:julien-maurel/jQuery-Storage-API.git"
   }
 }
