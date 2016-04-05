@@ -45,7 +45,7 @@ class EmojidexDataStorage
 
   set: (query, data, update) ->
     first_query = query.split('.')[0]
-    @hub.onConnect().then( =>
+    return @hub.onConnect().then( =>
       if update
         new_data = {}
         new_data[first_query] = data
@@ -53,7 +53,7 @@ class EmojidexDataStorage
       else
         return @hub.set first_query, @_get_chained_data(query, data)
     ).then =>
-      @update_cache first_query
+      return @update_cache first_query
 
   update: (query, data) ->
     merged = $.extend true, {}, @get(query.split('.')[0]), @_get_chained_data(query, data, false)
@@ -65,6 +65,7 @@ class EmojidexDataStorage
     ).then((keys) =>
       @hub.get keys
     ).then (hub_data) =>
+      console.log 'update_cache:END ---', hub_data
       if key
         return @hub_cache[key] = hub_data[key]
       else

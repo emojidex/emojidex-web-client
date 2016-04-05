@@ -10,7 +10,9 @@ helperBefore = (chains_data) ->
   @EC_spec = new EmojidexClient
     storageHubPath: hub_path
     onReady: (EC) =>
+      console.log 'helperBefore:onReady -'
       @EC_spec.User.set_auth(test_user_info.auth_user, test_user_info.auth_token).then =>
+        console.log 'helperBefore:set_auth --'
         helperChains chains_data
 
 helperBeforeForEmojidexData = (chains_data) ->

@@ -43,8 +43,8 @@ class EmojidexData
 
   emoji: (emoji_set) ->
     if emoji_set?
-      if @storage.hub_cache.emoji?
-        hub_emoji = @storage.hub_cache.emoji
+      if @storage.hub_cache.emojidex?.emoji?
+        hub_emoji = @storage.hub_cache.emojidex.emoji
         for new_emoji in emoji_set
           for emoji in hub_emoji
             if new_emoji.code is emoji.code
@@ -55,7 +55,10 @@ class EmojidexData
         return @storage.update 'emojidex', emoji: hub_emoji
       else
         return @storage.update 'emojidex', emoji: emoji_set
-    @storage.hub_cache.emoji
+    else if @storage.hub_cache.emojidex?.emoji?
+      return @storage.hub_cache.emojidex.emoji
+    else
+      return undefined
 
   favorites: (favorites_set) ->
     return @storage.update('emojidex', favorites: favorites_set) if favorites_set?

@@ -30,8 +30,8 @@ class EmojidexSearch
           @results = response.emoji
           @cur_page = response.meta.page
           @count = response.meta.count
-          @EC.Emoji.combine response.emoji
-          callback? response.emoji
+          @EC.Emoji.combine(response.emoji).then (data) ->
+            callback? response.emoji
         error: (response) =>
           @results = []
     else
@@ -80,8 +80,8 @@ class EmojidexSearch
         dataType: 'json'
         data: param
         success: (response) =>
-          @EC.Emoji.combine [response]
-          callback? response
+          @EC.Emoji.combine([response]).then (data) ->
+            callback? response
 
   next: ->
     @searched.param.page++ if @count is @searched.param.limit

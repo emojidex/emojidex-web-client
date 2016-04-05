@@ -26,8 +26,8 @@ class EmojidexIndexes
         @results = response.emoji
         @cur_page = response.meta.page
         @count = response.meta.count
-        @EC.Emoji.combine response.emoji
-        callback? response.emoji
+        @EC.Emoji.combine(response.emoji).then (data) ->
+          callback? response.emoji
       error: (response) =>
         @results = []
 
