@@ -1,7 +1,7 @@
 describe 'EmojidexData', ->
   beforeAll (done) ->
     helperChains
-      functions: [helperBeforeForEmojidexData]
+      functions: [clearStorage, helperBeforeForEmojidexData]
       end: done
 
   it 'has the Data class defined', ->

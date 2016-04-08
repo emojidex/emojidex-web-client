@@ -1,7 +1,7 @@
 describe 'EmojidexUtil', ->
   beforeEach (done) ->
     helperChains
-      functions: [helperBefore]
+      functions: [clearStorage, helperBefore]
       end: done
 
   it 'escape_term', ->

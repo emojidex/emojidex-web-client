@@ -1,7 +1,7 @@
 describe 'EmojidexUser', ->
   beforeEach (done) ->
     helperChains
-      functions: [helperBefore]
+      functions: [clearStorage, helperBefore]
       end: done
 
   describe 'Login', ->

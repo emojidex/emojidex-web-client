@@ -1,7 +1,7 @@
 describe 'EmojidexCategories', ->
   beforeAll (done) ->
     helperChains
-      functions: [helperBefore, getFacesEmoji]
+      functions: [clearStorage, helperBefore, getFacesEmoji]
       end: done
 
   it 'getEmoji', (done) ->

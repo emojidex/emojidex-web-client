@@ -1,7 +1,7 @@
 describe 'EmojidexSearch', ->
   beforeAll (done) ->
     helperChains
-      functions: [helperBefore]
+      functions: [clearStorage, helperBefore]
       end: done
 
   it 'search', (done) ->

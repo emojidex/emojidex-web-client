@@ -81,4 +81,4 @@ class EmojidexEmoji
   # DO NOT call this unless you have a really good reason!
   flush: ->
     @_emoji_instance = []
-    return @EC.Data.storage.remove 'emojidex.emoji'
+    return @EC.Data.storage._remove 'emojidex.emoji'

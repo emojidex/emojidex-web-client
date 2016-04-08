@@ -1,7 +1,7 @@
 describe 'EmojidexIndexes', ->
   beforeAll (done) ->
     helperChains
-      functions: [helperBefore, getExtendedEmojiData]
+      functions: [clearStorage, helperBefore, getExtendedEmojiData]
       end: done
 
   it 'user', (done) ->

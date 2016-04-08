@@ -1,7 +1,7 @@
 describe 'EmojidexClient', ->
   beforeAll (done) ->
     helperChains
-      functions: [helperBefore]
+      functions: [clearStorage, helperBefore]
       end: done
 
   it 'has the EmojidexClient class defined', ->

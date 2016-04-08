@@ -43,7 +43,7 @@ class EmojidexData
 
   emoji: (emoji_set) ->
     if emoji_set?
-      if @storage.hub_cache.emojidex?.emoji?
+      if @storage.hub_cache.emojidex.emoji.length > 0
         hub_emoji = @storage.hub_cache.emojidex.emoji
         for new_emoji in emoji_set
           for emoji in hub_emoji

@@ -48,7 +48,6 @@ class EmojidexCategories
 
   # Gets the full list of caetgories available
   sync: (callback, locale) ->
-    console.log 'sync:@_categories?.length', @_categories?.length?
     if @_categories?.length?
       return new Promise =>
         callback? @_categories

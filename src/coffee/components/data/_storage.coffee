@@ -65,13 +65,12 @@ class EmojidexDataStorage
     ).then((keys) =>
       @hub.get keys
     ).then (hub_data) =>
-      console.log 'update_cache:END ---', hub_data
       if key
         return @hub_cache[key] = hub_data[key]
       else
         return @hub_cache = hub_data
 
-  remove: (query) ->
+  _remove: (query) ->
     query = @_get_parsed_query query
     if query.array.length is 1
       return @hub.del query.code

@@ -144,10 +144,9 @@
     };
 
     EmojidexCategories.prototype.sync = function(callback, locale) {
-      var _ref, _ref1,
+      var _ref,
         _this = this;
-      console.log('sync:@_categories?.length', ((_ref = this._categories) != null ? _ref.length : void 0) != null);
-      if (((_ref1 = this._categories) != null ? _ref1.length : void 0) != null) {
+      if (((_ref = this._categories) != null ? _ref.length : void 0) != null) {
         return new Promise(function() {
           return typeof callback === "function" ? callback(_this._categories) : void 0;
         });
@@ -242,9 +241,9 @@
     }
 
     EmojidexData.prototype.emoji = function(emoji_set) {
-      var emoji, hub_emoji, new_emoji, _i, _j, _len, _len1, _ref, _ref1;
+      var emoji, hub_emoji, new_emoji, _i, _j, _len, _len1, _ref;
       if (emoji_set != null) {
-        if (((_ref = this.storage.hub_cache.emojidex) != null ? _ref.emoji : void 0) != null) {
+        if (this.storage.hub_cache.emojidex.emoji.length > 0) {
           hub_emoji = this.storage.hub_cache.emojidex.emoji;
           for (_i = 0, _len = emoji_set.length; _i < _len; _i++) {
             new_emoji = emoji_set[_i];
@@ -266,7 +265,7 @@
             emoji: emoji_set
           });
         }
-      } else if (((_ref1 = this.storage.hub_cache.emojidex) != null ? _ref1.emoji : void 0) != null) {
+      } else if (((_ref = this.storage.hub_cache.emojidex) != null ? _ref.emoji : void 0) != null) {
         return this.storage.hub_cache.emojidex.emoji;
       } else {
         return void 0;
@@ -421,7 +420,6 @@
       }).then(function(keys) {
         return _this.hub.get(keys);
       }).then(function(hub_data) {
-        console.log('update_cache:END ---', hub_data);
         if (key) {
           return _this.hub_cache[key] = hub_data[key];
         } else {
@@ -430,7 +428,7 @@
       });
     };
 
-    EmojidexDataStorage.prototype.remove = function(query) {
+    EmojidexDataStorage.prototype._remove = function(query) {
       var i, scope, target;
       query = this._get_parsed_query(query);
       if (query.array.length === 1) {
@@ -653,7 +651,7 @@
 
     EmojidexEmoji.prototype.flush = function() {
       this._emoji_instance = [];
-      return this.EC.Data.storage.remove('emojidex.emoji');
+      return this.EC.Data.storage._remove('emojidex.emoji');
     };
 
     return EmojidexEmoji;
