@@ -55,7 +55,8 @@ module.exports = (grunt) ->
     save_license:
       dist:
         src: [
-          'node_modules/cross-storage/dist/client.min.js'
+          'src/vendor/cross-storage/dist/client.min.js'
+          # 'node_modules/cross-storage/dist/client.min.js'
         ]
         dest: 'build/licenses.json'
 
@@ -80,7 +81,8 @@ module.exports = (grunt) ->
           stripBanners: true
           banner: '<%= meta.banner %><%= grunt.getLicense("build/licenses.json") %>\n */\n'
         src: [
-          'node_modules/cross-storage/dist/client.min.js'
+          'src/vendor/cross-storage/dist/client.min.js'
+          # 'node_modules/cross-storage/dist/client.min.js'
           'src/compiled_js/**/*.js'
         ]
         dest: 'dist/js/emojidex-client.js'
