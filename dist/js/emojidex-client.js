@@ -199,7 +199,9 @@
       } else {
         this.storage = new EmojidexDataStorage();
       }
-      return this.storage.hub.onConnect().then(function() {
+      return this.storage.hub.onReadyFrame().then(function() {
+        return _this.storage.hub.onConnect();
+      }).then(function() {
         return _this.storage.hub.getKeys();
       }).then(function(keys) {
         var _ref, _ref1, _ref2, _ref3, _ref4;

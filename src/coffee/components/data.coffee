@@ -10,7 +10,9 @@ class EmojidexData
     else
       @storage = new EmojidexDataStorage()
 
-    return @storage.hub.onConnect().then( =>
+    return @storage.hub.onReadyFrame().then( =>
+      return @storage.hub.onConnect()
+    ).then( =>
       return @storage.hub.getKeys()
     ).then((keys) =>
       if keys.indexOf('emojidex') isnt -1
