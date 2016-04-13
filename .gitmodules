@@ -1,0 +1,3 @@
+[submodule "src/vendor/cross-storage"]
+	path = src/vendor/cross-storage
+	url = git@github.com:snowsunny/cross-storage.git
