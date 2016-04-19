@@ -123,8 +123,11 @@
       var _ref,
         _this = this;
       if (((_ref = this._categories) != null ? _ref.length : void 0) != null) {
-        return new Promise(function() {
-          return typeof callback === "function" ? callback(_this._categories) : void 0;
+        return new Promise(function(resolve, reject) {
+          if (typeof callback === "function") {
+            callback(_this._categories);
+          }
+          return resolve();
         });
       } else {
         if (locale == null) {

@@ -49,8 +49,9 @@ class EmojidexCategories
   # Gets the full list of caetgories available
   sync: (callback, locale) ->
     if @_categories?.length?
-      return new Promise =>
+      return new Promise (resolve, reject) =>
         callback? @_categories
+        resolve()
     else
       locale ?= @EC.locale
       $.ajax(

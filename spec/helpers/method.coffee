@@ -1,3 +1,5 @@
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000
+
 hub_path = 'http://localhost:8001/build/hub.html'
 helperChains = (chains_data) ->
   if chains_data.functions.length is 0
