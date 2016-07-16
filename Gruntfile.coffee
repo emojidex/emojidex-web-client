@@ -8,14 +8,6 @@ module.exports = (grunt) ->
   unless data_path?
     data_path = ''
 
-  grunt.getLicense = (licenses_json) ->
-    licenses = grunt.file.readJSON licenses_json
-    info = ''
-    for license in licenses
-      info += license.replace /[ \n\*]+(.+) +\n/gi , "\n * $1"
-      info += '* --------------------------------'
-    return info
-
   getDefineUsePattern = (filepath, define_list) ->
     for define_name in Object.keys define_list
       path_patterns = define_list[define_name].pattern
@@ -52,13 +44,6 @@ module.exports = (grunt) ->
         ' * --------------------------------'
 
     # grunt --------------------------------
-    save_license:
-      dist:
-        src: [
-          'node_modules/cross-storage/dist/client.min.js'
-        ]
-        dest: 'build/licenses.json'
-
     coffee:
       client:
         options:
@@ -78,7 +63,6 @@ module.exports = (grunt) ->
       compiled_js:
         options:
           stripBanners: true
-          banner: '<%= meta.banner %><%= grunt.getLicense("build/licenses.json") %>\n */\n'
         src: [
           'node_modules/cross-storage/dist/client.min.js'
           'src/compiled_js/**/*.js'
@@ -87,9 +71,8 @@ module.exports = (grunt) ->
 
     uglify:
       client:
-        options:
-          # manglet: true
-          banner: '<%= meta.banner %><%= grunt.getLicense("build/licenses.json") %>\n */\n'
+        # options:
+        #   manglet: true
         src: ['dist/js/emojidex-client.js']
         dest: 'dist/js/emojidex-client.min.js'
 
@@ -126,18 +109,6 @@ module.exports = (grunt) ->
           'build/spec/helpers/method.js'
           'build/spec/helpers/data.js'
           data_path
-        ]
-
-    slim:
-      options:
-        pretty: true
-      dsit:
-        files: [
-          expand: true
-          cwd: 'src/slim/'
-          src: '*.slim'
-          dest: 'build/'
-          ext: '.html'
         ]
 
     # grunt dev --------------------------------
@@ -189,7 +160,7 @@ module.exports = (grunt) ->
               'coffee:client'
               'concat'
               'uglify'
-              defaults.jasmine.prop.join(':')
+              defaults.jasmine.prop.join(':') + ':build'
             ]
 
           spec:
@@ -227,7 +198,10 @@ module.exports = (grunt) ->
                     #   ]
               }
             ]
-            task: [defaults.coffee.prop.join(':'), defaults.jasmine.prop.join(':')]
+            task: [
+              defaults.coffee.prop.join(':')
+              defaults.jasmine.prop.join(':') + ':build'
+            ]
 
         setGruntConfig_getTask(getDefineUsePattern filepath, define_list)
 
@@ -237,8 +211,7 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-contrib-connect'
   grunt.loadNpmTasks 'grunt-este-watch'
   grunt.loadNpmTasks 'grunt-contrib-jasmine'
-  grunt.loadNpmTasks 'grunt-license-saver'
-  grunt.loadNpmTasks 'grunt-slim'
 
-  grunt.registerTask 'default', ['save_license', 'coffee', 'concat', 'uglify', 'slim', 'connect', 'jasmine']
+  grunt.registerTask 'default', ['coffee', 'concat', 'uglify', 'connect', 'jasmine:coverage:build']
+
   grunt.registerTask 'dev', ['connect', 'esteWatch']
