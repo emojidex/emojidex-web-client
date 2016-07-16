@@ -16,7 +16,7 @@
     "copyright": "Copyright 2013 Genshin Souzou Kabushiki Kaisha"
   },
   "devDependencies": {
-    "cross-storage": "^0.8.1",
+    "cross-storage": "https://github.com/snowsunny/cross-storage",
     "dotenv": "^2.0.0",
     "grunt": "~0.4.1",
     "grunt-cli": "~0.1.7",
