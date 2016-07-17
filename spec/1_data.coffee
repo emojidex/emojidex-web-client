@@ -18,7 +18,7 @@ describe 'EmojidexData', ->
         expect(EC_spec.Data.storage.get 'emojidex.history').toEqual([])
       it 'emojidex.favorites', ->
         expect(EC_spec.Data.storage.get 'emojidex.favorites').toEqual([])
-      # TODO: this example is missed.
+      # TODO: this example is not correct.
       # it 'emojidex.categories', ->
       #   expect(EC_spec.Data.storage.get 'emojidex.categories').toEqual([])
       it 'emojidex.auth_info', ->

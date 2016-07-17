@@ -76,6 +76,9 @@ module.exports = (grunt) ->
         src: ['dist/js/emojidex-client.js']
         dest: 'dist/js/emojidex-client.min.js'
 
+    clean:
+      spec: ['build/spec/*.js']
+
     jasmine:
       coverage:
         src: [
@@ -211,7 +214,7 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-contrib-connect'
   grunt.loadNpmTasks 'grunt-este-watch'
   grunt.loadNpmTasks 'grunt-contrib-jasmine'
+  grunt.loadNpmTasks 'grunt-contrib-clean'
 
-  grunt.registerTask 'default', ['coffee', 'concat', 'uglify', 'connect', 'jasmine:coverage:build']
-
+  grunt.registerTask 'default', ['clean', 'coffee', 'concat', 'uglify', 'connect', 'jasmine:coverage:build']
   grunt.registerTask 'dev', ['connect', 'esteWatch']
