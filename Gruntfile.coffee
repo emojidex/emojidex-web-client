@@ -114,6 +114,18 @@ module.exports = (grunt) ->
           data_path
         ]
 
+    slim:
+      options:
+        pretty: true
+      dsit:
+        files: [
+          expand: true
+          cwd: 'src/slim/'
+          src: '*.slim'
+          dest: 'build/'
+          ext: '.html'
+        ]
+
     # grunt dev --------------------------------
     connect:
       client: {}
@@ -215,6 +227,7 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-este-watch'
   grunt.loadNpmTasks 'grunt-contrib-jasmine'
   grunt.loadNpmTasks 'grunt-contrib-clean'
+  grunt.loadNpmTasks 'grunt-slim'
 
-  grunt.registerTask 'default', ['clean', 'coffee', 'concat', 'uglify', 'connect', 'jasmine:coverage:build']
-  grunt.registerTask 'dev', ['connect', 'esteWatch']
+  grunt.registerTask 'default', ['clean', 'slim', 'coffee', 'concat', 'uglify', 'jasmine:coverage:build']
+  grunt.registerTask 'dev', ['default', 'connect', 'esteWatch']
