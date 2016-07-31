@@ -1,6 +1,6 @@
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000
 
-hub_path = 'http://localhost:8001/build/hub.html'
+hub_path = 'https://www.emojidex.com/hub/0.8.2'
 helperChains = (chains_data) ->
   if chains_data.functions.length is 0
     chains_data.end()

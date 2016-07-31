@@ -160,6 +160,9 @@ module.exports = (grunt) ->
         else
           spec_file = path.basename(filepath, '.coffee')
 
+        if spec_file is 'data'
+          spec_file = '1_data'
+
         define_list =
           client:
             pattern: "src/coffee/**/*"

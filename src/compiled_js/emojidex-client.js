@@ -313,7 +313,7 @@
   EmojidexDataStorage = (function() {
     function EmojidexDataStorage(hub_path) {
       if (hub_path == null) {
-        hub_path = 'https://www.emojidex.com/hub';
+        hub_path = 'https://www.emojidex.com/hub/0.8.2';
       }
       this.hub = new CrossStorageClient(hub_path, {
         frameId: 'emojidex-client-storage-hub'
