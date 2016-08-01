@@ -313,7 +313,7 @@
   EmojidexDataStorage = (function() {
     function EmojidexDataStorage(hub_path) {
       if (hub_path == null) {
-        hub_path = 'https://www.emojidex.com/hub/0.8.2';
+        hub_path = 'https://www.emojidex.com/hub/1.0.0';
       }
       this.hub = new CrossStorageClient(hub_path, {
         frameId: 'emojidex-client-storage-hub'
@@ -1147,14 +1147,17 @@
 
     EmojidexUserFavorites.prototype.all = function(callback) {
       if (this._favorites != null) {
-        return typeof callback === "function" ? callback(this._favorites) : void 0;
+        if (typeof callback === "function") {
+          callback(this._favorites);
+        }
       } else {
-        return setTimeout(((function(_this) {
+        setTimeout(((function(_this) {
           return function() {
             return _this.all(callback);
           };
         })(this)), 500);
       }
+      return this._favorites;
     };
 
     return EmojidexUserFavorites;
@@ -1228,14 +1231,17 @@
 
     EmojidexUserHistory.prototype.all = function(callback) {
       if (this._history != null) {
-        return typeof callback === "function" ? callback(this._history) : void 0;
+        if (typeof callback === "function") {
+          callback(this._history);
+        }
       } else {
-        return setTimeout(((function(_this) {
+        setTimeout(((function(_this) {
           return function() {
             return _this.all(callback);
           };
         })(this)), 500);
       }
+      return this._history;
     };
 
     return EmojidexUserHistory;

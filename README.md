@@ -222,8 +222,40 @@ results_for_a_list = emojidex.Util.simplify();
 simple_list_of_seal_sized_emoji = emojidex.Util.simplify(emojidex.results, 'seal');
 ```
 
+Building
+========
+Building requires node and npm. After cloning the repository, simply do:
+
+```
+npm install
+grunt
+```
+
+Testing
+=======
+There are two types of specs: regular specs that use the test account and specs that require a
+premium account with R-18 enabled. As a developer you are eligable to receive a complimentary 
+upgrade to a premium account if you are working on either an emojidex package or module or 
+integration of emojidex in your own software. Simply contact info@emojidex.com with the subject 
+"Developer Account" and list the following details:
+1. Your username on emojidex
+2. The project(s) you intend to work on
+
+.env (optional)
+---------------
+After obtaining a permium account you can use it for testing. To do this you need to create a 
+file named '.env' with the following information:
+```
+USERNAME=Your_UserName
+AUTH_TOKEN=0123456789abcdef
+```
+replacing the Your_UserName and 0123456789abcdef with your actual username and auth_token. 
+The quickest way to find your auth_token is to log in on your browser, open up your user 
+settings by clicking on your username in the top right, and scrolling down to the Auth Token 
+field.
+
 License
 =======
 emojidex and emojidex tools are licensed under the [emojidex Open License](https://www.emojidex.com/emojidex/emojidex_open_license).
 
-©2013 the emojidex project / Genshin Souzou K.K. [Phantom Creation Inc.]
+©2013 the emojidex project / K.K. GenSouSha [Phantom Creation Inc.]

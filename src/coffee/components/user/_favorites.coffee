@@ -51,3 +51,4 @@ class EmojidexUserFavorites
       setTimeout (=>
         @all callback
       ), 500
+    @_favorites

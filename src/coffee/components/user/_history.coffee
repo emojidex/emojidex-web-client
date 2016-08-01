@@ -44,3 +44,4 @@ class EmojidexUserHistory
       setTimeout (=>
         @all callback
       ), 500
+    @_history
