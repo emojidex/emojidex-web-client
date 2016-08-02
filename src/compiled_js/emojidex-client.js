@@ -179,7 +179,12 @@
       this._def_auth_info = {
         status: 'none',
         user: '',
-        token: null
+        token: null,
+        r18: false,
+        premium: false,
+        premium_exp: null,
+        pro: false,
+        pro_exp: null
       };
       if (this.options.storageHubPath != null) {
         this.storage = new EmojidexDataStorage(this.options.storageHubPath);
@@ -313,7 +318,7 @@
   EmojidexDataStorage = (function() {
     function EmojidexDataStorage(hub_path) {
       if (hub_path == null) {
-        hub_path = 'https://www.emojidex.com/hub/1.0.0';
+        hub_path = 'https://www.emojidex.com/hub/0.8.2';
       }
       this.hub = new CrossStorageClient(hub_path, {
         frameId: 'emojidex-client-storage-hub'

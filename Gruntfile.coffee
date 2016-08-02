@@ -1,12 +1,18 @@
 module.exports = (grunt) ->
   path = require 'path'
 
-  dotenv = require 'dotenv'
-  dotenv.config()
+  if grunt.file.exists('.env')
+    grunt.log.writeln("*Found .env file; incorporating user auth data into specs.*")
+    grunt.log.writeln("NOTE: if your user is not Premium with R-18 enabled some specs will fail.")
+    dotenv = require 'dotenv'
+    dotenv.config()
 
-  data_path = process.env.DATA_PATH
-  unless data_path?
-    data_path = ''
+    username = process.env.USERNAME
+    auth_token = process.env.AUTH_TOKEN
+  else
+    grunt.log.writeln("*.env file not found; only some specs will run.*")
+    grunt.log.writeln("Check the '.env' secion in README.md for details on how to set .env")
+
 
   getDefineUsePattern = (filepath, define_list) ->
     for define_name in Object.keys define_list
@@ -111,7 +117,6 @@ module.exports = (grunt) ->
         helpers:[
           'build/spec/helpers/method.js'
           'build/spec/helpers/data.js'
-          data_path
         ]
 
     slim:

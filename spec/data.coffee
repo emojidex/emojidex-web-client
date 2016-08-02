@@ -22,7 +22,8 @@ describe 'EmojidexData', ->
       # it 'emojidex.categories', ->
       #   expect(EC_spec.Data.storage.get 'emojidex.categories').toEqual([])
       it 'emojidex.auth_info', ->
-        expect(EC_spec.Data.storage.get 'emojidex.auth_info').toEqual({status: 'none', user: '', token: null})
+        expect(EC_spec.Data.storage.get 'emojidex.auth_info').toEqual({status: 'none', user: '',
+        token: null, r18: false, premium: false, premium_exp: null, pro: false, pro_exp: null})
 
     it 'after', ->
       expect(EC_spec.Data.storage.isEmpty('emojidex')).toBe false

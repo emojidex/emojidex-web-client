@@ -4,6 +4,11 @@ class EmojidexData
       status: 'none'
       user: ''
       token: null
+      r18: false
+      premium: false
+      premium_exp: null
+      pro: false
+      pro_exp: null
 
     if @options.storageHubPath?
       @storage = new EmojidexDataStorage @options.storageHubPath

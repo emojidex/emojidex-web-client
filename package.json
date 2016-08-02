@@ -16,7 +16,7 @@
     "copyright": "Copyright 2013 emojidex"
   },
   "devDependencies": {
-    "cross-storage": "Kagetsuki/cross-storage",
+    "cross-storage": "snowsunny/cross-storage",
     "dotenv": "^2.0.0",
     "grunt": "~1.0.1",
     "grunt-cli": "~1.2.0",

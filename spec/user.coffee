@@ -26,8 +26,18 @@ describe 'EmojidexUser', ->
           expect(auth_info.status).toEqual('verified')
           done()
 
-      # it 'google login', ->
-      #   TODO:
+  describe 'User Details', ->
+    it 'has r18, pro, premium, etc.', (done) ->
+      #TODO switch login for user_info
+      EC_spec.User.login
+        authtype: 'token'
+        username: test_user_info.auth_user
+        auth_token: test_user_info.auth_token
+        callback: (auth_info) ->
+          expect(EC_spec.User.auth_info.r18).toEqual(false)
+          expect(EC_spec.User.auth_info.pro).toEqual(false)
+          expect(EC_spec.User.auth_info.premium).toEqual(false)
+      
 
   describe 'Favorites', ->
     it 'get', (done) ->
