@@ -31,11 +31,13 @@ describe 'EmojidexUser', ->
       expect(EC_spec.User.auth_info.r18).toEqual(false)
       expect(EC_spec.User.auth_info.pro).toEqual(false)
       expect(EC_spec.User.auth_info.premium).toEqual(false)
-      if user_info?
-        EC_spec.User.login authtype: 'plain', username: user_info.auth_user, password: user_info.password, callback: (auth_info) ->
-          expect(EC_spec.User.auth_info.r18).toEqual(true)
-          expect(EC_spec.User.auth_info.premium).toEqual(true)
+      done()
 
+  describe 'Full User Details', ->
+    pending() unless user_info?
+    EC_spec.User.login authtype: 'plain', username: user_info.auth_user, password: user_info.password, callback: (auth_info) ->
+      expect(EC_spec.User.auth_info.r18).toEqual(true)
+      expect(EC_spec.User.auth_info.premium).toEqual(true)
       done()
 
   describe 'Favorites', ->
