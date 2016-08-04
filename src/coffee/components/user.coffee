@@ -85,11 +85,16 @@ class EmojidexUser
     return false
 
   # directly set auth credentials
-  set_auth: (user, token) ->
+  set_auth: (user, token, r18 = false, premium = false, premium_exp = null, pro = false, pro_exp = null) ->
     return @EC.Data.auth_info(
       status: 'verified'
       user: user
       token: token
+      r18: r18
+      premium: premium
+      premium_exp: premium_exp
+      pro: pro
+      pro_exp: pro_exp
     ).then (data) =>
       @auth_info = @EC.Data.storage.get 'emojidex.auth_info'
       @sync_user_data()
@@ -101,6 +106,11 @@ class EmojidexUser
       status: response.auth_status
       token: response.auth_token
       user: response.auth_user
+      r18: response.r18
+      premium: response.premium
+      premium_exp: response.premium_exp
+      pro: response.pro
+      pro_exp: response.pro_exp
     ).then (data)=>
       @auth_info = @EC.Data.storage.get 'emojidex.auth_info'
       @sync_user_data()

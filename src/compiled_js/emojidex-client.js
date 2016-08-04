@@ -1038,11 +1038,31 @@
       return false;
     };
 
-    EmojidexUser.prototype.set_auth = function(user, token) {
+    EmojidexUser.prototype.set_auth = function(user, token, r18, premium, premium_exp, pro, pro_exp) {
+      if (r18 == null) {
+        r18 = false;
+      }
+      if (premium == null) {
+        premium = false;
+      }
+      if (premium_exp == null) {
+        premium_exp = null;
+      }
+      if (pro == null) {
+        pro = false;
+      }
+      if (pro_exp == null) {
+        pro_exp = null;
+      }
       return this.EC.Data.auth_info({
         status: 'verified',
         user: user,
-        token: token
+        token: token,
+        r18: r18,
+        premium: premium,
+        premium_exp: premium_exp,
+        pro: pro,
+        pro_exp: pro_exp
       }).then((function(_this) {
         return function(data) {
           _this.auth_info = _this.EC.Data.storage.get('emojidex.auth_info');
@@ -1056,7 +1076,12 @@
       return this.EC.Data.auth_info({
         status: response.auth_status,
         token: response.auth_token,
-        user: response.auth_user
+        user: response.auth_user,
+        r18: response.r18,
+        premium: response.premium,
+        premium_exp: response.premium_exp,
+        pro: response.pro,
+        pro_exp: response.pro_exp
       }).then((function(_this) {
         return function(data) {
           _this.auth_info = _this.EC.Data.storage.get('emojidex.auth_info');

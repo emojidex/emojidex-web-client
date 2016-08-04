@@ -36,7 +36,7 @@ describe 'EmojidexUser', ->
     describe '[Require user info] User Details', ->
       pending() unless premium_user_info?
       it 'has r18, pro, premium, etc.', (done) ->
-        EC_spec.User.login authtype: 'plain', username: user_info.auth_user, password: user_info.password, callback: (auth_info) ->
+        EC_spec.User.login authtype: 'token', username: premium_user_info.auth_user, auth_token: premium_user_info.auth_token, callback: (auth_info) ->
           expect(EC_spec.User.auth_info.r18).toEqual(true)
           expect(EC_spec.User.auth_info.premium).toEqual(true)
           done()
