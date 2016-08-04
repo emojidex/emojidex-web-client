@@ -33,12 +33,13 @@ describe 'EmojidexUser', ->
       expect(EC_spec.User.auth_info.premium).toEqual(false)
       done()
 
-  describe 'Full User Details', ->
-    pending() unless user_info?
-    EC_spec.User.login authtype: 'plain', username: user_info.auth_user, password: user_info.password, callback: (auth_info) ->
-      expect(EC_spec.User.auth_info.r18).toEqual(true)
-      expect(EC_spec.User.auth_info.premium).toEqual(true)
-      done()
+    describe '[Require user info] User Details', ->
+      pending() unless premium_user_info?
+      it 'has r18, pro, premium, etc.', (done) ->
+        EC_spec.User.login authtype: 'plain', username: user_info.auth_user, password: user_info.password, callback: (auth_info) ->
+          expect(EC_spec.User.auth_info.r18).toEqual(true)
+          expect(EC_spec.User.auth_info.premium).toEqual(true)
+          done()
 
   describe 'Favorites', ->
     it 'get', (done) ->

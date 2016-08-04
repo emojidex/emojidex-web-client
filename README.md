@@ -247,6 +247,8 @@ After obtaining a permium account you can use it for testing. To do this you nee
 file named '.env' with the following information:
 ```
 USERNAME=Your_UserName
+EMAIL=your@email.com
+PASSWORD=YourPassword123
 AUTH_TOKEN=0123456789abcdef
 ```
 replacing the Your_UserName and 0123456789abcdef with your actual username and auth_token. 

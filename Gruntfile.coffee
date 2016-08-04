@@ -7,11 +7,27 @@ module.exports = (grunt) ->
     dotenv = require 'dotenv'
     dotenv.config()
 
-    username = process.env.USERNAME
-    auth_token = process.env.AUTH_TOKEN
+    output = """
+      this.user_info = {
+        auth_user: '#{process.env.USERNAME}',
+        email: '#{process.env.EMAIL}',
+        password: '#{process.env.PASSWORD}',
+        auth_token: '#{process.env.AUTH_TOKEN}'
+      };
+
+      this.premium_user_info = {
+        auth_user: '#{process.env.USERNAME}',
+        auth_token: '#{process.env.AUTH_TOKEN}'
+      };
+
+    """
+
+    grunt.file.write('tmp/authinfo.js', output)
+
   else
     grunt.log.writeln("*.env file not found; only some specs will run.*")
     grunt.log.writeln("Check the '.env' secion in README.md for details on how to set .env")
+    grunt.file.write('tmp/authinfo.js', "")
 
 
   getDefineUsePattern = (filepath, define_list) ->
@@ -117,6 +133,7 @@ module.exports = (grunt) ->
         helpers:[
           'build/spec/helpers/method.js'
           'build/spec/helpers/data.js'
+          'tmp/authinfo.js'
         ]
 
     slim:
@@ -205,20 +222,8 @@ module.exports = (grunt) ->
                   src: defaults.jasmine.value.src
                   options:
                     specs: "build/#{path.dirname filepath}/#{path.basename filepath, '.coffee'}.js"
-                    # template: require('grunt-template-jasmine-istanbul')
-                    # templateOptions:
-                    #   coverage: 'build/spec/coverage/coverage.json'
-                    #   report: [
-                    #     {
-                    #       type: 'html'
-                    #       options: dir: 'build/spec/coverage/html'
-                    #     }
-                    #     {
-                    #       type: 'cobertura'
-                    #       options: dir: 'build/spec/coverage/cobertura'
-                    #     }
-                    #     { type: 'text-summary' }
-                    #   ]
+                    display: "full"
+                    summary: true
               }
             ]
             task: [
