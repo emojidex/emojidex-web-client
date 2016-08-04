@@ -28,14 +28,23 @@ class EmojidexSearch
         dataType: 'json'
         data: param
         success: (response) =>
-          @meta = response.meta
-          @results = response.emoji
-          @cur_page = response.meta.page
-          @count = response.meta.count
-          @EC.Emoji.combine(response.emoji).then (data) ->
-            callback? response.emoji
+          if response.status?
+            @results = []
+            @cur_page = 0
+            @count = 0
+            callback? []
+          else
+            @meta = response.meta
+            @results = response.emoji
+            @cur_page = response.meta.page
+            @count = response.meta.count
+            @EC.Emoji.combine(response.emoji).then (data) ->
+              callback? response.emoji
         error: (response) =>
           @results = []
+          @cur_page = 0
+          @count = 0
+          callback? []
     else
       call_func.storage? search_data, callback
 

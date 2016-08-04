@@ -840,18 +840,28 @@
           data: param,
           success: (function(_this) {
             return function(response) {
-              _this.meta = response.meta;
-              _this.results = response.emoji;
-              _this.cur_page = response.meta.page;
-              _this.count = response.meta.count;
-              return _this.EC.Emoji.combine(response.emoji).then(function(data) {
-                return typeof callback === "function" ? callback(response.emoji) : void 0;
-              });
+              if (response.status != null) {
+                _this.results = [];
+                _this.cur_page = 0;
+                _this.count = 0;
+                return typeof callback === "function" ? callback([]) : void 0;
+              } else {
+                _this.meta = response.meta;
+                _this.results = response.emoji;
+                _this.cur_page = response.meta.page;
+                _this.count = response.meta.count;
+                return _this.EC.Emoji.combine(response.emoji).then(function(data) {
+                  return typeof callback === "function" ? callback(response.emoji) : void 0;
+                });
+              }
             };
           })(this),
           error: (function(_this) {
             return function(response) {
-              return _this.results = [];
+              _this.results = [];
+              _this.cur_page = 0;
+              _this.count = 0;
+              return typeof callback === "function" ? callback([]) : void 0;
             };
           })(this)
         });
