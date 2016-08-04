@@ -3,8 +3,6 @@ class EmojidexUser
     @auth_info = @EC.Data._def_auth_info
     @History = new EmojidexUserHistory @EC
     @Favorites = new EmojidexUserFavorites @EC
-    @Newest = new EmojidexUserNewest @EC
-    @Popular = new EmojidexUserPopular @EC
     # @_auto_login()
 
   # Checks for local saved login data, and if present sets the username and api_key
@@ -117,6 +115,6 @@ class EmojidexUser
       return data
 
   sync_user_data: () ->
-    @History.token = @Favorites.token = @Newest.token = @Popular.token = @auth_info.token
+    @History.token = @Favorites.token = @auth_info.token
     @Favorites.sync()
     @History.sync()

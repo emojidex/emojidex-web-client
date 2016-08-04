@@ -81,22 +81,3 @@ describe 'EmojidexUser', ->
       EC_spec.User.History.all (history_data) ->
         expect(history_data.history.length).toBeTruthy()
         done()
-
-  describe '[Premium user only]', ->
-    pending() unless premium_user_info?
-    beforeEach (done) =>
-      helperChains
-        functions: [setPremiumUser]
-        end: done
-
-    describe 'Newest Emoji', ->
-      it 'get', (done) ->
-        EC_spec.User.Newest.get (newest_info) ->
-          expect(newest_info?.emoji?.length).toBeTruthy()
-          done()
-
-    describe 'Popular Emoji', ->
-      it 'get', (done) ->
-        EC_spec.User.Popular.get (popular_info) ->
-          expect(popular_info?.emoji?.length).toBeTruthy()
-          done()

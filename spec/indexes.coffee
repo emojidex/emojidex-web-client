@@ -35,3 +35,31 @@ describe 'EmojidexIndexes', ->
       expect(EC_spec.Indexes.cur_page).toEqual 1
       done()
     EC_spec.Indexes.prev()
+
+
+  it 'can not get newest index because user is not premium', (done) ->
+    EC_spec.Indexes.newest (emoji_data) ->
+      expect(emoji_data.length).toEqual(0)
+      done()
+
+  it 'can not get popular index because user is not premium', (done) ->
+    EC_spec.Indexes.popular (emoji_data) ->
+      expect(emoji_data.length).toEqual(0)
+      done()
+
+  describe '[Premium user only]', ->
+    pending() unless premium_user_info?
+    beforeEach (done) =>
+      helperChains
+        functions: [setPremiumUser]
+        end: done
+
+    it 'gets newest index', (done) ->
+      EC_spec.Indexes.newest (emoji_data) ->
+        expect(emoji_data.length).toBeTruthy()
+        done()
+
+    it 'gets popular index', (done) ->
+      EC_spec.Indexes.popular (emoji_data) ->
+        expect(emoji_data.length).toBeTruthy()
+        done()

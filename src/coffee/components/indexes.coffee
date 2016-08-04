@@ -9,6 +9,8 @@ class EmojidexIndexes
       page: 1
       limit: @EC.limit
       detailed: @EC.detailed
+    if @EC.User.auth_info.token != null
+      $.extend param, {auth_token: @EC.User.auth_info.token}
     $.extend param, opts
 
     if func?
@@ -23,16 +25,31 @@ class EmojidexIndexes
       dataType: 'json'
       data: param
       success: (response) =>
-        @results = response.emoji
-        @cur_page = response.meta.page
-        @count = response.meta.count
-        @EC.Emoji.combine(response.emoji).then (data) ->
-          callback? response.emoji
+        if response.status?
+          @results = []
+          @cur_page = 0
+          @count = 0
+          callback? []
+        else
+          @results = response.emoji
+          @cur_page = response.meta.page
+          @count = response.meta.count
+          @EC.Emoji.combine(response.emoji).then (data) ->
+            callback? response.emoji
       error: (response) =>
         @results = []
+        @cur_page = 0
+        @count = 0
+        callback? []
 
   index: (callback, opts) ->
     @_indexesAPI 'emoji', callback, opts, @index
+
+  newest: (callback, opts) ->
+    @_indexesAPI 'newest', callback, opts, @newest
+
+  popular: (callback, opts) ->
+    @_indexesAPI 'popular', callback, opts, @popular
 
   user: (username, callback, opts) ->
     @_indexesAPI "users/#{username}/emoji", callback, opts

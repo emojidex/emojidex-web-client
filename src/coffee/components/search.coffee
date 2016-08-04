@@ -10,6 +10,8 @@ class EmojidexSearch
       page: 1
       limit: @EC.limit
       detailed: @EC.detailed
+    if @EC.User.auth_info.token != null
+      $.extend param, {auth_token: @EC.User.auth_info.token}
     $.extend param, opts
 
     # TODO -------
