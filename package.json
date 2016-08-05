@@ -32,7 +32,7 @@
     "grunt-slim": "gruntjs-updater/grunt-slim#peerDep",
     "grunt-template-jasmine-istanbul": "^0.5.0",
     "jquery": "^3.1.0",
-    "promise-polyfill": "^2.1.0"
+    "promise-polyfill": "^6.0.1"
   },
   "scripts": {
     "test": "grunt && grunt jasmine"
