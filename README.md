@@ -251,10 +251,28 @@ EMAIL=your@email.com
 PASSWORD=YourPassword123
 AUTH_TOKEN=0123456789abcdef
 ```
-replacing the Your_UserName and 0123456789abcdef with your actual username and auth_token. 
+replacing the Your_UserName and 0123456789abcdef etc. with your actual username and auth_token... 
 The quickest way to find your auth_token is to log in on your browser, open up your user 
 settings by clicking on your username in the top right, and scrolling down to the Auth Token 
-field.
+field (or to do an auth request with CURL as in the developer.emojidex.com documentation).
+
+Building and Running Tests
+--------------------------
+For your initial build run `grunt` once. If there are no errors run `grunt dev` to start up the 
+live development server.
+
+Specs are using Jasmine, but due to some issues with phantomjs (async callbacks aren't supported?) 
+we currently have it disabled. To try with phantomjs simply type `grunt jasmine`, but don't expect 
+much for now.
+
+To actually run the specs open up 
+[http://localhost:8000/build/_SpecRunner.html](http://localhost:8000/build/_SpecRunner.html) 
+in your browser.
+After editing, check your terminal to make sure grunt has caught up compiling and refresh the 
+SpecRunner page in your browser.
+
+Running specs in your browser will taint your emojidex local storage entry, so be sure to log out 
+and log back in on [https://www.emojidex.com](https://www.emojidex.com) when you're done.
 
 License
 =======
