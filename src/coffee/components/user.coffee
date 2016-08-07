@@ -7,8 +7,9 @@ class EmojidexUser
 
   # Checks for local saved login data, and if present sets the username and api_key
   _auto_login: () ->
-    @auth_info = @EC.Data.auth_info()
-    if @auth_info?.token? then @sync_user_data() else @logout()
+    if @EC.Data.storage.hub_cache?.emojidex?.auth_info?.status == 'verified'
+      @auth_info = @EC.Data.storage.hub_cache.emojidex.auth_info
+      @sync_user_data()
 
   # login
   # takes a hash with one of the following combinations:
@@ -28,7 +29,8 @@ class EmojidexUser
       when 'google'
         @google_auth params.callback
       when 'session'
-        @auth_info = @EC.Data.auth_info()
+        if @EC.Data.storage.hub_cache?.emojidex?.auth_info?.status == 'verified'
+          @auth_info = @EC.Data.storage.hub_cache.emojidex.auth_info
       else
         @_auto_login()
 

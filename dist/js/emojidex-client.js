@@ -994,16 +994,15 @@
     }
 
     EmojidexUser.prototype._auto_login = function() {
-      var ref;
-      this.auth_info = this.EC.Data.auth_info();
-      if (((ref = this.auth_info) != null ? ref.token : void 0) != null) {
+      var ref, ref1, ref2;
+      if (((ref = this.EC.Data.storage.hub_cache) != null ? (ref1 = ref.emojidex) != null ? (ref2 = ref1.auth_info) != null ? ref2.status : void 0 : void 0 : void 0) === 'verified') {
+        this.auth_info = this.EC.Data.storage.hub_cache.emojidex.auth_info;
         return this.sync_user_data();
-      } else {
-        return this.logout();
       }
     };
 
     EmojidexUser.prototype.login = function(params) {
+      var ref, ref1, ref2;
       switch (params.authtype) {
         case 'plain':
           return this.plain_auth(params.username, params.password, params.callback);
@@ -1014,7 +1013,10 @@
         case 'google':
           return this.google_auth(params.callback);
         case 'session':
-          return this.auth_info = this.EC.Data.auth_info();
+          if (((ref = this.EC.Data.storage.hub_cache) != null ? (ref1 = ref.emojidex) != null ? (ref2 = ref1.auth_info) != null ? ref2.status : void 0 : void 0 : void 0) === 'verified') {
+            return this.auth_info = this.EC.Data.storage.hub_cache.emojidex.auth_info;
+          }
+          break;
         default:
           return this._auto_login();
       }
