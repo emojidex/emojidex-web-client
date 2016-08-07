@@ -7,7 +7,6 @@ class EmojidexUser
 
   # Checks for local saved login data, and if present sets the username and api_key
   _auto_login: () ->
-    return if @closed_net
     @auth_info = @EC.Data.auth_info()
     if @auth_info?.token? then @sync_user_data() else @logout()
 
@@ -28,6 +27,8 @@ class EmojidexUser
         @basic_auth params.user, params.password, params.callback
       when 'google'
         @google_auth params.callback
+      when 'session'
+        @auth_info = @EC.Data.auth_info()
       else
         @_auto_login()
 
