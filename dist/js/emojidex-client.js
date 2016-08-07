@@ -283,7 +283,7 @@
           favorites: favorites_set
         });
       }
-      return this.storage.hub_cache.emojidex.favorites;
+      return this.storage.hub_cache.favorites;
     };
 
     EmojidexData.prototype.history = function(history_set) {
@@ -292,7 +292,7 @@
           history: history_set
         });
       }
-      return this.storage.hub_cache.emojidex.history;
+      return this.storage.hub_cache.history;
     };
 
     EmojidexData.prototype.categories = function(categories_set) {
@@ -301,7 +301,7 @@
           categories: categories_set
         });
       }
-      return this.storage.hub_cache.emojidex.categories;
+      return this.storage.hub_cache.categories;
     };
 
     EmojidexData.prototype.auth_info = function(auth_info_set) {
@@ -310,7 +310,7 @@
           auth_info: auth_info_set
         });
       }
-      return this.storage.hub_cache.emojidex.auth_info;
+      return this.storage.hub_cache.auth_info;
     };
 
     return EmojidexData;
@@ -1004,21 +1004,19 @@
     };
 
     EmojidexUser.prototype.login = function(params) {
-      if (params === null) {
-        return this._auto_login();
-      } else {
-        switch (params.authtype) {
-          case 'plain':
-            return this.plain_auth(params.username, params.password, params.callback);
-          case 'token':
-            return this.token_auth(params.username, params.auth_token, params.callback);
-          case 'basic':
-            return this.basic_auth(params.user, params.password, params.callback);
-          case 'google':
-            return this.google_auth(params.callback);
-          case 'session':
-            return this.auth_info = this.EC.Data.auth_info();
-        }
+      switch (params.authtype) {
+        case 'plain':
+          return this.plain_auth(params.username, params.password, params.callback);
+        case 'token':
+          return this.token_auth(params.username, params.auth_token, params.callback);
+        case 'basic':
+          return this.basic_auth(params.user, params.password, params.callback);
+        case 'google':
+          return this.google_auth(params.callback);
+        case 'session':
+          return this.auth_info = this.EC.Data.auth_info();
+        default:
+          return this._auto_login();
       }
     };
 

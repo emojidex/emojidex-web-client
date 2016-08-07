@@ -18,20 +18,19 @@ class EmojidexUser
   # 4. {authtype: 'google', #TODO
   # * if no hash is given auto login is attempted
   login: (params) ->
-    if params == null
-      @_auto_login()
-    else
-      switch params.authtype
-        when 'plain'
-          @plain_auth params.username, params.password, params.callback
-        when 'token'
-          @token_auth params.username, params.auth_token, params.callback
-        when 'basic'
-          @basic_auth params.user, params.password, params.callback
-        when 'google'
-          @google_auth params.callback
-        when 'session'
-          @auth_info = @EC.Data.auth_info()
+    switch params.authtype
+      when 'plain'
+        @plain_auth params.username, params.password, params.callback
+      when 'token'
+        @token_auth params.username, params.auth_token, params.callback
+      when 'basic'
+        @basic_auth params.user, params.password, params.callback
+      when 'google'
+        @google_auth params.callback
+      when 'session'
+        @auth_info = @EC.Data.auth_info()
+      else
+        @_auto_login()
 
   # logout:
   # 'logs out' by clearing user data
