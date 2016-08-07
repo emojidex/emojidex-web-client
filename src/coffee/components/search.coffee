@@ -79,20 +79,26 @@ class EmojidexSearch
 
   # Not an actual search, just gets information on the given emoji
   find: (code, callback, opts) ->
+    emoji_cache = @EC.Data.emoji()
+    for emoji in emoji_cache
+      if emoji.code == code
+        callback? emoji
+        return emoji
+
     param =
       detailed: @EC.detailed
+    if @EC.User.auth_info.token != null
+      $.extend param, {auth_token: @EC.User.auth_info.token}
     $.extend param, opts
 
-    if @EC.closed_net
-      # TODO
-    else
-      $.ajax
-        url: @EC.api_url + "/emoji/#{code}"
-        dataType: 'json'
-        data: param
-        success: (response) =>
-          @EC.Emoji.combine([response]).then (data) ->
-            callback? response
+    $.ajax
+      url: @EC.api_url + "/emoji/#{code}"
+      dataType: 'json'
+      data: param
+      success: (response) =>
+        @EC.Emoji.combine([response])
+        callback? response
+        return response
 
   next: ->
     @searched.param.page++ if @count is @searched.param.limit

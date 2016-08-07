@@ -23,12 +23,10 @@ module.exports = (grunt) ->
     """
 
     grunt.file.write('tmp/authinfo.js', output)
-
   else
     grunt.log.writeln("*.env file not found; only some specs will run.*")
     grunt.log.writeln("Check the '.env' secion in README.md for details on how to set .env")
     grunt.file.write('tmp/authinfo.js', "")
-
 
   getDefineUsePattern = (filepath, define_list) ->
     for define_name in Object.keys define_list

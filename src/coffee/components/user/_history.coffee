@@ -35,7 +35,7 @@ class EmojidexUserHistory
     @_historyAPI options
 
   sync: ->
-    @get() # history currently can't be saved locally, so only get will work
+    @get()
 
   all: (callback) ->
     if @_history?
