@@ -309,6 +309,7 @@
           auth_info: auth_info_set
         });
       }
+      return this.storage.hub_cache.auth_info;
     };
 
     return EmojidexData;

@@ -82,3 +82,4 @@ class EmojidexData
   auth_info: (auth_info_set) ->
     if auth_info_set?
       return @storage.update('emojidex', auth_info: auth_info_set)
+    @storage.hub_cache.auth_info
