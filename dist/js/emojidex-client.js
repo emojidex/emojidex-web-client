@@ -994,9 +994,6 @@
 
     EmojidexUser.prototype._auto_login = function() {
       var ref;
-      if (this.closed_net) {
-        return;
-      }
       this.auth_info = this.EC.Data.auth_info();
       if (((ref = this.auth_info) != null ? ref.token : void 0) != null) {
         return this.sync_user_data();
@@ -1015,6 +1012,8 @@
           return this.basic_auth(params.user, params.password, params.callback);
         case 'google':
           return this.google_auth(params.callback);
+        case 'session':
+          return this.auth_info = this.EC.Data.auth_info();
         default:
           return this._auto_login();
       }
