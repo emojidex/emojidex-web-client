@@ -283,7 +283,7 @@
           favorites: favorites_set
         });
       }
-      return this.storage.hub_cache.favorites;
+      return this.storage.hub_cache.emojidex.favorites;
     };
 
     EmojidexData.prototype.history = function(history_set) {
@@ -292,7 +292,7 @@
           history: history_set
         });
       }
-      return this.storage.hub_cache.history;
+      return this.storage.hub_cache.emojidex.history;
     };
 
     EmojidexData.prototype.categories = function(categories_set) {
@@ -301,7 +301,7 @@
           categories: categories_set
         });
       }
-      return this.storage.hub_cache.categories;
+      return this.storage.hub_cache.emojidex.categories;
     };
 
     EmojidexData.prototype.auth_info = function(auth_info_set) {
@@ -310,7 +310,7 @@
           auth_info: auth_info_set
         });
       }
-      return this.storage.hub_cache.auth_info;
+      return this.storage.hub_cache.emojidex.auth_info;
     };
 
     return EmojidexData;
