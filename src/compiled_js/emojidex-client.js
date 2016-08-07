@@ -1003,19 +1003,21 @@
     };
 
     EmojidexUser.prototype.login = function(params) {
-      switch (params.authtype) {
-        case 'plain':
-          return this.plain_auth(params.username, params.password, params.callback);
-        case 'token':
-          return this.token_auth(params.username, params.auth_token, params.callback);
-        case 'basic':
-          return this.basic_auth(params.user, params.password, params.callback);
-        case 'google':
-          return this.google_auth(params.callback);
-        case 'session':
-          return this.auth_info = this.EC.Data.auth_info();
-        default:
-          return this._auto_login();
+      if (params === null) {
+        return this._auto_login();
+      } else {
+        switch (params.authtype) {
+          case 'plain':
+            return this.plain_auth(params.username, params.password, params.callback);
+          case 'token':
+            return this.token_auth(params.username, params.auth_token, params.callback);
+          case 'basic':
+            return this.basic_auth(params.user, params.password, params.callback);
+          case 'google':
+            return this.google_auth(params.callback);
+          case 'session':
+            return this.auth_info = this.EC.Data.auth_info();
+        }
       }
     };
 
