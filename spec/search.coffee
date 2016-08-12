@@ -34,9 +34,19 @@ describe 'EmojidexSearch', ->
       expect(emoji_data).toContain(jasmine.objectContaining emoji_kiss)
       done()
 
-  it 'find', (done) ->
+  it 'find: use cached emoji', (done) ->
     EC_spec.Search.find 'kiss', (emoji_data) ->
       expect(emoji_data).toEqual(jasmine.objectContaining emoji_kiss)
+      done()
+
+  it 'find: use ajax', (done) ->
+    EC_spec.Search.find 'dragon', (emoji_data) ->
+      expect(emoji_data).toEqual(jasmine.objectContaining emoji_dragon)
+      done()
+
+  it 'find: not found', (done) ->
+    EC_spec.Search.find 'aaaaaaaa', (response) ->
+      expect(response.statusText).toEqual('Not Found')
       done()
 
   describe 'Search and page transition', ->

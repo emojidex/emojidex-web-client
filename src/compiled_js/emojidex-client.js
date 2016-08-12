@@ -947,12 +947,20 @@
       }
       $.extend(param, opts);
       return $.ajax({
-        url: this.EC.api_url + ("/emoji/" + code),
+        url: this.EC.api_url + ("emoji/" + code),
         dataType: 'json',
         data: param,
         success: (function(_this) {
           return function(response) {
             _this.EC.Emoji.combine([response]);
+            if (typeof callback === "function") {
+              callback(response);
+            }
+            return response;
+          };
+        })(this),
+        error: (function(_this) {
+          return function(response) {
             if (typeof callback === "function") {
               callback(response);
             }

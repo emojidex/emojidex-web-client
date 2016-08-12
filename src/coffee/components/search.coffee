@@ -92,11 +92,14 @@ class EmojidexSearch
     $.extend param, opts
 
     $.ajax
-      url: @EC.api_url + "/emoji/#{code}"
+      url: @EC.api_url + "emoji/#{code}"
       dataType: 'json'
       data: param
       success: (response) =>
         @EC.Emoji.combine([response])
+        callback? response
+        return response
+      error: (response) =>
         callback? response
         return response
 
