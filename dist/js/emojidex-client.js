@@ -69,6 +69,11 @@
         limit: this.EC.limit,
         detailed: this.EC.detailed
       };
+      if (this.EC.User.auth_info.token !== null) {
+        $.extend(param, {
+          auth_token: this.EC.User.auth_info.token
+        });
+      }
       $.extend(param, opts);
       this.called_func = called_func;
       this.called_data = {
