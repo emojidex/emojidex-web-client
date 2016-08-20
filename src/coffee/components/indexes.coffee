@@ -31,6 +31,7 @@ class EmojidexIndexes
           @count = 0
           callback? []
         else
+          @meta = response.meta
           @results = response.emoji
           @cur_page = response.meta.page
           @count = response.meta.count
