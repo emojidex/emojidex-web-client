@@ -722,6 +722,7 @@
               _this.count = 0;
               return typeof callback === "function" ? callback([]) : void 0;
             } else {
+              _this.meta = response.meta;
               _this.results = response.emoji;
               _this.cur_page = response.meta.page;
               _this.count = response.meta.count;
