@@ -311,6 +311,7 @@
 
     EmojidexData.prototype.auth_info = function(auth_info_set) {
       if (auth_info_set != null) {
+        this.EC.User.auth_info = auth_info_set;
         return this.storage.update('emojidex', {
           auth_info: auth_info_set
         });
