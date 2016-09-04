@@ -58,10 +58,7 @@ module.exports = (grunt) ->
         ' * <%= pkg.license.url %>\n' +
         ' *\n' +
         ' * <%= pkg.license.copyright %>\n' +
-        ' *\n' +
-        ' *\n' +
-        ' * Includes:\n' +
-        ' * --------------------------------'
+        ' */\n\n'
 
     # grunt --------------------------------
     coffee:
@@ -83,6 +80,7 @@ module.exports = (grunt) ->
       compiled_js:
         options:
           stripBanners: true
+          banner: '<%= meta.banner %>'
         src: [
           'node_modules/cross-storage/dist/client.min.js'
           'src/compiled_js/**/*.js'
@@ -95,6 +93,8 @@ module.exports = (grunt) ->
         #   manglet: true
         src: ['dist/js/emojidex-client.js']
         dest: 'dist/js/emojidex-client.min.js'
+        options:
+          banner: '<%= meta.banner %>'
 
     clean:
       spec: ['build/spec/*.js']
