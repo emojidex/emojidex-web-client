@@ -97,8 +97,20 @@ module.exports = function(grunt) {
           src: '*.slim',
           dest: 'build/',
           ext: '.html'
+        }]
+      }
+    },
+
+    // Babel configuration to convert es6 to es5~ish JS
+    babel: {
+      options: {
+        sourceMap: true,
+        presets: ['es2015']
+      },
+      dist: {
+        files: {
+          'build/js/emojidex-client.js': ['src/es6/**/*.js']
         }
-        ]
       }
     },
 
@@ -305,6 +317,7 @@ module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-slim');
+  grunt.loadNpmTasks('grunt-babel');
   grunt.loadNpmTasks('grunt-contrib-coffee');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
@@ -312,6 +325,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-este-watch');
 
-  grunt.registerTask('default', ['clean', 'slim', 'coffee', 'concat', 'uglify', 'jasmine:coverage:build']);
+  grunt.registerTask('default', ['clean', 'slim', 'babel', 'coffee', 'concat', 'uglify', 'jasmine:coverage:build']);
   grunt.registerTask('dev', ['default', 'connect', 'esteWatch']);
 }
