@@ -79,6 +79,7 @@ module.exports = function(grunt) {
     //=========================================================================
     // Grunt configurations for individual tasks
     //=========================================================================
+
     // Clean out old files / temporary files / build partials
     clean: {
       spec: ['build/spec/*.js']
@@ -190,15 +191,16 @@ module.exports = function(grunt) {
     //-------------------------------------------------------------------------
     // Grunt configurations specific to the dev runner tasks
     //-------------------------------------------------------------------------
-//    connect: {
-//      client: {},
+
+    // Local dev client for live testing
+    connect: {
+      client: {}//,
 //      hub: {
 //        options: {
 //          port: 8001
 //        }
 //      }
-//    },
-
+    },
 
     // Auto re-build watcher configuration
     esteWatch: {
@@ -307,10 +309,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-jasmine');
-//  grunt.loadNpmTasks('grunt-contrib-connect');
+  grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-este-watch');
 
   grunt.registerTask('default', ['clean', 'slim', 'coffee', 'concat', 'uglify', 'jasmine:coverage:build']);
-//  grunt.registerTask('dev', ['default', 'connect', 'esteWatch']);
-  grunt.registerTask('dev', ['default', 'esteWatch']);
+  grunt.registerTask('dev', ['default', 'connect', 'esteWatch']);
 }
