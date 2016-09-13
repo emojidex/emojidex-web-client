@@ -144,7 +144,8 @@ module.exports = function(grunt) {
         },
         src: [
           'node_modules/cross-storage/dist/client.min.js',
-          'src/compiled_js/**/*.js'
+          'src/compiled_js/**/*.js',
+          'build/js/emojidex-client.js'
         ],
         dest: 'dist/js/emojidex-client.js'
       }
@@ -219,19 +220,24 @@ module.exports = function(grunt) {
       options: {
         dirs: [
           'src/coffee/**/',
+          'src/es6/**/',
           'spec/**/'
         ],
         livereload: {
           enabled: true,
           port: 35729,
-          extensions: ['coffee']
+          extensions: ['coffee', 'js']
         }
       },
 
-      ['coffee'](filepath) {
+      ['js'](filepath) {
         let defaults = {
           coffee: {
             prop: ['coffee', 'esteWatch']
+          },
+
+          js: {
+            prop: ['js', 'esteWatch']
           },
 
           jasmine: {
@@ -256,7 +262,7 @@ module.exports = function(grunt) {
 
         let define_list = {
           client: {
-            pattern: "src/coffee/**/*",
+            pattern: "src/**/*",
             config: {
               prop: defaults.jasmine.prop,
               value: {
@@ -269,7 +275,8 @@ module.exports = function(grunt) {
               }
             },
             task: [
-              'coffee:client',
+              'babel',
+              'coffee',
               'concat',
               'uglify',
               defaults.jasmine.prop.join(':') + ':build'

@@ -1,5 +1,5 @@
 (function() {
-  var EmojidexCategories, EmojidexData, EmojidexDataStorage, EmojidexEmoji, EmojidexIndexes, EmojidexSearch, EmojidexUser, EmojidexUserFavorites, EmojidexUserHistory, EmojidexUtil,
+  var EmojidexCategories, EmojidexData, EmojidexDataStorage, EmojidexEmoji, EmojidexIndexes, EmojidexSearch, EmojidexUser, EmojidexUserFavorites, EmojidexUserHistory,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   this.EmojidexClient = (function() {
@@ -1341,54 +1341,6 @@
     };
 
     return EmojidexUserHistory;
-
-  })();
-
-  EmojidexUtil = (function() {
-    function EmojidexUtil(EC) {
-      this.EC = EC;
-    }
-
-    EmojidexUtil.prototype.escape_term = function(term) {
-      return term.replace(/\s/g, '_').replace(/(\(|\))/g, '\\$1');
-    };
-
-    EmojidexUtil.prototype.de_escape_term = function(term) {
-      return term.replace(/_/g, ' ');
-    };
-
-    EmojidexUtil.prototype.breakout = function(items) {
-      if (items != null) {
-        if (items instanceof Array) {
-          return items;
-        } else {
-          return [items];
-        }
-      } else {
-        return [];
-      }
-    };
-
-    EmojidexUtil.prototype.simplify = function(emoji, size_code) {
-      var j, len, moji, results1;
-      if (emoji == null) {
-        emoji = this.results;
-      }
-      if (size_code == null) {
-        size_code = this.EC.size_code;
-      }
-      results1 = [];
-      for (j = 0, len = emoji.length; j < len; j++) {
-        moji = emoji[j];
-        results1.push({
-          code: this.escape_term(moji.code),
-          img_url: this.EC.cdn_url + "/" + size_code + "/" + (this.escape_term(moji.code)) + ".png"
-        });
-      }
-      return results1;
-    };
-
-    return EmojidexUtil;
 
   })();
 
