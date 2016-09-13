@@ -8,53 +8,27 @@ module.exports = function(grunt) {
     let dotenv = require('dotenv');
     dotenv.config();
 
-    let output = this.user_info = {
-      auth_user: '${process.env.USERNAME}',
-      email: '${process.env.EMAIL}',
-      password: '${process.env.PASSWORD}',
-      auth_token: '${process.env.AUTH_TOKEN}'
-    };
+    let output = `
+      this.ser_info = {
+        auth_user: '${process.env.USERNAME}',
+        email: '${process.env.EMAIL}',
+        password: '${process.env.PASSWORD}',
+        auth_token: '${process.env.AUTH_TOKEN}'
+      };
 
-    this.premium_user_info = {
-      auth_user: '${process.env.USERNAME}',
-      auth_token: '${process.env.AUTH_TOKEN}'
-    };
+      this.premium_user_info = {
+        auth_user: '${process.env.USERNAME}',
+        auth_token: '${process.env.AUTH_TOKEN}'
+      };
+    `;
 
 
-    grunt.file.write('tmp/authinfo.js', output);
+    grunt.file.write('tmp/authinfo.js', JSON.stringify(output));
   } else { // .env file wasn't found
     grunt.log.writeln("*.env file not found; only some specs will run.*");
     grunt.log.writeln("Check the '.env' secion in README.md for details on how to set .env");
     grunt.file.write('tmp/authinfo.js', "");
   }
-
-  // ?
-  let getDefineUsePattern = function(filepath, define_list) {
-    let iterable = Object.keys(define_list);
-    for (let i = 0; i < iterable.length; i++) {
-      let define_name = iterable[i];
-      let path_patterns = define_list[define_name].pattern;
-      if (!Array.isArray(path_patterns)) { path_patterns = [path_patterns]; }
-      for (let j = 0; j < path_patterns.length; j++) {
-        let path_pattern = path_patterns[j];
-        if (grunt.file.minimatch(filepath, path_pattern)) {
-          return define_list[define_name];
-          break;
-        }
-      }
-    }
-  };
-
-  let setGruntConfig_getTask = function(define) {
-    if (define.config != null) {
-      if (!Array.isArray(define.config)) { define.config = [define.config]; }
-      for (let i = 0; i < define.config.length; i++) {
-        let config = define.config[i];
-        grunt.config(config.prop, config.value);
-      }
-    }
-    return define.task;
-  };
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
@@ -169,22 +143,19 @@ module.exports = function(grunt) {
         ],
         options: {
           specs: 'spec/*.js',
-          helpers: 'spec/helpers/*.js',
-          template: require('grunt-template-jasmine-istanbul')
+          helpers:[
+            'spec/helpers/method.js',
+            'spec/helpers/data.js',
+            'tmp/authinfo.js'
+          ],
+          keepRunner: true,
+          outfile: 'build/_SpecRunner.html',
+          vendor:[
+            'node_modules/jquery/dist/jquery.min.js',
+            'node_modules/babel-polyfill/dist/polyfill.min.js'
+          ],
+          template: 'node_modules/grunt-template-jasmine-istanbul/src/main/js/template.js'//require('grunt-template-jasmine-istanbul')
         }
-      },
-      options: {
-        keepRunner: true,
-        outfile: 'build/_SpecRunner.html',
-        vendor:[
-          'node_modules/jquery/dist/jquery.min.js',
-          'node_modules/promise-polyfill/Promise.min.js'
-        ],
-        helpers:[
-          'build/spec/helpers/method.js',
-          'build/spec/helpers/data.js',
-          'tmp/authinfo.js'
-        ]
       }
     },
 
@@ -203,103 +174,18 @@ module.exports = function(grunt) {
     },
 
     // Auto re-build watcher configuration
-    esteWatch: {
-      options: {
-        dirs: [
-          'src/coffee/**/',
-          'src/es6/**/',
-          'spec/**/'
+    watch: {
+      scripts: {
+        files: ['src/es6/**/*.js', 'spec/**/*.js'],
+        tasks: [
+          'babel',
+          'concat',
+          'uglify',
+          'jasmine:coverage:build'
         ],
-        livereload: {
-          enabled: true,
-          port: 35729,
-          extensions: ['js']
+        options: {
+          spawn: false
         }
-      },
-
-      ['js'](filepath) {
-        let defaults = {
-          js: {
-            prop: ['js', 'esteWatch']
-          },
-
-          jasmine: {
-            prop: ['jasmine', 'esteWatch'],
-            value: {
-              src: ['dist/js/emojidex-client.js']
-            }
-          }
-        };
-
-        let spec_file = "";
-        if (path.basename(filepath, '.js')[0] === "_") {
-          let divided_path = path.dirname(filepath).split('/');
-          spec_file = divided_path[divided_path.length - 1];
-        } else {
-          spec_file = path.basename(filepath, '.js');
-        }
-
-        if (spec_file === 'data') {
-          spec_file = '1_data';
-        }
-
-        let define_list = {
-          client: {
-            pattern: "src/**/*",
-            config: {
-              prop: defaults.jasmine.prop,
-              value: {
-                src: defaults.jasmine.value.src,
-                options: {
-                  specs: [
-                    `build/spec/${spec_file}.js`
-                  ]
-                }
-              }
-            },
-            task: [
-              'babel',
-              'concat',
-              'uglify',
-              defaults.jasmine.prop.join(':') + ':build'
-            ]
-          },
-
-          spec: {
-            pattern: 'spec/**/*',
-            config: [
-              {
-                prop: defaults.coffee.prop,
-                value: {
-                  options: {
-                    bare: true
-                  },
-                  expand: true,
-                  src: filepath,
-                  dest: 'build/',
-                  ext: '.js'
-                }
-              },
-              {
-                prop: defaults.jasmine.prop,
-                value: {
-                  src: defaults.jasmine.value.src,
-                  options: {
-                    specs: `build/${path.dirname(filepath)}/${path.basename(filepath, '.js')}.js`,
-                    display: "full",
-                    summary: true
-                  }
-                }
-              }
-            ],
-            task: [
-              defaults.coffee.prop.join(':'),
-              defaults.jasmine.prop.join(':') + ':build'
-            ]
-          }
-        };
-
-        return setGruntConfig_getTask(getDefineUsePattern(filepath, define_list));
       }
     }
   });
@@ -312,8 +198,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-jasmine');
   grunt.loadNpmTasks('grunt-contrib-connect');
-  grunt.loadNpmTasks('grunt-este-watch');
+  grunt.loadNpmTasks('grunt-contrib-watch');
 
   grunt.registerTask('default', ['clean', 'slim', 'babel', 'coffee', 'concat', 'uglify', 'jasmine:coverage:build']);
-  grunt.registerTask('dev', ['default', 'connect', 'esteWatch']);
+  //grunt.registerTask('default', ['clean', 'slim', 'babel', 'coffee', 'concat', 'uglify']);
+  grunt.registerTask('dev', ['default', 'connect', 'watch']);
 }
