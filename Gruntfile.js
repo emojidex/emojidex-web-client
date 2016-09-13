@@ -123,17 +123,17 @@ module.exports = function(grunt) {
         files: {
           'src/compiled_js/emojidex-client.js': ['src/coffee/**/*.coffee']
         }
-      },
-      spec: {
-        options: {
-          bare: true
-        },
-        expand: true,
-        cwd: 'spec/',
-        src: ['**/*.coffee'],
-        dest: 'build/spec/',
-        ext: '.js'
-      }
+      }//,
+      //spec: {
+      //  options: {
+      //    bare: true
+      //  },
+      //  expand: true,
+      //  cwd: 'spec/',
+      //  src: ['**/*.coffee'],
+      //  dest: 'build/spec/',
+      //  ext: '.js'
+      //}
     },
 
     // Concat files together into one script
@@ -168,22 +168,9 @@ module.exports = function(grunt) {
           'dist/js/emojidex-client.js'
         ],
         options: {
-          specs: 'build/spec/*.js',
-          template: require('grunt-template-jasmine-istanbul'),
-          templateOptions: {
-            coverage: 'build/spec/coverage/coverage.json',
-            report: [
-              {
-                type: 'html',
-                options: { dir: 'build/spec/coverage/html' }
-              },
-              {
-                type: 'cobertura',
-                options: { dir: 'build/spec/coverage/cobertura' }
-              },
-              { type: 'text-summary' }
-            ]
-          }
+          specs: 'spec/*.js',
+          helpers: 'spec/helpers/*.js',
+          template: require('grunt-template-jasmine-istanbul')
         }
       },
       options: {
@@ -226,16 +213,12 @@ module.exports = function(grunt) {
         livereload: {
           enabled: true,
           port: 35729,
-          extensions: ['coffee', 'js']
+          extensions: ['js']
         }
       },
 
       ['js'](filepath) {
         let defaults = {
-          coffee: {
-            prop: ['coffee', 'esteWatch']
-          },
-
           js: {
             prop: ['js', 'esteWatch']
           },
@@ -249,11 +232,11 @@ module.exports = function(grunt) {
         };
 
         let spec_file = "";
-        if (path.basename(filepath, '.coffee')[0] === "_") {
+        if (path.basename(filepath, '.js')[0] === "_") {
           let divided_path = path.dirname(filepath).split('/');
           spec_file = divided_path[divided_path.length - 1];
         } else {
-          spec_file = path.basename(filepath, '.coffee');
+          spec_file = path.basename(filepath, '.js');
         }
 
         if (spec_file === 'data') {
@@ -276,7 +259,6 @@ module.exports = function(grunt) {
             },
             task: [
               'babel',
-              'coffee',
               'concat',
               'uglify',
               defaults.jasmine.prop.join(':') + ':build'
@@ -303,7 +285,7 @@ module.exports = function(grunt) {
                 value: {
                   src: defaults.jasmine.value.src,
                   options: {
-                    specs: `build/${path.dirname(filepath)}/${path.basename(filepath, '.coffee')}.js`,
+                    specs: `build/${path.dirname(filepath)}/${path.basename(filepath, '.js')}.js`,
                     display: "full",
                     summary: true
                   }
