@@ -153,8 +153,7 @@ module.exports = function(grunt) {
           vendor:[
             'node_modules/jquery/dist/jquery.min.js',
             'node_modules/babel-polyfill/dist/polyfill.min.js'
-          ],
-          template: 'node_modules/grunt-template-jasmine-istanbul/src/main/js/template.js'//require('grunt-template-jasmine-istanbul')
+          ]
         }
       }
     },
