@@ -6,12 +6,10 @@ describe('EmojidexData', function() {
     })
   );
 
-  it('has the Data class defined', () => expect(EC_spec.Data).toBeDefined()
-  );
+  it('has the Data class defined', () => expect(EC_spec.Data).toBeDefined());
 
-  return describe('initialize', function() {
-    it('first access to storage', () => expect(EC_spec.Data.storage.isEmpty('emojidex')).toBe(false)
-    );
+  describe('initialize', function() {
+    it('first access to storage', () => expect(EC_spec.Data.storage.isEmpty('emojidex')).toBe(false));
 
     describe('check initialize data', function() {
       it('emojidex.emoji', () => expect(EC_spec.Data.storage.get('emojidex.emoji')).toEqual([])
@@ -23,20 +21,15 @@ describe('EmojidexData', function() {
       // TODO: this example is not correct.
       // it 'emojidex.categories', ->
       //   expect(EC_spec.Data.storage.get 'emojidex.categories').toEqual([])
-      return it('emojidex.auth_info', () =>
+      it('emojidex.auth_info', () =>
         expect(EC_spec.Data.storage.get('emojidex.auth_info')).toEqual({status: 'none', user: '',
         token: null, r18: false, premium: false, premium_exp: null, pro: false, pro_exp: null})
-      
       );
-    }
-    );
+    });
 
-    return it('after', function() {
+    it('after', function() {
       expect(EC_spec.Data.storage.isEmpty('emojidex')).toBe(false);
-      return expect(EC_spec.Data.storage.keys('emojidex')).toEqual(['emoji', 'history', 'favorites', 'categories', 'auth_info', 'cdn_url']);
-    }
-    );
-  }
-  );
-}
-);
+      expect(EC_spec.Data.storage.keys('emojidex')).toEqual(['emoji', 'history', 'favorites', 'categories', 'auth_info', 'cdn_url']);
+    });
+  });
+});

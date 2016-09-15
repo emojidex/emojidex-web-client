@@ -10,44 +10,37 @@ describe('EmojidexCategories', function() {
     EC_spec.Categories.getEmoji('faces', function(emojis, called_data) {
       expect(called_data.category_name).toEqual('faces');
       expect(emojis).toContain(jasmine.objectContaining(faces_emoji[0]));
-      return done();
-    }
-    )
-  
+      done();
+    })
   );
 
   it('next', function(done) {
     EC_spec.Categories.called_data.callback = function() {
       expect(EC_spec.Categories.cur_page).toEqual(2);
-      return done();
+      done();
     };
-    return EC_spec.Categories.next();
-  }
-  );
+    EC_spec.Categories.next();
+  });
 
   it('prev', function(done) {
     EC_spec.Categories.called_data.callback = function() {
       expect(EC_spec.Categories.cur_page).toEqual(1);
-      return done();
+      done();
     };
-    return EC_spec.Categories.prev();
-  }
-  );
+    EC_spec.Categories.prev();
+  });
 
   it('sync', done =>
     EC_spec.Categories.sync(function(categories) {
       expect(categories.length).toBeTruthy();
-      return done();
+      done();
     })
-  
   );
 
-  return it('all', done =>
+  it('all', done =>
     EC_spec.Categories.all(function(categories) {
       expect(categories).toBeTruthy();
-      return done();
+      done();
     })
-  
   );
-}
-);
+});
