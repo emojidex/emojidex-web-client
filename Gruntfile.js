@@ -8,8 +8,8 @@ module.exports = function(grunt) {
     let dotenv = require('dotenv');
     dotenv.config();
 
-    let output = `
-      this.ser_info = {
+    output = `
+      this.user_info = {
         auth_user: '${process.env.USERNAME}',
         email: '${process.env.EMAIL}',
         password: '${process.env.PASSWORD}',
@@ -23,7 +23,7 @@ module.exports = function(grunt) {
     `;
 
 
-    grunt.file.write('tmp/authinfo.js', JSON.stringify(output));
+    grunt.file.write('tmp/authinfo.js', output);
   } else { // .env file wasn't found
     grunt.log.writeln("*.env file not found; only some specs will run.*");
     grunt.log.writeln("Check the '.env' secion in README.md for details on how to set .env");
