@@ -1412,4 +1412,4 @@ var EmojidexUtil = function () {
 
   return EmojidexUtil;
 }();
-//# sourceMappingURL=emojidex-client.js.map
+//# sourceMappingURL=util.js.map

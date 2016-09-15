@@ -82,9 +82,13 @@ module.exports = function(grunt) {
         presets: ['es2015']
       },
       dist: {
-        files: {
-          'build/js/emojidex-client.js': ['src/es6/**/*.js']
-        }
+        files: [{
+          expand: true,  
+          cwd: 'src/es6',
+          src: ['**/*.js'],
+          dest: 'build/js/',
+          ext: '.js'
+        }]
       }
     },
 
@@ -119,7 +123,7 @@ module.exports = function(grunt) {
         src: [
           'node_modules/cross-storage/dist/client.min.js',
           'src/compiled_js/**/*.js',
-          'build/js/emojidex-client.js'
+          'build/js/**/*.js'
         ],
         dest: 'dist/js/emojidex-client.js'
       }
@@ -137,22 +141,22 @@ module.exports = function(grunt) {
 
     // Setup Jasmine spec coverage
     jasmine: {
-      src: [
-        'dist/js/emojidex-client.js'
-      ],
-      options: {
-        specs: 'spec/*.js',
-        helpers:[
-          'spec/helpers/method.js',
-          'spec/helpers/data.js',
-          'tmp/authinfo.js'
-        ],
-        vendor:[
-          'node_modules/jquery/dist/jquery.min.js',
-          'node_modules/babel-polyfill/dist/polyfill.min.js'
-        ],
-        keepRunner: true,
-        outfile: 'build/_SpecRunner.html'
+      client: {
+        src: ['dist/js/emojidex-client.js'],
+        options: {
+          specs: ['spec/*.js'],
+          helpers:[
+            'spec/helpers/method.js',
+            'spec/helpers/data.js',
+            'tmp/authinfo.js'
+          ],
+          vendor:[
+            'node_modules/jquery/dist/jquery.min.js',
+            'node_modules/babel-polyfill/dist/polyfill.min.js'
+          ],
+          keepRunner: true,
+          outfile: 'build/_SpecRunner.html'
+        }
       }
     },
 
@@ -198,6 +202,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
 
   grunt.registerTask('default', ['clean', 'slim', 'babel', 'coffee', 'concat', 'uglify']);
-  grunt.registerTask('spec', ['default', 'jasmine']);
-  grunt.registerTask('dev', ['default', 'connect', 'watch']);
+  grunt.registerTask('spec', ['default', 'jasmine:client:build', 'jasmine']);
+  grunt.registerTask('dev', ['default', 'connect', 'jasmine:client:build', 'watch']);
 }
