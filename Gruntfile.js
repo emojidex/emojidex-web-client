@@ -137,24 +137,22 @@ module.exports = function(grunt) {
 
     // Setup Jasmine spec coverage
     jasmine: {
-      coverage: {
-        src: [
-          'dist/js/emojidex-client.js'
+      src: [
+        'dist/js/emojidex-client.js'
+      ],
+      options: {
+        specs: 'spec/*.js',
+        helpers:[
+          'spec/helpers/method.js',
+          'spec/helpers/data.js',
+          'tmp/authinfo.js'
         ],
-        options: {
-          specs: 'spec/*.js',
-          helpers:[
-            'spec/helpers/method.js',
-            'spec/helpers/data.js',
-            'tmp/authinfo.js'
-          ],
-          keepRunner: true,
-          outfile: 'build/_SpecRunner.html',
-          vendor:[
-            'node_modules/jquery/dist/jquery.min.js',
-            'node_modules/babel-polyfill/dist/polyfill.min.js'
-          ]
-        }
+        vendor:[
+          'node_modules/jquery/dist/jquery.min.js',
+          'node_modules/babel-polyfill/dist/polyfill.min.js'
+        ],
+        keepRunner: true,
+        outfile: 'build/_SpecRunner.html'
       }
     },
 
@@ -180,7 +178,7 @@ module.exports = function(grunt) {
           'babel',
           'concat',
           'uglify',
-          'jasmine:coverage:build'
+          'jasmine'
         ],
         options: {
           spawn: false
@@ -199,7 +197,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-contrib-watch');
 
-  grunt.registerTask('default', ['clean', 'slim', 'babel', 'coffee', 'concat', 'uglify', 'jasmine:coverage:build']);
-  //grunt.registerTask('default', ['clean', 'slim', 'babel', 'coffee', 'concat', 'uglify']);
+  grunt.registerTask('default', ['clean', 'slim', 'babel', 'coffee', 'concat', 'uglify']);
+  grunt.registerTask('spec', ['default', 'jasmine']);
   grunt.registerTask('dev', ['default', 'connect', 'watch']);
 }
