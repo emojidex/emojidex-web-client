@@ -1357,6 +1357,7 @@ var EmojidexUtil = function () {
   function EmojidexUtil(EC) {
     _classCallCheck(this, EmojidexUtil);
 
+    if (EC == null) EC = new EmojidexClient();
     this.EC = EC;
   }
 
@@ -1375,6 +1376,22 @@ var EmojidexUtil = function () {
     key: 'de_escape_term',
     value: function de_escape_term(term) {
       return term.replace(/_/g, ' ');
+    }
+
+    // Adds colons around a code
+
+  }, {
+    key: 'encapsulate_code',
+    value: function encapsulate_code(code) {
+      return ':' + this.unencapsulate_code(code) + ':';
+    }
+
+    // Removes colons around a code
+
+  }, {
+    key: 'unencapsulate_code',
+    value: function unencapsulate_code(code) {
+      return code.replace(/\:/g, '');
     }
 
     // Breakout into an array
