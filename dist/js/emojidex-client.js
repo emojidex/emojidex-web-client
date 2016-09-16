@@ -7,9 +7,13 @@
     function EmojidexClient(options) {
       this.env = {
         api_ver: 1,
+        cdn_proto: 'http://',
         cdn_addr: 'cdn.emojidex.com',
+        s_cdn_proto: 'https://',
         s_cdn_addr: '',
+        asset_proto: 'http://',
         asset_addr: 'assets.emojidex.com',
+        s_asset_proto: 'https://',
         s_asset_addr: ''
       };
       this.defaults = {
@@ -1424,6 +1428,42 @@ var EmojidexUtil = function () {
       }
 
       return emoji;
+    }
+
+    // Returns an HTML image/link tag for an emoji from an emoji object
+
+  }, {
+    key: 'emoji_to_html',
+    value: function emoji_to_html(emoji) {
+      var size_code = arguments.length <= 1 || arguments[1] === undefined ? this.EC.defaults.size_code : arguments[1];
+
+      var img = '<img src=\'http://' + this.EC.env.cdn_addr + '/emoji/' + this.EC.defaults.size_code + '/' + this.escape_term(emoji.code) + '.png\' emoji-code=\'' + this.escape_term(emoji.code) + '\' alt=\'' + this.de_escape_term(emoji.code) + '\' />';
+      if (emoji.link != null && emoji.link != '') return '<a href=\'' + emoji.link + '\' emoji-code=\'' + this.escape_term(emoji.code) + '\'>' + img + '</a>';
+      return img;
+    }
+
+    // Returns a MarkDown image/link tag for an emoji from an emoji object
+
+  }, {
+    key: 'emoji_to_md',
+    value: function emoji_to_md(emoji) {
+      var size_code = arguments.length <= 1 || arguments[1] === undefined ? this.EC.defaults.size_code : arguments[1];
+
+      var img = '![' + emoji.code + '](http://' + this.EC.env.cdn_addr + '/emoji/' + size_code + '/' + this.escape_term(emoji.code) + '.png "' + this.de_escape_term(emoji.code) + ' em😜ji")';
+      if (emoji.link != null && emoji.link != '') return '[' + img + ' ](' + emoji.link + ')';
+      return img;
+    }
+  }, {
+    key: 'de_emojify_html',
+    value: function de_emojify_html(source) {
+      //so = $(source);
+      //remove links
+      source.find("a[emoji-code]").contents().unwrap();
+
+      //change emoji images to encapsulated and de_escaped codes
+      //TODO
+
+      return so;
     }
   }]);
 
