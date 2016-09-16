@@ -1,5 +1,7 @@
 class EmojidexUtil {
   constructor(EC) {
+    if (EC == null)
+      EC = new EmojidexClient();
     this.EC = EC;
   }
 
@@ -11,6 +13,16 @@ class EmojidexUtil {
   // De-Escapes underscores to spaces
   de_escape_term(term) {
     return term.replace(/_/g, ' ');
+  }
+
+  // Adds colons around a code
+  encapsulate_code(code) {
+    return `:${this.unencapsulate_code(code)}:`;
+  }
+
+  // Removes colons around a code
+  unencapsulate_code(code) {
+    return code.replace(/\:/g, '')
   }
 
   // Breakout into an array
