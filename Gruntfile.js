@@ -121,6 +121,7 @@ module.exports = function(grunt) {
           stripBanners: true
         },
         src: [
+          'node_modules/babel-polyfill/dist/polyfill.min.js',
           'node_modules/cross-storage/dist/client.min.js',
           'src/compiled_js/**/*.js',
           'build/js/**/*.js'
@@ -151,8 +152,7 @@ module.exports = function(grunt) {
             'tmp/authinfo.js'
           ],
           vendor:[
-            'node_modules/jquery/dist/jquery.min.js',
-            'node_modules/babel-polyfill/dist/polyfill.min.js'
+            'node_modules/jquery/dist/jquery.min.js'
           ],
           keepRunner: true,
           outfile: 'build/_SpecRunner.html'
