@@ -7,13 +7,9 @@
     function EmojidexClient(options) {
       this.env = {
         api_ver: 1,
-        cdn_proto: 'http://',
         cdn_addr: 'cdn.emojidex.com',
-        s_cdn_proto: 'https://',
         s_cdn_addr: '',
-        asset_proto: 'http://',
         asset_addr: 'assets.emojidex.com',
-        s_asset_proto: 'https://',
         s_asset_addr: ''
       };
       this.defaults = {
@@ -1351,7 +1347,7 @@
 
 }).call(this);
 
-'use strict';
+"use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -1363,13 +1359,17 @@ var EmojidexUtil = function () {
 
     if (EC == null) EC = new EmojidexClient();
     this.EC = EC;
+
+    this.a_pattern = RegExp("<a href='[^']*' emoji-code='[^']*'><img src='[^']*' emoji-code='[^']*' alt='[^']*' \/><\/a>", 'g');
+    this.img_pattern = RegExp("<img src='[^']*' emoji-code='[^']*' alt='[^']*' \/>", 'g');
+    this.emoji_code_pattern = RegExp("emoji-code='([^']*)'", '');
   }
 
   // Escapes spaces to underscore
 
 
   _createClass(EmojidexUtil, [{
-    key: 'escape_term',
+    key: "escape_term",
     value: function escape_term(term) {
       return term.replace(/\s/g, '_').replace(/(\(|\))/g, '\\$1');
     }
@@ -1377,7 +1377,7 @@ var EmojidexUtil = function () {
     // De-Escapes underscores to spaces
 
   }, {
-    key: 'de_escape_term',
+    key: "de_escape_term",
     value: function de_escape_term(term) {
       return term.replace(/_/g, ' ');
     }
@@ -1385,15 +1385,15 @@ var EmojidexUtil = function () {
     // Adds colons around a code
 
   }, {
-    key: 'encapsulate_code',
+    key: "encapsulate_code",
     value: function encapsulate_code(code) {
-      return ':' + this.unencapsulate_code(code) + ':';
+      return ":" + this.unencapsulate_code(code) + ":";
     }
 
     // Removes colons around a code
 
   }, {
-    key: 'unencapsulate_code',
+    key: "unencapsulate_code",
     value: function unencapsulate_code(code) {
       return code.replace(/\:/g, '');
     }
@@ -1401,7 +1401,7 @@ var EmojidexUtil = function () {
     // Breakout into an array
 
   }, {
-    key: 'breakout',
+    key: "breakout",
     value: function breakout(items) {
       if (items != null) {
         if (items instanceof Array) {
@@ -1417,14 +1417,14 @@ var EmojidexUtil = function () {
     // Converts an emoji array to [{code: "moji_code", img_url: "http://cdn...moji_code.png}] format
 
   }, {
-    key: 'simplify',
+    key: "simplify",
     value: function simplify() {
       var emoji = arguments.length <= 0 || arguments[0] === undefined ? this.results : arguments[0];
       var size_code = arguments.length <= 1 || arguments[1] === undefined ? this.EC.size_code : arguments[1];
 
       for (i = 0; i < emoji.length; i++) {
         emoji[i].code = this.escape_term(emoji[i].code);
-        emoji[i].img_url = this.EC.cdn_url + '/' + size_code + '/' + this.escape_term(emoji[i].code) + '.png';
+        emoji[i].img_url = this.EC.cdn_url + "/" + size_code + "/" + this.escape_term(emoji[i].code) + ".png";
       }
 
       return emoji;
@@ -1433,37 +1433,100 @@ var EmojidexUtil = function () {
     // Returns an HTML image/link tag for an emoji from an emoji object
 
   }, {
-    key: 'emoji_to_html',
+    key: "emoji_to_html",
     value: function emoji_to_html(emoji) {
       var size_code = arguments.length <= 1 || arguments[1] === undefined ? this.EC.defaults.size_code : arguments[1];
 
-      var img = '<img src=\'http://' + this.EC.env.cdn_addr + '/emoji/' + this.EC.defaults.size_code + '/' + this.escape_term(emoji.code) + '.png\' emoji-code=\'' + this.escape_term(emoji.code) + '\' alt=\'' + this.de_escape_term(emoji.code) + '\' />';
-      if (emoji.link != null && emoji.link != '') return '<a href=\'' + emoji.link + '\' emoji-code=\'' + this.escape_term(emoji.code) + '\'>' + img + '</a>';
+      var img = "<img src='http://" + this.EC.env.cdn_addr + "/emoji/" + this.EC.defaults.size_code + "/" + this.escape_term(emoji.code) + ".png' emoji-code='" + (emoji.moji == null || emoji.moji == '' ? this.encapsulate_code(this.escape_term(emoji.code)) : emoji.moji) + "' alt='" + this.de_escape_term(emoji.code) + "' />";
+      if (emoji.link != null && emoji.link != '') return "<a href='" + emoji.link + "' emoji-code='" + this.encapsulate_code(this.escape_term(emoji.code)) + "'>" + img + "</a>";
       return img;
     }
 
     // Returns a MarkDown image/link tag for an emoji from an emoji object
 
   }, {
-    key: 'emoji_to_md',
+    key: "emoji_to_md",
     value: function emoji_to_md(emoji) {
       var size_code = arguments.length <= 1 || arguments[1] === undefined ? this.EC.defaults.size_code : arguments[1];
 
-      var img = '![' + emoji.code + '](http://' + this.EC.env.cdn_addr + '/emoji/' + size_code + '/' + this.escape_term(emoji.code) + '.png "' + this.de_escape_term(emoji.code) + ' em😜ji")';
-      if (emoji.link != null && emoji.link != '') return '[' + img + ' ](' + emoji.link + ')';
+      var img = "![" + emoji.code + "](http://" + this.EC.env.cdn_addr + "/emoji/" + size_code + "/" + this.escape_term(emoji.code) + ".png \"" + this.de_escape_term(emoji.code) + " em😜ji\")";
+      if (emoji.link != null && emoji.link != '') return "[" + img + " ](" + emoji.link + ")";
       return img;
     }
+
+    // Change emoji HTML tags into emoji codes and returns a string
+    // *This method takes a string and returns a string, such as the contents of 
+    // a text box/content editable element, NOT a DOM object.
+
   }, {
-    key: 'de_emojify_html',
+    key: "de_emojify_html",
     value: function de_emojify_html(source) {
-      //so = $(source);
-      //remove links
-      source.find("a[emoji-code]").contents().unwrap();
+      source = this.de_link_html(source);
 
-      //change emoji images to encapsulated and de_escaped codes
-      //TODO
+      var found = source.match(this.img_pattern);
 
-      return so;
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = found[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          find = _step.value;
+
+          source = source.replace(find, find.match(this.emoji_code_pattern)[1]);
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+
+      return source;
+    }
+
+    // Remove links from wrapped emoji images in HTML
+    // *Only do this if you need to remove links for functionality.
+
+  }, {
+    key: "de_link_html",
+    value: function de_link_html(source) {
+      var found = source.match(this.a_pattern);
+
+      var _iteratorNormalCompletion2 = true;
+      var _didIteratorError2 = false;
+      var _iteratorError2 = undefined;
+
+      try {
+        for (var _iterator2 = found[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          find = _step2.value;
+
+          source = source.replace(find, find.match(this.img_pattern)[0]);
+        }
+      } catch (err) {
+        _didIteratorError2 = true;
+        _iteratorError2 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion2 && _iterator2.return) {
+            _iterator2.return();
+          }
+        } finally {
+          if (_didIteratorError2) {
+            throw _iteratorError2;
+          }
+        }
+      }
+
+      return source;
     }
   }]);
 

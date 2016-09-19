@@ -3,6 +3,10 @@ class EmojidexUtil {
     if (EC == null)
       EC = new EmojidexClient();
     this.EC = EC;
+
+    this.a_pattern = RegExp("<a href='[^']*' emoji-code='[^']*'><img src='[^']*' emoji-code='[^']*' alt='[^']*' \/><\/a>", 'g');
+    this.img_pattern = RegExp("<img src='[^']*' emoji-code='[^']*' alt='[^']*' \/>", 'g');
+    this.emoji_code_pattern = RegExp("emoji-code='([^']*)'", '');
   }
 
   // Escapes spaces to underscore
@@ -51,9 +55,9 @@ class EmojidexUtil {
 
   // Returns an HTML image/link tag for an emoji from an emoji object
   emoji_to_html(emoji, size_code = this.EC.defaults.size_code) {
-    let img = `<img src='http://${this.EC.env.cdn_addr}/emoji/${this.EC.defaults.size_code}/${this.escape_term(emoji.code)}.png' emoji-code='${this.escape_term(emoji.code)}' alt='${this.de_escape_term(emoji.code)}' />`;
+    let img = `<img src='http://${this.EC.env.cdn_addr}/emoji/${this.EC.defaults.size_code}/${this.escape_term(emoji.code)}.png' emoji-code='${(emoji.moji == null || emoji.moji == '')? this.encapsulate_code(this.escape_term(emoji.code)) : emoji.moji}' alt='${this.de_escape_term(emoji.code)}' />`;
     if(emoji.link != null && emoji.link != '')
-      return `<a href='${emoji.link}' emoji-code='${this.escape_term(emoji.code)}'>${img}</a>`;
+      return `<a href='${emoji.link}' emoji-code='${this.encapsulate_code(this.escape_term(emoji.code))}'>${img}</a>`;
     return img;
   }
 
@@ -65,14 +69,30 @@ class EmojidexUtil {
     return img;
   }
 
+  // Change emoji HTML tags into emoji codes and returns a string
+  // *This method takes a string and returns a string, such as the contents of 
+  // a text box/content editable element, NOT a DOM object.
   de_emojify_html(source) {
-    //so = $(source);
-    //remove links
-    source.find("a[emoji-code]").contents().unwrap();
+    source = this.de_link_html(source);
 
-    //change emoji images to encapsulated and de_escaped codes
-    //TODO
+    let found = source.match(this.img_pattern);
 
-    return so;
+    for (find of found) {
+      source = source.replace(find, find.match(this.emoji_code_pattern)[1]);
+    }
+
+    return source;
+  }
+
+  // Remove links from wrapped emoji images in HTML
+  // *Only do this if you need to remove links for functionality.
+  de_link_html(source) {
+    let found = source.match(this.a_pattern);
+
+    for (find of found) {
+      source = source.replace(find, find.match(this.img_pattern)[0]);
+    }
+
+    return source;
   }
 }

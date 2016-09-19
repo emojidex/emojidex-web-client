@@ -32,7 +32,7 @@ describe('EmojidexUtil', function() {
   it('converts an emoji object into an HTML tag set', done => 
     EC_spec.Search.find('red_car', function(emoji) {
       expect(EC_spec.Util.emoji_to_html(emoji)).toBe(
-        "<img src='http://cdn.emojidex.com/emoji/px32/red_car.png' emoji-code='red_car' alt='red car' />");
+        "<img src='http://cdn.emojidex.com/emoji/px32/red_car.png' emoji-code='🚗' alt='red car' />");
       done();
     })
   );
@@ -40,7 +40,7 @@ describe('EmojidexUtil', function() {
   it('converts an emoji object into an HTML tag set with link', done =>
     EC_spec.Search.find('emojidex', function(emoji) {
       expect(EC_spec.Util.emoji_to_html(emoji)).toBe(
-          "<a href='https://www.emojidex.com' emoji-code='emojidex'><img src='http://cdn.emojidex.com/emoji/px32/emojidex.png' emoji-code='emojidex' alt='emojidex' /></a>");
+          "<a href='https://www.emojidex.com' emoji-code=':emojidex:'><img src='http://cdn.emojidex.com/emoji/px32/emojidex.png' emoji-code=':emojidex:' alt='emojidex' /></a>");
       done();
     })
   );
@@ -64,11 +64,11 @@ describe('EmojidexUtil', function() {
 
   it('converts text with emoji html in it to plain text with emoji short codes', function() {
     test_text = "Test text <img src='http://cdn.emojidex.com/emoji/px32/red_car.png' "
-      + "emoji-code='red_car' alt='red car' />テスト<a href='https://www.emojidex.com' "
-      + "emoji-code='emojidex'><img src='http://cdn.emojidex.com/emoji/px32/emojidex.png' "
-      + "emoji-code='emojidex' alt='emojidex' /></a>";
+      + "emoji-code='🚗' alt='red car' />テスト<a href='https://www.emojidex.com' "
+      + "emoji-code=':emojidex:'><img src='http://cdn.emojidex.com/emoji/px32/emojidex.png' "
+      + "emoji-code=':emojidex:' alt='emojidex' /></a><img src='http://cdn.emojidex.com/emoji/px32/red_car.png' />";
 
-    expected_text =  "Test text :red car:テスト:emojidex:";
+    expected_text =  "Test text 🚗テスト:emojidex:<img src='http://cdn.emojidex.com/emoji/px32/red_car.png' />";
 
     expect(EC_spec.Util.de_emojify_html(test_text)).toBe(expected_text);
   });
