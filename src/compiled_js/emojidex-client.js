@@ -6,13 +6,9 @@
     function EmojidexClient(options) {
       this.env = {
         api_ver: 1,
-        cdn_proto: 'http://',
         cdn_addr: 'cdn.emojidex.com',
-        s_cdn_proto: 'https://',
         s_cdn_addr: '',
-        asset_proto: 'http://',
         asset_addr: 'assets.emojidex.com',
-        s_asset_proto: 'https://',
         s_asset_addr: ''
       };
       this.defaults = {
