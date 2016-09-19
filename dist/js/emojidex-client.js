@@ -1362,7 +1362,6 @@ var EmojidexUtil = function () {
   function EmojidexUtil(EC) {
     _classCallCheck(this, EmojidexUtil);
 
-    if (EC == null) EC = new EmojidexClient();
     this.EC = EC;
 
     this.a_pattern = RegExp("<a href='[^']*' emoji-code='[^']*'><img src='[^']*' emoji-code='[^']*' alt='[^']*' \/><\/a>", 'g');
