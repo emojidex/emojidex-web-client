@@ -14,7 +14,7 @@ let helperBefore = function(chains_data) {
   this.EC_spec = new EmojidexClient({
     storageHubPath: hub_path,
     onReady: EC => {
-      this.EC_spec.User.set_auth(test_user_info.auth_user, test_user_info.auth_token).then(() => {
+      this.EC_spec.User.setAuth(test_user_info.auth_user, test_user_info.auth_token).then(() => {
         helperChains(chains_data);
       }
       );
@@ -67,7 +67,7 @@ let getFacesEmoji = chains_data =>
 ;
 
 let setPremiumUser = function(chains_data) {
-  this.EC_spec.User.set_auth(premium_user_info.auth_user, premium_user_info.auth_token).then(() => {
+  this.EC_spec.User.setAuth(premium_user_info.auth_user, premium_user_info.auth_token).then(() => {
     helperChains(chains_data);
   }
   );
