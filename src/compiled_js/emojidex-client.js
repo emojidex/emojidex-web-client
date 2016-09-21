@@ -880,7 +880,7 @@
 
     EmojidexSearch.prototype.search = function(term, callback, opts) {
       opts = $.extend({
-        code_cont: this.EC.Util.escape_term(term)
+        code_cont: this.EC.Util.escapeTerm(term)
       }, opts);
       return this._searchAPI(term, callback, opts, {
         ajax: this.search,
@@ -890,7 +890,7 @@
 
     EmojidexSearch.prototype.starting = function(term, callback, opts) {
       opts = $.extend({
-        code_sw: this.Util.escape_term(term)
+        code_sw: this.Util.escapeTerm(term)
       }, opts);
       return this._searchAPI(term, callback, opts, {
         ajax: this.starting,
@@ -900,7 +900,7 @@
 
     EmojidexSearch.prototype.ending = function(term, callback, opts) {
       opts = $.extend({
-        code_ew: this.Util.escape_term(term)
+        code_ew: this.Util.escapeTerm(term)
       }, opts);
       return this._searchAPI(term, callback, opts, {
         ajax: this.ending,
@@ -921,7 +921,7 @@
     EmojidexSearch.prototype.advanced = function(search_details, callback, opts) {
       var param;
       param = {
-        code_cont: this.Util.escape_term(search_details.term),
+        code_cont: this.Util.escapeTerm(search_details.term),
         "tags[]": this.Util.breakout(search_details.tags),
         "categories[]": this.Util.breakout(search_details.categories)
       };

@@ -22,7 +22,6 @@ module.exports = function(grunt) {
       };
     `;
 
-
     grunt.file.write('tmp/authinfo.js', output);
   } else { // .env file wasn't found
     grunt.log.writeln("*.env file not found; only some specs will run.*");
@@ -30,6 +29,7 @@ module.exports = function(grunt) {
     grunt.file.write('tmp/authinfo.js', "");
   }
 
+  // Grunt task configurations
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     meta: {
@@ -203,5 +203,5 @@ module.exports = function(grunt) {
 
   grunt.registerTask('default', ['clean', 'slim', 'babel', 'coffee', 'concat', 'uglify']);
   grunt.registerTask('spec', ['default', 'jasmine:client:build', 'jasmine']);
-  grunt.registerTask('dev', ['default', 'connect', 'jasmine:client:build', 'watch']);
+  grunt.registerTask('dev', ['default', 'jasmine:client:build', 'connect', 'watch']);
 }

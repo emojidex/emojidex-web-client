@@ -886,7 +886,7 @@ if(u&&c){if(this.prev<i.catchLoc)return handle(i.catchLoc,!0);if(this.prev<i.fin
 
     EmojidexSearch.prototype.search = function(term, callback, opts) {
       opts = $.extend({
-        code_cont: this.EC.Util.escape_term(term)
+        code_cont: this.EC.Util.escapeTerm(term)
       }, opts);
       return this._searchAPI(term, callback, opts, {
         ajax: this.search,
@@ -896,7 +896,7 @@ if(u&&c){if(this.prev<i.catchLoc)return handle(i.catchLoc,!0);if(this.prev<i.fin
 
     EmojidexSearch.prototype.starting = function(term, callback, opts) {
       opts = $.extend({
-        code_sw: this.Util.escape_term(term)
+        code_sw: this.Util.escapeTerm(term)
       }, opts);
       return this._searchAPI(term, callback, opts, {
         ajax: this.starting,
@@ -906,7 +906,7 @@ if(u&&c){if(this.prev<i.catchLoc)return handle(i.catchLoc,!0);if(this.prev<i.fin
 
     EmojidexSearch.prototype.ending = function(term, callback, opts) {
       opts = $.extend({
-        code_ew: this.Util.escape_term(term)
+        code_ew: this.Util.escapeTerm(term)
       }, opts);
       return this._searchAPI(term, callback, opts, {
         ajax: this.ending,
@@ -927,7 +927,7 @@ if(u&&c){if(this.prev<i.catchLoc)return handle(i.catchLoc,!0);if(this.prev<i.fin
     EmojidexSearch.prototype.advanced = function(search_details, callback, opts) {
       var param;
       param = {
-        code_cont: this.Util.escape_term(search_details.term),
+        code_cont: this.Util.escapeTerm(search_details.term),
         "tags[]": this.Util.breakout(search_details.tags),
         "categories[]": this.Util.breakout(search_details.categories)
       };
@@ -1364,41 +1364,42 @@ var EmojidexUtil = function () {
 
     this.EC = EC;
 
-    this.a_pattern = RegExp("<a href='[^']*' emoji-code='[^']*'><img src='[^']*' emoji-code='[^']*' alt='[^']*' \/><\/a>", 'g');
-    this.img_pattern = RegExp("<img src='[^']*' emoji-code='[^']*' alt='[^']*' \/>", 'g');
+    this.a_pattern = RegExp("<a href='[^']*' emoji-code='[^']*'><img src='[^']*' (emoji-code='[^']*' emoji-moji='[^']*'|emoji-code='[^']*') alt='[^']*' \/><\/a>", 'g');
+    this.img_pattern = RegExp("<img src='[^']*' (emoji-code='[^']*' emoji-moji='[^']*'|emoji-code='[^']*') alt='[^']*' \/>", 'g');
     this.emoji_code_pattern = RegExp("emoji-code='([^']*)'", '');
+    this.emoji_moji_pattern = RegExp("emoji-moji='([^']*)'", '');
   }
 
   // Escapes spaces to underscore
 
 
   _createClass(EmojidexUtil, [{
-    key: "escape_term",
-    value: function escape_term(term) {
+    key: "escapeTerm",
+    value: function escapeTerm(term) {
       return term.replace(/\s/g, '_').replace(/(\(|\))/g, '\\$1');
     }
 
     // De-Escapes underscores to spaces
 
   }, {
-    key: "de_escape_term",
-    value: function de_escape_term(term) {
+    key: "deEscapeTerm",
+    value: function deEscapeTerm(term) {
       return term.replace(/_/g, ' ');
     }
 
     // Adds colons around a code
 
   }, {
-    key: "encapsulate_code",
-    value: function encapsulate_code(code) {
-      return ":" + this.unencapsulate_code(code) + ":";
+    key: "encapsulateCode",
+    value: function encapsulateCode(code) {
+      return ":" + this.unEncapsulateCode(code) + ":";
     }
 
     // Removes colons around a code
 
   }, {
-    key: "unencapsulate_code",
-    value: function unencapsulate_code(code) {
+    key: "unEncapsulateCode",
+    value: function unEncapsulateCode(code) {
       return code.replace(/\:/g, '');
     }
 
@@ -1427,8 +1428,8 @@ var EmojidexUtil = function () {
       var size_code = arguments.length <= 1 || arguments[1] === undefined ? this.EC.size_code : arguments[1];
 
       for (i = 0; i < emoji.length; i++) {
-        emoji[i].code = this.escape_term(emoji[i].code);
-        emoji[i].img_url = this.EC.cdn_url + "/" + size_code + "/" + this.escape_term(emoji[i].code) + ".png";
+        emoji[i].code = this.escapeTerm(emoji[i].code);
+        emoji[i].img_url = this.EC.cdn_url + "/" + size_code + "/" + this.escapeTerm(emoji[i].code) + ".png";
       }
 
       return emoji;
@@ -1437,23 +1438,23 @@ var EmojidexUtil = function () {
     // Returns an HTML image/link tag for an emoji from an emoji object
 
   }, {
-    key: "emoji_to_html",
-    value: function emoji_to_html(emoji) {
+    key: "emojiToHTML",
+    value: function emojiToHTML(emoji) {
       var size_code = arguments.length <= 1 || arguments[1] === undefined ? this.EC.defaults.size_code : arguments[1];
 
-      var img = "<img src='http://" + this.EC.env.cdn_addr + "/emoji/" + this.EC.defaults.size_code + "/" + this.escape_term(emoji.code) + ".png' emoji-code='" + (emoji.moji == null || emoji.moji == '' ? this.encapsulate_code(this.escape_term(emoji.code)) : emoji.moji) + "' alt='" + this.de_escape_term(emoji.code) + "' />";
-      if (emoji.link != null && emoji.link != '') return "<a href='" + emoji.link + "' emoji-code='" + this.encapsulate_code(this.escape_term(emoji.code)) + "'>" + img + "</a>";
+      var img = "<img src='http://" + this.EC.env.cdn_addr + "/emoji/" + this.EC.defaults.size_code + "/" + this.escapeTerm(emoji.code) + ".png' emoji-code='" + this.escapeTerm(emoji.code) + "'" + (emoji.moji == null || emoji.moji == '' ? '' : " emoji-moji='" + emoji.moji + "'") + " alt='" + this.deEscapeTerm(emoji.code) + "' />";
+      if (emoji.link != null && emoji.link != '') return "<a href='" + emoji.link + "' emoji-code='" + this.escapeTerm(emoji.code) + "'>" + img + "</a>";
       return img;
     }
 
     // Returns a MarkDown image/link tag for an emoji from an emoji object
 
   }, {
-    key: "emoji_to_md",
-    value: function emoji_to_md(emoji) {
+    key: "emojiToMD",
+    value: function emojiToMD(emoji) {
       var size_code = arguments.length <= 1 || arguments[1] === undefined ? this.EC.defaults.size_code : arguments[1];
 
-      var img = "![" + emoji.code + "](http://" + this.EC.env.cdn_addr + "/emoji/" + size_code + "/" + this.escape_term(emoji.code) + ".png \"" + this.de_escape_term(emoji.code) + " em😜ji\")";
+      var img = "![" + (emoji.moji == null || emoji.moji == '' ? emoji.code : emoji.moji) + "](http://" + this.EC.env.cdn_addr + "/emoji/" + size_code + "/" + this.escapeTerm(emoji.code) + ".png \"" + this.deEscapeTerm(emoji.code) + "\")";
       if (emoji.link != null && emoji.link != '') return "[" + img + " ](" + emoji.link + ")";
       return img;
     }
@@ -1463,10 +1464,11 @@ var EmojidexUtil = function () {
     // a text box/content editable element, NOT a DOM object.
 
   }, {
-    key: "de_emojify_html",
-    value: function de_emojify_html(source) {
-      source = this.de_link_html(source);
+    key: "deEmojifyHTML",
+    value: function deEmojifyHTML(source) {
+      var mojify = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
 
+      source = this.deLinkHTML(source);
       var found = source.match(this.img_pattern);
 
       var _iteratorNormalCompletion = true;
@@ -1477,7 +1479,15 @@ var EmojidexUtil = function () {
         for (var _iterator = found[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
           find = _step.value;
 
-          source = source.replace(find, find.match(this.emoji_code_pattern)[1]);
+          if (mojify) {
+            var moji_code = find.match(this.emoji_moji_pattern);
+            if (moji_code != null && moji_code.length != 1) {
+              source = source.replace(find, moji_code[1]);
+              continue;
+            }
+          }
+          var emoji_code = find.match(this.emoji_code_pattern);
+          source = source.replace(find, this.encapsulateCode(emoji_code[1]));
         }
       } catch (err) {
         _didIteratorError = true;
@@ -1501,8 +1511,8 @@ var EmojidexUtil = function () {
     // *Only do this if you need to remove links for functionality.
 
   }, {
-    key: "de_link_html",
-    value: function de_link_html(source) {
+    key: "deLinkHTML",
+    value: function deLinkHTML(source) {
       var found = source.match(this.a_pattern);
 
       var _iteratorNormalCompletion2 = true;

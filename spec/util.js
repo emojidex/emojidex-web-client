@@ -6,21 +6,21 @@ describe('EmojidexUtil', function() {
     });
   });
 
-  it('escapes a term with escape_term', function() {
-    expect(EC_spec.Util.escape_term('emoji kiss')).toBe('emoji_kiss');
+  it('escapes a term with escapeTerm', function() {
+    expect(EC_spec.Util.escapeTerm('emoji kiss')).toBe('emoji_kiss');
   });
 
-  it('de-escapes a term with de_escape_term', function() {
-    expect(EC_spec.Util.de_escape_term('emoji_kiss')).toBe('emoji kiss');
+  it('de-escapes a term with deEscapeTerm', function() {
+    expect(EC_spec.Util.deEscapeTerm('emoji_kiss')).toBe('emoji kiss');
   });
 
   it('encapsulates a code with colons', function() {
-    expect(EC_spec.Util.encapsulate_code('my code')).toBe(':my code:');
-    expect(EC_spec.Util.encapsulate_code(':my code:')).toBe(':my code:');
+    expect(EC_spec.Util.encapsulateCode('my code')).toBe(':my code:');
+    expect(EC_spec.Util.encapsulateCode(':my code:')).toBe(':my code:');
   });
 
-  it('unencapsulates a code with colons', function() {
-    expect(EC_spec.Util.unencapsulate_code(':my code:')).toBe('my code');
+  it('un-encapsulates a code with colons', function() {
+    expect(EC_spec.Util.unEncapsulateCode(':my code:')).toBe('my code');
   });
 
   it('simplifies an emoji object array for easy processing with simplify', function() {
@@ -31,16 +31,16 @@ describe('EmojidexUtil', function() {
 
   it('converts an emoji object into an HTML tag set', done => 
     EC_spec.Search.find('red_car', function(emoji) {
-      expect(EC_spec.Util.emoji_to_html(emoji)).toBe(
-        "<img src='http://cdn.emojidex.com/emoji/px32/red_car.png' emoji-code='🚗' alt='red car' />");
+      expect(EC_spec.Util.emojiToHTML(emoji)).toBe(
+        "<img src='http://cdn.emojidex.com/emoji/px32/red_car.png' emoji-code='red_car' emoji-moji='🚗' alt='red car' />");
       done();
     })
   );
 
   it('converts an emoji object into an HTML tag set with link', done =>
     EC_spec.Search.find('emojidex', function(emoji) {
-      expect(EC_spec.Util.emoji_to_html(emoji)).toBe(
-          "<a href='https://www.emojidex.com' emoji-code=':emojidex:'><img src='http://cdn.emojidex.com/emoji/px32/emojidex.png' emoji-code=':emojidex:' alt='emojidex' /></a>");
+      expect(EC_spec.Util.emojiToHTML(emoji)).toBe(
+          "<a href='https://www.emojidex.com' emoji-code='emojidex'><img src='http://cdn.emojidex.com/emoji/px32/emojidex.png' emoji-code='emojidex' alt='emojidex' /></a>");
       done();
     })
   );
@@ -48,28 +48,28 @@ describe('EmojidexUtil', function() {
 
   it('converts an emoji object into a Markdown snippet', done =>
     EC_spec.Search.find('red_car', function(emoji) {
-      expect(EC_spec.Util.emoji_to_md(emoji)).toBe(
-        '![red car](http://cdn.emojidex.com/emoji/px32/red_car.png "red car em😜ji")');
+      expect(EC_spec.Util.emojiToMD(emoji)).toBe(
+        '![🚗](http://cdn.emojidex.com/emoji/px32/red_car.png "red car")');
       done();
     })
   );
 
   it('converts an emoji object into a Markdown snippet with link', done =>
     EC_spec.Search.find('emojidex', function(emoji) {
-      expect(EC_spec.Util.emoji_to_md(emoji)).toBe(
-          '[![emojidex](http://cdn.emojidex.com/emoji/px32/emojidex.png "emojidex em😜ji") ](https://www.emojidex.com)');
+      expect(EC_spec.Util.emojiToMD(emoji)).toBe(
+          '[![emojidex](http://cdn.emojidex.com/emoji/px32/emojidex.png "emojidex") ](https://www.emojidex.com)');
       done();
     })
   );
 
   it('converts text with emoji html in it to plain text with emoji short codes', function() {
     test_text = "Test text <img src='http://cdn.emojidex.com/emoji/px32/red_car.png' "
-      + "emoji-code='🚗' alt='red car' />テスト<a href='https://www.emojidex.com' "
-      + "emoji-code=':emojidex:'><img src='http://cdn.emojidex.com/emoji/px32/emojidex.png' "
-      + "emoji-code=':emojidex:' alt='emojidex' /></a><img src='http://cdn.emojidex.com/emoji/px32/red_car.png' />";
+      + "emoji-code='red_car' emoji-moji='🚗' alt='red car' />テスト<a href='https://www.emojidex.com' "
+      + "emoji-code='emojidex'><img src='http://cdn.emojidex.com/emoji/px32/emojidex.png' "
+      + "emoji-code='emojidex' alt='emojidex' /></a><img src='http://cdn.emojidex.com/emoji/px32/red_car.png' />";
 
     expected_text =  "Test text 🚗テスト:emojidex:<img src='http://cdn.emojidex.com/emoji/px32/red_car.png' />";
 
-    expect(EC_spec.Util.de_emojify_html(test_text)).toBe(expected_text);
+    expect(EC_spec.Util.deEmojifyHTML(test_text)).toBe(expected_text);
   });
 });
