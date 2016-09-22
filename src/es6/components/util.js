@@ -10,12 +10,12 @@ class EmojidexUtil {
 
   // Escapes spaces to underscore
   escapeTerm(term) {
-    return escape(term.replace(/\s/g, '_'));
+    return term.replace(/\s/g, '_').replace(/\(/g, '%28').replace(/\)/g, '%29');
   }
 
   // De-Escapes underscores to spaces
   deEscapeTerm(term) {
-    return unescape(term.replace(/_/g, ' '));
+    return term.replace(/_/g, ' ').replace(/%28/g, '(').replace(/%29/g, ')');
   }
 
   // Adds colons around a code
@@ -54,7 +54,7 @@ class EmojidexUtil {
 
   // Returns an HTML image/link tag for an emoji from an emoji object
   emojiToHTML(emoji, size_code = this.EC.defaults.size_code) {
-    let img = `<img src='http://${this.EC.env.cdn_addr}/emoji/${this.EC.defaults.size_code}/${this.escapeTerm(emoji.code)}.png' emoji-code='${this.escapeTerm(emoji.code)}'${(emoji.moji == null || emoji.moji == '')? '' : " emoji-moji='" + emoji.moji + "'"} alt='${this.deEscapeTerm(emoji.code)}' />`;
+    let img = `<img src='http://${this.EC.env.cdn_addr}/emoji/${size_code}/${this.escapeTerm(emoji.code)}.png' emoji-code='${this.escapeTerm(emoji.code)}'${(emoji.moji == null || emoji.moji == '')? '' : " emoji-moji='" + emoji.moji + "'"} alt='${this.deEscapeTerm(emoji.code)}' />`;
     if(emoji.link != null && emoji.link != '')
       return `<a href='${emoji.link}' emoji-code='${this.escapeTerm(emoji.code)}'>${img}</a>`;
     return img;
