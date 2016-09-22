@@ -1669,7 +1669,7 @@ var EmojidexUtil = function () {
   _createClass(EmojidexUtil, [{
     key: "escapeTerm",
     value: function escapeTerm(term) {
-      return term.replace(/\s/g, '_').replace(/(\(|\))/g, '\\$1');
+      return escape(term.replace(/\s/g, '_'));
     }
 
     // De-Escapes underscores to spaces
@@ -1677,7 +1677,7 @@ var EmojidexUtil = function () {
   }, {
     key: "deEscapeTerm",
     value: function deEscapeTerm(term) {
-      return term.replace(/_/g, ' ');
+      return unescape(term.replace(/_/g, ' '));
     }
 
     // Adds colons around a code

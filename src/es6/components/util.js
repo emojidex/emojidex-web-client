@@ -10,12 +10,12 @@ class EmojidexUtil {
 
   // Escapes spaces to underscore
   escapeTerm(term) {
-    return term.replace(/\s/g, '_').replace(/(\(|\))/g, '\\$1');
+    return escape(term.replace(/\s/g, '_'));
   }
 
   // De-Escapes underscores to spaces
   deEscapeTerm(term) {
-    return term.replace(/_/g, ' ');
+    return unescape(term.replace(/_/g, ' '));
   }
 
   // Adds colons around a code
