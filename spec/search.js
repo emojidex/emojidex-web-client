@@ -62,6 +62,13 @@ describe('EmojidexSearch', function() {
     })
   );
 
+  it('find: use ajax and auto escaping', done =>
+    EC_spec.Search.find('thinking face(p)', function(emoji_data) {
+      expect(emoji_data).toEqual(jasmine.objectContaining(emoji_thinking_face_p));
+      done();
+    })
+  );
+
   it('find: not found', done =>
     EC_spec.Search.find('aaaaaaaa', function(response) {
       expect(response.statusText).toEqual('Not Found');

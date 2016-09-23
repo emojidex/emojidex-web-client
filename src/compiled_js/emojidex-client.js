@@ -954,7 +954,7 @@
       }
       $.extend(param, opts);
       return $.ajax({
-        url: this.EC.api_url + ("emoji/" + code),
+        url: this.EC.api_url + ("emoji/" + (this.EC.Util.makeURLSafe(code))),
         dataType: 'json',
         data: param,
         success: (function(_this) {

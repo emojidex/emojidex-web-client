@@ -7,13 +7,13 @@ describe('EmojidexUtil', function() {
   });
 
   it('escapes a term with escapeTerm', function() {
-    expect(EC_spec.Util.escapeTerm('emoji kiss(p)')).toBe('emoji_kiss%28p%29');
-    expect(EC_spec.Util.escapeTerm('うんち　テスト (p)')).toBe('うんち_テスト_%28p%29');
+    expect(EC_spec.Util.escapeTerm('emoji kiss(p)')).toBe('emoji_kiss(p)');
+    expect(EC_spec.Util.escapeTerm('うんち　テスト (p)')).toBe('うんち_テスト_(p)');
   });
 
   it('de-escapes a term with deEscapeTerm', function() {
     expect(EC_spec.Util.deEscapeTerm('emoji_kiss(p)')).toBe('emoji kiss(p)');
-    expect(EC_spec.Util.deEscapeTerm('うんち_テスト_%28p%29')).toBe('うんち テスト (p)');
+    expect(EC_spec.Util.deEscapeTerm('うんち_テスト_(p)')).toBe('うんち テスト (p)');
   });
 
   it('encapsulates a code with colons', function() {

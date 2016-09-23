@@ -960,7 +960,7 @@ if(u&&c){if(this.prev<i.catchLoc)return handle(i.catchLoc,!0);if(this.prev<i.fin
       }
       $.extend(param, opts);
       return $.ajax({
-        url: this.EC.api_url + ("emoji/" + code),
+        url: this.EC.api_url + ("emoji/" + (this.EC.Util.makeURLSafe(code))),
         dataType: 'json',
         data: param,
         success: (function(_this) {
@@ -1458,7 +1458,7 @@ var EmojidexUtil = function () {
   _createClass(EmojidexUtil, [{
     key: "escapeTerm",
     value: function escapeTerm(term) {
-      return term.replace(/\s/g, '_'); //.replace(/\(/g, '%28').replace(/\)/g, '%29');
+      return term.replace(/\s/g, '_');
     }
 
     // De-Escapes underscores to spaces
@@ -1466,7 +1466,12 @@ var EmojidexUtil = function () {
   }, {
     key: "deEscapeTerm",
     value: function deEscapeTerm(term) {
-      return term.replace(/_/g, ' '); //.replace(/%28/g, '(').replace(/%29/g, ')');
+      return term.replace(/_/g, ' ');
+    }
+  }, {
+    key: "makeURLSafe",
+    value: function makeURLSafe(term) {
+      return escapeTerm(term).replace(/\(/g, '%28').replace(/\)/g, '%29');
     }
 
     // Adds colons around a code
