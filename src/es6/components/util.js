@@ -2,8 +2,8 @@ class EmojidexUtil {
   constructor(EC) {
     this.EC = EC;
 
-    this.a_pattern = RegExp("<a href='[^']*' emoji-code='[^']*'><img src='[^']*' (emoji-code='[^']*' emoji-moji='[^']*'|emoji-code='[^']*') alt='[^']*' \/><\/a>", 'g');
-    this.img_pattern = RegExp("<img src='[^']*' (emoji-code='[^']*' emoji-moji='[^']*'|emoji-code='[^']*') alt='[^']*' \/>", 'g');
+    this.a_pattern = RegExp("<a href='[^']*' emoji-code='[^']*'><img class='emojidex-emoji' src='[^']*' (emoji-code='[^']*' emoji-moji='[^']*'|emoji-code='[^']*') alt='[^']*' \/><\/a>", 'g');
+    this.img_pattern = RegExp("<img class='emojidex-emoji' src='[^']*' (emoji-code='[^']*' emoji-moji='[^']*'|emoji-code='[^']*') alt='[^']*' \/>", 'g');
     this.emoji_code_pattern = RegExp("emoji-code='([^']*)'", '');
     this.emoji_moji_pattern = RegExp("emoji-moji='([^']*)'", '');
   }
@@ -54,7 +54,7 @@ class EmojidexUtil {
 
   // Returns an HTML image/link tag for an emoji from an emoji object
   emojiToHTML(emoji, size_code = this.EC.defaults.size_code) {
-    let img = `<img src='http://${this.EC.env.cdn_addr}/emoji/${size_code}/${this.escapeTerm(emoji.code)}.png' emoji-code='${this.escapeTerm(emoji.code)}'${(emoji.moji == null || emoji.moji == '')? '' : " emoji-moji='" + emoji.moji + "'"} alt='${this.deEscapeTerm(emoji.code)}' />`;
+    let img = `<img class='emojidex-emoji' src='http://${this.EC.env.cdn_addr}/emoji/${size_code}/${this.escapeTerm(emoji.code)}.png' emoji-code='${this.escapeTerm(emoji.code)}'${(emoji.moji == null || emoji.moji == '')? '' : " emoji-moji='" + emoji.moji + "'"} alt='${this.deEscapeTerm(emoji.code)}' />`;
     if(emoji.link != null && emoji.link != '')
       return `<a href='${emoji.link}' emoji-code='${this.escapeTerm(emoji.code)}'>${img}</a>`;
     return img;
