@@ -19,7 +19,7 @@ class EmojidexUtil {
   }
 
   makeURLSafe(term) {
-    return escapeTerm(term).replace(/\(/g, '%28').replace(/\)/g, '%29');
+    return this.escapeTerm(term).replace(/\(/g, '%28').replace(/\)/g, '%29');
   }
 
   // Adds colons around a code
