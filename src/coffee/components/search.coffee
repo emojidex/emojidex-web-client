@@ -50,17 +50,17 @@ class EmojidexSearch
 
   # Executes a general search (code_cont)
   search: (term, callback, opts) ->
-    opts = $.extend code_cont: @EC.Util.escape_term(term), opts
+    opts = $.extend code_cont: @EC.Util.escapeTerm(term), opts
     @_searchAPI term, callback, opts, ajax: @search, storage: @EC.Emoji.search
 
   # Executes a search starting with the given term
   starting: (term, callback, opts) ->
-    opts = $.extend code_sw: @Util.escape_term(term), opts
+    opts = $.extend code_sw: @Util.escapeTerm(term), opts
     @_searchAPI term, callback, opts, ajax: @starting, storage: @EC.Emoji.starting
 
   # Executes a search ending with the given term
   ending: (term, callback, opts) ->
-    opts = $.extend code_ew: @Util.escape_term(term), opts
+    opts = $.extend code_ew: @Util.escapeTerm(term), opts
     @_searchAPI term, callback, opts, ajax: @ending, storage: @EC.Emoji.ending
 
   # Searches by tags
@@ -71,7 +71,7 @@ class EmojidexSearch
   # Searches using an array of keys and an array of tags
   advanced: (search_details, callback, opts) ->
     param =
-      code_cont: @Util.escape_term search_details.term
+      code_cont: @Util.escapeTerm search_details.term
       "tags[]": @Util.breakout search_details.tags
       "categories[]": @Util.breakout search_details.categories
     $.extend param, opts
@@ -92,7 +92,7 @@ class EmojidexSearch
     $.extend param, opts
 
     $.ajax
-      url: @EC.api_url + "emoji/#{code}"
+      url: @EC.api_url + "emoji/#{@EC.Util.makeURLSafe(code)}"
       dataType: 'json'
       data: param
       success: (response) =>

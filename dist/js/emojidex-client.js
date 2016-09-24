@@ -5,7 +5,7 @@ if(u&&c){if(this.prev<i.catchLoc)return handle(i.catchLoc,!0);if(this.prev<i.fin
 
 !function(e){function t(e,o){o=o||{},this._id=t._generateUUID(),this._promise=o.promise||Promise,this._frameId=o.frameId||"CrossStorageClient-"+this._id,this._origin=t._getOrigin(e),this._requests={},this._connected=!1,this._closed=!1,this._count=0,this._timeout=o.timeout||5e3,this._listener=null,this._installListener();var r;o.frameId&&(r=document.getElementById(o.frameId)),r&&this._poll(),r?this._hub=r.contentWindow:this._createFrame(e)}t.frameStyle={display:"none",position:"absolute",top:"-999px",left:"-999px"},t._getOrigin=function(e){var t,o,r;return t=document.createElement("a"),t.href=e,t.host||(t=window.location),o=t.protocol&&":"!==t.protocol?t.protocol:window.location.protocol,r=o+"//"+t.host,r=r.replace(/:80$|:443$/,"")},t._generateUUID=function(){return"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,function(e){var t=16*Math.random()|0,o="x"==e?t:3&t|8;return o.toString(16)})},t.prototype.onReadyFrame=function(){var e=this;return this._hub?this._promise.resolve():this._closed?this._promise.reject(new Error("CrossStorageClient has closed")):new this._promise(function(t,o){var r=setTimeout(function(){o(new Error("CrossStorageClient could not ready frame"))},e._timeout),n=setInterval(function(){e._hub&&(clearTimeout(r),clearInterval(n),t())},100)})},t.prototype.onConnect=function(){var e=this;return this._connected?this._promise.resolve():this._closed?this._promise.reject(new Error("CrossStorageClient has closed")):(this._requests.connect||(this._requests.connect=[]),new this._promise(function(t,o){var r=setTimeout(function(){o(new Error("CrossStorageClient could not connect"))},e._timeout);e._requests.connect.push(function(e){return clearTimeout(r),e?o(e):(t(),void 0)})}))},t.prototype.set=function(e,t,o){return this._request("set",{key:e,value:t,ttl:o})},t.prototype.get=function(){var e=Array.prototype.slice.call(arguments);return this._request("get",{keys:e})},t.prototype.del=function(){var e=Array.prototype.slice.call(arguments);return this._request("del",{keys:e})},t.prototype.clear=function(){return this._request("clear")},t.prototype.getKeys=function(){return this._request("getKeys")},t.prototype.close=function(){var e=document.getElementById(this._frameId);e&&e.parentNode.removeChild(e),window.removeEventListener?window.removeEventListener("message",this._listener,!1):window.detachEvent("onmessage",this._listener),this._connected=!1,this._closed=!0},t.prototype._installListener=function(){var e=this;this._listener=function(t){var o,r,n,s;if(!e._closed&&t.data&&"string"==typeof t.data&&(r="null"===t.origin?"file://":t.origin,r===e._origin))if("cross-storage:unavailable"!==t.data){if(-1!==t.data.indexOf("cross-storage:")&&!e._connected){if(e._connected=!0,!e._requests.connect)return;for(o=0;o<e._requests.connect.length;o++)e._requests.connect[o](n);delete e._requests.connect}if("cross-storage:ready"!==t.data){try{s=JSON.parse(t.data)}catch(i){return}s.id&&e._requests[s.id]&&e._requests[s.id](s.error,s.result)}}else{if(e._closed||e.close(),!e._requests.connect)return;for(n=new Error("Closing client. Could not access localStorage in hub."),o=0;o<e._requests.connect.length;o++)e._requests.connect[o](n)}},window.addEventListener?window.addEventListener("message",this._listener,!1):window.attachEvent("onmessage",this._listener)},t.prototype._poll=function(){var e,t,o;e=this,o="file://"===e._origin?"*":e._origin,t=setInterval(function(){return e._connected?clearInterval(t):(e._hub&&e._hub.postMessage("cross-storage:poll",o),void 0)},1e3)},t.prototype._createFrame=function(e){var o,r,n=this;o=window.document.createElement("iframe"),o.id=this._frameId;for(r in t.frameStyle)t.frameStyle.hasOwnProperty(r)&&(o.style[r]=t.frameStyle[r]);window.document.body.appendChild(o),o.onload=function(){n._hub=o.contentWindow},o.src=e},t.prototype._request=function(e,t){var o,r;return this._closed?this._promise.reject(new Error("CrossStorageClient has closed")):(r=this,r._count++,o={id:this._id+":"+r._count,method:"cross-storage:"+e,params:t},new this._promise(function(e,t){var n,s,i;n=setTimeout(function(){r._requests[o.id]&&(delete r._requests[o.id],t(new Error("Timeout: could not perform "+o.method)))},r._timeout),r._requests[o.id]=function(s,i){return clearTimeout(n),delete r._requests[o.id],s?t(new Error(s)):(e(i),void 0)},Array.prototype.toJSON&&(s=Array.prototype.toJSON,Array.prototype.toJSON=null),i="file://"===r._origin?"*":r._origin,r._hub.postMessage(JSON.stringify(o),i),s&&(Array.prototype.toJSON=s)}))},"undefined"!=typeof module&&module.exports?module.exports=t:"undefined"!=typeof exports?exports.CrossStorageClient=t:"function"==typeof define&&define.amd?define([],function(){return t}):e.CrossStorageClient=t}(this);
 (function() {
-  var EmojidexCategories, EmojidexData, EmojidexDataStorage, EmojidexEmoji, EmojidexIndexes, EmojidexSearch, EmojidexUser, EmojidexUserFavorites, EmojidexUserHistory,
+  var EmojidexCategories, EmojidexData, EmojidexDataStorage, EmojidexEmoji, EmojidexIndexes, EmojidexSearch,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   this.EmojidexClient = (function() {
@@ -886,7 +886,7 @@ if(u&&c){if(this.prev<i.catchLoc)return handle(i.catchLoc,!0);if(this.prev<i.fin
 
     EmojidexSearch.prototype.search = function(term, callback, opts) {
       opts = $.extend({
-        code_cont: this.EC.Util.escape_term(term)
+        code_cont: this.EC.Util.escapeTerm(term)
       }, opts);
       return this._searchAPI(term, callback, opts, {
         ajax: this.search,
@@ -896,7 +896,7 @@ if(u&&c){if(this.prev<i.catchLoc)return handle(i.catchLoc,!0);if(this.prev<i.fin
 
     EmojidexSearch.prototype.starting = function(term, callback, opts) {
       opts = $.extend({
-        code_sw: this.Util.escape_term(term)
+        code_sw: this.Util.escapeTerm(term)
       }, opts);
       return this._searchAPI(term, callback, opts, {
         ajax: this.starting,
@@ -906,7 +906,7 @@ if(u&&c){if(this.prev<i.catchLoc)return handle(i.catchLoc,!0);if(this.prev<i.fin
 
     EmojidexSearch.prototype.ending = function(term, callback, opts) {
       opts = $.extend({
-        code_ew: this.Util.escape_term(term)
+        code_ew: this.Util.escapeTerm(term)
       }, opts);
       return this._searchAPI(term, callback, opts, {
         ajax: this.ending,
@@ -927,7 +927,7 @@ if(u&&c){if(this.prev<i.catchLoc)return handle(i.catchLoc,!0);if(this.prev<i.fin
     EmojidexSearch.prototype.advanced = function(search_details, callback, opts) {
       var param;
       param = {
-        code_cont: this.Util.escape_term(search_details.term),
+        code_cont: this.Util.escapeTerm(search_details.term),
         "tags[]": this.Util.breakout(search_details.tags),
         "categories[]": this.Util.breakout(search_details.categories)
       };
@@ -960,7 +960,7 @@ if(u&&c){if(this.prev<i.catchLoc)return handle(i.catchLoc,!0);if(this.prev<i.fin
       }
       $.extend(param, opts);
       return $.ajax({
-        url: this.EC.api_url + ("emoji/" + code),
+        url: this.EC.api_url + ("emoji/" + (this.EC.Util.makeURLSafe(code))),
         dataType: 'json',
         data: param,
         success: (function(_this) {
@@ -1005,127 +1005,166 @@ if(u&&c){if(this.prev<i.catchLoc)return handle(i.catchLoc,!0);if(this.prev<i.fin
 
   })();
 
-  EmojidexUser = (function() {
-    function EmojidexUser(EC) {
-      this.EC = EC;
-      this.auth_info = this.EC.Data._def_auth_info;
-      this.History = new EmojidexUserHistory(this.EC);
-      this.Favorites = new EmojidexUserFavorites(this.EC);
+}).call(this);
+
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var EmojidexUser = function () {
+  function EmojidexUser(EC) {
+    _classCallCheck(this, EmojidexUser);
+
+    this.EC = EC;
+    this.auth_info = this.EC.Data._def_auth_info;
+    this.History = new EmojidexUserHistory(this.EC);
+    this.Favorites = new EmojidexUserFavorites(this.EC);
+  }
+  // @_auto_login()
+
+  // Checks for local saved login data, and if present sets the username and api_key
+
+
+  _createClass(EmojidexUser, [{
+    key: '_autoLogin',
+    value: function _autoLogin() {
+      if (__guard__(__guard__(__guard__(this.EC.Data.storage.hub_cache, function (x2) {
+        return x2.emojidex;
+      }), function (x1) {
+        return x1.auth_info;
+      }), function (x) {
+        return x.status;
+      }) === 'verified') {
+        this.auth_info = this.EC.Data.storage.hub_cache.emojidex.auth_info;
+        return this.syncUserData();
+      }
     }
 
-    EmojidexUser.prototype._auto_login = function() {
-      var ref, ref1, ref2;
-      if (((ref = this.EC.Data.storage.hub_cache) != null ? (ref1 = ref.emojidex) != null ? (ref2 = ref1.auth_info) != null ? ref2.status : void 0 : void 0 : void 0) === 'verified') {
-        this.auth_info = this.EC.Data.storage.hub_cache.emojidex.auth_info;
-        return this.sync_user_data();
-      }
-    };
+    // login
+    // takes a hash with one of the following combinations:
+    // 1. {authtype: 'plain', username: 'username', password: '****'}
+    // 2. {authtype: 'token', username: 'username', auth_token: '****'}
+    // 3. {authtype: 'basic', user: 'username-or-email', password: '****'}
+    // * if no hash is given auto login is attempted
 
-    EmojidexUser.prototype.login = function(params) {
-      var ref, ref1, ref2;
+  }, {
+    key: 'login',
+    value: function login(params) {
       switch (params.authtype) {
         case 'plain':
-          return this.plain_auth(params.username, params.password, params.callback);
+          return this.plainAuth(params.username, params.password, params.callback);
         case 'token':
-          return this.token_auth(params.username, params.auth_token, params.callback);
+          return this.tokenAuth(params.username, params.auth_token, params.callback);
         case 'basic':
-          return this.basic_auth(params.user, params.password, params.callback);
-        case 'google':
-          return this.google_auth(params.callback);
+          return this.basicAuth(params.user, params.password, params.callback);
         case 'session':
-          if (((ref = this.EC.Data.storage.hub_cache) != null ? (ref1 = ref.emojidex) != null ? (ref2 = ref1.auth_info) != null ? ref2.status : void 0 : void 0 : void 0) === 'verified') {
+          if (__guard__(__guard__(__guard__(this.EC.Data.storage.hub_cache, function (x2) {
+            return x2.emojidex;
+          }), function (x1) {
+            return x1.auth_info;
+          }), function (x) {
+            return x.status;
+          }) === 'verified') {
             return this.auth_info = this.EC.Data.storage.hub_cache.emojidex.auth_info;
           }
-          break;
         default:
-          return this._auto_login();
+          return this._autoLogin();
       }
-    };
+    }
 
-    EmojidexUser.prototype.logout = function() {
+    // logout:
+    // 'logs out' by clearing user data
+
+  }, {
+    key: 'logout',
+    value: function logout() {
       return this.EC.Data.auth_info(this.EC.Data._def_auth_info);
-    };
+    }
+  }, {
+    key: '_authenticateAPI',
+    value: function _authenticateAPI(options, callback) {
+      var _this = this;
 
-    EmojidexUser.prototype._authenticateAPI = function(options, callback) {
-      var ajax_obj;
-      ajax_obj = {
+      var ajax_obj = {
         url: this.EC.api_url + 'users/authenticate',
         dataType: 'json',
-        success: (function(_this) {
-          return function(response) {
-            return _this._set_auth_from_response(response).then(function() {
-              return typeof callback === "function" ? callback(_this.auth_info) : void 0;
+        success: function success(response) {
+          return _this._setAuthFromResponse(response).then(function () {
+            return __guardFunc__(callback, function (f) {
+              return f(_this.auth_info);
             });
+          });
+        },
+        error: function error(response) {
+          var status = JSON.parse(response.responseText);
+          _this.auth_info = {
+            status: status.auth_status,
+            token: null,
+            user: ''
           };
-        })(this),
-        error: (function(_this) {
-          return function(response) {
-            var status;
-            status = JSON.parse(response.responseText);
-            _this.auth_info = {
-              status: status.auth_status,
-              token: null,
-              user: ''
-            };
-            return _this.EC.Data.auth_info(_this.EC.Data.auth_info).then(function() {
-              return typeof callback === "function" ? callback({
-                auth_info: _this.auth_info,
-                error_info: response
-              }) : void 0;
+          return _this.EC.Data.auth_info(_this.EC.Data.auth_info).then(function () {
+            return __guardFunc__(callback, function (f) {
+              return f({ auth_info: _this.auth_info, error_info: response });
             });
-          };
-        })(this)
+          });
+        }
       };
-      return $.ajax($.extend(ajax_obj, options));
-    };
 
-    EmojidexUser.prototype.plain_auth = function(username, password, callback) {
+      return $.ajax($.extend(ajax_obj, options));
+    }
+
+    // regular login with username/email and password
+
+  }, {
+    key: 'plainAuth',
+    value: function plainAuth(username, password, callback) {
       return this._authenticateAPI({
         data: {
           username: username,
           password: password
         }
       }, callback);
-    };
-
-    EmojidexUser.prototype.token_auth = function(username, token, callback) {
+    }
+  }, {
+    key: 'tokenAuth',
+    value: function tokenAuth(username, token, callback) {
       return this._authenticateAPI({
         data: {
           username: username,
           token: token
         }
       }, callback);
-    };
+    }
 
-    EmojidexUser.prototype.basic_auth = function(user, password, callback) {
+    // auth with HTTP basic auth
+
+  }, {
+    key: 'basicAuth',
+    value: function basicAuth(user, password, callback) {
       return this._authenticateAPI({
         data: {
           user: user,
           password: password
         }
       }, callback);
-    };
+    }
 
-    EmojidexUser.prototype.google_auth = function(callback) {
-      return false;
-    };
+    // directly set auth credentials
 
-    EmojidexUser.prototype.set_auth = function(user, token, r18, premium, premium_exp, pro, pro_exp) {
-      if (r18 == null) {
-        r18 = false;
-      }
-      if (premium == null) {
-        premium = false;
-      }
-      if (premium_exp == null) {
-        premium_exp = null;
-      }
-      if (pro == null) {
-        pro = false;
-      }
-      if (pro_exp == null) {
-        pro_exp = null;
-      }
+  }, {
+    key: 'setAuth',
+    value: function setAuth(user, token) {
+      var r18 = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
+      var premium = arguments.length <= 3 || arguments[3] === undefined ? false : arguments[3];
+      var premium_exp = arguments.length <= 4 || arguments[4] === undefined ? null : arguments[4];
+
+      var _this2 = this;
+
+      var pro = arguments.length <= 5 || arguments[5] === undefined ? false : arguments[5];
+      var pro_exp = arguments.length <= 6 || arguments[6] === undefined ? null : arguments[6];
+
       return this.EC.Data.auth_info({
         status: 'verified',
         user: user,
@@ -1135,16 +1174,20 @@ if(u&&c){if(this.prev<i.catchLoc)return handle(i.catchLoc,!0);if(this.prev<i.fin
         premium_exp: premium_exp,
         pro: pro,
         pro_exp: pro_exp
-      }).then((function(_this) {
-        return function(data) {
-          _this.auth_info = _this.EC.Data.storage.get('emojidex.auth_info');
-          _this.sync_user_data();
-          return data;
-        };
-      })(this));
-    };
+      }).then(function (data) {
+        _this2.auth_info = _this2.EC.Data.storage.get('emojidex.auth_info');
+        _this2.syncUserData();
+        return data;
+      });
+    }
 
-    EmojidexUser.prototype._set_auth_from_response = function(response) {
+    // sets auth parameters from a successful auth request [login]
+
+  }, {
+    key: '_setAuthFromResponse',
+    value: function _setAuthFromResponse(response) {
+      var _this3 = this;
+
       return this.EC.Data.auth_info({
         status: response.auth_status,
         token: response.auth_token,
@@ -1154,203 +1197,242 @@ if(u&&c){if(this.prev<i.catchLoc)return handle(i.catchLoc,!0);if(this.prev<i.fin
         premium_exp: response.premium_exp,
         pro: response.pro,
         pro_exp: response.pro_exp
-      }).then((function(_this) {
-        return function(data) {
-          _this.auth_info = _this.EC.Data.storage.get('emojidex.auth_info');
-          _this.sync_user_data();
-          return data;
-        };
-      })(this));
-    };
-
-    EmojidexUser.prototype.sync_user_data = function() {
+      }).then(function (data) {
+        _this3.auth_info = _this3.EC.Data.storage.get('emojidex.auth_info');
+        _this3.syncUserData();
+        return data;
+      });
+    }
+  }, {
+    key: 'syncUserData',
+    value: function syncUserData() {
       this.History.token = this.Favorites.token = this.auth_info.token;
       this.Favorites.sync();
-      return this.History.sync();
-    };
-
-    return EmojidexUser;
-
-  })();
-
-  EmojidexUserFavorites = (function() {
-    function EmojidexUserFavorites(EC, token) {
-      this.EC = EC;
-      this.token = token;
-      this._favorites = this.EC.Data.favorites();
+      this.History.sync();
     }
+  }]);
 
-    EmojidexUserFavorites.prototype._favoritesAPI = function(options) {
-      var ajax_obj;
+  return EmojidexUser;
+}();
+
+function __guard__(value, transform) {
+  return typeof value !== 'undefined' && value !== null ? transform(value) : undefined;
+}
+function __guardFunc__(func, transform) {
+  return typeof func === 'function' ? transform(func) : undefined;
+}
+//# sourceMappingURL=user.js.map
+
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var EmojidexUserFavorites = function () {
+  function EmojidexUserFavorites(EC, token) {
+    _classCallCheck(this, EmojidexUserFavorites);
+
+    this.EC = EC;
+    this.token = token;
+    this._favorites = this.EC.Data.favorites();
+  }
+
+  _createClass(EmojidexUserFavorites, [{
+    key: '_favoritesAPI',
+    value: function _favoritesAPI(options) {
       if (this.token != null) {
-        ajax_obj = {
+        var ajax_obj = {
           url: this.EC.api_url + 'users/favorites',
           dataType: 'json'
         };
         return $.ajax($.extend(ajax_obj, options));
       }
-    };
+    }
+  }, {
+    key: 'get',
+    value: function get(callback) {
+      var _this = this;
 
-    EmojidexUserFavorites.prototype.get = function(callback) {
-      var options;
-      options = {
+      var options = {
         data: {
           auth_token: this.token
         },
-        success: (function(_this) {
-          return function(response) {
-            _this._favorites = response;
-            _this.EC.Data.favorites(response);
-            return typeof callback === "function" ? callback(_this._favorites) : void 0;
-          };
-        })(this)
+        success: function success(response) {
+          _this._favorites = response;
+          _this.EC.Data.favorites(response);
+          return __guardFunc__(callback, function (f) {
+            return f(_this._favorites);
+          });
+        }
       };
       return this._favoritesAPI(options);
-    };
+    }
+  }, {
+    key: 'set',
+    value: function set(emoji_code) {
+      var _this2 = this;
 
-    EmojidexUserFavorites.prototype.set = function(emoji_code) {
-      var options;
-      options = {
+      var options = {
         type: 'POST',
         data: {
           auth_token: this.token,
           emoji_code: emoji_code
         },
-        success: (function(_this) {
-          return function(response) {
-            _this._favorites.push(response);
-            return _this.EC.Data.favorites(_this._favorites);
-          };
-        })(this)
+        success: function success(response) {
+          _this2._favorites.push(response);
+          return _this2.EC.Data.favorites(_this2._favorites);
+        }
       };
       return this._favoritesAPI(options);
-    };
+    }
+  }, {
+    key: 'unset',
+    value: function unset(emoji_code) {
+      var _this3 = this;
 
-    EmojidexUserFavorites.prototype.unset = function(emoji_code) {
-      var options;
-      options = {
+      var options = {
         type: 'DELETE',
         data: {
           auth_token: this.token,
           emoji_code: emoji_code
         },
-        success: (function(_this) {
-          return function(response) {
-            return _this.sync();
-          };
-        })(this)
+        success: function success(response) {
+          return _this3.sync();
+        }
       };
       return this._favoritesAPI(options);
-    };
+    }
+  }, {
+    key: 'sync',
+    value: function sync() {
+      return this.get(); // persistant favorites currently require an account
+    }
+  }, {
+    key: 'all',
+    value: function all(callback) {
+      var _this4 = this;
 
-    EmojidexUserFavorites.prototype.sync = function() {
-      return this.get();
-    };
-
-    EmojidexUserFavorites.prototype.all = function(callback) {
       if (this._favorites != null) {
-        if (typeof callback === "function") {
-          callback(this._favorites);
-        }
+        __guardFunc__(callback, function (f) {
+          return f(_this4._favorites);
+        });
       } else {
-        setTimeout(((function(_this) {
-          return function() {
-            return _this.all(callback);
-          };
-        })(this)), 500);
+        setTimeout(function () {
+          return _this4.all(callback);
+        }, 500);
       }
       return this._favorites;
-    };
-
-    return EmojidexUserFavorites;
-
-  })();
-
-  EmojidexUserHistory = (function() {
-    function EmojidexUserHistory(EC, token) {
-      this.EC = EC;
-      this.token = token;
-      this._history = this.EC.Data.history();
     }
+  }]);
 
-    EmojidexUserHistory.prototype._historyAPI = function(options) {
-      var ajax_obj;
+  return EmojidexUserFavorites;
+}();
+
+function __guardFunc__(func, transform) {
+  return typeof func === 'function' ? transform(func) : undefined;
+}
+//# sourceMappingURL=favorites.js.map
+
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var EmojidexUserHistory = function () {
+  function EmojidexUserHistory(EC, token) {
+    _classCallCheck(this, EmojidexUserHistory);
+
+    this.EC = EC;
+    this.token = token;
+    this._history = this.EC.Data.history();
+  }
+
+  _createClass(EmojidexUserHistory, [{
+    key: '_historyAPI',
+    value: function _historyAPI(options) {
       if (this.token != null) {
-        ajax_obj = {
+        var ajax_obj = {
           url: this.EC.api_url + 'users/history',
           dataType: 'json'
         };
         return $.ajax($.extend(ajax_obj, options));
       }
-    };
+    }
+  }, {
+    key: 'get',
+    value: function get(callback) {
+      var _this = this;
 
-    EmojidexUserHistory.prototype.get = function(callback) {
-      var options;
-      options = {
+      var options = {
         data: {
           auth_token: this.token
         },
-        success: (function(_this) {
-          return function(response) {
-            _this._history = response;
-            _this.EC.Data.history(response);
-            return typeof callback === "function" ? callback(_this._history) : void 0;
-          };
-        })(this)
+        success: function success(response) {
+          _this._history = response;
+          _this.EC.Data.history(response);
+          return __guardFunc__(callback, function (f) {
+            return f(_this._history);
+          });
+        }
       };
       return this._historyAPI(options);
-    };
+    }
+  }, {
+    key: 'set',
+    value: function set(emoji_code) {
+      var _this2 = this;
 
-    EmojidexUserHistory.prototype.set = function(emoji_code) {
-      var options;
-      options = {
+      var options = {
         type: 'POST',
         data: {
           auth_token: this.token,
           emoji_code: emoji_code
         },
-        success: (function(_this) {
-          return function(response) {
-            var entry, i, j, len, ref;
-            ref = _this._history;
-            for (i = j = 0, len = ref.length; j < len; i = ++j) {
-              entry = ref[i];
-              if (entry.emoji_code === response.emoji_code) {
-                _this._history[i] = response;
-                _this.EC.Data.history(_this._history);
-                return response;
-              }
+        success: function success(response) {
+          for (var i = 0; i < _this2._history.length; i++) {
+            var entry = _this2._history[i];
+            if (entry.emoji_code === response.emoji_code) {
+              _this2._history[i] = response;
+              _this2.EC.Data.history(_this2._history);
+              return response;
             }
-          };
-        })(this)
+          }
+        }
       };
       return this._historyAPI(options);
-    };
-
-    EmojidexUserHistory.prototype.sync = function() {
+    }
+  }, {
+    key: 'sync',
+    value: function sync() {
       return this.get();
-    };
+    }
+  }, {
+    key: 'all',
+    value: function all(callback) {
+      var _this3 = this;
 
-    EmojidexUserHistory.prototype.all = function(callback) {
       if (this._history != null) {
-        if (typeof callback === "function") {
-          callback(this._history);
-        }
+        __guardFunc__(callback, function (f) {
+          return f(_this3._history);
+        });
       } else {
-        setTimeout(((function(_this) {
-          return function() {
-            return _this.all(callback);
-          };
-        })(this)), 500);
+        setTimeout(function () {
+          return _this3.all(callback);
+        }, 500);
       }
       return this._history;
-    };
+    }
+  }]);
 
-    return EmojidexUserHistory;
+  return EmojidexUserHistory;
+}();
 
-  })();
-
-}).call(this);
+function __guardFunc__(func, transform) {
+  return typeof func === 'function' ? transform(func) : undefined;
+}
+//# sourceMappingURL=history.js.map
 
 "use strict";
 
@@ -1364,41 +1446,47 @@ var EmojidexUtil = function () {
 
     this.EC = EC;
 
-    this.a_pattern = RegExp("<a href='[^']*' emoji-code='[^']*'><img src='[^']*' emoji-code='[^']*' alt='[^']*' \/><\/a>", 'g');
-    this.img_pattern = RegExp("<img src='[^']*' emoji-code='[^']*' alt='[^']*' \/>", 'g');
+    this.a_pattern = RegExp("<a href='[^']*' emoji-code='[^']*'><img class='emojidex-emoji' src='[^']*' (emoji-code='[^']*' emoji-moji='[^']*'|emoji-code='[^']*') alt='[^']*' \/><\/a>", 'g');
+    this.img_pattern = RegExp("<img class='emojidex-emoji' src='[^']*' (emoji-code='[^']*' emoji-moji='[^']*'|emoji-code='[^']*') alt='[^']*' \/>", 'g');
     this.emoji_code_pattern = RegExp("emoji-code='([^']*)'", '');
+    this.emoji_moji_pattern = RegExp("emoji-moji='([^']*)'", '');
   }
 
   // Escapes spaces to underscore
 
 
   _createClass(EmojidexUtil, [{
-    key: "escape_term",
-    value: function escape_term(term) {
-      return term.replace(/\s/g, '_').replace(/(\(|\))/g, '\\$1');
+    key: "escapeTerm",
+    value: function escapeTerm(term) {
+      return term.replace(/\s/g, '_');
     }
 
     // De-Escapes underscores to spaces
 
   }, {
-    key: "de_escape_term",
-    value: function de_escape_term(term) {
+    key: "deEscapeTerm",
+    value: function deEscapeTerm(term) {
       return term.replace(/_/g, ' ');
+    }
+  }, {
+    key: "makeURLSafe",
+    value: function makeURLSafe(term) {
+      return this.escapeTerm(term).replace(/\(/g, '%28').replace(/\)/g, '%29');
     }
 
     // Adds colons around a code
 
   }, {
-    key: "encapsulate_code",
-    value: function encapsulate_code(code) {
-      return ":" + this.unencapsulate_code(code) + ":";
+    key: "encapsulateCode",
+    value: function encapsulateCode(code) {
+      return ":" + this.unEncapsulateCode(code) + ":";
     }
 
     // Removes colons around a code
 
   }, {
-    key: "unencapsulate_code",
-    value: function unencapsulate_code(code) {
+    key: "unEncapsulateCode",
+    value: function unEncapsulateCode(code) {
       return code.replace(/\:/g, '');
     }
 
@@ -1427,8 +1515,8 @@ var EmojidexUtil = function () {
       var size_code = arguments.length <= 1 || arguments[1] === undefined ? this.EC.size_code : arguments[1];
 
       for (i = 0; i < emoji.length; i++) {
-        emoji[i].code = this.escape_term(emoji[i].code);
-        emoji[i].img_url = this.EC.cdn_url + "/" + size_code + "/" + this.escape_term(emoji[i].code) + ".png";
+        emoji[i].code = this.escapeTerm(emoji[i].code);
+        emoji[i].img_url = this.EC.cdn_url + "/" + size_code + "/" + this.escapeTerm(emoji[i].code) + ".png";
       }
 
       return emoji;
@@ -1437,23 +1525,23 @@ var EmojidexUtil = function () {
     // Returns an HTML image/link tag for an emoji from an emoji object
 
   }, {
-    key: "emoji_to_html",
-    value: function emoji_to_html(emoji) {
+    key: "emojiToHTML",
+    value: function emojiToHTML(emoji) {
       var size_code = arguments.length <= 1 || arguments[1] === undefined ? this.EC.defaults.size_code : arguments[1];
 
-      var img = "<img src='http://" + this.EC.env.cdn_addr + "/emoji/" + this.EC.defaults.size_code + "/" + this.escape_term(emoji.code) + ".png' emoji-code='" + (emoji.moji == null || emoji.moji == '' ? this.encapsulate_code(this.escape_term(emoji.code)) : emoji.moji) + "' alt='" + this.de_escape_term(emoji.code) + "' />";
-      if (emoji.link != null && emoji.link != '') return "<a href='" + emoji.link + "' emoji-code='" + this.encapsulate_code(this.escape_term(emoji.code)) + "'>" + img + "</a>";
+      var img = "<img class='emojidex-emoji' src='http://" + this.EC.env.cdn_addr + "/emoji/" + size_code + "/" + this.escapeTerm(emoji.code) + ".png' emoji-code='" + this.escapeTerm(emoji.code) + "'" + (emoji.moji == null || emoji.moji == '' ? '' : " emoji-moji='" + emoji.moji + "'") + " alt='" + this.deEscapeTerm(emoji.code) + "' />";
+      if (emoji.link != null && emoji.link != '') return "<a href='" + emoji.link + "' emoji-code='" + this.escapeTerm(emoji.code) + "'>" + img + "</a>";
       return img;
     }
 
     // Returns a MarkDown image/link tag for an emoji from an emoji object
 
   }, {
-    key: "emoji_to_md",
-    value: function emoji_to_md(emoji) {
+    key: "emojiToMD",
+    value: function emojiToMD(emoji) {
       var size_code = arguments.length <= 1 || arguments[1] === undefined ? this.EC.defaults.size_code : arguments[1];
 
-      var img = "![" + emoji.code + "](http://" + this.EC.env.cdn_addr + "/emoji/" + size_code + "/" + this.escape_term(emoji.code) + ".png \"" + this.de_escape_term(emoji.code) + " em😜ji\")";
+      var img = "![" + (emoji.moji == null || emoji.moji == '' ? emoji.code : emoji.moji) + "](http://" + this.EC.env.cdn_addr + "/emoji/" + size_code + "/" + this.escapeTerm(emoji.code) + ".png \"" + this.deEscapeTerm(emoji.code) + "\")";
       if (emoji.link != null && emoji.link != '') return "[" + img + " ](" + emoji.link + ")";
       return img;
     }
@@ -1463,10 +1551,11 @@ var EmojidexUtil = function () {
     // a text box/content editable element, NOT a DOM object.
 
   }, {
-    key: "de_emojify_html",
-    value: function de_emojify_html(source) {
-      source = this.de_link_html(source);
+    key: "deEmojifyHTML",
+    value: function deEmojifyHTML(source) {
+      var mojify = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
 
+      source = this.deLinkHTML(source);
       var found = source.match(this.img_pattern);
 
       var _iteratorNormalCompletion = true;
@@ -1477,7 +1566,15 @@ var EmojidexUtil = function () {
         for (var _iterator = found[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
           find = _step.value;
 
-          source = source.replace(find, find.match(this.emoji_code_pattern)[1]);
+          if (mojify) {
+            var moji_code = find.match(this.emoji_moji_pattern);
+            if (moji_code != null && moji_code.length != 1) {
+              source = source.replace(find, moji_code[1]);
+              continue;
+            }
+          }
+          var emoji_code = find.match(this.emoji_code_pattern);
+          source = source.replace(find, this.encapsulateCode(emoji_code[1]));
         }
       } catch (err) {
         _didIteratorError = true;
@@ -1501,8 +1598,8 @@ var EmojidexUtil = function () {
     // *Only do this if you need to remove links for functionality.
 
   }, {
-    key: "de_link_html",
-    value: function de_link_html(source) {
+    key: "deLinkHTML",
+    value: function deLinkHTML(source) {
       var found = source.match(this.a_pattern);
 
       var _iteratorNormalCompletion2 = true;
