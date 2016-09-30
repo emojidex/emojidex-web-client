@@ -1,15 +1,11 @@
-emojidex Coffee/Java Script Client
+emojidex Java Script Client
 ==================================
-The emojidex Coffee/Java Script client is set up to handle searching, listing, login, history,
+The emojidex Java Script client is set up to handle searching, listing, login, history,
 favorites etc. against the emojidex API.
-
-All examples here will be given as JavaScript. If you are bundling/using the client as Coffee
-(which is the recommend way to use it) please use the original coffee file and convert syntax
-accordingly.
 
 Building
 --------
-You will need node with a usable npm, grunt, bower. In general grunt and bower should be
+You will need node with a usable npm and grunt. In general grunt should be
 installed globally or should be present and usable in your path. We'll assume you have a
 working node/npm that you either installed using your package manager or built yourself.
 
@@ -23,7 +19,6 @@ cd emojidex-web-client
 ### Install Packages and Obtain Required Sources
 ```shell
 npm install
-bower install
 ```
 
 ### Build
@@ -36,45 +31,45 @@ For development mode with dynamic compilation and dev server:
 ```shell
 grunt dev
 ```
+
 The jasmin spec runner page is left after each run at
 [http://localhost:8000/build/_SpecRunner.html](http://localhost:8000/build/_SpecRunner.html).
 You can open that file and play with the client in the javascript/debug terminal.
 
 Design
 ======
-
 The client is a state machine as much as it can be. Instance variables will usually apply to
 the current state and will often be automatically changed after an operation. As such:
 *DO NOT RELY ON INSTANCE VARIABLES TO BE ACCURATE AFTER CONSECUTIVE OR PARALLEL OPERATIONS*
-Be careful not to create race conditions. Utilize callbacks efficiently.
+Either be careful not to create race conditions or make sure you obtain data solely off of 
+callbacks. Utilize callbacks efficiently.
 
 _ALWAYS_ create a separate instance of the client for each widget or component you are using
 the client in. If you have two separate pieces of code operating on the same view or in the same
 module each piece of code should have a different client instance.
 
-The client is broken up into a set of nested modules:<br>
-Client<br>
-  ┣Emoji<br>
-  ┣Categories<br>
-  ┣Indexes<br>
-  ┣User<br>
-  ┃  ┣History<br>
-  ┃  ┗Favorites<br>
-  ┣Search<br>
-  ┣Data<br>
-  ┗Util<br>
+The client is broken up into a set of nested modules:  
+Client  
+  ┣Emoji  
+  ┣Categories  
+  ┣Indexes  
+  ┣User  
+  ┃  ┣History  
+  ┃  ┗Favorites  
+  ┣Search  
+  ┣Data  
+  ┗Util  
 
 The Data modules should usually be ignored unless you're doing something particularly
 hackish - but be warned that messing with these could be a quick way to break user data!
-The Emoji and Search modules will likely be of the most interest to most developers. If you're
-looking to play around with emoji these are good places to start.
+The Emoji, Search and Util modules will likely be of the most interest to most developers. 
+If you're looking to play around with emoji these are good places to start.
 
 Argument Layout
 ---------------
-
 For the sake of uniformity and familiarity most methods will have the same layout:
-```coffee
-client_method(primary, secondary = [], callback = null, opts)
+```js
+ClassObject.Tool.someMethod(primary, secondary = [], callback = null, opts)
 ```
 That is:
   1. primary: the primary argument, such as the search term
@@ -87,15 +82,13 @@ That is:
 
 Usage
 =====
-
 Basic usage is listed here. For more usage patterns please check the JavaScript tabs on
 [developer.emojidex.com](http://developer.emojidex.com).
 
 Initialization/Instantiation
 ----------------------------
-
 Basic initialization and usage:
-```coffee
+```js
 emojidex = new EmojidexClient();
 ```
 
@@ -115,16 +108,15 @@ open an issue on github.
 
 Plain Auth / Login
 ------------------
-
 If an API Key / Auth Token is already obtained it will be saved in local storage. The easiest way
 to obtain an API Key is with basic authentication using a username or e-mail address and password.
-```coffee
+```js
 emojidex.User.login({"authtype": "plain", "username": "MeMeMe", "password": "******"});
 ```
 
 If you need to log the user out you can log out by calling the logout method. Please avoid calling
 this method unless you have a really good reason.
-```coffee
+```js
 emojidex.logout();
 ```
 
@@ -137,28 +129,28 @@ emojidex.Search.results
 ```
 
 Basic code search:
-```coffee
-# coffee signature
-search: term, callback = null, opts) ->
+```js
+# signature
+search(term, callback = null, opts)
 # usage
-emojidex.Search.search("smile")
+emojidex.Search.search("smile");
 ```
 
 Advanced code search:
 *note that more tags will yeiled fewer results (AND) and more categories will yield more results (OR)*
-```coffee
-# coffee signature
-advanced: (search_details, callback = null, opts) ->
+```js
+# signature
+advanced(search_details, callback = null, opts)
 # usage
-emojidex.Search.advanced({term: "smile", tags: ["happy"], categories: ["faces", "people"]})
+emojidex.Search.advanced({term: "smile", tags: ["happy"], categories: ["faces", "people"]});
 ```
 
 Tag search:
-```coffee
-# coffee signature
+```js
+# signature
 tags: (tags, callback = null, opts) ->
 # usage
-emojidex.Search.tags(["open source", "education"])
+emojidex.Search.tags(["open source", "education"]);
 ```
 
 History
@@ -166,13 +158,13 @@ History
 
 History is automatically obtained upon login / is saved locally so you will generally not need to
 call "get", it will simply be available from:
-```coffee
-emojidex.User.History.all()
+```js
+emojidex.User.History.all();
 ```
 
 Add an item to history (please call whenever a user "uses" an emoji) using the emoji code:
-```coffee
-emojidex.User.History.set("combat_knife")
+```js
+emojidex.User.History.set("combat_knife");
 ```
 
 Favorites
@@ -180,20 +172,20 @@ Favorites
 
 Favorites are automatically obtained upon login/ are saved locally so you will generally not need
 to call "get", it will simply be available from:
-```coffee
-emojidex.User.Favorites.all()
+```js
+emojidex.User.Favorites.all();
 ```
 
 Add an emoji to user favorites:
 *note that despite "favorites" being plural this method takes a single emoji code*
-```coffee
-emojidex.User.Favorites.set("combat_knife")
+```js
+emojidex.User.Favorites.set("combat_knife");
 ```
 
 Remove an emoji from user favorites:
 *note that despite "favorites" being plural this method takes a single emoji code*
-```coffee
-emojidex.User.Favorites.unset("combat_knife")
+```js
+emojidex.User.Favorites.unset("combat_knife");
 ```
 
 The Magic "next" and "prev" Method
@@ -202,18 +194,18 @@ All search methods will set the "next" and "prev" method to get the next or prev
 You can call a search, then later simply call next() or prev() and get the page.
 *When next is called and there are no more results an empty array will be returned*
 
-```coffee
+```js
 // first 32 results are returned and put in .results
-emojidex.Search.search("face")
+emojidex.Search.search("face");
 // next 32 results are returned and put in .results
-emojidex.Search.next()
+emojidex.Search.next();
 // prev 32 results are returned and put in .results
-emojidex.Search.prev()
+emojidex.Search.prev();
 ```
 
 Utility Methods
 ---------------
-```coffee
+```js
 // adds an aray of emoji to the emoji available in the emoji instance variable, removing dupes
 selection = emojidex.Emoji.combine(emoji_we_want_users_to_use_on_our_site);
 
