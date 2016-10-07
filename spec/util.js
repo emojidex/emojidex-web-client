@@ -74,4 +74,17 @@ describe('EmojidexUtil', function() {
 
     expect(EC_spec.Util.deEmojifyHTML(test_text)).toBe(expected_text);
   });
+
+//  it('finds emoji and short codes in text and converts them with the chosen drop-in converter', function(done) {
+//    test_text = 'I have a 🚗. My favorite sushi is :(サーモン)すし:. :-) :::xxxxxxxx:.';
+//
+//    expected_text = 'I have a *red car*. My favorite sushi is *(サーモン)すし*. :-) :::xxxxxxxx:.';
+//
+//    EC_spec.Util.emojify(test_text, function(emoji) {
+//      return '*' + emoji.code + '*';
+//    }, function(processed_text) {
+//      expect(processed_text).toBe(expected_text);
+//      done();
+//    });
+//  });
 });

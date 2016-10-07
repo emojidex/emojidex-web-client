@@ -25,11 +25,16 @@ class EmojidexData
       else
         @storage.hub_cache =
           emojidex:
-            emoji: @EC.options?.emoji || []
-            history: @EC.options?.history || []
-            favorites: @EC.options?.favorites || []
-            categories: @EC.options?.categories || []
-            auth_info: @EC.options?.auth_info || @_def_auth_info
+            #moji_codes: @EC.options.moji_codes || {emoji_string: "", emoji_array: [], emoji_index: {}}
+            moji_codes:
+              emoji_string: ""
+              emoji_array: []
+              emoji_index: {}
+            emoji: @EC.options.emoji || []
+            history: @EC.options.history || []
+            favorites: @EC.options.favorites || []
+            categories: @EC.options.categories || []
+            auth_info: @EC.options.auth_info || @_def_auth_info
         return @storage.update 'emojidex', @storage.hub_cache.emojidex
     ).then((data) =>
       if @storage.hub_cache?.emojidex?.cdn_url?
@@ -47,6 +52,9 @@ class EmojidexData
             return @storage.update('emojidex', cdn_url: @EC.cdn_url)
     ).then (data) =>
       @EC.Data = @
+
+  moji_codes: () ->
+    return @storage.hub_cache.emojidex.moji_codes
 
   emoji: (emoji_set) ->
     if emoji_set?

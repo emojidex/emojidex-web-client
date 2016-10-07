@@ -5,7 +5,7 @@ if(u&&c){if(this.prev<i.catchLoc)return handle(i.catchLoc,!0);if(this.prev<i.fin
 
 !function(e){function t(e,o){o=o||{},this._id=t._generateUUID(),this._promise=o.promise||Promise,this._frameId=o.frameId||"CrossStorageClient-"+this._id,this._origin=t._getOrigin(e),this._requests={},this._connected=!1,this._closed=!1,this._count=0,this._timeout=o.timeout||5e3,this._listener=null,this._installListener();var r;o.frameId&&(r=document.getElementById(o.frameId)),r&&this._poll(),r?this._hub=r.contentWindow:this._createFrame(e)}t.frameStyle={display:"none",position:"absolute",top:"-999px",left:"-999px"},t._getOrigin=function(e){var t,o,r;return t=document.createElement("a"),t.href=e,t.host||(t=window.location),o=t.protocol&&":"!==t.protocol?t.protocol:window.location.protocol,r=o+"//"+t.host,r=r.replace(/:80$|:443$/,"")},t._generateUUID=function(){return"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,function(e){var t=16*Math.random()|0,o="x"==e?t:3&t|8;return o.toString(16)})},t.prototype.onReadyFrame=function(){var e=this;return this._hub?this._promise.resolve():this._closed?this._promise.reject(new Error("CrossStorageClient has closed")):new this._promise(function(t,o){var r=setTimeout(function(){o(new Error("CrossStorageClient could not ready frame"))},e._timeout),n=setInterval(function(){e._hub&&(clearTimeout(r),clearInterval(n),t())},100)})},t.prototype.onConnect=function(){var e=this;return this._connected?this._promise.resolve():this._closed?this._promise.reject(new Error("CrossStorageClient has closed")):(this._requests.connect||(this._requests.connect=[]),new this._promise(function(t,o){var r=setTimeout(function(){o(new Error("CrossStorageClient could not connect"))},e._timeout);e._requests.connect.push(function(e){return clearTimeout(r),e?o(e):(t(),void 0)})}))},t.prototype.set=function(e,t,o){return this._request("set",{key:e,value:t,ttl:o})},t.prototype.get=function(){var e=Array.prototype.slice.call(arguments);return this._request("get",{keys:e})},t.prototype.del=function(){var e=Array.prototype.slice.call(arguments);return this._request("del",{keys:e})},t.prototype.clear=function(){return this._request("clear")},t.prototype.getKeys=function(){return this._request("getKeys")},t.prototype.close=function(){var e=document.getElementById(this._frameId);e&&e.parentNode.removeChild(e),window.removeEventListener?window.removeEventListener("message",this._listener,!1):window.detachEvent("onmessage",this._listener),this._connected=!1,this._closed=!0},t.prototype._installListener=function(){var e=this;this._listener=function(t){var o,r,n,s;if(!e._closed&&t.data&&"string"==typeof t.data&&(r="null"===t.origin?"file://":t.origin,r===e._origin))if("cross-storage:unavailable"!==t.data){if(-1!==t.data.indexOf("cross-storage:")&&!e._connected){if(e._connected=!0,!e._requests.connect)return;for(o=0;o<e._requests.connect.length;o++)e._requests.connect[o](n);delete e._requests.connect}if("cross-storage:ready"!==t.data){try{s=JSON.parse(t.data)}catch(i){return}s.id&&e._requests[s.id]&&e._requests[s.id](s.error,s.result)}}else{if(e._closed||e.close(),!e._requests.connect)return;for(n=new Error("Closing client. Could not access localStorage in hub."),o=0;o<e._requests.connect.length;o++)e._requests.connect[o](n)}},window.addEventListener?window.addEventListener("message",this._listener,!1):window.attachEvent("onmessage",this._listener)},t.prototype._poll=function(){var e,t,o;e=this,o="file://"===e._origin?"*":e._origin,t=setInterval(function(){return e._connected?clearInterval(t):(e._hub&&e._hub.postMessage("cross-storage:poll",o),void 0)},1e3)},t.prototype._createFrame=function(e){var o,r,n=this;o=window.document.createElement("iframe"),o.id=this._frameId;for(r in t.frameStyle)t.frameStyle.hasOwnProperty(r)&&(o.style[r]=t.frameStyle[r]);window.document.body.appendChild(o),o.onload=function(){n._hub=o.contentWindow},o.src=e},t.prototype._request=function(e,t){var o,r;return this._closed?this._promise.reject(new Error("CrossStorageClient has closed")):(r=this,r._count++,o={id:this._id+":"+r._count,method:"cross-storage:"+e,params:t},new this._promise(function(e,t){var n,s,i;n=setTimeout(function(){r._requests[o.id]&&(delete r._requests[o.id],t(new Error("Timeout: could not perform "+o.method)))},r._timeout),r._requests[o.id]=function(s,i){return clearTimeout(n),delete r._requests[o.id],s?t(new Error(s)):(e(i),void 0)},Array.prototype.toJSON&&(s=Array.prototype.toJSON,Array.prototype.toJSON=null),i="file://"===r._origin?"*":r._origin,r._hub.postMessage(JSON.stringify(o),i),s&&(Array.prototype.toJSON=s)}))},"undefined"!=typeof module&&module.exports?module.exports=t:"undefined"!=typeof exports?exports.CrossStorageClient=t:"function"==typeof define&&define.amd?define([],function(){return t}):e.CrossStorageClient=t}(this);
 (function() {
-  var EmojidexCategories, EmojidexData, EmojidexDataStorage, EmojidexEmoji, EmojidexIndexes, EmojidexSearch,
+  var EmojidexCategories, EmojidexData, EmojidexDataStorage, EmojidexEmoji, EmojidexSearch,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   this.EmojidexClient = (function() {
@@ -212,17 +212,21 @@ if(u&&c){if(this.prev<i.catchLoc)return handle(i.catchLoc,!0);if(this.prev<i.fin
         };
       })(this)).then((function(_this) {
         return function(keys) {
-          var ref, ref1, ref2, ref3, ref4;
           if (keys.indexOf('emojidex') !== -1) {
             return _this.storage.update_cache('emojidex');
           } else {
             _this.storage.hub_cache = {
               emojidex: {
-                emoji: ((ref = _this.EC.options) != null ? ref.emoji : void 0) || [],
-                history: ((ref1 = _this.EC.options) != null ? ref1.history : void 0) || [],
-                favorites: ((ref2 = _this.EC.options) != null ? ref2.favorites : void 0) || [],
-                categories: ((ref3 = _this.EC.options) != null ? ref3.categories : void 0) || [],
-                auth_info: ((ref4 = _this.EC.options) != null ? ref4.auth_info : void 0) || _this._def_auth_info
+                moji_codes: {
+                  emoji_string: "",
+                  emoji_array: [],
+                  emoji_index: {}
+                },
+                emoji: _this.EC.options.emoji || [],
+                history: _this.EC.options.history || [],
+                favorites: _this.EC.options.favorites || [],
+                categories: _this.EC.options.categories || [],
+                auth_info: _this.EC.options.auth_info || _this._def_auth_info
               }
             };
             return _this.storage.update('emojidex', _this.storage.hub_cache.emojidex);
@@ -254,6 +258,10 @@ if(u&&c){if(this.prev<i.catchLoc)return handle(i.catchLoc,!0);if(this.prev<i.fin
         };
       })(this));
     }
+
+    EmojidexData.prototype.moji_codes = function() {
+      return this.storage.hub_cache.emojidex.moji_codes;
+    };
 
     EmojidexData.prototype.emoji = function(emoji_set) {
       var emoji, hub_emoji, j, k, len, len1, new_emoji, ref;
@@ -687,138 +695,6 @@ if(u&&c){if(this.prev<i.catchLoc)return handle(i.catchLoc,!0);if(this.prev<i.fin
 
   })();
 
-  EmojidexIndexes = (function() {
-    function EmojidexIndexes(EC) {
-      this.EC = EC;
-      this.results = [];
-      this.cur_page = 1;
-      this.count = 0;
-    }
-
-    EmojidexIndexes.prototype._indexesAPI = function(query, callback, opts, func) {
-      var param;
-      param = {
-        page: 1,
-        limit: this.EC.limit,
-        detailed: this.EC.detailed
-      };
-      if (this.EC.User.auth_info.token !== null) {
-        $.extend(param, {
-          auth_token: this.EC.User.auth_info.token
-        });
-      }
-      $.extend(param, opts);
-      if (func != null) {
-        this.indexed_func = func;
-        this.indexed = {
-          query: query,
-          callback: callback,
-          param: param
-        };
-      }
-      return $.ajax({
-        url: this.EC.api_url + query,
-        dataType: 'json',
-        data: param,
-        success: (function(_this) {
-          return function(response) {
-            if (response.status != null) {
-              _this.results = [];
-              _this.cur_page = 0;
-              _this.count = 0;
-              return typeof callback === "function" ? callback([]) : void 0;
-            } else {
-              _this.meta = response.meta;
-              _this.results = response.emoji;
-              _this.cur_page = response.meta.page;
-              _this.count = response.meta.count;
-              return _this.EC.Emoji.combine(response.emoji).then(function(data) {
-                return typeof callback === "function" ? callback(response.emoji) : void 0;
-              });
-            }
-          };
-        })(this),
-        error: (function(_this) {
-          return function(response) {
-            _this.results = [];
-            _this.cur_page = 0;
-            _this.count = 0;
-            return typeof callback === "function" ? callback([]) : void 0;
-          };
-        })(this)
-      });
-    };
-
-    EmojidexIndexes.prototype.index = function(callback, opts) {
-      return this._indexesAPI('emoji', callback, opts, this.index);
-    };
-
-    EmojidexIndexes.prototype.newest = function(callback, opts) {
-      return this._indexesAPI('newest', callback, opts, this.newest);
-    };
-
-    EmojidexIndexes.prototype.popular = function(callback, opts) {
-      return this._indexesAPI('popular', callback, opts, this.popular);
-    };
-
-    EmojidexIndexes.prototype.user = function(username, callback, opts) {
-      return this._indexesAPI("users/" + username + "/emoji", callback, opts);
-    };
-
-    EmojidexIndexes.prototype["static"] = function(static_type, language, callback) {
-      var j, len, loadStatic, loaded_emoji, loaded_num, results1, type;
-      loaded_num = 0;
-      loaded_emoji = [];
-      loadStatic = (function(_this) {
-        return function(url_string) {
-          return $.ajax({
-            url: url_string,
-            dataType: 'json',
-            success: function(response) {
-              loaded_emoji = loaded_emoji.concat(response);
-              if (++loaded_num === static_type.length) {
-                return _this.EC.Emoji.combine(loaded_emoji).then(function(data) {
-                  return typeof callback === "function" ? callback(data) : void 0;
-                });
-              }
-            }
-          });
-        };
-      })(this);
-      results1 = [];
-      for (j = 0, len = static_type.length; j < len; j++) {
-        type = static_type[j];
-        if (language) {
-          results1.push(loadStatic((this.EC.api_url + type) + "?locale=" + language));
-        } else {
-          results1.push(loadStatic("" + (this.EC.api_url + type)));
-        }
-      }
-      return results1;
-    };
-
-    EmojidexIndexes.prototype.select = function(code, callback, opts) {
-      return this.EC.Search.find(code, callback, opts);
-    };
-
-    EmojidexIndexes.prototype.next = function() {
-      if (this.count === this.indexed.param.limit) {
-        this.indexed.param.page++;
-      }
-      return this.indexed_func(this.indexed.callback, this.indexed.param, this.indexed_func);
-    };
-
-    EmojidexIndexes.prototype.prev = function() {
-      if (this.indexed.param.page > 1) {
-        this.indexed.param.page--;
-      }
-      return this.indexed_func(this.indexed.callback, this.indexed.param, this.indexed_func);
-    };
-
-    return EmojidexIndexes;
-
-  })();
-
   EmojidexSearch = (function() {
     function EmojidexSearch(EC) {
       this.EC = EC;
@@ -1013,6 +889,159 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var EmojidexIndexes = function () {
+  function EmojidexIndexes(EC) {
+    _classCallCheck(this, EmojidexIndexes);
+
+    this.EC = EC;
+    this.results = [];
+    this.cur_page = 1;
+    this.count = 0;
+  }
+
+  _createClass(EmojidexIndexes, [{
+    key: '_indexesAPI',
+    value: function _indexesAPI(query, callback, opts, func) {
+      var _this = this;
+
+      var param = {
+        page: 1,
+        limit: this.EC.limit,
+        detailed: this.EC.detailed
+      };
+      if (this.EC.User.auth_info.token !== null) {
+        $.extend(param, { auth_token: this.EC.User.auth_info.token });
+      }
+      $.extend(param, opts);
+
+      if (func != null) {
+        this.indexed_func = func;
+        this.indexed = {
+          query: query,
+          callback: callback,
+          param: param
+        };
+      }
+
+      return $.ajax({
+        url: this.EC.api_url + query,
+        dataType: 'json',
+        data: param,
+        success: function success(response) {
+          if (response.status != null) {
+            _this.results = [];
+            _this.cur_page = 0;
+            _this.count = 0;
+            return __guardFunc__(callback, function (f) {
+              return f([]);
+            });
+          } else {
+            _this.meta = response.meta;
+            _this.results = response.emoji;
+            _this.cur_page = response.meta.page;
+            _this.count = response.meta.count;
+            return _this.EC.Emoji.combine(response.emoji).then(function (data) {
+              return __guardFunc__(callback, function (f1) {
+                return f1(response.emoji);
+              });
+            });
+          }
+        },
+        error: function error(response) {
+          _this.results = [];
+          _this.cur_page = 0;
+          _this.count = 0;
+          return __guardFunc__(callback, function (f) {
+            return f([]);
+          });
+        } });
+    }
+  }, {
+    key: 'index',
+    value: function index(callback, opts) {
+      return this._indexesAPI('emoji', callback, opts, this.index);
+    }
+  }, {
+    key: 'newest',
+    value: function newest(callback, opts) {
+      return this._indexesAPI('newest', callback, opts, this.newest);
+    }
+  }, {
+    key: 'popular',
+    value: function popular(callback, opts) {
+      return this._indexesAPI('popular', callback, opts, this.popular);
+    }
+  }, {
+    key: 'user',
+    value: function user(username, callback, opts) {
+      return this._indexesAPI('users/' + username + '/emoji', callback, opts);
+    }
+  }, {
+    key: 'static',
+    value: function _static(static_type, language, callback) {
+      var _this2 = this;
+
+      var loaded_num = 0;
+      var loaded_emoji = [];
+
+      var loadStatic = function loadStatic(url_string) {
+        return $.ajax({
+          url: url_string,
+          dataType: 'json',
+          success: function success(response) {
+            loaded_emoji = loaded_emoji.concat(response);
+            if (++loaded_num === static_type.length) {
+              return _this2.EC.Emoji.combine(loaded_emoji).then(function (data) {
+                return __guardFunc__(callback, function (f) {
+                  return f(data);
+                });
+              });
+            }
+          }
+        });
+      };
+
+      return static_type.map(function (type) {
+        return language ? loadStatic(_this2.EC.api_url + type + '?locale=' + language) : loadStatic('' + (_this2.EC.api_url + type));
+      });
+    }
+  }, {
+    key: 'select',
+    value: function select(code, callback, opts) {
+      return this.EC.Search.find(code, callback, opts);
+    }
+  }, {
+    key: 'next',
+    value: function next() {
+      if (this.count === this.indexed.param.limit) {
+        this.indexed.param.page++;
+      }
+      return this.indexed_func(this.indexed.callback, this.indexed.param, this.indexed_func);
+    }
+  }, {
+    key: 'prev',
+    value: function prev() {
+      if (this.indexed.param.page > 1) {
+        this.indexed.param.page--;
+      }
+      return this.indexed_func(this.indexed.callback, this.indexed.param, this.indexed_func);
+    }
+  }]);
+
+  return EmojidexIndexes;
+}();
+
+function __guardFunc__(func, transform) {
+  return typeof func === 'function' ? transform(func) : undefined;
+}
+//# sourceMappingURL=indexes.js.map
+
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var EmojidexUser = function () {
   function EmojidexUser(EC) {
     _classCallCheck(this, EmojidexUser);
@@ -1156,14 +1185,14 @@ var EmojidexUser = function () {
   }, {
     key: 'setAuth',
     value: function setAuth(user, token) {
-      var r18 = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
-      var premium = arguments.length <= 3 || arguments[3] === undefined ? false : arguments[3];
-      var premium_exp = arguments.length <= 4 || arguments[4] === undefined ? null : arguments[4];
+      var r18 = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+      var premium = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+      var premium_exp = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
 
       var _this2 = this;
 
-      var pro = arguments.length <= 5 || arguments[5] === undefined ? false : arguments[5];
-      var pro_exp = arguments.length <= 6 || arguments[6] === undefined ? null : arguments[6];
+      var pro = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
+      var pro_exp = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : null;
 
       return this.EC.Data.auth_info({
         status: 'verified',
@@ -1448,8 +1477,10 @@ var EmojidexUtil = function () {
 
     this.a_pattern = RegExp("<a href='[^']*' emoji-code='[^']*'><img class='emojidex-emoji' src='[^']*' (emoji-code='[^']*' emoji-moji='[^']*'|emoji-code='[^']*') alt='[^']*' \/><\/a>", 'g');
     this.img_pattern = RegExp("<img class='emojidex-emoji' src='[^']*' (emoji-code='[^']*' emoji-moji='[^']*'|emoji-code='[^']*') alt='[^']*' \/>", 'g');
-    this.emoji_code_pattern = RegExp("emoji-code='([^']*)'", '');
-    this.emoji_moji_pattern = RegExp("emoji-moji='([^']*)'", '');
+    this.emoji_code_tag_attr_pattern = RegExp("emoji-code='([^']*)'", '');
+    this.emoji_moji_tag_attr_pattern = RegExp("emoji-moji='([^']*)'", '');
+    this.ignored_characters = '\'":;@&#~{}<>\\r\\n\\[\\]\\!\\$\\+\\?\\%\\*\\/\\\\';
+    this.short_code_pattern = RegExp(":([^\\s" + this.ignored_characters + "][^" + this.ignored_characters + "]*[^" + this.ignored_characters + "]):|:([^" + this.ignored_characters + "]):", 'g');
   }
 
   // Escapes spaces to underscore
@@ -1511,8 +1542,8 @@ var EmojidexUtil = function () {
   }, {
     key: "simplify",
     value: function simplify() {
-      var emoji = arguments.length <= 0 || arguments[0] === undefined ? this.results : arguments[0];
-      var size_code = arguments.length <= 1 || arguments[1] === undefined ? this.EC.size_code : arguments[1];
+      var emoji = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.results;
+      var size_code = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.EC.size_code;
 
       for (i = 0; i < emoji.length; i++) {
         emoji[i].code = this.escapeTerm(emoji[i].code);
@@ -1522,12 +1553,47 @@ var EmojidexUtil = function () {
       return emoji;
     }
 
+    // Convert emoji characters[moji] and short codes in a text block to whatever
+    // format is retrurned by the method passed as the processor parameter.
+    // An emoji object is passed to the processor and formatted text should be returned.
+    // Default processer converts to HTML tags.
+
+  }, {
+    key: "emojify",
+    value: function emojify(source) {
+      var processor = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.emojiToHTML;
+      var callback = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
+      processed_text = '';
+
+      //let found = 
+
+      // Detect emoji characters within the text
+
+
+      return processed_text;
+    }
+  }, {
+    key: "emojifyMoji",
+    value: function emojifyMoji(source) {
+      //let found = source.match();
+
+      var processor = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.emojiToHTML;
+      var callback = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+    }
+  }, {
+    key: "emojifyCodes",
+    value: function emojifyCodes(source) {
+      var processor = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.emojiToHTML;
+      var callback = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+    }
+
     // Returns an HTML image/link tag for an emoji from an emoji object
 
   }, {
     key: "emojiToHTML",
     value: function emojiToHTML(emoji) {
-      var size_code = arguments.length <= 1 || arguments[1] === undefined ? this.EC.defaults.size_code : arguments[1];
+      var size_code = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.EC.defaults.size_code;
 
       var img = "<img class='emojidex-emoji' src='http://" + this.EC.env.cdn_addr + "/emoji/" + size_code + "/" + this.escapeTerm(emoji.code) + ".png' emoji-code='" + this.escapeTerm(emoji.code) + "'" + (emoji.moji == null || emoji.moji == '' ? '' : " emoji-moji='" + emoji.moji + "'") + " alt='" + this.deEscapeTerm(emoji.code) + "' />";
       if (emoji.link != null && emoji.link != '') return "<a href='" + emoji.link + "' emoji-code='" + this.escapeTerm(emoji.code) + "'>" + img + "</a>";
@@ -1539,7 +1605,7 @@ var EmojidexUtil = function () {
   }, {
     key: "emojiToMD",
     value: function emojiToMD(emoji) {
-      var size_code = arguments.length <= 1 || arguments[1] === undefined ? this.EC.defaults.size_code : arguments[1];
+      var size_code = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.EC.defaults.size_code;
 
       var img = "![" + (emoji.moji == null || emoji.moji == '' ? emoji.code : emoji.moji) + "](http://" + this.EC.env.cdn_addr + "/emoji/" + size_code + "/" + this.escapeTerm(emoji.code) + ".png \"" + this.deEscapeTerm(emoji.code) + "\")";
       if (emoji.link != null && emoji.link != '') return "[" + img + " ](" + emoji.link + ")";
@@ -1553,7 +1619,7 @@ var EmojidexUtil = function () {
   }, {
     key: "deEmojifyHTML",
     value: function deEmojifyHTML(source) {
-      var mojify = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+      var mojify = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
       source = this.deLinkHTML(source);
       var found = source.match(this.img_pattern);
@@ -1567,13 +1633,13 @@ var EmojidexUtil = function () {
           find = _step.value;
 
           if (mojify) {
-            var moji_code = find.match(this.emoji_moji_pattern);
+            var moji_code = find.match(this.emoji_moji_tag_attr_pattern);
             if (moji_code != null && moji_code.length != 1) {
               source = source.replace(find, moji_code[1]);
               continue;
             }
           }
-          var emoji_code = find.match(this.emoji_code_pattern);
+          var emoji_code = find.match(this.emoji_code_tag_attr_pattern);
           source = source.replace(find, this.encapsulateCode(emoji_code[1]));
         }
       } catch (err) {

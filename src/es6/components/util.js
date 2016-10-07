@@ -4,8 +4,10 @@ class EmojidexUtil {
 
     this.a_pattern = RegExp("<a href='[^']*' emoji-code='[^']*'><img class='emojidex-emoji' src='[^']*' (emoji-code='[^']*' emoji-moji='[^']*'|emoji-code='[^']*') alt='[^']*' \/><\/a>", 'g');
     this.img_pattern = RegExp("<img class='emojidex-emoji' src='[^']*' (emoji-code='[^']*' emoji-moji='[^']*'|emoji-code='[^']*') alt='[^']*' \/>", 'g');
-    this.emoji_code_pattern = RegExp("emoji-code='([^']*)'", '');
-    this.emoji_moji_pattern = RegExp("emoji-moji='([^']*)'", '');
+    this.emoji_code_tag_attr_pattern = RegExp("emoji-code='([^']*)'", '');
+    this.emoji_moji_tag_attr_pattern = RegExp("emoji-moji='([^']*)'", '');
+    this.ignored_characters = '\'":;@&#~{}<>\\r\\n\\[\\]\\!\\$\\+\\?\\%\\*\\/\\\\';
+    this.short_code_pattern = RegExp(`:([^\\s${this.ignored_characters}][^${this.ignored_characters}]*[^${this.ignored_characters}]):|:([^${this.ignored_characters}]):`, 'g');
   }
 
   // Escapes spaces to underscore
@@ -55,6 +57,27 @@ class EmojidexUtil {
     return emoji;
   }
 
+  // Convert emoji characters[moji] and short codes in a text block to whatever
+  // format is retrurned by the method passed as the processor parameter.
+  // An emoji object is passed to the processor and formatted text should be returned.
+  // Default processer converts to HTML tags.
+  emojify(source, processor = this.emojiToHTML, callback = null) {
+    processed_text = '';
+
+    //let found = 
+
+    // Detect emoji characters within the text
+    
+
+    return processed_text;
+  }
+
+  emojifyMoji(source, processor = this.emojiToHTML, callback = null) {
+    //let found = source.match();
+  }
+
+  emojifyCodes(source, processor = this.emojiToHTML, callback = null) {
+  }
 
   // Returns an HTML image/link tag for an emoji from an emoji object
   emojiToHTML(emoji, size_code = this.EC.defaults.size_code) {
@@ -81,13 +104,13 @@ class EmojidexUtil {
 
     for (find of found) {
       if (mojify) {
-        let moji_code = find.match(this.emoji_moji_pattern);
+        let moji_code = find.match(this.emoji_moji_tag_attr_pattern);
         if (moji_code != null && moji_code.length != 1) {
           source = source.replace(find, moji_code[1]);
           continue;
         }
       }
-      let emoji_code = find.match(this.emoji_code_pattern);
+      let emoji_code = find.match(this.emoji_code_tag_attr_pattern);
       source = source.replace(find, this.encapsulateCode(emoji_code[1]));
     }
 

@@ -1,5 +1,5 @@
 (function() {
-  var EmojidexCategories, EmojidexData, EmojidexDataStorage, EmojidexEmoji, EmojidexIndexes, EmojidexSearch,
+  var EmojidexCategories, EmojidexData, EmojidexDataStorage, EmojidexEmoji, EmojidexSearch,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   this.EmojidexClient = (function() {
@@ -206,17 +206,21 @@
         };
       })(this)).then((function(_this) {
         return function(keys) {
-          var ref, ref1, ref2, ref3, ref4;
           if (keys.indexOf('emojidex') !== -1) {
             return _this.storage.update_cache('emojidex');
           } else {
             _this.storage.hub_cache = {
               emojidex: {
-                emoji: ((ref = _this.EC.options) != null ? ref.emoji : void 0) || [],
-                history: ((ref1 = _this.EC.options) != null ? ref1.history : void 0) || [],
-                favorites: ((ref2 = _this.EC.options) != null ? ref2.favorites : void 0) || [],
-                categories: ((ref3 = _this.EC.options) != null ? ref3.categories : void 0) || [],
-                auth_info: ((ref4 = _this.EC.options) != null ? ref4.auth_info : void 0) || _this._def_auth_info
+                moji_codes: {
+                  emoji_string: "",
+                  emoji_array: [],
+                  emoji_index: {}
+                },
+                emoji: _this.EC.options.emoji || [],
+                history: _this.EC.options.history || [],
+                favorites: _this.EC.options.favorites || [],
+                categories: _this.EC.options.categories || [],
+                auth_info: _this.EC.options.auth_info || _this._def_auth_info
               }
             };
             return _this.storage.update('emojidex', _this.storage.hub_cache.emojidex);
@@ -248,6 +252,10 @@
         };
       })(this));
     }
+
+    EmojidexData.prototype.moji_codes = function() {
+      return this.storage.hub_cache.emojidex.moji_codes;
+    };
 
     EmojidexData.prototype.emoji = function(emoji_set) {
       var emoji, hub_emoji, j, k, len, len1, new_emoji, ref;
@@ -678,138 +686,6 @@
     };
 
     return EmojidexEmoji;
-
-  })();
-
-  EmojidexIndexes = (function() {
-    function EmojidexIndexes(EC) {
-      this.EC = EC;
-      this.results = [];
-      this.cur_page = 1;
-      this.count = 0;
-    }
-
-    EmojidexIndexes.prototype._indexesAPI = function(query, callback, opts, func) {
-      var param;
-      param = {
-        page: 1,
-        limit: this.EC.limit,
-        detailed: this.EC.detailed
-      };
-      if (this.EC.User.auth_info.token !== null) {
-        $.extend(param, {
-          auth_token: this.EC.User.auth_info.token
-        });
-      }
-      $.extend(param, opts);
-      if (func != null) {
-        this.indexed_func = func;
-        this.indexed = {
-          query: query,
-          callback: callback,
-          param: param
-        };
-      }
-      return $.ajax({
-        url: this.EC.api_url + query,
-        dataType: 'json',
-        data: param,
-        success: (function(_this) {
-          return function(response) {
-            if (response.status != null) {
-              _this.results = [];
-              _this.cur_page = 0;
-              _this.count = 0;
-              return typeof callback === "function" ? callback([]) : void 0;
-            } else {
-              _this.meta = response.meta;
-              _this.results = response.emoji;
-              _this.cur_page = response.meta.page;
-              _this.count = response.meta.count;
-              return _this.EC.Emoji.combine(response.emoji).then(function(data) {
-                return typeof callback === "function" ? callback(response.emoji) : void 0;
-              });
-            }
-          };
-        })(this),
-        error: (function(_this) {
-          return function(response) {
-            _this.results = [];
-            _this.cur_page = 0;
-            _this.count = 0;
-            return typeof callback === "function" ? callback([]) : void 0;
-          };
-        })(this)
-      });
-    };
-
-    EmojidexIndexes.prototype.index = function(callback, opts) {
-      return this._indexesAPI('emoji', callback, opts, this.index);
-    };
-
-    EmojidexIndexes.prototype.newest = function(callback, opts) {
-      return this._indexesAPI('newest', callback, opts, this.newest);
-    };
-
-    EmojidexIndexes.prototype.popular = function(callback, opts) {
-      return this._indexesAPI('popular', callback, opts, this.popular);
-    };
-
-    EmojidexIndexes.prototype.user = function(username, callback, opts) {
-      return this._indexesAPI("users/" + username + "/emoji", callback, opts);
-    };
-
-    EmojidexIndexes.prototype["static"] = function(static_type, language, callback) {
-      var j, len, loadStatic, loaded_emoji, loaded_num, results1, type;
-      loaded_num = 0;
-      loaded_emoji = [];
-      loadStatic = (function(_this) {
-        return function(url_string) {
-          return $.ajax({
-            url: url_string,
-            dataType: 'json',
-            success: function(response) {
-              loaded_emoji = loaded_emoji.concat(response);
-              if (++loaded_num === static_type.length) {
-                return _this.EC.Emoji.combine(loaded_emoji).then(function(data) {
-                  return typeof callback === "function" ? callback(data) : void 0;
-                });
-              }
-            }
-          });
-        };
-      })(this);
-      results1 = [];
-      for (j = 0, len = static_type.length; j < len; j++) {
-        type = static_type[j];
-        if (language) {
-          results1.push(loadStatic((this.EC.api_url + type) + "?locale=" + language));
-        } else {
-          results1.push(loadStatic("" + (this.EC.api_url + type)));
-        }
-      }
-      return results1;
-    };
-
-    EmojidexIndexes.prototype.select = function(code, callback, opts) {
-      return this.EC.Search.find(code, callback, opts);
-    };
-
-    EmojidexIndexes.prototype.next = function() {
-      if (this.count === this.indexed.param.limit) {
-        this.indexed.param.page++;
-      }
-      return this.indexed_func(this.indexed.callback, this.indexed.param, this.indexed_func);
-    };
-
-    EmojidexIndexes.prototype.prev = function() {
-      if (this.indexed.param.page > 1) {
-        this.indexed.param.page--;
-      }
-      return this.indexed_func(this.indexed.callback, this.indexed.param, this.indexed_func);
-    };
-
-    return EmojidexIndexes;
 
   })();
 
