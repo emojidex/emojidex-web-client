@@ -26,6 +26,7 @@ class @EmojidexClient
       size_code: 'px32'
       detailed: false
       limit: 32
+      onReady: (arg) => {}
 
     @options = $.extend {}, @defaults, options
 
@@ -50,7 +51,7 @@ class @EmojidexClient
       @Util = new EmojidexUtil @
       @Search = new EmojidexSearch @
       @Emoji = new EmojidexEmoji @
+      @Categories = new EmojidexCategories @
 
-      return @Categories = new EmojidexCategories @
     ).then =>
-      @options.onReady? @
+      @options.onReady @

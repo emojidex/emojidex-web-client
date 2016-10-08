@@ -16,7 +16,12 @@
         min_query_len: 4,
         size_code: 'px32',
         detailed: false,
-        limit: 32
+        limit: 32,
+        onReady: (function(_this) {
+          return function(arg) {
+            return {};
+          };
+        })(this)
       };
       this.options = $.extend({}, this.defaults, options);
       this.closed_net = this.options.closed_net;
@@ -37,8 +42,7 @@
         };
       })(this)).then((function(_this) {
         return function() {
-          var base;
-          return typeof (base = _this.options).onReady === "function" ? base.onReady(_this) : void 0;
+          return _this.options.onReady(_this);
         };
       })(this));
     }
