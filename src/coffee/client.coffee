@@ -1,13 +1,11 @@
 # emojidex coffee client
 # * Provides search, index caching and combining and asset URI resolution
 #
-# require: jquery.storageapi
-#
 # =LICENSE=
 # Licensed under the emojidex Open License
 # https://www.emojidex.com/emojidex/emojidex_open_license
 #
-# Copyright 2013 Genshin Souzou Kabushiki Kaisha
+# Copyright 2013 the emojidex project / K.K. GenSouSha
 
 class @EmojidexClient
   constructor: (options) ->
