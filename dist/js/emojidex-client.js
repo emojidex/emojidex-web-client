@@ -4,60 +4,78 @@ return it(jt(this),t,arguments.length>1?arguments[1]:void 0)},forEach:function f
 if(u&&c){if(this.prev<i.catchLoc)return handle(i.catchLoc,!0);if(this.prev<i.finallyLoc)return handle(i.finallyLoc)}else if(u){if(this.prev<i.catchLoc)return handle(i.catchLoc,!0)}else{if(!c)throw new Error("try statement without catch or finally");if(this.prev<i.finallyLoc)return handle(i.finallyLoc)}}}},abrupt:function(t,n){for(var r=this.tryEntries.length-1;r>=0;--r){var i=this.tryEntries[r];if(i.tryLoc<=this.prev&&e.call(i,"finallyLoc")&&this.prev<i.finallyLoc){var o=i;break}}o&&("break"===t||"continue"===t)&&o.tryLoc<=n&&n<=o.finallyLoc&&(o=null);var u=o?o.completion:{};return u.type=t,u.arg=n,o?this.next=o.finallyLoc:this.complete(u),v},complete:function(t,n){if("throw"===t.type)throw t.arg;"break"===t.type||"continue"===t.type?this.next=t.arg:"return"===t.type?(this.rval=t.arg,this.next="end"):"normal"===t.type&&n&&(this.next=n)},finish:function(t){for(var n=this.tryEntries.length-1;n>=0;--n){var r=this.tryEntries[n];if(r.finallyLoc===t)return this.complete(r.completion,r.afterLoc),resetTryEntry(r),v}},catch:function(t){for(var n=this.tryEntries.length-1;n>=0;--n){var r=this.tryEntries[n];if(r.tryLoc===t){var e=r.completion;if("throw"===e.type){var i=e.arg;resetTryEntry(r)}return i}}throw new Error("illegal catch attempt")},delegateYield:function(t,n,r){return this.delegate={iterator:values(t),resultName:n,nextLoc:r},v}}}("object"==typeof t?t:"object"==typeof window?window:"object"==typeof self?self:this)}).call(this,"undefined"!=typeof global?global:"undefined"!=typeof self?self:"undefined"!=typeof window?window:{})},{}]},{},[1]);
 
 !function(e){function t(e,o){o=o||{},this._id=t._generateUUID(),this._promise=o.promise||Promise,this._frameId=o.frameId||"CrossStorageClient-"+this._id,this._origin=t._getOrigin(e),this._requests={},this._connected=!1,this._closed=!1,this._count=0,this._timeout=o.timeout||5e3,this._listener=null,this._installListener();var r;o.frameId&&(r=document.getElementById(o.frameId)),r&&this._poll(),r?this._hub=r.contentWindow:this._createFrame(e)}t.frameStyle={display:"none",position:"absolute",top:"-999px",left:"-999px"},t._getOrigin=function(e){var t,o,r;return t=document.createElement("a"),t.href=e,t.host||(t=window.location),o=t.protocol&&":"!==t.protocol?t.protocol:window.location.protocol,r=o+"//"+t.host,r=r.replace(/:80$|:443$/,"")},t._generateUUID=function(){return"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,function(e){var t=16*Math.random()|0,o="x"==e?t:3&t|8;return o.toString(16)})},t.prototype.onReadyFrame=function(){var e=this;return this._hub?this._promise.resolve():this._closed?this._promise.reject(new Error("CrossStorageClient has closed")):new this._promise(function(t,o){var r=setTimeout(function(){o(new Error("CrossStorageClient could not ready frame"))},e._timeout),n=setInterval(function(){e._hub&&(clearTimeout(r),clearInterval(n),t())},100)})},t.prototype.onConnect=function(){var e=this;return this._connected?this._promise.resolve():this._closed?this._promise.reject(new Error("CrossStorageClient has closed")):(this._requests.connect||(this._requests.connect=[]),new this._promise(function(t,o){var r=setTimeout(function(){o(new Error("CrossStorageClient could not connect"))},e._timeout);e._requests.connect.push(function(e){return clearTimeout(r),e?o(e):(t(),void 0)})}))},t.prototype.set=function(e,t,o){return this._request("set",{key:e,value:t,ttl:o})},t.prototype.get=function(){var e=Array.prototype.slice.call(arguments);return this._request("get",{keys:e})},t.prototype.del=function(){var e=Array.prototype.slice.call(arguments);return this._request("del",{keys:e})},t.prototype.clear=function(){return this._request("clear")},t.prototype.getKeys=function(){return this._request("getKeys")},t.prototype.close=function(){var e=document.getElementById(this._frameId);e&&e.parentNode.removeChild(e),window.removeEventListener?window.removeEventListener("message",this._listener,!1):window.detachEvent("onmessage",this._listener),this._connected=!1,this._closed=!0},t.prototype._installListener=function(){var e=this;this._listener=function(t){var o,r,n,s;if(!e._closed&&t.data&&"string"==typeof t.data&&(r="null"===t.origin?"file://":t.origin,r===e._origin))if("cross-storage:unavailable"!==t.data){if(-1!==t.data.indexOf("cross-storage:")&&!e._connected){if(e._connected=!0,!e._requests.connect)return;for(o=0;o<e._requests.connect.length;o++)e._requests.connect[o](n);delete e._requests.connect}if("cross-storage:ready"!==t.data){try{s=JSON.parse(t.data)}catch(i){return}s.id&&e._requests[s.id]&&e._requests[s.id](s.error,s.result)}}else{if(e._closed||e.close(),!e._requests.connect)return;for(n=new Error("Closing client. Could not access localStorage in hub."),o=0;o<e._requests.connect.length;o++)e._requests.connect[o](n)}},window.addEventListener?window.addEventListener("message",this._listener,!1):window.attachEvent("onmessage",this._listener)},t.prototype._poll=function(){var e,t,o;e=this,o="file://"===e._origin?"*":e._origin,t=setInterval(function(){return e._connected?clearInterval(t):(e._hub&&e._hub.postMessage("cross-storage:poll",o),void 0)},1e3)},t.prototype._createFrame=function(e){var o,r,n=this;o=window.document.createElement("iframe"),o.id=this._frameId;for(r in t.frameStyle)t.frameStyle.hasOwnProperty(r)&&(o.style[r]=t.frameStyle[r]);window.document.body.appendChild(o),o.onload=function(){n._hub=o.contentWindow},o.src=e},t.prototype._request=function(e,t){var o,r;return this._closed?this._promise.reject(new Error("CrossStorageClient has closed")):(r=this,r._count++,o={id:this._id+":"+r._count,method:"cross-storage:"+e,params:t},new this._promise(function(e,t){var n,s,i;n=setTimeout(function(){r._requests[o.id]&&(delete r._requests[o.id],t(new Error("Timeout: could not perform "+o.method)))},r._timeout),r._requests[o.id]=function(s,i){return clearTimeout(n),delete r._requests[o.id],s?t(new Error(s)):(e(i),void 0)},Array.prototype.toJSON&&(s=Array.prototype.toJSON,Array.prototype.toJSON=null),i="file://"===r._origin?"*":r._origin,r._hub.postMessage(JSON.stringify(o),i),s&&(Array.prototype.toJSON=s)}))},"undefined"!=typeof module&&module.exports?module.exports=t:"undefined"!=typeof exports?exports.CrossStorageClient=t:"function"==typeof define&&define.amd?define([],function(){return t}):e.CrossStorageClient=t}(this);
-(function() {
-  this.EmojidexClient = (function() {
-    function EmojidexClient(options) {
-      this.env = {
-        api_ver: 1,
-        cdn_addr: 'cdn.emojidex.com',
-        s_cdn_addr: '',
-        asset_addr: 'assets.emojidex.com',
-        s_asset_addr: ''
-      };
-      this.defaults = {
-        locale: 'en',
-        api_url: 'https://www.emojidex.com/api/v1/',
-        cdn_url: "http://" + this.env.cdn_addr + "/emoji/",
-        closed_net: false,
-        min_query_len: 4,
-        size_code: 'px32',
-        detailed: false,
-        limit: 32,
-        onReady: (function(_this) {
-          return function(arg) {
-            return {};
-          };
-        })(this)
-      };
-      this.options = $.extend({}, this.defaults, options);
-      this.closed_net = this.options.closed_net;
-      this.api_url = this.options.api_url;
-      this.cdn_url = this.options.cdn_url;
-      this.size_code = this.options.size_code;
-      this.detailed = this.options.detailed;
-      this.limit = this.options.limit;
-      this.locale = this.options.locale;
-      this.Data = new EmojidexData(this, this.options).then((function(_this) {
-        return function(data) {
-          _this.User = new EmojidexUser(_this);
-          _this.Indexes = new EmojidexIndexes(_this);
-          _this.Util = new EmojidexUtil(_this);
-          _this.Search = new EmojidexSearch(_this);
-          _this.Emoji = new EmojidexEmoji(_this);
-          return _this.Categories = new EmojidexCategories(_this);
-        };
-      })(this)).then((function(_this) {
-        return function() {
-          return _this.options.onReady(_this);
-        };
-      })(this));
+'use strict';
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+// emojidex coffee client
+// * Provides search, index caching and combining and asset URI resolution
+//
+// =LICENSE=
+// Licensed under the emojidex Open License
+// https://www.emojidex.com/emojidex/emojidex_open_license
+//
+// Copyright 2013 the emojidex project / K.K. GenSouSha
+
+var EmojidexClient = function EmojidexClient(options) {
+  var _this = this;
+
+  _classCallCheck(this, EmojidexClient);
+
+  this.env = {
+    api_ver: 1,
+    cdn_addr: 'cdn.emojidex.com',
+    s_cdn_addr: '',
+    asset_addr: 'assets.emojidex.com',
+    s_asset_addr: ''
+  };
+
+  // sets global default value
+  this.defaults = {
+    locale: 'en',
+    api_url: 'https://www.emojidex.com/api/v1/',
+    cdn_url: 'http://' + this.env.cdn_addr + '/emoji/',
+    closed_net: false,
+    min_query_len: 4,
+    size_code: 'px32',
+    detailed: false,
+    limit: 32,
+    onReady: function onReady(arg) {
+      return {};
     }
+  };
 
-    return EmojidexClient;
+  this.options = $.extend({}, this.defaults, options);
 
-  })();
+  // set closed network flag (for OSS distrobutions, intranet/private neworks, or closed license)
+  // DO NOT set to true unless permitted by an emojidex License
+  this.closed_net = this.options.closed_net;
 
-}).call(this);
+  // set end points
+  this.api_url = this.options.api_url;
+  this.cdn_url = this.options.cdn_url;
+  this.size_code = this.options.size_code;
+
+  // common @options
+  this.detailed = this.options.detailed;
+  this.limit = this.options.limit;
+  this.locale = this.options.locale;
+
+  // new Emojidex modules
+  this.Data = new EmojidexData(this, this.options).then(function (data) {
+    _this.User = new EmojidexUser(_this);
+    _this.Indexes = new EmojidexIndexes(_this);
+    _this.Util = new EmojidexUtil(_this);
+    _this.Search = new EmojidexSearch(_this);
+    _this.Emoji = new EmojidexEmoji(_this);
+    _this.Categories = new EmojidexCategories(_this);
+  }).then(function () {
+    _this.options.onReady(_this);
+  });
+};
+
+;
+//# sourceMappingURL=client.js.map
 
 'use strict';
 
