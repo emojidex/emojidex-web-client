@@ -62,21 +62,32 @@ class EmojidexUtil {
   // An emoji object is passed to the processor and formatted text should be returned.
   // Default processer converts to HTML tags.
   emojify(source, processor = this.emojiToHTML, callback = null) {
-    processed_text = '';
-
-    //let found = 
-
-    // Detect emoji characters within the text
-    
-
-    return processed_text;
+    return emojifyMoji(source, processor, function(processed) {
+      emojifyCodes(processed, processor, function(processed) {
+        if (callback != null)
+          callback(processed);
+      });
+    });
   }
 
   emojifyMoji(source, processor = this.emojiToHTML, callback = null) {
     //let found = source.match();
+    //
+    if (callback != null)
+      callback(source);
   }
 
   emojifyCodes(source, processor = this.emojiToHTML, callback = null) {
+    let found = source.match(this.short_code_pattern);
+    
+    for (find of found) {
+      this.EC.Search.find(this.EC.Util.unEncapsulateCode(find), function(result) {
+        console.log(result);
+      });
+    }
+
+    if (callback != null)
+      callback(source);
   }
 
   // Returns an HTML image/link tag for an emoji from an emoji object

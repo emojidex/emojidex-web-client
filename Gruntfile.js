@@ -56,7 +56,7 @@ module.exports = function(grunt) {
 
     // Clean out old files / temporary files / build partials
     clean: {
-      spec: ['build/spec/*.js']
+      spec: ['build/spec/util.js']
     },
 
     // SLIM file compilation options
@@ -92,38 +92,15 @@ module.exports = function(grunt) {
       }
     },
 
-    // Coffee file compilation options
-    coffee: {
-      client: {
-        options: {
-          join: true
-        },
-        files: {
-          'src/compiled_js/emojidex-client.js': ['src/coffee/**/*.coffee']
-        }
-      }//,
-      //spec: {
-      //  options: {
-      //    bare: true
-      //  },
-      //  expand: true,
-      //  cwd: 'spec/',
-      //  src: ['**/*.coffee'],
-      //  dest: 'build/spec/',
-      //  ext: '.js'
-      //}
-    },
-
     // Concat files together into one script
     concat: {
-      compiled_js: {
+      javascript: {
         options: {
           stripBanners: true
         },
         src: [
           'node_modules/babel-polyfill/dist/polyfill.min.js',
           'node_modules/cross-storage/dist/client.min.js',
-          'src/compiled_js/**/*.js',
           'build/js/**/*.js'
         ],
         dest: 'dist/js/emojidex-client.js'
@@ -194,14 +171,13 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-slim');
   grunt.loadNpmTasks('grunt-babel');
-  grunt.loadNpmTasks('grunt-contrib-coffee');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-jasmine');
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-contrib-watch');
 
-  grunt.registerTask('default', ['clean', 'slim', 'babel', 'coffee', 'concat', 'uglify']);
+  grunt.registerTask('default', ['clean', 'slim', 'babel', 'concat', 'uglify']);
   grunt.registerTask('spec', ['default', 'jasmine:client:build', 'jasmine']);
   grunt.registerTask('dev', ['default', 'jasmine:client:build', 'connect', 'watch']);
 }

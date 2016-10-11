@@ -27,34 +27,35 @@ class EmojidexSearch {
       param
     };
 
-    if (!this.EC.closed_net) {
-      return $.ajax({
-        url: this.EC.api_url + 'search/emoji',
-        dataType: 'json',
-        data: param,
-        success: response => {
-          if (response.status != null) {
-            this.results = [];
-            this.cur_page = 0;
-            this.count = 0;
-            return __guardFunc__(callback, f => f([]));
-          } else {
-            this.meta = response.meta;
-            this.results = response.emoji;
-            this.cur_page = response.meta.page;
-            this.count = response.meta.count;
-            return this.EC.Emoji.combine(response.emoji).then(data => __guardFunc__(callback, f1 => f1(response.emoji)));
-          }
-        },
-        error: response => {
+    return $.ajax({
+      url: this.EC.api_url + 'search/emoji',
+      dataType: 'json',
+      data: param,
+      success: response => {
+        if (response.status != null) {
           this.results = [];
           this.cur_page = 0;
           this.count = 0;
-          return __guardFunc__(callback, f => f([]));
-        }});
-    } else {
-      return __guardFunc__(call_func.storage, f => f(search_data, callback));
-    }
+          if (callback != null)
+            callback([]);
+        } else {
+          this.meta = response.meta;
+          this.results = response.emoji;
+          this.cur_page = response.meta.page;
+          this.count = response.meta.count;
+          this.EC.Emoji.combine(response.emoji)
+          if (callback != null)
+            callback(response.emoji);
+        }
+      },
+      error: response => {
+        this.results = [];
+        this.cur_page = 0;
+        this.count = 0;
+        if (callback != null)
+          callback([]);
+      }
+    });
   }
 
   // Executes a general search (code_cont)
@@ -93,12 +94,13 @@ class EmojidexSearch {
   }
 
   // Not an actual search, just gets information on the given emoji
-  find(code, callback, opts) {
+  find(code, callback = null, opts) {
     let emoji_cache = this.EC.Data.emoji();
     for (let i = 0; i < emoji_cache.length; i++) {
       let emoji = emoji_cache[i];
       if (emoji.code === code) {
-        __guardFunc__(callback, f => f(emoji));
+        if (callback != null)
+          callback(emoji);
         return emoji;
       }
     }
@@ -116,11 +118,13 @@ class EmojidexSearch {
       data: param,
       success: response => {
         this.EC.Emoji.combine([response]);
-        __guardFunc__(callback, f1 => f1(response));
+        if (callback != null)
+          callback(response);
         return response;
       },
       error: response => {
-        __guardFunc__(callback, f1 => f1(response));
+        if (callback != null)
+          callback(response);
         return response;
       }
     });
@@ -135,8 +139,4 @@ class EmojidexSearch {
     if (this.searched.param.page > 1) { this.searched.param.page--; }
     return this.searched_func(this.searched.data, this.searched.callback, this.searched.param, {ajax: this.searched_func});
   }
-}
-
-function __guardFunc__(func, transform) {
-  return typeof func === 'function' ? transform(func) : undefined;
 }
