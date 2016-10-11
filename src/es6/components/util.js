@@ -62,8 +62,8 @@ class EmojidexUtil {
   // An emoji object is passed to the processor and formatted text should be returned.
   // Default processer converts to HTML tags.
   emojify(source, processor = this.emojiToHTML, callback = null) {
-    return emojifyMoji(source, processor, function(processed) {
-      emojifyCodes(processed, processor, function(processed) {
+    return this.emojifyMoji(source, processor, function(processed) {
+      this.emojifyCodes(processed, processor, function(processed) {
         if (callback != null)
           callback(processed);
       });
@@ -79,15 +79,30 @@ class EmojidexUtil {
 
   emojifyCodes(source, processor = this.emojiToHTML, callback = null) {
     let found = source.match(this.short_code_pattern);
-    
+
+    let count = found.length;
+    let replacements = [];
+
+    if (count == 0 && callback != null)
+      callback(source);
+
     for (find of found) {
-      this.EC.Search.find(this.EC.Util.unEncapsulateCode(find), function(result) {
-        console.log(result);
+      let snip = `${find}`;
+      this.EC.Search.find(this.EC.Util.unEncapsulateCode(snip), (result) => {
+        if (result.hasOwnProperty('code')) {
+          replacements.push({pre: snip, post: processor(result)});
+        }
+
+        count -= 1;
+        if (count == 0) {
+          for (replacement of replacements) {
+            source = source.replace(replacement.pre, replacement.post);
+          }
+          if (callback != null)
+            callback(source);
+        }
       });
     }
-
-    if (callback != null)
-      callback(source);
   }
 
   // Returns an HTML image/link tag for an emoji from an emoji object

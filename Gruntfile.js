@@ -56,7 +56,7 @@ module.exports = function(grunt) {
 
     // Clean out old files / temporary files / build partials
     clean: {
-      spec: ['build/spec/util.js']
+      spec: ['build/spec/*.js']
     },
 
     // SLIM file compilation options
@@ -122,7 +122,7 @@ module.exports = function(grunt) {
       client: {
         src: ['dist/js/emojidex-client.js'],
         options: {
-          specs: ['spec/*.js'],
+          specs: ['spec/util.js'],
           helpers:[
             'spec/helpers/method.js',
             'spec/helpers/data.js',

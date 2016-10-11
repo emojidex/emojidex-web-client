@@ -1628,8 +1628,8 @@ var EmojidexUtil = function () {
       var processor = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.emojiToHTML;
       var callback = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
-      return emojifyMoji(source, processor, function (processed) {
-        emojifyCodes(processed, processor, function (processed) {
+      return this.emojifyMoji(source, processor, function (processed) {
+        this.emojifyCodes(processed, processor, function (processed) {
           if (callback != null) callback(processed);
         });
       });
@@ -1647,22 +1647,66 @@ var EmojidexUtil = function () {
   }, {
     key: "emojifyCodes",
     value: function emojifyCodes(source) {
+      var _this = this;
+
       var processor = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.emojiToHTML;
       var callback = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
       var found = source.match(this.short_code_pattern);
+
+      var count = found.length;
+      var replacements = [];
+
+      if (count == 0 && callback != null) callback(source);
 
       var _iteratorNormalCompletion = true;
       var _didIteratorError = false;
       var _iteratorError = undefined;
 
       try {
-        for (var _iterator = found[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        var _loop = function _loop() {
           find = _step.value;
 
-          this.EC.Search.find(this.EC.Util.unEncapsulateCode(find), function (result) {
-            console.log(result);
+          var snip = "" + find;
+          _this.EC.Search.find(_this.EC.Util.unEncapsulateCode(snip), function (result) {
+            if (result.hasOwnProperty('code')) {
+              replacements.push({ pre: snip, post: processor(result) });
+            }
+
+            count -= 1;
+            if (count == 0) {
+              var _iteratorNormalCompletion2 = true;
+              var _didIteratorError2 = false;
+              var _iteratorError2 = undefined;
+
+              try {
+                for (var _iterator2 = replacements[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                  replacement = _step2.value;
+
+                  source = source.replace(replacement.pre, replacement.post);
+                }
+              } catch (err) {
+                _didIteratorError2 = true;
+                _iteratorError2 = err;
+              } finally {
+                try {
+                  if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                    _iterator2.return();
+                  }
+                } finally {
+                  if (_didIteratorError2) {
+                    throw _iteratorError2;
+                  }
+                }
+              }
+
+              if (callback != null) callback(source);
+            }
           });
+        };
+
+        for (var _iterator = found[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          _loop();
         }
       } catch (err) {
         _didIteratorError = true;
@@ -1678,8 +1722,6 @@ var EmojidexUtil = function () {
           }
         }
       }
-
-      if (callback != null) callback(source);
     }
 
     // Returns an HTML image/link tag for an emoji from an emoji object
@@ -1718,13 +1760,13 @@ var EmojidexUtil = function () {
       source = this.deLinkHTML(source);
       var found = source.match(this.img_pattern);
 
-      var _iteratorNormalCompletion2 = true;
-      var _didIteratorError2 = false;
-      var _iteratorError2 = undefined;
+      var _iteratorNormalCompletion3 = true;
+      var _didIteratorError3 = false;
+      var _iteratorError3 = undefined;
 
       try {
-        for (var _iterator2 = found[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-          find = _step2.value;
+        for (var _iterator3 = found[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+          find = _step3.value;
 
           if (mojify) {
             var moji_code = find.match(this.emoji_moji_tag_attr_pattern);
@@ -1737,16 +1779,16 @@ var EmojidexUtil = function () {
           source = source.replace(find, this.encapsulateCode(emoji_code[1]));
         }
       } catch (err) {
-        _didIteratorError2 = true;
-        _iteratorError2 = err;
+        _didIteratorError3 = true;
+        _iteratorError3 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion2 && _iterator2.return) {
-            _iterator2.return();
+          if (!_iteratorNormalCompletion3 && _iterator3.return) {
+            _iterator3.return();
           }
         } finally {
-          if (_didIteratorError2) {
-            throw _iteratorError2;
+          if (_didIteratorError3) {
+            throw _iteratorError3;
           }
         }
       }
@@ -1762,27 +1804,27 @@ var EmojidexUtil = function () {
     value: function deLinkHTML(source) {
       var found = source.match(this.a_pattern);
 
-      var _iteratorNormalCompletion3 = true;
-      var _didIteratorError3 = false;
-      var _iteratorError3 = undefined;
+      var _iteratorNormalCompletion4 = true;
+      var _didIteratorError4 = false;
+      var _iteratorError4 = undefined;
 
       try {
-        for (var _iterator3 = found[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-          find = _step3.value;
+        for (var _iterator4 = found[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+          find = _step4.value;
 
           source = source.replace(find, find.match(this.img_pattern)[0]);
         }
       } catch (err) {
-        _didIteratorError3 = true;
-        _iteratorError3 = err;
+        _didIteratorError4 = true;
+        _iteratorError4 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion3 && _iterator3.return) {
-            _iterator3.return();
+          if (!_iteratorNormalCompletion4 && _iterator4.return) {
+            _iterator4.return();
           }
         } finally {
-          if (_didIteratorError3) {
-            throw _iteratorError3;
+          if (_didIteratorError4) {
+            throw _iteratorError4;
           }
         }
       }

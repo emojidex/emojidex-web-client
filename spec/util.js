@@ -1,7 +1,7 @@
 describe('EmojidexUtil', function() {
   beforeEach(function(done) {
     helperChains({
-      functions: [helperBefore],
+      functions: [clearStorage, helperBefore],
       end: done
     });
   });
@@ -89,9 +89,11 @@ describe('EmojidexUtil', function() {
   });
 
   it('finds short codes in text and converts them with the chosen drop-in converter', function(done) {
-    test_text = 'I have a 🚗. My favorite sushi is :(サーモン)すし:. :-) :::xxxxxxxx:.';
+    test_text = 'I have a 🚗. My favorite sushi is :(サーモン)すし:. :-) :::xxxxxxxx:.' + 
+      ":two hearts::lemon::cupcake::椛::hamburger::86 taillight(left)::幻::幻(白)::bat:";
 
-    expected_text = 'I have a 🚗. My favorite sushi is *(サーモン)すし*. :-) :::xxxxxxxx:.';
+    expected_text = 'I have a 🚗. My favorite sushi is *(サーモン)すし*. :-) :::xxxxxxxx:.' +
+      "*two hearts**lemon**cupcake**椛**hamburger**86 taillight(left)**幻**幻(白)**bat*";
 
     EC_spec.Util.emojifyCodes(test_text, function(emoji) {
       return '*' + emoji.code + '*';
