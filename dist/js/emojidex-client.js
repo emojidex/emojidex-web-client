@@ -969,21 +969,21 @@ var EmojidexSearch = function () {
             _this.results = [];
             _this.cur_page = 0;
             _this.count = 0;
-            if (callback != null) callback([]);
+            if (typeof callback === 'function') callback([]);
           } else {
             _this.meta = response.meta;
             _this.results = response.emoji;
             _this.cur_page = response.meta.page;
             _this.count = response.meta.count;
             _this.EC.Emoji.combine(response.emoji);
-            if (callback != null) callback(response.emoji);
+            if (typeof callback === 'function') callback(response.emoji);
           }
         },
         error: function error(response) {
           _this.results = [];
           _this.cur_page = 0;
           _this.count = 0;
-          if (callback != null) callback([]);
+          if (typeof callback === 'function') callback([]);
         }
       });
     }
@@ -1052,7 +1052,7 @@ var EmojidexSearch = function () {
       for (var i = 0; i < emoji_cache.length; i++) {
         var emoji = emoji_cache[i];
         if (emoji.code === code) {
-          if (callback != null) callback(emoji);
+          if (typeof callback === 'function') callback(emoji);
           return emoji;
         }
       }
@@ -1069,11 +1069,11 @@ var EmojidexSearch = function () {
         data: param,
         success: function success(response) {
           _this2.EC.Emoji.combine([response]);
-          if (callback != null) callback(response);
+          if (typeof callback === 'function') callback(response);
           return response;
         },
         error: function error(response) {
-          if (callback != null) callback(response);
+          if (typeof callback === 'function') callback(response);
           return response;
         }
       });
@@ -1630,7 +1630,7 @@ var EmojidexUtil = function () {
 
       return this.emojifyMoji(source, processor, function (processed) {
         this.emojifyCodes(processed, processor, function (processed) {
-          if (callback != null) callback(processed);
+          if (typeof callback === 'function') callback(processed);
         });
       });
     }
@@ -1642,7 +1642,7 @@ var EmojidexUtil = function () {
 
       //let found = source.match();
       //
-      if (callback != null) callback(source);
+      if (typeof callback === 'function') callback(source);
     }
   }, {
     key: "emojifyCodes",
@@ -1657,7 +1657,7 @@ var EmojidexUtil = function () {
       var count = found.length;
       var replacements = [];
 
-      if (count == 0 && callback != null) callback(source);
+      if (count == 0 && typeof callback === 'function') callback(source);
 
       var _iteratorNormalCompletion = true;
       var _didIteratorError = false;
@@ -1700,7 +1700,7 @@ var EmojidexUtil = function () {
                 }
               }
 
-              if (callback != null) callback(source);
+              if (typeof callback === 'function') callback(source);
             }
           });
         };

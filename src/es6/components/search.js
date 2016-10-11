@@ -36,7 +36,7 @@ class EmojidexSearch {
           this.results = [];
           this.cur_page = 0;
           this.count = 0;
-          if (callback != null)
+          if (typeof callback === 'function')
             callback([]);
         } else {
           this.meta = response.meta;
@@ -44,7 +44,7 @@ class EmojidexSearch {
           this.cur_page = response.meta.page;
           this.count = response.meta.count;
           this.EC.Emoji.combine(response.emoji)
-          if (callback != null)
+          if (typeof callback === 'function')
             callback(response.emoji);
         }
       },
@@ -52,7 +52,7 @@ class EmojidexSearch {
         this.results = [];
         this.cur_page = 0;
         this.count = 0;
-        if (callback != null)
+        if (typeof callback === 'function')
           callback([]);
       }
     });
@@ -99,7 +99,7 @@ class EmojidexSearch {
     for (let i = 0; i < emoji_cache.length; i++) {
       let emoji = emoji_cache[i];
       if (emoji.code === code) {
-        if (callback != null)
+        if (typeof callback === 'function')
           callback(emoji);
         return emoji;
       }
@@ -118,12 +118,12 @@ class EmojidexSearch {
       data: param,
       success: response => {
         this.EC.Emoji.combine([response]);
-        if (callback != null)
+        if (typeof callback === 'function')
           callback(response);
         return response;
       },
       error: response => {
-        if (callback != null)
+        if (typeof callback === 'function')
           callback(response);
         return response;
       }

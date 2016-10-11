@@ -64,7 +64,7 @@ class EmojidexUtil {
   emojify(source, processor = this.emojiToHTML, callback = null) {
     return this.emojifyMoji(source, processor, function(processed) {
       this.emojifyCodes(processed, processor, function(processed) {
-        if (callback != null)
+        if (typeof callback === 'function')
           callback(processed);
       });
     });
@@ -73,7 +73,7 @@ class EmojidexUtil {
   emojifyMoji(source, processor = this.emojiToHTML, callback = null) {
     //let found = source.match();
     //
-    if (callback != null)
+    if (typeof callback === 'function')
       callback(source);
   }
 
@@ -83,7 +83,7 @@ class EmojidexUtil {
     let count = found.length;
     let replacements = [];
 
-    if (count == 0 && callback != null)
+    if (count == 0 && typeof callback === 'function')
       callback(source);
 
     for (find of found) {
@@ -98,7 +98,7 @@ class EmojidexUtil {
           for (replacement of replacements) {
             source = source.replace(replacement.pre, replacement.post);
           }
-          if (callback != null)
+          if (typeof callback === 'function')
             callback(source);
         }
       });

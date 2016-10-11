@@ -122,7 +122,7 @@ module.exports = function(grunt) {
       client: {
         src: ['dist/js/emojidex-client.js'],
         options: {
-          specs: ['spec/util.js'],
+          specs: ['spec/*.js'],
           helpers:[
             'spec/helpers/method.js',
             'spec/helpers/data.js',
