@@ -83,7 +83,7 @@ module.exports = function(grunt) {
       },
       dist: {
         files: [{
-          expand: true,  
+          expand: true,
           cwd: 'src/es6',
           src: ['**/*.js'],
           dest: 'build/js/',
@@ -122,7 +122,17 @@ module.exports = function(grunt) {
       client: {
         src: ['dist/js/emojidex-client.js'],
         options: {
-          specs: ['spec/*.js'],
+          specs: [
+            // 'spec/categories.js',
+            // 'spec/client.js',
+            // 'spec/data.js',
+            // 'spec/emoji.js',
+            // 'spec/indexes.js',
+            // 'spec/search.js',
+            // 'spec/user.js',
+            // 'spec/util.js',
+            'spec/*.js'
+          ],
           helpers:[
             'spec/helpers/method.js',
             'spec/helpers/data.js',

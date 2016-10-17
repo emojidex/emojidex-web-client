@@ -26,14 +26,14 @@ describe('EmojidexData', function() {
         token: null, r18: false, premium: false, premium_exp: null, pro: false, pro_exp: null})
       );
 
-      it('emojidex.moji_data', function() {
+      it('emojidex.moji_codes', function() {
           //expect(EC_spec.Data.storage.get('emojidex.moji_data.moji_codes').moji_string).toBeTruthy();
           //expect(EC_spec.Data.storage.get('emojidex.moji_data.moji_codes').moji_array.length).toBeTruthy();
           //expect(EC_spec.Data.storage.get('emojidex.moji_data.moji_codes').moji_index.keys.length).toBeTruthy();
 
-          expect(EC_spec.Data.storage.get('emojidex.moji_data.moji_codes.moji_string')).toEqual("");
-          expect(EC_spec.Data.storage.get('emojidex.moji_data.moji_codes.moji_array')).toEqual([]);
-          expect(EC_spec.Data.storage.get('emojidex.moji_data.moji_codes.moji_index')).toEqual({});
+          expect(EC_spec.Data.storage.get('emojidex.moji_codes.emoji_string')).toEqual("");
+          expect(EC_spec.Data.storage.get('emojidex.moji_codes.emoji_array')).toEqual([]);
+          expect(EC_spec.Data.storage.get('emojidex.moji_codes.emoji_index')).toEqual({});
       });
     });
 
