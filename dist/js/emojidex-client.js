@@ -266,22 +266,18 @@ var EmojidexData = function () {
       if (keys.indexOf('emojidex') !== -1) {
         return _this.storage.update_cache('emojidex');
       } else {
-        _this.storage.hub_cache = {
-          emojidex: {
-            //moji_codes: @EC.options.moji_codes || {emoji_string: "", emoji_array: [], emoji_index: {}}
-            moji_codes: {
-              emoji_string: "",
-              emoji_array: [],
-              emoji_index: {}
-            },
-            emoji: _this.EC.options.emoji || [],
-            history: _this.EC.options.history || [],
-            favorites: _this.EC.options.favorites || [],
-            categories: _this.EC.options.categories || [],
-            auth_info: _this.EC.options.auth_info || _this._def_auth_info
-          }
-        };
-        return _this.storage.update('emojidex', _this.storage.hub_cache.emojidex);
+        return _this.storage.update('emojidex', {
+          moji_codes: {
+            emoji_string: "",
+            emoji_array: [],
+            emoji_index: {}
+          },
+          emoji: _this.EC.options.emoji || [],
+          history: _this.EC.options.history || [],
+          favorites: _this.EC.options.favorites || [],
+          categories: _this.EC.options.categories || [],
+          auth_info: _this.EC.options.auth_info || _this._def_auth_info
+        });
       }
     }).then(function (data) {
       if (_this.storage.hub_cache.emojidex.cdn_url != null) {

@@ -125,13 +125,13 @@ module.exports = function(grunt) {
           specs: [
             // 'spec/categories.js',
             // 'spec/client.js',
-            // 'spec/data.js',
+            'spec/data.js',
             // 'spec/emoji.js',
             // 'spec/indexes.js',
             // 'spec/search.js',
             // 'spec/user.js',
             // 'spec/util.js',
-            'spec/*.js'
+            // 'spec/*.js'
           ],
           helpers:[
             'spec/helpers/method.js',

@@ -21,33 +21,26 @@ class EmojidexData {
 
     return this.storage.hub.onReadyFrame().then( () => {
       return this.storage.hub.onConnect();
-    }
-    ).then( () => {
+    }).then( () => {
       return this.storage.hub.getKeys();
-    }
-    ).then(keys => {
+    }).then(keys => {
       if (keys.indexOf('emojidex') !== -1) {
         return this.storage.update_cache('emojidex');
       } else {
-        this.storage.hub_cache = {
-          emojidex: {
-            //moji_codes: @EC.options.moji_codes || {emoji_string: "", emoji_array: [], emoji_index: {}}
-            moji_codes: {
-              emoji_string: "",
-              emoji_array: [],
-              emoji_index: {}
-            },
-            emoji: this.EC.options.emoji || [],
-            history: this.EC.options.history || [],
-            favorites: this.EC.options.favorites || [],
-            categories: this.EC.options.categories || [],
-            auth_info: this.EC.options.auth_info || this._def_auth_info
-          }
-        };
-        return this.storage.update('emojidex', this.storage.hub_cache.emojidex);
+        return this.storage.update('emojidex', {
+          moji_codes: {
+            emoji_string: "",
+            emoji_array: [],
+            emoji_index: {}
+          },
+          emoji: this.EC.options.emoji || [],
+          history: this.EC.options.history || [],
+          favorites: this.EC.options.favorites || [],
+          categories: this.EC.options.categories || [],
+          auth_info: this.EC.options.auth_info || this._def_auth_info
+        })
       }
-    }
-    ).then(data => {
+    }).then(data => {
       if (this.storage.hub_cache.emojidex.cdn_url != null) {
         return this.EC.cdn_url = this.storage.get('emojidex.cdn_url');
       } else {
@@ -65,11 +58,9 @@ class EmojidexData {
           );
         }
       }
-    }
-    ).then(data => {
+    }).then(data => {
       return this.EC.Data = this;
-    }
-    );
+    });
   }
 
   moji_codes() {
