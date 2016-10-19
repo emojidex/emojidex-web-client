@@ -58,25 +58,41 @@ class EmojidexData {
         }
       }
     }).then(data => {
-      return this._init_moji_codes(this.storage.get('emojidex.moji_codes').moji_string === "");
+      if(this._needUpdate()) {
+        return this._init_moji_codes()
+      } else {
+        return this.storage.get('emojidex')
+      }
     }).then(data => {
+      this.moji_codes = this.storage.get('emojidex.moji_codes');
       return this.EC.Data = this;
     });
   }
 
   _init_moji_codes(force = false) {
-    if (force) {
+    return this.storage.update('emojidex.moji_codes_updated', new Date().toString()).then(() => {
       return $.ajax({
         url: this.EC.api_url + 'moji_codes',
         dataType: 'json'
-      }).then(response => {
-        this.moji_codes = response;
-        this.storage.set('emojidex.moji_codes', response);
-        return response;
-      });
-    }
+      })
+    }).then(response => {
+      return this.storage.update('emojidex.moji_codes', response);
+    })
+  }
 
-    return this.moji_codes = this.storage.get('emojidex.moji_codes');
+  _needUpdate() {
+    if(this.storage.isSet('emojidex.utfInfoUpdated')) {
+      current = new Date();
+      updated = new Date(this.storage.get('emojidex.utfInfoUpdated'));
+      // ２週間に一度更新する
+      if(current - updated >= 3600000 * 24 * 14) {
+        return true
+      } else {
+        return false
+      }
+    } else {
+      return true
+    }
   }
 
   emoji(emoji_set) {

@@ -297,8 +297,14 @@ var EmojidexData = function () {
         }
       }
     }).then(function (data) {
-      return _this._init_moji_codes(_this.storage.get('emojidex.moji_codes').moji_string === "");
+      if (_this._needUpdate()) {
+        return _this._init_moji_codes();
+      } else {
+        return _this.storage.get('emojidex');
+      }
     }).then(function (data) {
+      console.log(data);
+      _this.moji_codes = _this.storage.get('emojidex.moji_codes');
       return _this.EC.Data = _this;
     });
   }
@@ -310,18 +316,30 @@ var EmojidexData = function () {
 
       var force = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
-      if (force) {
+      return this.storage.update('emojidex.moji_codes_updated', new Date().toString()).then(function () {
         return $.ajax({
-          url: this.EC.api_url + 'moji_codes',
+          url: _this2.EC.api_url + 'moji_codes',
           dataType: 'json'
-        }).then(function (response) {
-          _this2.moji_codes = response;
-          _this2.storage.set('emojidex.moji_codes', response);
-          return response;
         });
+      }).then(function (response) {
+        return _this2.storage.update('emojidex.moji_codes', response);
+      });
+    }
+  }, {
+    key: '_needUpdate',
+    value: function _needUpdate() {
+      if (this.storage.isSet('emojidex.utfInfoUpdated')) {
+        current = new Date();
+        updated = new Date(this.storage.get('emojidex.utfInfoUpdated'));
+        // ２週間に一度更新する
+        if (current - updated >= 3600000 * 24 * 14) {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        return true;
       }
-
-      return this.moji_codes = this.storage.get('emojidex.moji_codes');
     }
   }, {
     key: 'emoji',
