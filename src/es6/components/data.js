@@ -58,7 +58,7 @@ class EmojidexData {
         }
       }
     }).then(data => {
-      this._init_moji_codes(this.storage.get('emojidex.moji_codes').moji_string === "");
+      return this._init_moji_codes(this.storage.get('emojidex.moji_codes').moji_string === "");
     }).then(data => {
       return this.EC.Data = this;
     });
@@ -71,11 +71,12 @@ class EmojidexData {
         dataType: 'json'
       }).then(response => {
         this.moji_codes = response;
-        return this.storage.set('emojidex.moji_codes', response);
+        this.storage.set('emojidex.moji_codes', response);
+        return response;
       });
     }
 
-    this.moji_codes = this.storage.get('emojidex.moji_codes');
+    return this.moji_codes = this.storage.get('emojidex.moji_codes');
   }
 
   emoji(emoji_set) {

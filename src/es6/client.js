@@ -48,9 +48,9 @@ class EmojidexClient {
 
     // new Emojidex modules
     this.Data = new EmojidexData(this, this.options).then(data => {
+      this.Util = new EmojidexUtil(this);
       this.User = new EmojidexUser(this);
       this.Indexes = new EmojidexIndexes(this);
-      this.Util = new EmojidexUtil(this);
       this.Search = new EmojidexSearch(this);
       this.Emoji = new EmojidexEmoji(this);
       this.Categories = new EmojidexCategories(this);

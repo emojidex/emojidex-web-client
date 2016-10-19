@@ -63,9 +63,9 @@ var EmojidexClient = function EmojidexClient(options) {
 
   // new Emojidex modules
   this.Data = new EmojidexData(this, this.options).then(function (data) {
+    _this.Util = new EmojidexUtil(_this);
     _this.User = new EmojidexUser(_this);
     _this.Indexes = new EmojidexIndexes(_this);
-    _this.Util = new EmojidexUtil(_this);
     _this.Search = new EmojidexSearch(_this);
     _this.Emoji = new EmojidexEmoji(_this);
     _this.Categories = new EmojidexCategories(_this);
@@ -297,7 +297,7 @@ var EmojidexData = function () {
         }
       }
     }).then(function (data) {
-      _this._init_moji_codes(_this.storage.get('emojidex.moji_codes').moji_string === "");
+      return _this._init_moji_codes(_this.storage.get('emojidex.moji_codes').moji_string === "");
     }).then(function (data) {
       return _this.EC.Data = _this;
     });
@@ -316,11 +316,12 @@ var EmojidexData = function () {
           dataType: 'json'
         }).then(function (response) {
           _this2.moji_codes = response;
-          return _this2.storage.set('emojidex.moji_codes', response);
+          _this2.storage.set('emojidex.moji_codes', response);
+          return response;
         });
       }
 
-      this.moji_codes = this.storage.get('emojidex.moji_codes');
+      return this.moji_codes = this.storage.get('emojidex.moji_codes');
     }
   }, {
     key: 'emoji',
@@ -942,7 +943,6 @@ var EmojidexSearch = function () {
     _classCallCheck(this, EmojidexSearch);
 
     this.EC = EC;
-    this.Util = new EmojidexUtil();
     this.results = [];
     this.cur_page = 1;
     this.count = 0;
@@ -1014,7 +1014,7 @@ var EmojidexSearch = function () {
   }, {
     key: 'starting',
     value: function starting(term, callback, opts) {
-      opts = $.extend({ code_sw: this.Util.escapeTerm(term) }, opts);
+      opts = $.extend({ code_sw: this.EC.Util.escapeTerm(term) }, opts);
       return this._searchAPI(term, callback, opts, { ajax: this.starting, storage: this.EC.Emoji.starting });
     }
 
@@ -1023,7 +1023,7 @@ var EmojidexSearch = function () {
   }, {
     key: 'ending',
     value: function ending(term, callback, opts) {
-      opts = $.extend({ code_ew: this.Util.escapeTerm(term) }, opts);
+      opts = $.extend({ code_ew: this.EC.Util.escapeTerm(term) }, opts);
       return this._searchAPI(term, callback, opts, { ajax: this.ending, storage: this.EC.Emoji.ending });
     }
 
@@ -1032,7 +1032,7 @@ var EmojidexSearch = function () {
   }, {
     key: 'tags',
     value: function tags(_tags, callback, opts) {
-      opts = $.extend({ "tags[]": this.Util.breakout(_tags) }, opts);
+      opts = $.extend({ "tags[]": this.EC.Util.breakout(_tags) }, opts);
       return this._searchAPI(_tags, callback, opts, { ajax: this.tags, storage: this.EC.Emoji.tags });
     }
 
@@ -1042,9 +1042,9 @@ var EmojidexSearch = function () {
     key: 'advanced',
     value: function advanced(search_details, callback, opts) {
       var param = {
-        code_cont: this.Util.escapeTerm(search_details.term),
-        "tags[]": this.Util.breakout(search_details.tags),
-        "categories[]": this.Util.breakout(search_details.categories)
+        code_cont: this.EC.Util.escapeTerm(search_details.term),
+        "tags[]": this.EC.Util.breakout(search_details.tags),
+        "categories[]": this.EC.Util.breakout(search_details.categories)
       };
       $.extend(param, opts);
       return this._searchAPI(search_details, callback, param, { ajax: this.advanced, storage: this.EC.Emoji.advanced });

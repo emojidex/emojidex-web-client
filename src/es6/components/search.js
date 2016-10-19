@@ -1,7 +1,6 @@
 class EmojidexSearch {
   constructor(EC) {
     this.EC = EC;
-    this.Util = new EmojidexUtil();
     this.results = [];
     this.cur_page = 1;
     this.count = 0;
@@ -66,28 +65,28 @@ class EmojidexSearch {
 
   // Executes a search starting with the given term
   starting(term, callback, opts) {
-    opts = $.extend({code_sw: this.Util.escapeTerm(term)}, opts);
+    opts = $.extend({code_sw: this.EC.Util.escapeTerm(term)}, opts);
     return this._searchAPI(term, callback, opts, {ajax: this.starting, storage: this.EC.Emoji.starting});
   }
 
   // Executes a search ending with the given term
   ending(term, callback, opts) {
-    opts = $.extend({code_ew: this.Util.escapeTerm(term)}, opts);
+    opts = $.extend({code_ew: this.EC.Util.escapeTerm(term)}, opts);
     return this._searchAPI(term, callback, opts, {ajax: this.ending, storage: this.EC.Emoji.ending});
   }
 
   // Searches by tags
   tags(tags, callback, opts) {
-    opts = $.extend({"tags[]": this.Util.breakout(tags)}, opts);
+    opts = $.extend({"tags[]": this.EC.Util.breakout(tags)}, opts);
     return this._searchAPI(tags, callback, opts, {ajax: this.tags, storage: this.EC.Emoji.tags});
   }
 
   // Searches using an array of keys and an array of tags
   advanced(search_details, callback, opts) {
     let param = {
-      code_cont: this.Util.escapeTerm(search_details.term),
-      "tags[]": this.Util.breakout(search_details.tags),
-      "categories[]": this.Util.breakout(search_details.categories)
+      code_cont: this.EC.Util.escapeTerm(search_details.term),
+      "tags[]": this.EC.Util.breakout(search_details.tags),
+      "categories[]": this.EC.Util.breakout(search_details.categories)
     };
     $.extend(param, opts);
     return this._searchAPI(search_details, callback, param, {ajax: this.advanced, storage: this.EC.Emoji.advanced});
