@@ -1,7 +1,7 @@
 describe('EmojidexData', function() {
   beforeAll(done =>
     helperChains({
-      functions: [clearStorage, helperBeforeForEmojidexData],
+      functions: [helperBeforeForEmojidexData],
       end: done
     })
   );
@@ -31,9 +31,9 @@ describe('EmojidexData', function() {
           //expect(EC_spec.Data.storage.get('emojidex.moji_data.moji_codes').moji_array.length).toBeTruthy();
           //expect(EC_spec.Data.storage.get('emojidex.moji_data.moji_codes').moji_index.keys.length).toBeTruthy();
 
-          expect(EC_spec.Data.storage.get('emojidex.moji_codes.emoji_string')).toEqual("");
-          expect(EC_spec.Data.storage.get('emojidex.moji_codes.emoji_array')).toEqual([]);
-          expect(EC_spec.Data.storage.get('emojidex.moji_codes.emoji_index')).toEqual({});
+          expect(EC_spec.Data.storage.get('emojidex.moji_codes.moji_string')).toEqual("");
+          expect(EC_spec.Data.storage.get('emojidex.moji_codes.moji_array')).toEqual([]);
+          expect(EC_spec.Data.storage.get('emojidex.moji_codes.moji_index')).toEqual({});
       });
     });
 

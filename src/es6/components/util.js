@@ -8,6 +8,7 @@ class EmojidexUtil {
     this.emoji_moji_tag_attr_pattern = RegExp("emoji-moji='([^']*)'", '');
     this.ignored_characters = '\'":;@&#~{}<>\\r\\n\\[\\]\\!\\$\\+\\?\\%\\*\\/\\\\';
     this.short_code_pattern = RegExp(`:([^\\s${this.ignored_characters}][^${this.ignored_characters}]*[^${this.ignored_characters}]):|:([^${this.ignored_characters}]):`, 'g');
+    this.utf_pattern = RegExp(this.EC.Data.moji_codes.moji_array.join('|'), 'g');
   }
 
   // Escapes spaces to underscore
@@ -71,10 +72,31 @@ class EmojidexUtil {
   }
 
   emojifyMoji(source, processor = this.emojiToHTML, callback = null) {
-    //let found = source.match();
-    //
-    if (typeof callback === 'function')
+    let found = source.match(this.utf_pattern);
+
+    let count = found.length;
+    let replacements = [];
+
+    if (count == 0 && typeof callback === 'function')
       callback(source);
+
+    for (find of found) {
+      let snip = `${find}`;
+      this.EC.Search.find(this.EC.Data.moji_codes.moji_index[snip], (result) => {
+        if (result.hasOwnProperty('code')) {
+          replacements.push({pre: snip, post: processor(result)});
+        }
+
+        count -= 1;
+        if (count == 0) {
+          for (replacement of replacements) {
+            source = source.replace(replacement.pre, replacement.post);
+          }
+          if (typeof callback === 'function')
+            callback(source);
+        }
+      });
+    }
   }
 
   emojifyCodes(source, processor = this.emojiToHTML, callback = null) {

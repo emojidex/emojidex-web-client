@@ -16,8 +16,7 @@ let helperBefore = function(chains_data) {
     onReady: EC => {
       this.EC_spec.User.setAuth(test_user_info.auth_user, test_user_info.auth_token).then(() => {
         helperChains(chains_data);
-      }
-      );
+      });
     }
   });
 };

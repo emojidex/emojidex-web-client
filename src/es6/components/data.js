@@ -29,9 +29,9 @@ class EmojidexData {
       } else {
         return this.storage.update('emojidex', {
           moji_codes: {
-            emoji_string: "",
-            emoji_array: [],
-            emoji_index: {}
+            moji_string: "",
+            moji_array: [],
+            moji_index: {}
           },
           emoji: this.EC.options.emoji || [],
           history: this.EC.options.history || [],
@@ -46,7 +46,7 @@ class EmojidexData {
       } else {
         // if the CDN URL has not been overridden
         // attempt to get it from the api env
-        if (this.EC.cdn_url === this.EC.defaults.cdn_url && this.EC.closed_net === false) {
+        if (this.EC.cdn_url === this.EC.defaults.cdn_url) {
           return $.ajax({
             url: this.EC.api_url + "/env",
             dataType: 'json'
@@ -54,17 +54,28 @@ class EmojidexData {
             this.EC.env = response;
             this.EC.cdn_url = `https://${this.EC.env.s_cdn_addr}/emoji/`;
             return this.storage.update('emojidex', {cdn_url: this.EC.cdn_url});
-          }
-          );
+          });
         }
       }
+    }).then(data => {
+      this._init_moji_codes(this.storage.get('emojidex.moji_codes').moji_string === "");
     }).then(data => {
       return this.EC.Data = this;
     });
   }
 
-  moji_codes() {
-    return this.storage.hub_cache.emojidex.moji_codes;
+  _init_moji_codes(force = false) {
+    if (force) {
+      return $.ajax({
+        url: this.EC.api_url + 'moji_codes',
+        dataType: 'json'
+      }).then(response => {
+        this.moji_codes = response;
+        return this.storage.set('emojidex.moji_codes', response);
+      });
+    }
+
+    this.moji_codes = this.storage.get('emojidex.moji_codes');
   }
 
   emoji(emoji_set) {
