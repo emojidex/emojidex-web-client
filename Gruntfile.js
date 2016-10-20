@@ -43,11 +43,7 @@ module.exports = function(grunt) {
         ' * <%= pkg.license.description %>\n' +
         ' * <%= pkg.license.url %>\n' +
         ' *\n' +
-        ' * <%= pkg.license.copyright %>\n' +
-        ' *\n' +
-        ' *\n' +
-        ' * Includes:\n' +
-        ' * --------------------------------'
+        ' * <%= pkg.license.copyright %>\n'
     },
 
     //=========================================================================
@@ -96,7 +92,8 @@ module.exports = function(grunt) {
     concat: {
       javascript: {
         options: {
-          stripBanners: true
+          stripBanners: true,
+          banner: '<%= meta.banner %> */\n'
         },
         src: [
           'node_modules/babel-polyfill/dist/polyfill.min.js',
@@ -113,7 +110,10 @@ module.exports = function(grunt) {
         // options:
         //   manglet: true
         src: ['dist/js/emojidex-client.js'],
-        dest: 'dist/js/emojidex-client.min.js'
+        dest: 'dist/js/emojidex-client.min.js',
+        options: {
+          banner: '<%= meta.banner %> */\n'
+        }
       }
     },
 

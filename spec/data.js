@@ -1,7 +1,7 @@
 describe('EmojidexData', function() {
   beforeAll(done =>
     helperChains({
-      functions: [helperBeforeForEmojidexData],
+      functions: [clearStorage, helperBeforeForEmojidexData],
       end: done
     })
   );

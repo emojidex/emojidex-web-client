@@ -36,7 +36,7 @@ describe('EmojidexEmoji', function() {
 
   it('search', done =>
     EC_spec.Emoji.search('kissing', function(emoji_data) {
-      expect(emoji_data).toContain(jasmine.objectContaining(emoji_kissing));
+      expect(emoji_data).toContain(jasmine.objectContaining({ code: 'kissing', moji: '😗', unicode: '1f617', category: 'faces' }));
       done();
     })
   );

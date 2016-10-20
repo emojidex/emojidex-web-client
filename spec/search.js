@@ -8,7 +8,7 @@ describe('EmojidexSearch', function() {
 
   it('search', done =>
     EC_spec.Search.search('kissing', function(emoji_data) {
-      expect(emoji_data).toContain(jasmine.objectContaining(emoji_kissing));
+      expect(emoji_data).toContain(jasmine.objectContaining({ code: 'kissing', moji: '😗', unicode: '1f617', category: 'faces' }));
       done();
     })
   );
@@ -36,7 +36,7 @@ describe('EmojidexSearch', function() {
 
   it('advanced: term', done =>
     EC_spec.Search.advanced({term: 'kissing'}, function(emoji_data) {
-      expect(emoji_data).toContain(jasmine.objectContaining(emoji_kissing));
+      expect(emoji_data).toContain(jasmine.objectContaining({ code: 'kissing', moji: '😗', unicode: '1f617', category: 'faces' }));
       done();
     })
   );
