@@ -303,7 +303,6 @@ var EmojidexData = function () {
         return _this.storage.get('emojidex');
       }
     }).then(function (data) {
-      console.log(data);
       _this.moji_codes = _this.storage.get('emojidex.moji_codes');
       return _this.EC.Data = _this;
     });
@@ -1656,11 +1655,13 @@ var EmojidexUtil = function () {
   }, {
     key: "emojify",
     value: function emojify(source) {
+      var _this = this;
+
       var processor = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.emojiToHTML;
       var callback = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
       return this.emojifyMoji(source, processor, function (processed) {
-        this.emojifyCodes(processed, processor, function (processed) {
+        _this.emojifyCodes(processed, processor, function (processed) {
           if (typeof callback === 'function') callback(processed);
         });
       });
@@ -1668,7 +1669,7 @@ var EmojidexUtil = function () {
   }, {
     key: "emojifyMoji",
     value: function emojifyMoji(source) {
-      var _this = this;
+      var _this2 = this;
 
       var processor = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.emojiToHTML;
       var callback = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
@@ -1689,7 +1690,7 @@ var EmojidexUtil = function () {
           find = _step.value;
 
           var snip = "" + find;
-          _this.EC.Search.find(_this.EC.Data.moji_codes.moji_index[snip], function (result) {
+          _this2.EC.Search.find(_this2.EC.Data.moji_codes.moji_index[snip], function (result) {
             if (result.hasOwnProperty('code')) {
               replacements.push({ pre: snip, post: processor(result) });
             }
@@ -1747,7 +1748,7 @@ var EmojidexUtil = function () {
   }, {
     key: "emojifyCodes",
     value: function emojifyCodes(source) {
-      var _this2 = this;
+      var _this3 = this;
 
       var processor = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.emojiToHTML;
       var callback = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
@@ -1768,7 +1769,7 @@ var EmojidexUtil = function () {
           find = _step3.value;
 
           var snip = "" + find;
-          _this2.EC.Search.find(_this2.EC.Util.unEncapsulateCode(snip), function (result) {
+          _this3.EC.Search.find(_this3.EC.Util.unEncapsulateCode(snip), function (result) {
             if (result.hasOwnProperty('code')) {
               replacements.push({ pre: snip, post: processor(result) });
             }
