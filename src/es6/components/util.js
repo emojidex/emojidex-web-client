@@ -71,8 +71,12 @@ class EmojidexUtil {
     });
   }
 
+  // Convert UTF emoji using the specified processor
   emojifyMoji(source, processor = this.emojiToHTML, callback = null) {
     let found = source.match(this.utf_pattern);
+
+    if (found == null)
+      return;
 
     let count = found.length;
     let replacements = [];
@@ -99,8 +103,12 @@ class EmojidexUtil {
     }
   }
 
+  // Convert emoji short codes using the specified processor
   emojifyCodes(source, processor = this.emojiToHTML, callback = null) {
     let found = source.match(this.short_code_pattern);
+
+    if (found == null)
+      return;
 
     let count = found.length;
     let replacements = [];
@@ -125,6 +133,16 @@ class EmojidexUtil {
         }
       });
     }
+  }
+
+  // Shortcut to emojify with emojiToHTML as the processor
+  emojifyToHTML(source, callback) {
+    this.emojify(source, this.emojiToHTML, callback);
+  }
+
+  // Shortcut to emojify with emojiToMD as the processor
+  emojifyToMD(source, callback) {
+    this.emojify(source, this.emojiToMD, callback);
   }
 
   // Returns an HTML image/link tag for an emoji from an emoji object

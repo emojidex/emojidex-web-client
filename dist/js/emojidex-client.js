@@ -1677,6 +1677,9 @@ var EmojidexUtil = function () {
         });
       });
     }
+
+    // Convert UTF emoji using the specified processor
+
   }, {
     key: "emojifyMoji",
     value: function emojifyMoji(source) {
@@ -1686,6 +1689,8 @@ var EmojidexUtil = function () {
       var callback = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
       var found = source.match(this.utf_pattern);
+
+      if (found == null) return;
 
       var count = found.length;
       var replacements = [];
@@ -1756,6 +1761,9 @@ var EmojidexUtil = function () {
         }
       }
     }
+
+    // Convert emoji short codes using the specified processor
+
   }, {
     key: "emojifyCodes",
     value: function emojifyCodes(source) {
@@ -1765,6 +1773,8 @@ var EmojidexUtil = function () {
       var callback = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
       var found = source.match(this.short_code_pattern);
+
+      if (found == null) return;
 
       var count = found.length;
       var replacements = [];
@@ -1834,6 +1844,22 @@ var EmojidexUtil = function () {
           }
         }
       }
+    }
+
+    // Shortcut to emojify with emojiToHTML as the processor
+
+  }, {
+    key: "emojifyToHTML",
+    value: function emojifyToHTML(source, callback) {
+      this.emojify(source, this.emojiToHTML, callback);
+    }
+
+    // Shortcut to emojify with emojiToMD as the processor
+
+  }, {
+    key: "emojifyToMD",
+    value: function emojifyToMD(source, callback) {
+      this.emojify(source, this.emojiToMD, callback);
     }
 
     // Returns an HTML image/link tag for an emoji from an emoji object
