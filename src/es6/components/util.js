@@ -87,16 +87,18 @@ class EmojidexUtil {
           if (result.hasOwnProperty('code')) {
             replacements.push({pre: snip, post: processor(result)});
           }
-
+          return source
+        }).then((source) => {
           count -= 1;
-          if (count == 0) {
+        }).catch((responce) => {
+          count -= 1;
+        }).then(() => {
+          if(count == 0) {
             for (replacement of replacements) {
               source = source.replace(replacement.pre, replacement.post);
             }
+            resolve(source)
           }
-          return source
-        }).then((source) => {
-          resolve(source);
         });
       }
     });
