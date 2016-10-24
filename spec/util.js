@@ -41,7 +41,6 @@ describe('EmojidexUtil', function() {
 
   it('converts an emoji object into an HTML tag set with link', done =>
     EC_spec.Search.find('emojidex', function(emoji) {
-      console.log(emoji)
       expect(EC_spec.Util.emojiToHTML(emoji)).toBe(
         "<a href='https://www.emojidex.com' emoji-code='emojidex'><img class='emojidex-emoji' src='http://cdn.emojidex.com/emoji/xhdpi/emojidex.png' emoji-code='emojidex' alt='emojidex' /></a>");
       done();
@@ -99,7 +98,6 @@ describe('EmojidexUtil', function() {
     EC_spec.Util.emojifyCodes(test_text, function(emoji) {
       return '*' + emoji.code + '*';
     }).then((processed_text) => {
-      console.log('koketeru spec-1',processed_text);
       expect(processed_text).toBe(expected_text);
       done();
     });
