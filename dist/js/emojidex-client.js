@@ -1790,8 +1790,13 @@ var EmojidexUtil = function () {
               if (result.hasOwnProperty('code')) {
                 replacements.push({ pre: snip, post: processor(result) });
               }
-
+              return source;
+            }).then(function (source) {
               count -= 1;
+            }).catch(function (responce) {
+              count -= 1;
+            }).then(function () {
+              console.log(count);
               if (count == 0) {
                 var _iteratorNormalCompletion4 = true;
                 var _didIteratorError4 = false;
@@ -1817,10 +1822,9 @@ var EmojidexUtil = function () {
                     }
                   }
                 }
+
+                resolve(source);
               }
-              return source;
-            }).then(function (source) {
-              resolve(source);
             });
           };
 

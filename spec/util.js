@@ -76,18 +76,18 @@ describe('EmojidexUtil', function() {
   //   expect(EC_spec.Util.deEmojifyHTML(test_text)).toBe(expected_text);
   // });
 
-  it('finds emoji character codes in text and converts them with the chosen drop-in converter', function(done) {
-    test_text = 'I have a 🚗. My favorite sushi is :(サーモン)すし:. :-) :::xxxxxxxx:.';
-
-    expected_text = 'I have a *red car*. My favorite sushi is :(サーモン)すし:. :-) :::xxxxxxxx:.';
-
-    EC_spec.Util.emojifyMoji(test_text, function(emoji) {
-      return '*' + emoji.code + '*';
-    }).then((processed_text) => {
-      expect(processed_text).toBe(expected_text);
-      done();
-    });
-  });
+  // it('finds emoji character codes in text and converts them with the chosen drop-in converter', function(done) {
+  //   test_text = 'I have a 🚗. My favorite sushi is :(サーモン)すし:. :-) :::xxxxxxxx:.';
+  //
+  //   expected_text = 'I have a *red car*. My favorite sushi is :(サーモン)すし:. :-) :::xxxxxxxx:.';
+  //
+  //   EC_spec.Util.emojifyMoji(test_text, function(emoji) {
+  //     return '*' + emoji.code + '*';
+  //   }).then((processed_text) => {
+  //     expect(processed_text).toBe(expected_text);
+  //     done();
+  //   });
+  // });
 
   it('finds short codes in text and converts them with the chosen drop-in converter', function(done) {
     test_text = 'I have a 🚗. My favorite sushi is :(サーモン)すし:. :-) :::xxxxxxxx:.' +
@@ -99,36 +99,36 @@ describe('EmojidexUtil', function() {
     EC_spec.Util.emojifyCodes(test_text, function(emoji) {
       return '*' + emoji.code + '*';
     }).then((processed_text) => {
+      console.log('koketeru spec-1',processed_text);
       expect(processed_text).toBe(expected_text);
       done();
     });
   });
 
-  it('converts plain text with emoji characters and short codes into text with emoji HTML tags', function(done) {
-    test_text = "Test text 🚗テスト:emojidex:";
-
-    expected_text = "Test text <img class='emojidex-emoji' src='http://cdn.emojidex.com/emoji/xhdpi/red_car.png' "
-      + "emoji-code='red_car' emoji-moji='🚗' alt='red car' />テスト<a href='https://www.emojidex.com' "
-      + "emoji-code='emojidex'><img class='emojidex-emoji' src='http://cdn.emojidex.com/emoji/xhdpi/emojidex.png' "
-      + "emoji-code='emojidex' alt='emojidex' /></a>";
-
-    EC_spec.Util.emojifyToHTML(test_text).then((processed) => {
-      expect(processed).toBe(expected_text);
-      done();
-    });
-  });
-
-  it('finds emoji and short codes in text and converts them with the chosen drop-in converter', function(done) {
-    test_text = 'I have a 🚗. My favorite sushi is :(サーモン)すし:. :-) :::xxxxxxxx:.';
-
-    expected_text = 'I have a *red car*. My favorite sushi is *(サーモン)すし*. :-) :::xxxxxxxx:.';
-
-    EC_spec.Util.emojify(test_text, function(emoji) {
-      return '*' + emoji.code + '*';
-    }).then((processed_text) => {
-      console.log(processed_text)
-      expect(processed_text).toBe(expected_text);
-      done();
-    });
-  });
+  // it('converts plain text with emoji characters and short codes into text with emoji HTML tags', function(done) {
+  //   test_text = "Test text 🚗テスト:emojidex:";
+  //
+  //   expected_text = "Test text <img class='emojidex-emoji' src='http://cdn.emojidex.com/emoji/xhdpi/red_car.png' "
+  //     + "emoji-code='red_car' emoji-moji='🚗' alt='red car' />テスト<a href='https://www.emojidex.com' "
+  //     + "emoji-code='emojidex'><img class='emojidex-emoji' src='http://cdn.emojidex.com/emoji/xhdpi/emojidex.png' "
+  //     + "emoji-code='emojidex' alt='emojidex' /></a>";
+  //
+  //   EC_spec.Util.emojifyToHTML(test_text).then((processed) => {
+  //     expect(processed).toBe(expected_text);
+  //     done();
+  //   });
+  // });
+  //
+  // it('finds emoji and short codes in text and converts them with the chosen drop-in converter', function(done) {
+  //   test_text = 'I have a 🚗. My favorite sushi is :(サーモン)すし:. :-) :::xxxxxxxx:.';
+  //
+  //   expected_text = 'I have a *red car*. My favorite sushi is *(サーモン)すし*. :-) :::xxxxxxxx:.';
+  //
+  //   EC_spec.Util.emojify(test_text, function(emoji) {
+  //     return '*' + emoji.code + '*';
+  //   }).then((processed_text) => {
+  //     expect(processed_text).toBe(expected_text);
+  //     done();
+  //   });
+  // });
 });
