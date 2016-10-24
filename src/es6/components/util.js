@@ -63,8 +63,10 @@ class EmojidexUtil {
   // An emoji object is passed to the processor and formatted text should be returned.
   // Default processer converts to HTML tags.
   emojify(source, processor = this.emojiToHTML, callback = null) {
-    return this.emojifyMoji(source, processor, (processed) => {
-      this.emojifyCodes(processed, processor, function(processed) {
+    console.log("emojifyMoji");
+    this.emojifyMoji(source, processor, (processed) => {
+      console.log("emojifyCodes");
+      this.emojifyCodes(processed, processor, (processed) => {
         if (typeof callback === 'function')
           callback(processed);
       });

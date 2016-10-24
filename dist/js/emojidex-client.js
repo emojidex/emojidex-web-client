@@ -48,7 +48,7 @@ var EmojidexClient = function EmojidexClient(options) {
     cdn_url: 'http://' + this.env.cdn_addr + '/emoji/',
     closed_net: false,
     min_query_len: 4,
-    size_code: 'px32',
+    size_code: 'xhdpi',
     detailed: false,
     limit: 32,
     onReady: function onReady(arg) {
@@ -1671,7 +1671,9 @@ var EmojidexUtil = function () {
       var processor = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.emojiToHTML;
       var callback = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
-      return this.emojifyMoji(source, processor, function (processed) {
+      console.log("emojifyMoji");
+      this.emojifyMoji(source, processor, function (processed) {
+        console.log("emojifyCodes");
         _this.emojifyCodes(processed, processor, function (processed) {
           if (typeof callback === 'function') callback(processed);
         });

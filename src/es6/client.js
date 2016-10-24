@@ -24,7 +24,7 @@ class EmojidexClient {
       cdn_url: `http://${this.env.cdn_addr}/emoji/`,
       closed_net: false,
       min_query_len: 4,
-      size_code: 'px32',
+      size_code: 'xhdpi',
       detailed: false,
       limit: 32,
       onReady: arg => ({})
