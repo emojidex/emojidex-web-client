@@ -100,7 +100,7 @@ class EmojidexSearch {
       if (emoji.code === code) {
         if (typeof callback === 'function')
           callback(emoji);
-        return emoji;
+        return Promise.resolve(emoji);
       }
     }
 
