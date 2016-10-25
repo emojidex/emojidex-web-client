@@ -1709,7 +1709,7 @@ var EmojidexUtil = function () {
               return source;
             }).then(function (source) {
               count -= 1;
-            }).catch(function (responce) {
+            }).catch(function (response) {
               count -= 1;
             }).then(function () {
               if (count == 0) {
@@ -1796,7 +1796,7 @@ var EmojidexUtil = function () {
               return source;
             }).then(function (source) {
               count -= 1;
-            }).catch(function (responce) {
+            }).catch(function (response) {
               count -= 1;
             }).then(function () {
               if (count == 0) {

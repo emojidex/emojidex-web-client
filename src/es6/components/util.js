@@ -90,7 +90,7 @@ class EmojidexUtil {
           return source;
         }).then((source) => {
           count -= 1;
-        }).catch((responce) => {
+        }).catch((response) => {
           count -= 1;
         }).then(() => {
           if(count == 0) {
@@ -124,7 +124,7 @@ class EmojidexUtil {
           return source;
         }).then((source) => {
           count -= 1;
-        }).catch((responce) => {
+        }).catch((response) => {
           count -= 1;
         }).then(() => {
           if(count == 0) {
