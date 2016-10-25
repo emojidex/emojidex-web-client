@@ -66,9 +66,9 @@ class EmojidexUtil {
   // Default processor converts to HTML tags.
   emojify(source, processor = self.emojiToHTML) {
     return self.emojifyMoji(source, processor).then((processed) => {
-      return self.emojifyCodes(processed, processor)
+      return self.emojifyCodes(processed, processor);
     }).then((processed) => {
-      return processed
+      return processed;
     });
   }
 
@@ -76,7 +76,7 @@ class EmojidexUtil {
   emojifyMoji(source, processor = self.emojiToHTML) {
     return new Promise((resolve, reject) => {
       let found = source.match(self.utf_pattern);
-      if (found == null) { return }
+      if (found == null) { return; }
 
       let count = found.length;
       let replacements = [];
@@ -87,7 +87,7 @@ class EmojidexUtil {
           if (result.hasOwnProperty('code')) {
             replacements.push({pre: snip, post: processor(result)});
           }
-          return source
+          return source;
         }).then((source) => {
           count -= 1;
         }).catch((responce) => {
@@ -97,7 +97,7 @@ class EmojidexUtil {
             for (replacement of replacements) {
               source = source.replace(replacement.pre, replacement.post);
             }
-            resolve(source)
+            resolve(source);
           }
         });
       }
@@ -109,7 +109,7 @@ class EmojidexUtil {
     return new Promise((resolve, reject) => {
       let found = source.match(self.short_code_pattern);
 
-      if (found == null) { return }
+      if (found == null) { return; }
 
       let count = found.length;
       let replacements = [];
@@ -121,7 +121,7 @@ class EmojidexUtil {
           if (result.hasOwnProperty('code')) {
             replacements.push({pre: snip, post: processor(result)});
           }
-          return source
+          return source;
         }).then((source) => {
           count -= 1;
         }).catch((responce) => {
@@ -131,7 +131,7 @@ class EmojidexUtil {
             for (replacement of replacements) {
               source = source.replace(replacement.pre, replacement.post);
             }
-            resolve(source)
+            resolve(source);
           }
         });
       }
@@ -140,7 +140,7 @@ class EmojidexUtil {
 
   // Shortcut to emojify with emojiToHTML as the processor
   emojifyToHTML(source) {
-    return self.emojify(source, self.emojiToHTML)
+    return self.emojify(source, self.emojiToHTML);
   }
 
   // Shortcut to emojify with emojiToMD as the processor
@@ -191,9 +191,8 @@ class EmojidexUtil {
   deLinkHTML(source) {
     let found = source.match(self.a_pattern);
 
-    for (find of found) {
+    for (find of found) 
       source = source.replace(find, find.match(self.img_pattern)[0]);
-    }
 
     return source;
   }
