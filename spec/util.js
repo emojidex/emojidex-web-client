@@ -1,7 +1,7 @@
 describe('EmojidexUtil', function() {
   beforeEach(function(done) {
     helperChains({
-      functions: [helperBefore],
+      functions: [clearStorage, helperBefore],
       end: done
     });
   });
