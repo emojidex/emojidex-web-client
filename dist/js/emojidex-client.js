@@ -1691,6 +1691,7 @@ var EmojidexUtil = function () {
         }
 
         var count = found.length;
+        if (count == 0) resolve(source);
         var replacements = [];
 
         var _iteratorNormalCompletion = true;
@@ -1778,6 +1779,7 @@ var EmojidexUtil = function () {
         }
 
         var count = found.length;
+        if (count == 0) resolve(source);
         var replacements = [];
 
         var _iteratorNormalCompletion3 = true;

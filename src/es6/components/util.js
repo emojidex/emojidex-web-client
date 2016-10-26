@@ -79,6 +79,8 @@ class EmojidexUtil {
       if (found == null) { return; }
 
       let count = found.length;
+      if (count == 0)
+        resolve(source);
       let replacements = [];
 
       for (find of found) {
@@ -112,8 +114,9 @@ class EmojidexUtil {
       if (found == null) { return; }
 
       let count = found.length;
+      if (count == 0)
+        resolve(source);
       let replacements = [];
-
 
       for (find of found) {
         let snip = `${find}`;
