@@ -1686,12 +1686,11 @@ var EmojidexUtil = function () {
 
       return new Promise(function (resolve, reject) {
         var found = source.match(self.utf_pattern);
-        if (found == null) {
-          return;
+        if (found == null || found.length == 0) {
+          resolve(source);
         }
 
         var count = found.length;
-        if (count == 0) resolve(source);
         var replacements = [];
 
         var _iteratorNormalCompletion = true;
@@ -1773,13 +1772,11 @@ var EmojidexUtil = function () {
 
       return new Promise(function (resolve, reject) {
         var found = source.match(self.short_code_pattern);
-
-        if (found == null) {
-          return;
+        if (found == null || found.length == 0) {
+          resolve(source);
         }
 
         var count = found.length;
-        if (count == 0) resolve(source);
         var replacements = [];
 
         var _iteratorNormalCompletion3 = true;

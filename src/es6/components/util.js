@@ -76,11 +76,9 @@ class EmojidexUtil {
   emojifyMoji(source, processor = self.emojiToHTML) {
     return new Promise((resolve, reject) => {
       let found = source.match(self.utf_pattern);
-      if (found == null) { return; }
+      if (found == null || found.length == 0) { resolve(source); }
 
       let count = found.length;
-      if (count == 0)
-        resolve(source);
       let replacements = [];
 
       for (find of found) {
@@ -110,12 +108,9 @@ class EmojidexUtil {
   emojifyCodes(source, processor = self.emojiToHTML) {
     return new Promise((resolve, reject) => {
       let found = source.match(self.short_code_pattern);
-
-      if (found == null) { return; }
+      if (found == null || found.length == 0) { resolve(source); }
 
       let count = found.length;
-      if (count == 0)
-        resolve(source);
       let replacements = [];
 
       for (find of found) {

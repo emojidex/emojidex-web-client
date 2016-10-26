@@ -117,6 +117,32 @@ describe('EmojidexUtil', function() {
     });
   });
 
+  it('finds emoji text with only emoji characters and converts them with the chosen drop-in converter', function(done) {
+    test_text = 'I have a 🚗. :-) :::xxxxxxxx:.';
+
+    expected_text = 'I have a *red car*. :-) :::xxxxxxxx:.';
+
+    EC_spec.Util.emojify(test_text, function(emoji) {
+      return '*' + emoji.code + '*';
+    }).then((processed_text) => {
+      expect(processed_text).toBe(expected_text);
+      done();
+    });
+  });
+
+  it('finds short codes in text with only short codes and converts them with the chosen drop-in converter', function(done) {
+    test_text = 'My favorite sushi is :(サーモン)すし:. :-) :::xxxxxxxx:.';
+
+    expected_text = 'My favorite sushi is *(サーモン)すし*. :-) :::xxxxxxxx:.';
+
+    EC_spec.Util.emojify(test_text, function(emoji) {
+      return '*' + emoji.code + '*';
+    }).then((processed_text) => {
+      expect(processed_text).toBe(expected_text);
+      done();
+    });
+  });
+
   it('finds emoji and short codes in text and converts them with the chosen drop-in converter', function(done) {
     test_text = 'I have a 🚗. My favorite sushi is :(サーモン)すし:. :-) :::xxxxxxxx:.';
 
