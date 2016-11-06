@@ -1685,12 +1685,12 @@ var EmojidexUtil = function () {
       var processor = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : self.emojiToHTML;
 
       return new Promise(function (resolve, reject) {
-        var found = source.match(self.utf_pattern);
-        if (found == null || found.length == 0) {
+        var targets = source.match(self.utf_pattern);
+        if (targets == null || targets.length == 0) {
           resolve(source);
         }
 
-        var count = found.length;
+        var count = targets.length;
         var replacements = [];
 
         var _iteratorNormalCompletion = true;
@@ -1698,13 +1698,13 @@ var EmojidexUtil = function () {
         var _iteratorError = undefined;
 
         try {
-          var _loop = function _loop() {
-            find = _step.value;
+          for (var _iterator = targets[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            target = _step.value;
 
-            var snip = "" + find;
+            var snip = "" + target;
             self.EC.Search.find(self.EC.Data.moji_codes.moji_index[snip]).then(function (result) {
               if (result.hasOwnProperty('code')) {
-                replacements.push({ pre: snip, post: processor(result) });
+                replacements.push(processor(result));
               }
               return source;
             }).then(function (source) {
@@ -1713,38 +1713,12 @@ var EmojidexUtil = function () {
               count -= 1;
             }).then(function () {
               if (count == 0) {
-                var _iteratorNormalCompletion2 = true;
-                var _didIteratorError2 = false;
-                var _iteratorError2 = undefined;
-
-                try {
-                  for (var _iterator2 = replacements[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                    replacement = _step2.value;
-
-                    source = source.replace(replacement.pre, replacement.post);
-                  }
-                } catch (err) {
-                  _didIteratorError2 = true;
-                  _iteratorError2 = err;
-                } finally {
-                  try {
-                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                      _iterator2.return();
-                    }
-                  } finally {
-                    if (_didIteratorError2) {
-                      throw _iteratorError2;
-                    }
-                  }
-                }
-
+                source = source.replace(self.utf_pattern, function () {
+                  return replacements[count++];
+                });
                 resolve(source);
               }
             });
-          };
-
-          for (var _iterator = found[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-            _loop();
           }
         } catch (err) {
           _didIteratorError = true;
@@ -1771,23 +1745,23 @@ var EmojidexUtil = function () {
       var processor = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : self.emojiToHTML;
 
       return new Promise(function (resolve, reject) {
-        var found = source.match(self.short_code_pattern);
-        if (found == null || found.length == 0) {
+        var targets = source.match(self.short_code_pattern);
+        if (targets == null || targets.length == 0) {
           resolve(source);
         }
 
-        var count = found.length;
+        var count = targets.length;
         var replacements = [];
 
-        var _iteratorNormalCompletion3 = true;
-        var _didIteratorError3 = false;
-        var _iteratorError3 = undefined;
+        var _iteratorNormalCompletion2 = true;
+        var _didIteratorError2 = false;
+        var _iteratorError2 = undefined;
 
         try {
-          var _loop2 = function _loop2() {
-            find = _step3.value;
+          var _loop = function _loop() {
+            target = _step2.value;
 
-            var snip = "" + find;
+            var snip = "" + target;
             self.EC.Search.find(self.EC.Util.unEncapsulateCode(snip)).then(function (result) {
               if (result.hasOwnProperty('code')) {
                 replacements.push({ pre: snip, post: processor(result) });
@@ -1799,27 +1773,27 @@ var EmojidexUtil = function () {
               count -= 1;
             }).then(function () {
               if (count == 0) {
-                var _iteratorNormalCompletion4 = true;
-                var _didIteratorError4 = false;
-                var _iteratorError4 = undefined;
+                var _iteratorNormalCompletion3 = true;
+                var _didIteratorError3 = false;
+                var _iteratorError3 = undefined;
 
                 try {
-                  for (var _iterator4 = replacements[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                    replacement = _step4.value;
+                  for (var _iterator3 = replacements[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                    replacement = _step3.value;
 
                     source = source.replace(replacement.pre, replacement.post);
                   }
                 } catch (err) {
-                  _didIteratorError4 = true;
-                  _iteratorError4 = err;
+                  _didIteratorError3 = true;
+                  _iteratorError3 = err;
                 } finally {
                   try {
-                    if (!_iteratorNormalCompletion4 && _iterator4.return) {
-                      _iterator4.return();
+                    if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                      _iterator3.return();
                     }
                   } finally {
-                    if (_didIteratorError4) {
-                      throw _iteratorError4;
+                    if (_didIteratorError3) {
+                      throw _iteratorError3;
                     }
                   }
                 }
@@ -1829,20 +1803,20 @@ var EmojidexUtil = function () {
             });
           };
 
-          for (var _iterator3 = found[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-            _loop2();
+          for (var _iterator2 = targets[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+            _loop();
           }
         } catch (err) {
-          _didIteratorError3 = true;
-          _iteratorError3 = err;
+          _didIteratorError2 = true;
+          _iteratorError2 = err;
         } finally {
           try {
-            if (!_iteratorNormalCompletion3 && _iterator3.return) {
-              _iterator3.return();
+            if (!_iteratorNormalCompletion2 && _iterator2.return) {
+              _iterator2.return();
             }
           } finally {
-            if (_didIteratorError3) {
-              throw _iteratorError3;
+            if (_didIteratorError2) {
+              throw _iteratorError2;
             }
           }
         }
@@ -1899,37 +1873,37 @@ var EmojidexUtil = function () {
       var mojify = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
       source = self.deLinkHTML(source);
-      var found = source.match(self.img_pattern);
+      var targets = source.match(self.img_pattern);
 
-      var _iteratorNormalCompletion5 = true;
-      var _didIteratorError5 = false;
-      var _iteratorError5 = undefined;
+      var _iteratorNormalCompletion4 = true;
+      var _didIteratorError4 = false;
+      var _iteratorError4 = undefined;
 
       try {
-        for (var _iterator5 = found[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-          find = _step5.value;
+        for (var _iterator4 = targets[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+          target = _step4.value;
 
           if (mojify) {
-            var moji_code = find.match(self.emoji_moji_tag_attr_pattern);
+            var moji_code = target.match(self.emoji_moji_tag_attr_pattern);
             if (moji_code != null && moji_code.length != 1) {
-              source = source.replace(find, moji_code[1]);
+              source = source.replace(target, moji_code[1]);
               continue;
             }
           }
-          var emoji_code = find.match(self.emoji_code_tag_attr_pattern);
-          source = source.replace(find, self.encapsulateCode(emoji_code[1]));
+          var emoji_code = target.match(self.emoji_code_tag_attr_pattern);
+          source = source.replace(target, self.encapsulateCode(emoji_code[1]));
         }
       } catch (err) {
-        _didIteratorError5 = true;
-        _iteratorError5 = err;
+        _didIteratorError4 = true;
+        _iteratorError4 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion5 && _iterator5.return) {
-            _iterator5.return();
+          if (!_iteratorNormalCompletion4 && _iterator4.return) {
+            _iterator4.return();
           }
         } finally {
-          if (_didIteratorError5) {
-            throw _iteratorError5;
+          if (_didIteratorError4) {
+            throw _iteratorError4;
           }
         }
       }
@@ -1943,29 +1917,29 @@ var EmojidexUtil = function () {
   }, {
     key: "deLinkHTML",
     value: function deLinkHTML(source) {
-      var found = source.match(self.a_pattern);
+      var targets = source.match(self.a_pattern);
 
-      var _iteratorNormalCompletion6 = true;
-      var _didIteratorError6 = false;
-      var _iteratorError6 = undefined;
+      var _iteratorNormalCompletion5 = true;
+      var _didIteratorError5 = false;
+      var _iteratorError5 = undefined;
 
       try {
-        for (var _iterator6 = found[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-          find = _step6.value;
+        for (var _iterator5 = targets[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+          target = _step5.value;
 
-          source = source.replace(find, find.match(self.img_pattern)[0]);
+          source = source.replace(target, target.match(self.img_pattern)[0]);
         }
       } catch (err) {
-        _didIteratorError6 = true;
-        _iteratorError6 = err;
+        _didIteratorError5 = true;
+        _iteratorError5 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion6 && _iterator6.return) {
-            _iterator6.return();
+          if (!_iteratorNormalCompletion5 && _iterator5.return) {
+            _iterator5.return();
           }
         } finally {
-          if (_didIteratorError6) {
-            throw _iteratorError6;
+          if (_didIteratorError5) {
+            throw _iteratorError5;
           }
         }
       }

@@ -78,10 +78,10 @@ describe('EmojidexUtil', function() {
   it('finds emoji character codes in text and converts them with the chosen drop-in converter', function(done) {
     test_text = 'I have a 🚗🚗. My favorite sushi is :(サーモン)すし:. :-) :::xxxxxxxx:.';
 
-    expected_text = 'I have a *red car**red car*. My favorite sushi is :(サーモン)すし:. :-) :::xxxxxxxx:.';
+    expected_text = 'I have a *moji=🚗*red car===3*moji=🚗*red car===3. My favorite sushi is :(サーモン)すし:. :-) :::xxxxxxxx:.';
 
     EC_spec.Util.emojifyMoji(test_text, function(emoji) {
-      return '*' + emoji.code + '*';
+      return '*moji=🚗*' + emoji.code + '===3';
     }).then((processed_text) => {
       expect(processed_text).toBe(expected_text);
       done();

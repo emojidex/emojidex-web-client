@@ -123,15 +123,15 @@ module.exports = function(grunt) {
         src: ['dist/js/emojidex-client.js'],
         options: {
           specs: [
-            'spec/data.js',
-            'spec/util.js',
-            'spec/client.js',
-            'spec/categories.js',
-            'spec/emoji.js',
-            'spec/indexes.js',
-            'spec/search.js',
-            'spec/user.js'
-            // 'spec/*.js'
+            // 'spec/data.js',
+            // 'spec/util.js',
+            // 'spec/client.js',
+            // 'spec/categories.js',
+            // 'spec/emoji.js',
+            // 'spec/indexes.js',
+            // 'spec/search.js',
+            // 'spec/user.js'
+            'spec/*.js'
           ],
           helpers:[
             'spec/helpers/method.js',
@@ -153,12 +153,12 @@ module.exports = function(grunt) {
 
     // Local dev client for live testing
     connect: {
-      client: {}//,
-//      hub: {
-//        options: {
-//          port: 8001
-//        }
-//      }
+      client: {
+        // for debug ---
+        // options: {
+        //   port: 8001
+        // }
+      }
     },
 
     // Auto re-build watcher configuration
