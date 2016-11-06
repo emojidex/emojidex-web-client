@@ -75,17 +75,17 @@ class EmojidexUtil {
   // Convert UTF emoji using the specified processor
   emojifyMoji(source, processor = self.emojiToHTML) {
     return new Promise((resolve, reject) => {
-      let found = source.match(self.utf_pattern);
-      if (found == null || found.length == 0) { resolve(source); }
+      let targets = source.match(self.utf_pattern);
+      if (targets == null || targets.length == 0) { resolve(source); }
 
-      let count = found.length;
+      let count = targets.length;
       let replacements = [];
 
-      for (find of found) {
-        let snip = `${find}`;
+      for (target of targets) {
+        let snip = `${target}`;
         self.EC.Search.find(self.EC.Data.moji_codes.moji_index[snip]).then((result) => {
           if (result.hasOwnProperty('code')) {
-            replacements.push({pre: snip, post: processor(result)});
+            replacements.push(processor(result));
           }
           return source;
         }).then((source) => {
@@ -94,9 +94,9 @@ class EmojidexUtil {
           count -= 1;
         }).then(() => {
           if(count == 0) {
-            for (replacement of replacements) {
-              source = source.replace(replacement.pre, replacement.post);
-            }
+            source = source.replace(self.utf_pattern, () => {
+              return replacements[count++]
+            });
             resolve(source);
           }
         });
@@ -107,14 +107,14 @@ class EmojidexUtil {
   // Convert emoji short codes using the specified processor
   emojifyCodes(source, processor = self.emojiToHTML) {
     return new Promise((resolve, reject) => {
-      let found = source.match(self.short_code_pattern);
-      if (found == null || found.length == 0) { resolve(source); }
+      let targets = source.match(self.short_code_pattern);
+      if (targets == null || targets.length == 0) { resolve(source); }
 
-      let count = found.length;
+      let count = targets.length;
       let replacements = [];
 
-      for (find of found) {
-        let snip = `${find}`;
+      for (target of targets) {
+        let snip = `${target}`;
         self.EC.Search.find(self.EC.Util.unEncapsulateCode(snip)).then((result) => {
           if (result.hasOwnProperty('code')) {
             replacements.push({pre: snip, post: processor(result)});
@@ -147,7 +147,7 @@ class EmojidexUtil {
   }
 
   // Returns an HTML image/link tag for an emoji from an emoji object
-  emojiToHTML(emoji, size_code =  self.EC.defaults.size_code) {
+  emojiToHTML(emoji, size_code = self.EC.defaults.size_code) {
     let img = `<img class='emojidex-emoji' src='http://${self.EC.env.cdn_addr}/emoji/${size_code}/${self.escapeTerm(emoji.code)}.png' emoji-code='${self.escapeTerm(emoji.code)}'${(emoji.moji == null || emoji.moji == '')? '' : " emoji-moji='" + emoji.moji + "'"} alt='${self.deEscapeTerm(emoji.code)}' />`;
     if(emoji.link != null && emoji.link != '')
       return `<a href='${emoji.link}' emoji-code='${self.escapeTerm(emoji.code)}'>${img}</a>`;
@@ -167,18 +167,18 @@ class EmojidexUtil {
   // a text box/content editable element, NOT a DOM object.
   deEmojifyHTML(source, mojify = true) {
     source = self.deLinkHTML(source);
-    let found = source.match(self.img_pattern);
+    let targets = source.match(self.img_pattern);
 
-    for (find of found) {
+    for (target of targets) {
       if (mojify) {
-        let moji_code = find.match(self.emoji_moji_tag_attr_pattern);
+        let moji_code = target.match(self.emoji_moji_tag_attr_pattern);
         if (moji_code != null && moji_code.length != 1) {
-          source = source.replace(find, moji_code[1]);
+          source = source.replace(target, moji_code[1]);
           continue;
         }
       }
-      let emoji_code = find.match(self.emoji_code_tag_attr_pattern);
-      source = source.replace(find, self.encapsulateCode(emoji_code[1]));
+      let emoji_code = target.match(self.emoji_code_tag_attr_pattern);
+      source = source.replace(target, self.encapsulateCode(emoji_code[1]));
     }
 
     return source;
@@ -187,10 +187,11 @@ class EmojidexUtil {
   // Remove links from wrapped emoji images in HTML
   // *Only do self if you need to remove links for functionality.
   deLinkHTML(source) {
-    let found = source.match(self.a_pattern);
+    let targets = source.match(self.a_pattern);
 
-    for (find of found) 
-      source = source.replace(find, find.match(self.img_pattern)[0]);
+    for (target of targets) {
+      source = source.replace(target, target.match(self.img_pattern)[0]);
+    }
 
     return source;
   }
