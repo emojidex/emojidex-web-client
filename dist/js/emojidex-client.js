@@ -1,5 +1,5 @@
 /*
- * emojidex client - v0.13.1
+ * emojidex client - v0.13.2
  * * Provides search, index caching and combining and asset URI resolution
  * https://github.com/emojidex/emojidex-web-client
  *
@@ -1567,7 +1567,7 @@ function __guardFunc__(func, transform) {
 }
 //# sourceMappingURL=history.js.map
 
-"use strict";
+'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -1581,12 +1581,12 @@ var EmojidexUtil = function () {
 
     self.EC = EC;
 
-    self.a_pattern = RegExp("<a href='[^']*' emoji-code='[^']*'><img class='emojidex-emoji' src='[^']*' (emoji-code='[^']*' emoji-moji='[^']*'|emoji-code='[^']*') alt='[^']*' \/><\/a>", 'g');
-    self.img_pattern = RegExp("<img class='emojidex-emoji' src='[^']*' (emoji-code='[^']*' emoji-moji='[^']*'|emoji-code='[^']*') alt='[^']*' \/>", 'g');
-    self.emoji_code_tag_attr_pattern = RegExp("emoji-code='([^']*)'", '');
-    self.emoji_moji_tag_attr_pattern = RegExp("emoji-moji='([^']*)'", '');
+    self.a_pattern = RegExp('<a href=["|\'][^\'|"]*[\'|"] emoji-code=["|\'][^\'|"]*[\'|"]><img class=["|\']emojidex-emoji[\'|"] src=["|\'][^\'|"]*[\'|"] (emoji-code=["|\'][^\'|"]*[\'|"] emoji-moji=["|\'][^\'|"]*[\'|"]|emoji-code=["|\'][^\'|"]*[\'|"]) alt=["|\'][^\'|"]*[\'|"][ />|/>|>]</a>', 'g');
+    self.img_pattern = RegExp('<img class=["|\']emojidex-emoji[\'|"] src=["|\'][^\'|^"]*[\'|"] (emoji-code=["|\'][^\'|^"]*[\'|"] emoji-moji=["|\'][^\'|^"]*[\'|"]|emoji-code=["|\'][^\'|^"]*[\'|"]) alt=["|\'][^\'|^"]*[\'|"][ />|/>|>]', 'g');
+    self.emoji_code_tag_attr_pattern = RegExp('emoji-code=["|\']([^\'|^"]*)[\'|"]', '');
+    self.emoji_moji_tag_attr_pattern = RegExp('emoji-moji=["|\']([^\'|^"]*)[\'|"]', '');
     self.ignored_characters = '\'":;@&#~{}<>\\r\\n\\[\\]\\!\\$\\+\\?\\%\\*\\/\\\\';
-    self.short_code_pattern = RegExp(":([^\\s" + self.ignored_characters + "][^" + self.ignored_characters + "]*[^" + self.ignored_characters + "]):|:([^" + self.ignored_characters + "]):", 'g');
+    self.short_code_pattern = RegExp(':([^\\s' + self.ignored_characters + '][^' + self.ignored_characters + ']*[^' + self.ignored_characters + ']):|:([^' + self.ignored_characters + ']):', 'g');
     self.utf_pattern = RegExp(self.EC.Data.moji_codes.moji_array.join('|'), 'g');
   }
 
@@ -1594,7 +1594,7 @@ var EmojidexUtil = function () {
 
 
   _createClass(EmojidexUtil, [{
-    key: "escapeTerm",
+    key: 'escapeTerm',
     value: function escapeTerm(term) {
       return term.replace(/\s/g, '_');
     }
@@ -1602,12 +1602,12 @@ var EmojidexUtil = function () {
     // De-Escapes underscores to spaces
 
   }, {
-    key: "deEscapeTerm",
+    key: 'deEscapeTerm',
     value: function deEscapeTerm(term) {
       return term.replace(/_/g, ' ');
     }
   }, {
-    key: "makeURLSafe",
+    key: 'makeURLSafe',
     value: function makeURLSafe(term) {
       return self.escapeTerm(term).replace(/\(/g, '%28').replace(/\)/g, '%29');
     }
@@ -1615,15 +1615,15 @@ var EmojidexUtil = function () {
     // Adds colons around a code
 
   }, {
-    key: "encapsulateCode",
+    key: 'encapsulateCode',
     value: function encapsulateCode(code) {
-      return ":" + self.unEncapsulateCode(code) + ":";
+      return ':' + self.unEncapsulateCode(code) + ':';
     }
 
     // Removes colons around a code
 
   }, {
-    key: "unEncapsulateCode",
+    key: 'unEncapsulateCode',
     value: function unEncapsulateCode(code) {
       return code.replace(/\:/g, '');
     }
@@ -1631,7 +1631,7 @@ var EmojidexUtil = function () {
     // Breakout into an array
 
   }, {
-    key: "breakout",
+    key: 'breakout',
     value: function breakout(items) {
       if (items != null) {
         if (items instanceof Array) {
@@ -1647,14 +1647,14 @@ var EmojidexUtil = function () {
     // Converts an emoji array to [{code: "moji_code", img_url: "http://cdn...moji_code.png}] format
 
   }, {
-    key: "simplify",
+    key: 'simplify',
     value: function simplify() {
       var emoji = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : self.results;
       var size_code = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : self.EC.size_code;
 
       for (i = 0; i < emoji.length; i++) {
         emoji[i].code = self.escapeTerm(emoji[i].code);
-        emoji[i].img_url = self.EC.cdn_url + "/" + size_code + "/" + self.escapeTerm(emoji[i].code) + ".png";
+        emoji[i].img_url = self.EC.cdn_url + '/' + size_code + '/' + self.escapeTerm(emoji[i].code) + '.png';
       }
 
       return emoji;
@@ -1666,7 +1666,7 @@ var EmojidexUtil = function () {
     // Default processor converts to HTML tags.
 
   }, {
-    key: "emojify",
+    key: 'emojify',
     value: function emojify(source) {
       var processor = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : self.emojiToHTML;
 
@@ -1680,7 +1680,7 @@ var EmojidexUtil = function () {
     // Convert UTF emoji using the specified processor
 
   }, {
-    key: "emojifyMoji",
+    key: 'emojifyMoji',
     value: function emojifyMoji(source) {
       var processor = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : self.emojiToHTML;
 
@@ -1701,7 +1701,7 @@ var EmojidexUtil = function () {
           for (var _iterator = targets[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
             target = _step.value;
 
-            var snip = "" + target;
+            var snip = '' + target;
             self.EC.Search.find(self.EC.Data.moji_codes.moji_index[snip]).then(function (result) {
               if (result.hasOwnProperty('code')) {
                 replacements.push(processor(result));
@@ -1740,7 +1740,7 @@ var EmojidexUtil = function () {
     // Convert emoji short codes using the specified processor
 
   }, {
-    key: "emojifyCodes",
+    key: 'emojifyCodes',
     value: function emojifyCodes(source) {
       var processor = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : self.emojiToHTML;
 
@@ -1761,7 +1761,7 @@ var EmojidexUtil = function () {
           var _loop = function _loop() {
             target = _step2.value;
 
-            var snip = "" + target;
+            var snip = '' + target;
             self.EC.Search.find(self.EC.Util.unEncapsulateCode(snip)).then(function (result) {
               if (result.hasOwnProperty('code')) {
                 replacements.push({ pre: snip, post: processor(result) });
@@ -1826,7 +1826,7 @@ var EmojidexUtil = function () {
     // Shortcut to emojify with emojiToHTML as the processor
 
   }, {
-    key: "emojifyToHTML",
+    key: 'emojifyToHTML',
     value: function emojifyToHTML(source) {
       return self.emojify(source, self.emojiToHTML);
     }
@@ -1834,7 +1834,7 @@ var EmojidexUtil = function () {
     // Shortcut to emojify with emojiToMD as the processor
 
   }, {
-    key: "emojifyToMD",
+    key: 'emojifyToMD',
     value: function emojifyToMD(source) {
       return self.emojify(source, self.emojiToMD);
     }
@@ -1842,24 +1842,24 @@ var EmojidexUtil = function () {
     // Returns an HTML image/link tag for an emoji from an emoji object
 
   }, {
-    key: "emojiToHTML",
+    key: 'emojiToHTML',
     value: function emojiToHTML(emoji) {
       var size_code = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : self.EC.defaults.size_code;
 
-      var img = "<img class='emojidex-emoji' src='http://" + self.EC.env.cdn_addr + "/emoji/" + size_code + "/" + self.escapeTerm(emoji.code) + ".png' emoji-code='" + self.escapeTerm(emoji.code) + "'" + (emoji.moji == null || emoji.moji == '' ? '' : " emoji-moji='" + emoji.moji + "'") + " alt='" + self.deEscapeTerm(emoji.code) + "' />";
-      if (emoji.link != null && emoji.link != '') return "<a href='" + emoji.link + "' emoji-code='" + self.escapeTerm(emoji.code) + "'>" + img + "</a>";
+      var img = '<img class="emojidex-emoji" src="http://' + self.EC.env.cdn_addr + '/emoji/' + size_code + '/' + self.escapeTerm(emoji.code) + '.png" emoji-code="' + self.escapeTerm(emoji.code) + '"' + (emoji.moji == null || emoji.moji == "" ? "" : ' emoji-moji="' + emoji.moji + '"') + ' alt="' + self.deEscapeTerm(emoji.code) + '" />';
+      if (emoji.link != null && emoji.link != '') return '<a href="' + emoji.link + '" emoji-code="' + self.escapeTerm(emoji.code) + '">' + img + '</a>';
       return img;
     }
 
     // Returns a MarkDown image/link tag for an emoji from an emoji object
 
   }, {
-    key: "emojiToMD",
+    key: 'emojiToMD',
     value: function emojiToMD(emoji) {
       var size_code = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : self.EC.defaults.size_code;
 
-      var img = "![" + (emoji.moji == null || emoji.moji == '' ? emoji.code : emoji.moji) + "](http://" + self.EC.env.cdn_addr + "/emoji/" + size_code + "/" + self.escapeTerm(emoji.code) + ".png \"" + self.deEscapeTerm(emoji.code) + "\")";
-      if (emoji.link != null && emoji.link != '') return "[" + img + " ](" + emoji.link + ")";
+      var img = '![' + (emoji.moji == null || emoji.moji == '' ? emoji.code : emoji.moji) + '](http://' + self.EC.env.cdn_addr + '/emoji/' + size_code + '/' + self.escapeTerm(emoji.code) + '.png "' + self.deEscapeTerm(emoji.code) + '")';
+      if (emoji.link != null && emoji.link != '') return '[' + img + ' ](' + emoji.link + ')';
       return img;
     }
 
@@ -1868,12 +1868,14 @@ var EmojidexUtil = function () {
     // a text box/content editable element, NOT a DOM object.
 
   }, {
-    key: "deEmojifyHTML",
+    key: 'deEmojifyHTML',
     value: function deEmojifyHTML(source) {
       var mojify = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
-      source = self.deLinkHTML(source);
+      source = '' + source;
+      //source = self.deLinkHTML(source);
       var targets = source.match(self.img_pattern);
+      if (targets == null) return source;
 
       var _iteratorNormalCompletion4 = true;
       var _didIteratorError4 = false;
@@ -1915,36 +1917,26 @@ var EmojidexUtil = function () {
     // *Only do self if you need to remove links for functionality.
 
   }, {
-    key: "deLinkHTML",
+    key: 'deLinkHTML',
     value: function deLinkHTML(source) {
+      source = '' + source;
       var targets = source.match(self.a_pattern);
+      if (targets == null) return source;
 
-      var _iteratorNormalCompletion5 = true;
-      var _didIteratorError5 = false;
-      var _iteratorError5 = undefined;
-
-      try {
-        for (var _iterator5 = targets[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-          target = _step5.value;
-
-          source = source.replace(target, target.match(self.img_pattern)[0]);
-        }
-      } catch (err) {
-        _didIteratorError5 = true;
-        _iteratorError5 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion5 && _iterator5.return) {
-            _iterator5.return();
-          }
-        } finally {
-          if (_didIteratorError5) {
-            throw _iteratorError5;
-          }
-        }
+      for (var i = 0; i < targets.length; i++) {
+        source = source.replace(targets[i], targets[i].match(self.img_pattern)[0]);
       }
 
       return source;
+    }
+
+    // Get's the 'this' context for this Util instance
+    // Generally should not be necessary, but with JS you never know...
+
+  }, {
+    key: 'getContext',
+    value: function getContext() {
+      return self;
     }
   }]);
 

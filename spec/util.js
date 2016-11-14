@@ -34,7 +34,7 @@ describe('EmojidexUtil', function() {
   it('converts an emoji object into an HTML tag set', done =>
     EC_spec.Search.find('red_car', function(emoji) {
       expect(EC_spec.Util.emojiToHTML(emoji)).toBe(
-        "<img class='emojidex-emoji' src='http://cdn.emojidex.com/emoji/xhdpi/red_car.png' emoji-code='red_car' emoji-moji='🚗' alt='red car' />");
+        '<img class="emojidex-emoji" src="http://cdn.emojidex.com/emoji/xhdpi/red_car.png" emoji-code="red_car" emoji-moji="🚗" alt="red car" />');
       done();
     })
   );
@@ -42,7 +42,7 @@ describe('EmojidexUtil', function() {
   it('converts an emoji object into an HTML tag set with link', done =>
     EC_spec.Search.find('emojidex', function(emoji) {
       expect(EC_spec.Util.emojiToHTML(emoji)).toBe(
-        "<a href='https://www.emojidex.com' emoji-code='emojidex'><img class='emojidex-emoji' src='http://cdn.emojidex.com/emoji/xhdpi/emojidex.png' emoji-code='emojidex' alt='emojidex' /></a>");
+        '<a href="https://www.emojidex.com" emoji-code="emojidex"><img class="emojidex-emoji" src="http://cdn.emojidex.com/emoji/xhdpi/emojidex.png" emoji-code="emojidex" alt="emojidex" /></a>');
       done();
     })
   );
@@ -65,14 +65,25 @@ describe('EmojidexUtil', function() {
   );
 
   it('converts text with emoji html in it to plain text with emoji short codes', function() {
-    test_text = "Test text <img class='emojidex-emoji' src='http://cdn.emojidex.com/emoji/xhdpi/red_car.png' "
-      + "emoji-code='red_car' emoji-moji='🚗' alt='red car' />テスト<a href='https://www.emojidex.com' "
-      + "emoji-code='emojidex'><img class='emojidex-emoji' src='http://cdn.emojidex.com/emoji/xhdpi/emojidex.png' "
-      + "emoji-code='emojidex' alt='emojidex' /></a><img src='http://cdn.emojidex.com/emoji/xhdpi/red_car.png' />";
+    test_text = 'Test text <img class="emojidex-emoji" src="http://cdn.emojidex.com/emoji/xhdpi/red_car.png" '
+      + 'emoji-code="red_car" emoji-moji="🚗" alt="red car" />テスト<a href="https://www.emojidex.com" '
+      + 'emoji-code="emojidex"><img class="emojidex-emoji" src="http://cdn.emojidex.com/emoji/xhdpi/emojidex.png" '
+      + 'emoji-code="emojidex" alt="emojidex" /></a><img src="http://cdn.emojidex.com/emoji/xhdpi/red_car.png" />';
 
-    expected_text =  "Test text 🚗テスト:emojidex:<img src='http://cdn.emojidex.com/emoji/xhdpi/red_car.png' />";
+    expected_text =  'Test text 🚗テスト:emojidex:<img src="http://cdn.emojidex.com/emoji/xhdpi/red_car.png" />';
 
     expect(EC_spec.Util.deEmojifyHTML(test_text)).toBe(expected_text);
+  });
+
+  it('converts text with emoji html in it to plain text with emoji short codes (assuming quotes were reversed)', function() {
+    test_text2 =  "Test text <img class='emojidex-emoji' src='http://cdn.emojidex.com/emoji/xhdpi/red_car.png' "
+      + "emoji-code='red_car' emoji-moji='🚗' alt='red car' />テスト<a href='https://www.emojidex.com' "
+      + "emoji-code='emojidex'><img class='emojidex-emoji' src='http://cdn.emojidex.com/emoji/xhdpi/emojidex.png' "
+      + "emoji-code='emojidex' alt='emojidex' /></a><img src='http://cdn.emojidex.com/emoji/xhdpi/red_car.png' />';
+
+    expected_text = "Test text 🚗テスト:emojidex:<img src='http://cdn.emojidex.com/emoji/xhdpi/red_car.png' />";
+
+    expect(EC_spec.Util.deEmojifyHTML(test_text2)).toBe(expected_text);
   });
 
   it('finds emoji character codes in text and converts them with the chosen drop-in converter', function(done) {
@@ -106,10 +117,10 @@ describe('EmojidexUtil', function() {
   it('converts plain text with emoji characters and short codes into text with emoji HTML tags', function(done) {
     test_text = "Test text 🚗テスト:emojidex:";
 
-    expected_text = "Test text <img class='emojidex-emoji' src='http://cdn.emojidex.com/emoji/xhdpi/red_car.png' "
-      + "emoji-code='red_car' emoji-moji='🚗' alt='red car' />テスト<a href='https://www.emojidex.com' "
-      + "emoji-code='emojidex'><img class='emojidex-emoji' src='http://cdn.emojidex.com/emoji/xhdpi/emojidex.png' "
-      + "emoji-code='emojidex' alt='emojidex' /></a>";
+    expected_text = 'Test text <img class="emojidex-emoji" src="http://cdn.emojidex.com/emoji/xhdpi/red_car.png" '
+      + 'emoji-code="red_car" emoji-moji="🚗" alt="red car" />テスト<a href="https://www.emojidex.com" '
+      + 'emoji-code="emojidex"><img class="emojidex-emoji" src="http://cdn.emojidex.com/emoji/xhdpi/emojidex.png" '
+      + 'emoji-code="emojidex" alt="emojidex" /></a>';
 
     EC_spec.Util.emojifyToHTML(test_text).then((processed) => {
       expect(processed).toBe(expected_text);

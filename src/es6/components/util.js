@@ -4,10 +4,10 @@ class EmojidexUtil {
 
     self.EC = EC;
 
-    self.a_pattern = RegExp("<a href='[^']*' emoji-code='[^']*'><img class='emojidex-emoji' src='[^']*' (emoji-code='[^']*' emoji-moji='[^']*'|emoji-code='[^']*') alt='[^']*' \/><\/a>", 'g');
-    self.img_pattern = RegExp("<img class='emojidex-emoji' src='[^']*' (emoji-code='[^']*' emoji-moji='[^']*'|emoji-code='[^']*') alt='[^']*' \/>", 'g');
-    self.emoji_code_tag_attr_pattern = RegExp("emoji-code='([^']*)'", '');
-    self.emoji_moji_tag_attr_pattern = RegExp("emoji-moji='([^']*)'", '');
+    self.a_pattern = RegExp(`<a href=["|'][^'|"]*['|"] emoji-code=["|'][^'|"]*['|"]><img class=["|']emojidex-emoji['|"] src=["|'][^'|"]*['|"] (emoji-code=["|'][^'|"]*['|"] emoji-moji=["|'][^'|"]*['|"]|emoji-code=["|'][^'|"]*['|"]) alt=["|'][^'|"]*['|"][ \/>|\/>|>]<\/a>`, 'g');
+    self.img_pattern = RegExp(`<img class=["|']emojidex-emoji['|"] src=["|'][^'|^"]*['|"] (emoji-code=["|'][^'|^"]*['|"] emoji-moji=["|'][^'|^"]*['|"]|emoji-code=["|'][^'|^"]*['|"]) alt=["|'][^'|^"]*['|"][ \/>|\/>|>]`, 'g');
+    self.emoji_code_tag_attr_pattern = RegExp(`emoji-code=["|']([^'|^"]*)['|"]`, '');
+    self.emoji_moji_tag_attr_pattern = RegExp(`emoji-moji=["|']([^'|^"]*)['|"]`, '');
     self.ignored_characters = '\'":;@&#~{}<>\\r\\n\\[\\]\\!\\$\\+\\?\\%\\*\\/\\\\';
     self.short_code_pattern = RegExp(`:([^\\s${self.ignored_characters}][^${self.ignored_characters}]*[^${self.ignored_characters}]):|:([^${self.ignored_characters}]):`, 'g');
     self.utf_pattern = RegExp(self.EC.Data.moji_codes.moji_array.join('|'), 'g');
@@ -148,9 +148,9 @@ class EmojidexUtil {
 
   // Returns an HTML image/link tag for an emoji from an emoji object
   emojiToHTML(emoji, size_code = self.EC.defaults.size_code) {
-    let img = `<img class='emojidex-emoji' src='http://${self.EC.env.cdn_addr}/emoji/${size_code}/${self.escapeTerm(emoji.code)}.png' emoji-code='${self.escapeTerm(emoji.code)}'${(emoji.moji == null || emoji.moji == '')? '' : " emoji-moji='" + emoji.moji + "'"} alt='${self.deEscapeTerm(emoji.code)}' />`;
+    let img = `<img class="emojidex-emoji" src="http://${self.EC.env.cdn_addr}/emoji/${size_code}/${self.escapeTerm(emoji.code)}.png" emoji-code="${self.escapeTerm(emoji.code)}"${(emoji.moji == null || emoji.moji == "")? "" : ' emoji-moji="' + emoji.moji + '"'} alt="${self.deEscapeTerm(emoji.code)}" />`;
     if(emoji.link != null && emoji.link != '')
-      return `<a href='${emoji.link}' emoji-code='${self.escapeTerm(emoji.code)}'>${img}</a>`;
+      return `<a href="${emoji.link}" emoji-code="${self.escapeTerm(emoji.code)}">${img}</a>`;
     return img;
   }
 
@@ -166,8 +166,11 @@ class EmojidexUtil {
   // *This method takes a string and returns a string, such as the contents of
   // a text box/content editable element, NOT a DOM object.
   deEmojifyHTML(source, mojify = true) {
-    source = self.deLinkHTML(source);
-    let targets = source.match(self.img_pattern);
+    source = `${source}`;
+    //source = self.deLinkHTML(source);
+    var targets = source.match(self.img_pattern);
+    if (targets == null)
+      return source;
 
     for (target of targets) {
       if (mojify) {
@@ -187,12 +190,21 @@ class EmojidexUtil {
   // Remove links from wrapped emoji images in HTML
   // *Only do self if you need to remove links for functionality.
   deLinkHTML(source) {
-    let targets = source.match(self.a_pattern);
+    source = `${source}`;
+    var targets = source.match(self.a_pattern);
+    if (targets == null)
+      return source;
 
-    for (target of targets) {
-      source = source.replace(target, target.match(self.img_pattern)[0]);
+    for (var i = 0; i < targets.length; i++) {
+      source = source.replace(targets[i], targets[i].match(self.img_pattern)[0]);
     }
 
     return source;
+  }
+
+  // Get's the 'this' context for this Util instance
+  // Generally should not be necessary, but with JS you never know...
+  getContext() {
+    return self;
   }
 }
