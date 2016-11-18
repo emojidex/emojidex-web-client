@@ -4,8 +4,8 @@ class EmojidexUtil {
 
     self.EC = EC;
 
-    self.a_pattern = RegExp(`<a href=["|'][^'|"]*['|"] emoji-code=["|'][^'|"]*['|"]><img class=["|']emojidex-emoji['|"] src=["|'][^'|"]*['|"] (emoji-code=["|'][^'|"]*['|"] emoji-moji=["|'][^'|"]*['|"]|emoji-code=["|'][^'|"]*['|"]) alt=["|'][^'|"]*['|"][ \/>|\/>|>]<\/a>`, 'g');
-    self.img_pattern = RegExp(`<img class=["|']emojidex-emoji['|"] src=["|'][^'|^"]*['|"] (emoji-code=["|'][^'|^"]*['|"] emoji-moji=["|'][^'|^"]*['|"]|emoji-code=["|'][^'|^"]*['|"]) alt=["|'][^'|^"]*['|"][ \/>|\/>|>]`, 'g');
+    self.a_pattern = RegExp(`<a href=["|'][^'|^"]*['|"] emoji-code=["|'][^'|^"]*['|"]><img class=["|']emojidex-emoji['|"] src=["|'][^'|^"]*['|"] (emoji-code=["|'][^'|^"]*['|"] emoji-moji=["|'][^'|^"]*['|"]|emoji-code=["|'][^'|^"]*['|"]) alt=["|'][^'|^"]*['|"]( \/>|\/>|>)<\/a>`, 'g');
+    self.img_pattern = RegExp(`<img class=["|']emojidex-emoji['|"] src=["|'][^'|^"]*['|"] (emoji-code=["|'][^'|^"]*['|"] emoji-moji=["|'][^'|^"]*['|"]|emoji-code=["|'][^'|^"]*['|"]) alt=["|'][^'|^"]*['|"]( \/>|\/>|>)`, 'g');
     self.emoji_code_tag_attr_pattern = RegExp(`emoji-code=["|']([^'|^"]*)['|"]`, '');
     self.emoji_moji_tag_attr_pattern = RegExp(`emoji-moji=["|']([^'|^"]*)['|"]`, '');
     self.ignored_characters = '\'":;@&#~{}<>\\r\\n\\[\\]\\!\\$\\+\\?\\%\\*\\/\\\\';
@@ -167,7 +167,7 @@ class EmojidexUtil {
   // a text box/content editable element, NOT a DOM object.
   deEmojifyHTML(source, mojify = true) {
     source = `${source}`;
-    //source = self.deLinkHTML(source);
+    source = self.deLinkHTML(source);
     var targets = source.match(self.img_pattern);
     if (targets == null)
       return source;

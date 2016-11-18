@@ -79,7 +79,7 @@ describe('EmojidexUtil', function() {
     test_text2 =  "Test text <img class='emojidex-emoji' src='http://cdn.emojidex.com/emoji/xhdpi/red_car.png' "
       + "emoji-code='red_car' emoji-moji='🚗' alt='red car' />テスト<a href='https://www.emojidex.com' "
       + "emoji-code='emojidex'><img class='emojidex-emoji' src='http://cdn.emojidex.com/emoji/xhdpi/emojidex.png' "
-      + "emoji-code='emojidex' alt='emojidex' /></a><img src='http://cdn.emojidex.com/emoji/xhdpi/red_car.png' />';
+      + "emoji-code='emojidex' alt='emojidex' /></a><img src='http://cdn.emojidex.com/emoji/xhdpi/red_car.png' />";
 
     expected_text = "Test text 🚗テスト:emojidex:<img src='http://cdn.emojidex.com/emoji/xhdpi/red_car.png' />";
 

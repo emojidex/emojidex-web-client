@@ -1,5 +1,5 @@
 /*
- * emojidex client - v0.13.2
+ * emojidex client - v0.13.3
  * * Provides search, index caching and combining and asset URI resolution
  * https://github.com/emojidex/emojidex-web-client
  *
@@ -1089,6 +1089,7 @@ var EmojidexSearch = function () {
       var opts = arguments[2];
 
       var emoji_cache = this.EC.Data.emoji();
+      code = this.EC.Util.escapeTerm(code);
       for (var i = 0; i < emoji_cache.length; i++) {
         var emoji = emoji_cache[i];
         if (emoji.code === code) {
@@ -1581,8 +1582,8 @@ var EmojidexUtil = function () {
 
     self.EC = EC;
 
-    self.a_pattern = RegExp('<a href=["|\'][^\'|"]*[\'|"] emoji-code=["|\'][^\'|"]*[\'|"]><img class=["|\']emojidex-emoji[\'|"] src=["|\'][^\'|"]*[\'|"] (emoji-code=["|\'][^\'|"]*[\'|"] emoji-moji=["|\'][^\'|"]*[\'|"]|emoji-code=["|\'][^\'|"]*[\'|"]) alt=["|\'][^\'|"]*[\'|"][ />|/>|>]</a>', 'g');
-    self.img_pattern = RegExp('<img class=["|\']emojidex-emoji[\'|"] src=["|\'][^\'|^"]*[\'|"] (emoji-code=["|\'][^\'|^"]*[\'|"] emoji-moji=["|\'][^\'|^"]*[\'|"]|emoji-code=["|\'][^\'|^"]*[\'|"]) alt=["|\'][^\'|^"]*[\'|"][ />|/>|>]', 'g');
+    self.a_pattern = RegExp('<a href=["|\'][^\'|^"]*[\'|"] emoji-code=["|\'][^\'|^"]*[\'|"]><img class=["|\']emojidex-emoji[\'|"] src=["|\'][^\'|^"]*[\'|"] (emoji-code=["|\'][^\'|^"]*[\'|"] emoji-moji=["|\'][^\'|^"]*[\'|"]|emoji-code=["|\'][^\'|^"]*[\'|"]) alt=["|\'][^\'|^"]*[\'|"]( />|/>|>)</a>', 'g');
+    self.img_pattern = RegExp('<img class=["|\']emojidex-emoji[\'|"] src=["|\'][^\'|^"]*[\'|"] (emoji-code=["|\'][^\'|^"]*[\'|"] emoji-moji=["|\'][^\'|^"]*[\'|"]|emoji-code=["|\'][^\'|^"]*[\'|"]) alt=["|\'][^\'|^"]*[\'|"]( />|/>|>)', 'g');
     self.emoji_code_tag_attr_pattern = RegExp('emoji-code=["|\']([^\'|^"]*)[\'|"]', '');
     self.emoji_moji_tag_attr_pattern = RegExp('emoji-moji=["|\']([^\'|^"]*)[\'|"]', '');
     self.ignored_characters = '\'":;@&#~{}<>\\r\\n\\[\\]\\!\\$\\+\\?\\%\\*\\/\\\\';
@@ -1873,7 +1874,7 @@ var EmojidexUtil = function () {
       var mojify = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
       source = '' + source;
-      //source = self.deLinkHTML(source);
+      source = self.deLinkHTML(source);
       var targets = source.match(self.img_pattern);
       if (targets == null) return source;
 
