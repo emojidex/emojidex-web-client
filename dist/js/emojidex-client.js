@@ -1,5 +1,5 @@
 /*
- * emojidex client - v0.13.3
+ * emojidex client - v0.13.4
  * * Provides search, index caching and combining and asset URI resolution
  * https://github.com/emojidex/emojidex-web-client
  *
@@ -1089,7 +1089,7 @@ var EmojidexSearch = function () {
       var opts = arguments[2];
 
       var emoji_cache = this.EC.Data.emoji();
-      code = this.EC.Util.escapeTerm(code);
+      code = this.EC.Util.deEscapeTerm(code);
       for (var i = 0; i < emoji_cache.length; i++) {
         var emoji = emoji_cache[i];
         if (emoji.code === code) {

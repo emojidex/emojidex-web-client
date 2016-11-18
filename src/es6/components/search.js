@@ -95,7 +95,7 @@ class EmojidexSearch {
   // Not an actual search, just gets information on the given emoji
   find(code, callback = null, opts) {
     let emoji_cache = this.EC.Data.emoji();
-    code = this.EC.Util.escapeTerm(code);
+    code = this.EC.Util.deEscapeTerm(code);
     for (let i = 0; i < emoji_cache.length; i++) {
       let emoji = emoji_cache[i];
       if (emoji.code === code) {
