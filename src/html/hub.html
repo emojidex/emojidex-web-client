@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="../node_modules/cross-storage/dist/hub.min.js"></script>
+    <script>
+      (function() {
+        CrossStorageHub.init([
+          {
+            origin: /.+/,
+            allow: ['get', 'set', 'del', 'getKeys', 'clear']
+          }
+        ]);
+      
+      }).call(this);
+      
+    </script>
+  </head>
+</html>

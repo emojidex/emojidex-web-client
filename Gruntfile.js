@@ -55,22 +55,6 @@ module.exports = function(grunt) {
       spec: ['build/spec/*.js']
     },
 
-    // SLIM file compilation options
-    slim: {
-      options: {
-        pretty: true
-      },
-      dsit: {
-        files: [{
-          expand: true,
-          cwd: 'src/slim/',
-          src: '*.slim',
-          dest: 'build/',
-          ext: '.html'
-        }]
-      }
-    },
-
     // Babel configuration to convert es6 to es5~ish JS
     babel: {
       options: {
@@ -115,6 +99,14 @@ module.exports = function(grunt) {
           banner: '<%= meta.banner %> */\n'
         }
       }
+    },
+
+    // Copy the basic hub module for semi-local debugging
+    copy: {
+      main: {
+        src: 'src/html/hub.html',
+        dest: 'build/hub.html',
+      },
     },
 
     // Setup Jasmine spec coverage
@@ -180,15 +172,15 @@ module.exports = function(grunt) {
   });
 
   grunt.loadNpmTasks('grunt-contrib-clean');
-  grunt.loadNpmTasks('grunt-slim');
   grunt.loadNpmTasks('grunt-babel');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-jasmine');
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-contrib-copy');
 
-  grunt.registerTask('default', ['clean', 'slim', 'babel', 'concat', 'uglify']);
+  grunt.registerTask('default', ['clean', 'copy', 'babel', 'concat', 'uglify']);
   grunt.registerTask('spec', ['default', 'jasmine:client:build', 'jasmine']);
   grunt.registerTask('dev', ['default', 'jasmine:client:build', 'connect', 'watch']);
 }
