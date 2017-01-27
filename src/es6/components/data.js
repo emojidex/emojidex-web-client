@@ -19,9 +19,7 @@ class EmojidexData {
       this.storage = new EmojidexDataStorage();
     }
 
-    return this.storage.hub.onReadyFrame().then( () => {
-      return this.storage.hub.onConnect();
-    }).then( () => {
+    return this.storage.hub.onConnect().then( () => {
       return this.storage.hub.getKeys();
     }).then(keys => {
       if (keys.indexOf('emojidex') !== -1) {

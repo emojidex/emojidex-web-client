@@ -269,9 +269,7 @@ var EmojidexData = function () {
       this.storage = new EmojidexDataStorage();
     }
 
-    return this.storage.hub.onReadyFrame().then(function () {
-      return _this.storage.hub.onConnect();
-    }).then(function () {
+    return this.storage.hub.onConnect().then(function () {
       return _this.storage.hub.getKeys();
     }).then(function (keys) {
       if (keys.indexOf('emojidex') !== -1) {
@@ -409,7 +407,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var EmojidexDataStorage = function () {
   function EmojidexDataStorage() {
-    var hub_path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'https://www.emojidex.com/hub/0.8.2';
+    var hub_path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'https://www.emojidex.com/hub/1.0.0';
 
     _classCallCheck(this, EmojidexDataStorage);
 
