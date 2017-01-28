@@ -21,7 +21,7 @@ class EmojidexClient {
     this.defaults = {
       locale: 'en',
       api_url: 'https://www.emojidex.com/api/v1/',
-      cdn_url: 'https://www.emojidex.com/emoji/',
+      cdn_url: 'https://cdn.emojidex.com/emoji/',
       closed_net: false,
       min_query_len: 4,
       size_code: 'xhdpi',
