@@ -36,7 +36,7 @@ var EmojidexClient = function EmojidexClient(options) {
   this.env = {
     api_ver: 1,
     cdn_addr: 'cdn.emojidex.com',
-    s_cdn_addr: '',
+    s_cdn_addr: 'cdn.emojidex.com',
     asset_addr: 'assets.emojidex.com',
     s_asset_addr: ''
   };
@@ -45,7 +45,7 @@ var EmojidexClient = function EmojidexClient(options) {
   this.defaults = {
     locale: 'en',
     api_url: 'https://www.emojidex.com/api/v1/',
-    cdn_url: 'http://' + this.env.cdn_addr + '/emoji/',
+    cdn_url: 'https://www.emojidex.com/emoji/',
     closed_net: false,
     min_query_len: 4,
     size_code: 'xhdpi',
@@ -289,23 +289,6 @@ var EmojidexData = function () {
           categories: _this.EC.options.categories || [],
           auth_info: _this.EC.options.auth_info || _this._def_auth_info
         });
-      }
-    }).then(function (data) {
-      if (_this.storage.hub_cache.emojidex.cdn_url != null) {
-        return _this.EC.cdn_url = _this.storage.get('emojidex.cdn_url');
-      } else {
-        // if the CDN URL has not been overridden
-        // attempt to get it from the api env
-        if (_this.EC.cdn_url === _this.EC.defaults.cdn_url) {
-          return $.ajax({
-            url: _this.EC.api_url + "/env",
-            dataType: 'json'
-          }).then(function (response) {
-            _this.EC.env = response;
-            _this.EC.cdn_url = 'https://' + _this.EC.env.s_cdn_addr + '/emoji/';
-            return _this.storage.update('emojidex', { cdn_url: _this.EC.cdn_url });
-          });
-        }
       }
     }).then(function (data) {
       if (_this._needUpdate()) {

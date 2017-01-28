@@ -12,7 +12,7 @@ class EmojidexClient {
     this.env = {
       api_ver: 1,
       cdn_addr: 'cdn.emojidex.com',
-      s_cdn_addr: '',
+      s_cdn_addr: 'cdn.emojidex.com',
       asset_addr: 'assets.emojidex.com',
       s_asset_addr: ''
     };
@@ -21,7 +21,7 @@ class EmojidexClient {
     this.defaults = {
       locale: 'en',
       api_url: 'https://www.emojidex.com/api/v1/',
-      cdn_url: `http://${this.env.cdn_addr}/emoji/`,
+      cdn_url: 'https://www.emojidex.com/emoji/',
       closed_net: false,
       min_query_len: 4,
       size_code: 'xhdpi',

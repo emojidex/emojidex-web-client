@@ -41,23 +41,6 @@ class EmojidexData {
         })
       }
     }).then(data => {
-      if (this.storage.hub_cache.emojidex.cdn_url != null) {
-        return this.EC.cdn_url = this.storage.get('emojidex.cdn_url');
-      } else {
-        // if the CDN URL has not been overridden
-        // attempt to get it from the api env
-        if (this.EC.cdn_url === this.EC.defaults.cdn_url) {
-          return $.ajax({
-            url: this.EC.api_url + "/env",
-            dataType: 'json'
-          }).then(response => {
-            this.EC.env = response;
-            this.EC.cdn_url = `https://${this.EC.env.s_cdn_addr}/emoji/`;
-            return this.storage.update('emojidex', {cdn_url: this.EC.cdn_url});
-          });
-        }
-      }
-    }).then(data => {
       if(this._needUpdate()) {
         return this._init_moji_codes()
       } else {

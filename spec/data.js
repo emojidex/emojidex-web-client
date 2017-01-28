@@ -39,7 +39,7 @@ describe('EmojidexData', function() {
 
     it('after', function() {
       expect(EC_spec.Data.storage.isEmpty('emojidex')).toBe(false);
-      expect(EC_spec.Data.storage.keys('emojidex')).toEqual(['moji_codes', 'emoji', 'history', 'favorites', 'categories', 'auth_info', 'cdn_url', 'moji_codes_updated']);
+      expect(EC_spec.Data.storage.keys('emojidex')).toEqual(['moji_codes', 'emoji', 'history', 'favorites', 'categories', 'auth_info', 'moji_codes_updated']);
     });
   });
 });
