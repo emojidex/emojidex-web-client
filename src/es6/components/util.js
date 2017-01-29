@@ -50,7 +50,7 @@ class EmojidexUtil {
     }
   }
 
-  // Converts an emoji array to [{code: "moji_code", img_url: "http://cdn...moji_code.png}] format
+  // Converts an emoji array to [{code: "moji_code", img_url: "https://cdn...moji_code.png}] format
   simplify(emoji = self.results, size_code = self.EC.size_code) {
     for (i = 0; i < emoji.length; i++) {
       emoji[i].code = self.escapeTerm(emoji[i].code);
@@ -148,7 +148,7 @@ class EmojidexUtil {
 
   // Returns an HTML image/link tag for an emoji from an emoji object
   emojiToHTML(emoji, size_code = self.EC.defaults.size_code) {
-    let img = `<img class="emojidex-emoji" src="http://${self.EC.env.cdn_addr}/emoji/${size_code}/${self.escapeTerm(emoji.code)}.png" emoji-code="${self.escapeTerm(emoji.code)}"${(emoji.moji == null || emoji.moji == "")? "" : ' emoji-moji="' + emoji.moji + '"'} alt="${self.deEscapeTerm(emoji.code)}" />`;
+    let img = `<img class="emojidex-emoji" src="https://${self.EC.env.cdn_addr}/emoji/${size_code}/${self.escapeTerm(emoji.code)}.png" emoji-code="${self.escapeTerm(emoji.code)}"${(emoji.moji == null || emoji.moji == "")? "" : ' emoji-moji="' + emoji.moji + '"'} alt="${self.deEscapeTerm(emoji.code)}" />`;
     if(emoji.link != null && emoji.link != '')
       return `<a href="${emoji.link}" emoji-code="${self.escapeTerm(emoji.code)}">${img}</a>`;
     return img;
@@ -156,7 +156,7 @@ class EmojidexUtil {
 
   // Returns a MarkDown image/link tag for an emoji from an emoji object
   emojiToMD(emoji, size_code = self.EC.defaults.size_code) {
-    let img = `![${(emoji.moji == null || emoji.moji == '')? emoji.code : emoji.moji}](http://${self.EC.env.cdn_addr}/emoji/${size_code}/${self.escapeTerm(emoji.code)}.png "${self.deEscapeTerm(emoji.code)}")`;
+    let img = `![${(emoji.moji == null || emoji.moji == '')? emoji.code : emoji.moji}](https://${self.EC.env.cdn_addr}/emoji/${size_code}/${self.escapeTerm(emoji.code)}.png "${self.deEscapeTerm(emoji.code)}")`;
     if (emoji.link != null && emoji.link != '')
       return `[${img} ](${emoji.link})`;
     return img;
