@@ -1628,7 +1628,7 @@ var EmojidexUtil = function () {
       }
     }
 
-    // Converts an emoji array to [{code: "moji_code", img_url: "http://cdn...moji_code.png}] format
+    // Converts an emoji array to [{code: "moji_code", img_url: "https://cdn...moji_code.png}] format
 
   }, {
     key: 'simplify',
@@ -1830,7 +1830,7 @@ var EmojidexUtil = function () {
     value: function emojiToHTML(emoji) {
       var size_code = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : self.EC.defaults.size_code;
 
-      var img = '<img class="emojidex-emoji" src="http://' + self.EC.env.cdn_addr + '/emoji/' + size_code + '/' + self.escapeTerm(emoji.code) + '.png" emoji-code="' + self.escapeTerm(emoji.code) + '"' + (emoji.moji == null || emoji.moji == "" ? "" : ' emoji-moji="' + emoji.moji + '"') + ' alt="' + self.deEscapeTerm(emoji.code) + '" />';
+      var img = '<img class="emojidex-emoji" src="https://' + self.EC.env.cdn_addr + '/emoji/' + size_code + '/' + self.escapeTerm(emoji.code) + '.png" emoji-code="' + self.escapeTerm(emoji.code) + '"' + (emoji.moji == null || emoji.moji == "" ? "" : ' emoji-moji="' + emoji.moji + '"') + ' alt="' + self.deEscapeTerm(emoji.code) + '" />';
       if (emoji.link != null && emoji.link != '') return '<a href="' + emoji.link + '" emoji-code="' + self.escapeTerm(emoji.code) + '">' + img + '</a>';
       return img;
     }
@@ -1842,7 +1842,7 @@ var EmojidexUtil = function () {
     value: function emojiToMD(emoji) {
       var size_code = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : self.EC.defaults.size_code;
 
-      var img = '![' + (emoji.moji == null || emoji.moji == '' ? emoji.code : emoji.moji) + '](http://' + self.EC.env.cdn_addr + '/emoji/' + size_code + '/' + self.escapeTerm(emoji.code) + '.png "' + self.deEscapeTerm(emoji.code) + '")';
+      var img = '![' + (emoji.moji == null || emoji.moji == '' ? emoji.code : emoji.moji) + '](https://' + self.EC.env.cdn_addr + '/emoji/' + size_code + '/' + self.escapeTerm(emoji.code) + '.png "' + self.deEscapeTerm(emoji.code) + '")';
       if (emoji.link != null && emoji.link != '') return '[' + img + ' ](' + emoji.link + ')';
       return img;
     }
