@@ -1,5 +1,5 @@
 /*
- * emojidex client - v0.13.6
+ * emojidex client - v0.13.7
  * * Provides search, index caching and combining and asset URI resolution
  * https://github.com/emojidex/emojidex-web-client
  *
@@ -1565,8 +1565,12 @@ var EmojidexUtil = function () {
 
     self.EC = EC;
 
-    self.a_pattern = RegExp('<a href=["|\'][^\'|^"]*[\'|"] emoji-code=["|\'][^\'|^"]*[\'|"]><img class=["|\']emojidex-emoji[\'|"] src=["|\'][^\'|^"]*[\'|"] (emoji-code=["|\'][^\'|^"]*[\'|"] emoji-moji=["|\'][^\'|^"]*[\'|"]|emoji-code=["|\'][^\'|^"]*[\'|"]) alt=["|\'][^\'|^"]*[\'|"]( />|/>|>)</a>', 'g');
-    self.img_pattern = RegExp('<img class=["|\']emojidex-emoji[\'|"] src=["|\'][^\'|^"]*[\'|"] (emoji-code=["|\'][^\'|^"]*[\'|"] emoji-moji=["|\'][^\'|^"]*[\'|"]|emoji-code=["|\'][^\'|^"]*[\'|"]) alt=["|\'][^\'|^"]*[\'|"]( />|/>|>)', 'g');
+    self.a_pattern_base = '<a href=["|\'][^\'|^"]*[\'|"] emoji-code=["|\'][^\'|^"]*[\'|"]><img class=["|\']emojidex-emoji[\'|"] src=["|\'][^\'|^"]*[\'|"] (emoji-code=["|\'][^\'|^"]*[\'|"] emoji-moji=["|\'][^\'|^"]*[\'|"]|emoji-code=["|\'][^\'|^"]*[\'|"]) alt=["|\'][^\'|^"]*[\'|"]( />|/>|>)</a>';
+    self.img_pattern_base = '<img class=["|\']emojidex-emoji[\'|"] src=["|\'][^\'|^"]*[\'|"] (emoji-code=["|\'][^\'|^"]*[\'|"] emoji-moji=["|\'][^\'|^"]*[\'|"]|emoji-code=["|\'][^\'|^"]*[\'|"]) alt=["|\'][^\'|^"]*[\'|"]( />|/>|>)';
+    self.a_pattern = RegExp(self.a_pattern_base, 'g');
+    self.img_pattern = RegExp(self.img_pattern_base, 'g');
+    self.wrapped_a_pattern = RegExp('<span[^>]*>' + self.a_pattern_base + '</span>', 'g');
+    self.wrapped_img_pattern = RegExp('<span[^>]*>' + self.img_pattern_base + '</span>', 'g');
     self.emoji_code_tag_attr_pattern = RegExp('emoji-code=["|\']([^\'|^"]*)[\'|"]', '');
     self.emoji_moji_tag_attr_pattern = RegExp('emoji-moji=["|\']([^\'|^"]*)[\'|"]', '');
     self.ignored_characters = '\'":;@&#~{}<>\\r\\n\\[\\]\\!\\$\\+\\?\\%\\*\\/\\\\';
@@ -1856,7 +1860,7 @@ var EmojidexUtil = function () {
     value: function deEmojifyHTML(source) {
       var mojify = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
-      source = '' + source;
+      source = self._deEmojifyWrappedHTML('' + source, mojify);
       source = self.deLinkHTML(source);
       var targets = source.match(self.img_pattern);
       if (targets == null) return source;
@@ -1896,6 +1900,50 @@ var EmojidexUtil = function () {
 
       return source;
     }
+  }, {
+    key: '_deEmojifyWrappedHTML',
+    value: function _deEmojifyWrappedHTML(source) {
+      var mojify = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
+      source = self.deLinkHTML(source);
+      var targets = source.match(self.wrapped_img_pattern);
+      if (targets == null) return source;
+
+      var _iteratorNormalCompletion5 = true;
+      var _didIteratorError5 = false;
+      var _iteratorError5 = undefined;
+
+      try {
+        for (var _iterator5 = targets[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+          target = _step5.value;
+
+          if (mojify) {
+            var moji_code = target.match(self.emoji_moji_tag_attr_pattern);
+            if (moji_code != null && moji_code.length != 1) {
+              source = source.replace(target, moji_code[1]);
+              continue;
+            }
+          }
+          var emoji_code = target.match(self.emoji_code_tag_attr_pattern);
+          source = source.replace(target, self.encapsulateCode(emoji_code[1]));
+        }
+      } catch (err) {
+        _didIteratorError5 = true;
+        _iteratorError5 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion5 && _iterator5.return) {
+            _iterator5.return();
+          }
+        } finally {
+          if (_didIteratorError5) {
+            throw _iteratorError5;
+          }
+        }
+      }
+
+      return source;
+    }
 
     // Remove links from wrapped emoji images in HTML
     // *Only do self if you need to remove links for functionality.
@@ -1903,8 +1951,20 @@ var EmojidexUtil = function () {
   }, {
     key: 'deLinkHTML',
     value: function deLinkHTML(source) {
-      source = '' + source;
+      source = self._deLinkWrappedHTML('' + source);
       var targets = source.match(self.a_pattern);
+      if (targets == null) return source;
+
+      for (var i = 0; i < targets.length; i++) {
+        source = source.replace(targets[i], targets[i].match(self.img_pattern)[0]);
+      }
+
+      return source;
+    }
+  }, {
+    key: '_deLinkWrappedHTML',
+    value: function _deLinkWrappedHTML(source) {
+      var targets = source.match(self.wrapped_a_pattern);
       if (targets == null) return source;
 
       for (var i = 0; i < targets.length; i++) {

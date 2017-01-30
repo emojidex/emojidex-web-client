@@ -4,8 +4,12 @@ class EmojidexUtil {
 
     self.EC = EC;
 
-    self.a_pattern = RegExp(`<a href=["|'][^'|^"]*['|"] emoji-code=["|'][^'|^"]*['|"]><img class=["|']emojidex-emoji['|"] src=["|'][^'|^"]*['|"] (emoji-code=["|'][^'|^"]*['|"] emoji-moji=["|'][^'|^"]*['|"]|emoji-code=["|'][^'|^"]*['|"]) alt=["|'][^'|^"]*['|"]( \/>|\/>|>)<\/a>`, 'g');
-    self.img_pattern = RegExp(`<img class=["|']emojidex-emoji['|"] src=["|'][^'|^"]*['|"] (emoji-code=["|'][^'|^"]*['|"] emoji-moji=["|'][^'|^"]*['|"]|emoji-code=["|'][^'|^"]*['|"]) alt=["|'][^'|^"]*['|"]( \/>|\/>|>)`, 'g');
+    self.a_pattern_base = `<a href=["|'][^'|^"]*['|"] emoji-code=["|'][^'|^"]*['|"]><img class=["|']emojidex-emoji['|"] src=["|'][^'|^"]*['|"] (emoji-code=["|'][^'|^"]*['|"] emoji-moji=["|'][^'|^"]*['|"]|emoji-code=["|'][^'|^"]*['|"]) alt=["|'][^'|^"]*['|"]( \/>|\/>|>)<\/a>`;
+    self.img_pattern_base = `<img class=["|']emojidex-emoji['|"] src=["|'][^'|^"]*['|"] (emoji-code=["|'][^'|^"]*['|"] emoji-moji=["|'][^'|^"]*['|"]|emoji-code=["|'][^'|^"]*['|"]) alt=["|'][^'|^"]*['|"]( \/>|\/>|>)`;
+    self.a_pattern = RegExp(self.a_pattern_base, 'g');
+    self.img_pattern = RegExp(self.img_pattern_base, 'g');
+    self.wrapped_a_pattern = RegExp(`<span[^>]*>` + self.a_pattern_base + `</span>`, 'g');
+    self.wrapped_img_pattern = RegExp(`<span[^>]*>` + self.img_pattern_base + `</span>`, 'g');
     self.emoji_code_tag_attr_pattern = RegExp(`emoji-code=["|']([^'|^"]*)['|"]`, '');
     self.emoji_moji_tag_attr_pattern = RegExp(`emoji-moji=["|']([^'|^"]*)['|"]`, '');
     self.ignored_characters = '\'":;@&#~{}<>\\r\\n\\[\\]\\!\\$\\+\\?\\%\\*\\/\\\\';
@@ -166,9 +170,30 @@ class EmojidexUtil {
   // *This method takes a string and returns a string, such as the contents of
   // a text box/content editable element, NOT a DOM object.
   deEmojifyHTML(source, mojify = true) {
-    source = `${source}`;
+    source = self._deEmojifyWrappedHTML(`${source}`, mojify);
     source = self.deLinkHTML(source);
     var targets = source.match(self.img_pattern);
+    if (targets == null)
+      return source;
+
+    for (target of targets) {
+      if (mojify) {
+        let moji_code = target.match(self.emoji_moji_tag_attr_pattern);
+        if (moji_code != null && moji_code.length != 1) {
+          source = source.replace(target, moji_code[1]);
+          continue;
+        }
+      }
+      let emoji_code = target.match(self.emoji_code_tag_attr_pattern);
+      source = source.replace(target, self.encapsulateCode(emoji_code[1]));
+    }
+
+    return source;
+  }
+
+  _deEmojifyWrappedHTML(source, mojify = true) {
+    source = self.deLinkHTML(source);
+    var targets = source.match(self.wrapped_img_pattern);
     if (targets == null)
       return source;
 
@@ -190,8 +215,20 @@ class EmojidexUtil {
   // Remove links from wrapped emoji images in HTML
   // *Only do self if you need to remove links for functionality.
   deLinkHTML(source) {
-    source = `${source}`;
+    source = self._deLinkWrappedHTML(`${source}`);
     var targets = source.match(self.a_pattern);
+    if (targets == null)
+      return source;
+
+    for (var i = 0; i < targets.length; i++) {
+      source = source.replace(targets[i], targets[i].match(self.img_pattern)[0]);
+    }
+
+    return source;
+  }
+
+  _deLinkWrappedHTML(source) {
+    var targets = source.match(self.wrapped_a_pattern);
     if (targets == null)
       return source;
 
