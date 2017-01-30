@@ -10,6 +10,7 @@ class EmojidexUtil {
     self.img_pattern = RegExp(self.img_pattern_base, 'g');
     self.wrapped_a_pattern = RegExp(`<span[^>]*>` + self.a_pattern_base + `</span>`, 'g');
     self.wrapped_img_pattern = RegExp(`<span[^>]*>` + self.img_pattern_base + `</span>`, 'g');
+    self.garbage_tags = RegExp(`<span></span>`, 'g');
     self.emoji_code_tag_attr_pattern = RegExp(`emoji-code=["|']([^'|^"]*)['|"]`, '');
     self.emoji_moji_tag_attr_pattern = RegExp(`emoji-moji=["|']([^'|^"]*)['|"]`, '');
     self.ignored_characters = '\'":;@&#~{}<>\\r\\n\\[\\]\\!\\$\\+\\?\\%\\*\\/\\\\';
@@ -188,7 +189,7 @@ class EmojidexUtil {
       source = source.replace(target, self.encapsulateCode(emoji_code[1]));
     }
 
-    return source;
+    return self._scrubGarbageTags(source);
   }
 
   _deEmojifyWrappedHTML(source, mojify = true) {
@@ -207,6 +208,19 @@ class EmojidexUtil {
       }
       let emoji_code = target.match(self.emoji_code_tag_attr_pattern);
       source = source.replace(target, self.encapsulateCode(emoji_code[1]));
+    }
+
+    return source;
+  }
+
+  // Scrubs junk left by at.js
+  _scrubGarbageTags(source) {
+    var targets = source.match(self.garbage_tags);
+    if (targets == null)
+      return source;
+
+    for (var i = 0; i < targets.length; i++) {
+      source = source.replace(targets[i], '');
     }
 
     return source;
