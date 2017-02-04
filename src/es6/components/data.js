@@ -42,7 +42,7 @@ class EmojidexData {
       }
     }).then(data => {
       if(this._needUpdate()) {
-        return this._init_moji_codes()
+        return this._initMojiCodes()
       } else {
         return this.storage.get('emojidex')
       }
@@ -52,10 +52,10 @@ class EmojidexData {
     });
   }
 
-  _init_moji_codes(force = false) {
+  _initMojiCodes(force = false) {
     return this.storage.update('emojidex.moji_codes_updated', new Date().toString()).then(() => {
       return $.ajax({
-        url: this.EC.api_url + 'moji_codes',
+        url: this.EC.api_url + 'moji_codes' + '?locale=' + this.EC.locale,
         dataType: 'json'
       })
     }).then(response => {

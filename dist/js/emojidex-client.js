@@ -292,7 +292,7 @@ var EmojidexData = function () {
       }
     }).then(function (data) {
       if (_this._needUpdate()) {
-        return _this._init_moji_codes();
+        return _this._initMojiCodes();
       } else {
         return _this.storage.get('emojidex');
       }
@@ -303,15 +303,15 @@ var EmojidexData = function () {
   }
 
   _createClass(EmojidexData, [{
-    key: '_init_moji_codes',
-    value: function _init_moji_codes() {
+    key: '_initMojiCodes',
+    value: function _initMojiCodes() {
       var _this2 = this;
 
       var force = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
       return this.storage.update('emojidex.moji_codes_updated', new Date().toString()).then(function () {
         return $.ajax({
-          url: _this2.EC.api_url + 'moji_codes',
+          url: _this2.EC.api_url + 'moji_codes' + '?locale=' + _this2.EC.locale,
           dataType: 'json'
         });
       }).then(function (response) {
