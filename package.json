@@ -1,6 +1,6 @@
 {
   "name": "emojidex-client",
-  "version": "0.13.7",
+  "version": "0.13.8",
   "title": "emojidex client",
   "description": "* Provides search, index caching and combining and asset URI resolution",
   "author": "emojidex",
@@ -21,21 +21,23 @@
     "babel-preset-es2015": "^6.14.0",
     "cross-storage": "snowsunny/cross-storage",
     "dotenv": "^2.0.0",
-    "grunt": "~1.0.1",
-    "grunt-babel": "^6.0.0",
-    "grunt-cli": "~1.2.0",
-    "grunt-contrib-clean": "^1.0.0",
-    "grunt-contrib-concat": "^1.0.1",
-    "grunt-contrib-connect": "^1.0.2",
-    "grunt-contrib-copy": "^1.0.0",
-    "grunt-contrib-jasmine": "^1.0.3",
-    "grunt-contrib-uglify": "^1.0.1",
-    "grunt-contrib-watch": "~1.0.0",
-    "grunt-contrib-copy": "~1.0.0",
-    "grunt-template-jasmine-istanbul": "^0.5.0",
+    "gulp": "~3.9.1",
+    "del": "^2.2.2",
+    "pump": "^1.0.2",
+    "run-sequence": "^1.2.2",
+    "gulp-header": "^1.8.8",
+    "gulp-sourcemaps": "^2.4.1",
+    "gulp-babel": "^6.1.2",
+    "gulp-clean": "^0.3.2",
+    "gulp-concat": "^2.6.1",
+    "gulp-copy": "^1.0.0",
+    "gulp-jasmine": "^2.4.2",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglify": "^2.0.1",
+    "gulp-watch": "~4.3.11",
     "jquery": "^3.1.1"
   },
   "scripts": {
-    "test": "grunt && grunt jasmine"
+    "test": "gulp && gulp jasmine"
   }
 }

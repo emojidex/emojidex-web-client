@@ -1,4 +1,4 @@
-// emojidex coffee client
+// emojidex client
 // * Provides search, index caching and combining and asset URI resolution
 //
 // =LICENSE=
