@@ -60,4 +60,4 @@ class EmojidexClient {
       this.options.onReady(this);
     });
   }
-};
+}

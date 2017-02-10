@@ -10,6 +10,7 @@ var concat = require('gulp-concat')
 var uglify = require('gulp-uglify')
 var jasmine = require('gulp-jasmine')
 var copy = require('gulp-copy')
+var eslint = require('gulp-eslint');
 
 var banner = [
         '/**\n',
@@ -77,6 +78,13 @@ gulp.task('jasmine', function () {
     .src('dist/js/emojidex-client.js')
 })
 
+gulp.task('lint', () => {
+  return gulp.src(['src/es6/**/*.js','!node_modules/**'])
+    .pipe(eslint())
+    .pipe(eslint.format())
+    .pipe(eslint.failAfterError());
+});
+
 gulp.task('watch', function () {
   gulp.watch('src/es6/**/*.js', [ /* dependencies */ ])
 })
@@ -85,7 +93,7 @@ gulp.task('default', function (cb) {
   runSequence("clean", ["copy", "babel"], "concat", "uglify", "banner", cb)
 })
 
-gulp.task('spec', ["default", "jasmine"])
+gulp.task('spec', ["default", "lint", "jasmine"])
 
 gulp.task('dev', ["default", "watch"])
 
