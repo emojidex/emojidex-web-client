@@ -52,6 +52,9 @@ class EmojidexDataStorage {
     if (query.length) {
       for (let i = 0; i < query.length; i++) {
         let q = query[i];
+        if (cache[q] === undefined ) {
+          return null;
+        }
         cache = cache[q];
       }
     }
@@ -64,7 +67,8 @@ class EmojidexDataStorage {
       if (update) {
         let new_data = {};
         new_data[first_query] = data;
-        return this.hub.set(first_query, new_data);
+        // return this.hub.set(first_query, new_data);
+        return this.hub.set(first_query, JSON.stringify(new_data));
       } else {
         return this.hub.set(first_query, this._get_chained_data(query, data));
       }
