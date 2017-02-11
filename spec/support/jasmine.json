@@ -1,0 +1,13 @@
+{
+  "spec_files": [
+    "spec/*.spec.js"
+  ],
+  "helpers": [
+    "spec/helpers/*.js"
+  ],
+  "vendor": [
+    "node_modules/jquery/dist/jquery.min.js"
+  ],
+  "keepRunner": true,
+  "outfile": "build/_SpecRunner.html"
+}

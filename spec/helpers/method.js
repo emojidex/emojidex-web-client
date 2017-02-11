@@ -9,6 +9,7 @@ let helperChains = function(chains_data) {
     chain_function(chains_data);
   }
 };
+global.helperChains = helperChains;
 
 let helperBefore = function(chains_data) {
   this.EC_spec = new EmojidexClient({
@@ -20,16 +21,18 @@ let helperBefore = function(chains_data) {
     }
   });
 };
+global.helperBefore = helperBefore;
 
 let clearStorage = function(chains_data) {
-  let CSC = new CrossStorageClient(hub_path,
+  /*let CSC = new CrossStorageClient(hub_path,
     {frameId: 'emojidex-client-storage-hub'});
   CSC.onConnect().then(() => {
-    CSC.clear();
+    CSC.clear();*/
     helperChains(chains_data);
-  }
-  );
+  //}
+  //);
 };
+global.clearStorage = clearStorage;
 
 let helperBeforeForEmojidexData = function(chains_data) {
   this.EC_spec = new EmojidexClient({
@@ -38,7 +41,9 @@ let helperBeforeForEmojidexData = function(chains_data) {
       helperChains(chains_data);
     }
   });
+  global.EC_spec = this.EC_spec;
 };
+global.helperBeforeForEmojidexData = helperBeforeForEmojidexData;
 
 let getExtendedEmojiData = chains_data =>
   $.ajax({
