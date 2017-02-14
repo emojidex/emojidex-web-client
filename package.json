@@ -32,17 +32,17 @@
     "gulp-copy": "^1.0.0",
     "gulp-eslint": "^3.0.1",
     "gulp-header": "^1.8.8",
-    "gulp-jasmine": "^2.4.2",
-    "gulp-jasmine-browser": "^1.7.1",
+    "gulp-jest": "^1.0.0",
     "gulp-rename": "^1.2.2",
     "gulp-sourcemaps": "^2.4.1",
     "gulp-uglify": "^2.0.1",
     "gulp-watch": "~4.3.11",
+    "jest-cli": "^18.1.0",
     "jquery": "^3.1.1",
     "pump": "^1.0.2",
     "run-sequence": "^1.2.2"
   },
   "scripts": {
-    "test": "gulp && gulp jasmine"
+    "test": "gulp && gulp jest"
   }
 }

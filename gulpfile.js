@@ -8,11 +8,10 @@ var runSequence = require('run-sequence');
 var babel = require('gulp-babel');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
-var jasmine = require('gulp-jasmine');
-var jasmineBrowser = require('gulp-jasmine-browser');
 var copy = require('gulp-copy');
 var eslint = require('gulp-eslint');
- 
+var jest = require('gulp-jest').default;
+
 var banner = [
         '/**\n',
         '* <%= pkg.title || pkg.name %> - v<%= pkg.version %>\n',
@@ -74,18 +73,29 @@ gulp.task('copy', function () {
     .pipe(gulp.dest('build'));
 });
 
-gulp.task('jasmine', function () {
-  return gulp
-    .src('dist/js/emojidex-client.js')
-    .pipe(
-      jasmine({config: require('./spec/support/jasmine.json')})
-    );
-});
+// gulp.task('jasmine', function () {
+//   return gulp
+//     .src('dist/js/emojidex-client.js')
+//     .pipe(
+//       jasmine({config: require('./spec/support/jasmine.json')})
+//     );
+// });
+//
+// gulp.task('jasmineBrowser', function() {
+//   return gulp.src(['src/**/*.js', 'spec/**/*.spec.js'])
+//     .pipe(jasmineBrowser.specRunner())
+//     .pipe(jasmineBrowser.server({port: 8888}));
+// });
 
-gulp.task('jasmineBrowser', function() {
-  return gulp.src(['src/**/*.js', 'spec/**/*.spec.js'])
-    .pipe(jasmineBrowser.specRunner())
-    .pipe(jasmineBrowser.server({port: 8888}));
+gulp.task('jest', () => {
+  return gulp.src('spec').pipe(jest({
+    config: {
+      "transformIgnorePatterns": [
+        "<rootDir>/dist/", "<rootDir>/node_modules/"
+      ],
+      "automock": false
+    }
+  }))
 });
 
 gulp.task('lint', () => {
@@ -103,7 +113,6 @@ gulp.task('default', function (cb) {
   runSequence("clean", ["copy", "babel"], "concat", "uglify", "banner", cb);
 });
 
-gulp.task('spec', ["default", "lint", "jasmine"]);
+gulp.task('spec', ["default", "lint", "jest"]);
 
 gulp.task('dev', ["default", "watch"]);
-

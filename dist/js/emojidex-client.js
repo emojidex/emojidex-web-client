@@ -6787,7 +6787,7 @@ module.exports = _dereq_(23);
 /**
  * cross-storage - Cross domain local storage
  *
- * @version   0.8.2
+ * @version   1.0.0
  * @link      https://github.com/zendesk/cross-storage
  * @author    Daniel St. Jules <danielst.jules@gmail.com>
  * @copyright Zendesk
@@ -6858,12 +6858,8 @@ module.exports = _dereq_(23);
     }
 
     // Create the frame if not found or specified
-    if (frame) {
-      this._hub = frame.contentWindow;
-    } else {
-      this._createFrame(url)
-    }
-
+    frame = frame || this._createFrame(url);
+    this._hub = frame.contentWindow;
   }
 
   /**
@@ -6926,33 +6922,6 @@ module.exports = _dereq_(23);
     });
   };
 
-
-  CrossStorageClient.prototype.onReadyFrame = function() {
-    var client = this;
-
-    if (this._hub) {
-      return this._promise.resolve();
-    } else if (this._closed) {
-      return this._promise.reject(new Error('CrossStorageClient has closed'));
-    }
-
-    return new this._promise(function(resolve, reject) {
-      var timeout = setTimeout(function() {
-        reject(new Error('CrossStorageClient could not ready frame'));
-      }, client._timeout);
-
-      var interval = setInterval(function() {
-        if (client._hub) {
-          clearTimeout(timeout);
-          clearInterval(interval);
-          resolve();
-        }
-      }, 100)
-
-    });
-  };
-
-
   /**
    * Returns a promise that is fulfilled when a connection has been established
    * with the cross storage hub. Its use is required to avoid sending any
@@ -6989,21 +6958,18 @@ module.exports = _dereq_(23);
   };
 
   /**
-   * Sets a key to the specified value, optionally accepting a ttl to passively
-   * expire the key after a number of milliseconds. Returns a promise that is
-   * fulfilled on success, or rejected if any errors setting the key occurred,
-   * or the request timed out.
+   * Sets a key to the specified value. Returns a promise that is fulfilled on
+   * success, or rejected if any errors setting the key occurred, or the request
+   * timed out.
    *
    * @param   {string}  key   The key to set
    * @param   {*}       value The value to assign
-   * @param   {int}     ttl   Time to live in milliseconds
    * @returns {Promise} A promise that is settled on hub response or timeout
    */
-  CrossStorageClient.prototype.set = function(key, value, ttl) {
+  CrossStorageClient.prototype.set = function(key, value) {
     return this._request('set', {
       key:   key,
-      value: value,
-      ttl:   ttl
+      value: value
     });
   };
 
@@ -7184,7 +7150,6 @@ module.exports = _dereq_(23);
    * returns {HTMLIFrameElement} The iFrame element itself
    */
   CrossStorageClient.prototype._createFrame = function(url) {
-    var client = this;
     var frame, key;
 
     frame = window.document.createElement('iframe');
@@ -7196,12 +7161,11 @@ module.exports = _dereq_(23);
         frame.style[key] = CrossStorageClient.frameStyle[key];
       }
     }
-    window.document.body.appendChild(frame);
 
-    frame.onload = function(){
-      client._hub = frame.contentWindow
-    }
+    window.document.body.appendChild(frame);
     frame.src = url;
+
+    return frame;
   };
 
   /**
