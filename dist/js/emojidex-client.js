@@ -7534,9 +7534,7 @@ var EmojidexData = function () {
       this.storage = new EmojidexDataStorage();
     }
 
-    return this.storage.hub.onReadyFrame().then(function () {
-      return _this.storage.hub.onConnect();
-    }).then(function () {
+    return this.storage.hub.onConnect().then(function () {
       return _this.storage.hub.getKeys();
     }).then(function (keys) {
       if (keys.indexOf('emojidex') !== -1) {
@@ -8865,7 +8863,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var EmojidexDataStorage = function () {
   function EmojidexDataStorage() {
-    var hub_path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'https://www.emojidex.com/hub/0.8.2';
+    var hub_path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'https://www.emojidex.com/hub/1.0.0';
 
     _classCallCheck(this, EmojidexDataStorage);
 
@@ -8928,6 +8926,9 @@ var EmojidexDataStorage = function () {
       if (query.length) {
         for (var i = 0; i < query.length; i++) {
           var q = query[i];
+          if (cache[q] === undefined) {
+            return null;
+          }
           cache = cache[q];
         }
       }
@@ -8943,7 +8944,7 @@ var EmojidexDataStorage = function () {
         if (update) {
           var new_data = {};
           new_data[first_query] = data;
-          return _this2.hub.set(first_query, new_data);
+          return _this2.hub.set(first_query, JSON.stringify(new_data));
         } else {
           return _this2.hub.set(first_query, _this2._get_chained_data(query, data));
         }
@@ -8971,10 +8972,11 @@ var EmojidexDataStorage = function () {
       }).then(function (keys) {
         return _this3.hub.get(keys);
       }).then(function (hub_data) {
+        data = $.parseJSON(hub_data);
         if (key) {
-          return _this3.hub_cache[key] = hub_data[key];
+          return _this3.hub_cache[key] = data[key];
         } else {
-          return _this3.hub_cache = hub_data;
+          return _this3.hub_cache = data;
         }
       });
     }

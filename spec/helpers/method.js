@@ -1,6 +1,6 @@
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
 
-let hub_path = 'https://www.emojidex.com/hub/0.8.2';
+let hub_path = 'https://www.emojidex.com/hub/1.0.0';
 let helperChains = function(chains_data) {
   if (chains_data.functions.length === 0) {
     chains_data.end();
