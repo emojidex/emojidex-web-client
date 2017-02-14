@@ -67,7 +67,6 @@ class EmojidexDataStorage {
       if (update) {
         let new_data = {};
         new_data[first_query] = data;
-        // return this.hub.set(first_query, new_data);
         return this.hub.set(first_query, JSON.stringify(new_data));
       } else {
         return this.hub.set(first_query, this._get_chained_data(query, data));
@@ -92,10 +91,11 @@ class EmojidexDataStorage {
       return this.hub.get(keys);
     }
     ).then(hub_data => {
+      data = $.parseJSON(hub_data);
       if (key) {
-        return this.hub_cache[key] = hub_data[key];
+        return this.hub_cache[key] = data[key];
       } else {
-        return this.hub_cache = hub_data;
+        return this.hub_cache = data;
       }
     }
     );
