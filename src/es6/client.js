@@ -61,3 +61,5 @@ class EmojidexClient {
     });
   }
 }
+
+module.exports.EmojidexClient = EmojidexClient;

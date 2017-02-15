@@ -1,5 +1,12 @@
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
 
+// jest.dontMock('../../dist/js/emojidex-client.js')
+global.$ = require('jquery');
+global.CrossStorageClient = require('cross-storage').CrossStorageClient;
+global.EmojidexClient = require('../../dist/js/emojidex-client.js').EmojidexClient
+
+global.EC_spec = null;
+
 let hub_path = 'https://www.emojidex.com/hub/1.0.0';
 let helperChains = function(chains_data) {
   if (chains_data.functions.length === 0) {
@@ -12,10 +19,10 @@ let helperChains = function(chains_data) {
 global.helperChains = helperChains;
 
 let helperBefore = function(chains_data) {
-  this.EC_spec = new EmojidexClient({
+  global.EC_spec = new EmojidexClient({
     storageHubPath: hub_path,
     onReady: EC => {
-      this.EC_spec.User.setAuth(test_user_info.auth_user, test_user_info.auth_token).then(() => {
+      global.EC_spec.User.setAuth(test_user_info.auth_user, test_user_info.auth_token).then(() => {
         helperChains(chains_data);
       });
     }
@@ -35,13 +42,12 @@ let clearStorage = function(chains_data) {
 global.clearStorage = clearStorage;
 
 let helperBeforeForEmojidexData = function(chains_data) {
-  this.EC_spec = new EmojidexClient({
+  global.EC_spec = new EmojidexClient({
     storageHubPath: hub_path,
     onReady(EC) {
       helperChains(chains_data);
     }
   });
-  global.EC_spec = this.EC_spec;
 };
 global.helperBeforeForEmojidexData = helperBeforeForEmojidexData;
 
@@ -71,7 +77,7 @@ let getFacesEmoji = chains_data =>
 ;
 
 let setPremiumUser = function(chains_data) {
-  this.EC_spec.User.setAuth(premium_user_info.auth_user, premium_user_info.auth_token).then(() => {
+  global.EC_spec.User.setAuth(premium_user_info.auth_user, premium_user_info.auth_token).then(() => {
     helperChains(chains_data);
   }
   );

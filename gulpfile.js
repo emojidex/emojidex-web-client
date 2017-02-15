@@ -88,10 +88,12 @@ gulp.task('copy', function () {
 // });
 
 gulp.task('jest', () => {
-  return gulp.src('spec').pipe(jest({
+  // return gulp.src('spec').pipe(jest({
+  return gulp.src('spec/util.spec.js').pipe(jest({
     config: {
+      "moduleDirectories": ["node_modules"],
       "transformIgnorePatterns": [
-        "<rootDir>/dist/", "<rootDir>/node_modules/"
+        "<rootDir>/dist", "<rootDir>/node_modules"
       ],
       "automock": false
     }
@@ -113,6 +115,9 @@ gulp.task('default', function (cb) {
   runSequence("clean", ["copy", "babel"], "concat", "uglify", "banner", cb);
 });
 
-gulp.task('spec', ["default", "lint", "jest"]);
+// gulp.task('spec', ["default", "lint", "jest"]);
+gulp.task('spec', function (cb) {
+  runSequence("default", /*"lint",*/ "jest", cb);
+});
 
 gulp.task('dev', ["default", "watch"]);
