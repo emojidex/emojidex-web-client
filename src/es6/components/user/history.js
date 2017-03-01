@@ -23,7 +23,7 @@ export default class EmojidexUserHistory {
       success: response => {
         this._history = response;
         this.EC.Data.history(response);
-        return __guardFunc__(callback, f => f(this._history));
+        if (typeof callback === 'function') { callback(this._history); }
       }
     };
     return this._historyAPI(options);
@@ -56,7 +56,7 @@ export default class EmojidexUserHistory {
 
   all(callback) {
     if (this._history != null) {
-      __guardFunc__(callback, f => f(this._history));
+      if (typeof callback === 'function') { callback(this._history); }
     } else {
       setTimeout((() => {
         return this.all(callback);
@@ -65,8 +65,4 @@ export default class EmojidexUserHistory {
     }
     return this._history;
   }
-}
-
-function __guardFunc__(func, transform) {
-  return typeof func === 'function' ? transform(func) : undefined;
 }

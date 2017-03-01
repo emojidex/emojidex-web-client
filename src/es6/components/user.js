@@ -12,7 +12,10 @@ export default class EmojidexUser {
 
   // Checks for local saved login data, and if present sets the username and api_key
   _autoLogin() {
-    if (__guard__(__guard__(__guard__(this.EC.Data.storage.hub_cache, x2 => x2.emojidex), x1 => x1.auth_info), x => x.status) === 'verified') {
+    if (typeof this.EC.Data.storage.hub_cache !== 'undefined' &&
+        typeof this.EC.Data.storage.hub_cache.emojidex !== 'undefined' &&
+        typeof this.EC.Data.storage.hub_cache.emojidex.auth_info !== 'undefined' &&
+        this.EC.Data.storage.hub_cache.emojidex.auth_info.status === 'verified') {
       this.auth_info = this.EC.Data.storage.hub_cache.emojidex.auth_info;
       return this.syncUserData();
     }
@@ -33,7 +36,10 @@ export default class EmojidexUser {
       case 'basic':
         return this.basicAuth(params.user, params.password, params.callback);
       case 'session':
-        if (__guard__(__guard__(__guard__(this.EC.Data.storage.hub_cache, x2 => x2.emojidex), x1 => x1.auth_info), x => x.status) === 'verified') {
+      if (typeof this.EC.Data.storage.hub_cache !== 'undefined' &&
+          typeof this.EC.Data.storage.hub_cache.emojidex !== 'undefined' &&
+          typeof this.EC.Data.storage.hub_cache.emojidex.auth_info !== 'undefined' &&
+          this.EC.Data.storage.hub_cache.emojidex.auth_info.status === 'verified') {
           return this.auth_info = this.EC.Data.storage.hub_cache.emojidex.auth_info;
         }
       default:
@@ -53,9 +59,8 @@ export default class EmojidexUser {
       dataType: 'json',
       success: response => {
         return this._setAuthFromResponse(response).then(() => {
-          return __guardFunc__(callback, f => f(this.auth_info));
-        }
-        );
+          if (typeof callback === 'function') { callback(this.auth_info); }
+        });
       },
       error: response => {
         let status = JSON.parse(response.responseText);
@@ -65,7 +70,12 @@ export default class EmojidexUser {
           user: ''
         };
         return this.EC.Data.auth_info(this.EC.Data.auth_info).then(() => {
-          return __guardFunc__(callback, f => f({ auth_info: this.auth_info, error_info: response }));
+          if (typeof callback === 'function') {
+            callback({
+              auth_info: this.auth_info,
+              error_info: response
+            });
+          }
         });
       }
     };
@@ -146,11 +156,4 @@ export default class EmojidexUser {
     this.Favorites.sync();
     this.History.sync();
   }
-}
-
-function __guard__(value, transform) {
-  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
-}
-function __guardFunc__(func, transform) {
-  return typeof func === 'function' ? transform(func) : undefined;
 }

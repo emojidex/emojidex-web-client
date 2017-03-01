@@ -35,20 +35,22 @@ export default class EmojidexIndexes {
           this.results = [];
           this.cur_page = 0;
           this.count = 0;
-          return __guardFunc__(callback, f => f([]));
+          if (typeof callback === 'function') { callback([]); }
         } else {
           this.meta = response.meta;
           this.results = response.emoji;
           this.cur_page = response.meta.page;
           this.count = response.meta.count;
-          return this.EC.Emoji.combine(response.emoji).then(data => __guardFunc__(callback, f1 => f1(response.emoji)));
+          return this.EC.Emoji.combine(response.emoji).then(data => {
+            if (typeof callback === 'function') { callback(response.emoji); }
+          });
         }
       },
       error: response => {
         this.results = [];
         this.cur_page = 0;
         this.count = 0;
-        return __guardFunc__(callback, f => f([]));
+        if (typeof callback === 'function') { callback([]); }
       }});
   }
 
@@ -79,7 +81,9 @@ export default class EmojidexIndexes {
         success: response => {
           loaded_emoji = loaded_emoji.concat(response);
           if (++loaded_num === static_type.length) {
-            return this.EC.Emoji.combine(loaded_emoji).then(data => __guardFunc__(callback, f => f(data)));
+            return this.EC.Emoji.combine(loaded_emoji).then(data => {
+              if (typeof callback === 'function') { callback(data); }
+            });
           }
         }
       });
@@ -105,8 +109,4 @@ export default class EmojidexIndexes {
     if (this.indexed.param.page > 1) { this.indexed.param.page--; }
     return this.indexed_func(this.indexed.callback, this.indexed.param, this.indexed_func);
   }
-}
-
-function __guardFunc__(func, transform) {
-  return typeof func === 'function' ? transform(func) : undefined;
 }

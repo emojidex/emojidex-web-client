@@ -10469,13 +10469,13 @@
 	          _this2.cur_page = response.meta.page;
 	          _this2.count = response.meta.count;
 	          return _this2.EC.Emoji.combine(response.emoji).then(function () {
-	            return __guardFunc__(callback, function (f) {
-	              return f(response.emoji, {
+	            if (typeof callback === 'function') {
+	              return callback(response.emoji, {
 	                category_name: category_name,
 	                callback: callback,
 	                param: param
 	              });
-	            });
+	            }
 	          });
 	        }
 	      });
@@ -10511,13 +10511,11 @@
 	    value: function sync(callback, locale) {
 	      var _this3 = this;
 
-	      if (__guard__(this._categories, function (x) {
-	        return x.length;
-	      }) != null) {
+	      if (typeof this._categories !== 'undefined' && typeof this._categories.length !== 'undefined') {
 	        return new Promise(function (resolve, reject) {
-	          __guardFunc__(callback, function (f) {
-	            return f(_this3._categories);
-	          });
+	          if (typeof callback === 'function') {
+	            callback(_this3._categories);
+	          }
 	          return resolve();
 	        });
 	      } else {
@@ -10533,9 +10531,9 @@
 	        }).then(function (response) {
 	          _this3._categories = response.categories;
 	          return _this3.EC.Data.categories(response.categories).then(function () {
-	            return __guardFunc__(callback, function (f) {
-	              return f(_this3._categories);
-	            });
+	            if (typeof callback === 'function') {
+	              callback(_this3._categories);
+	            }
 	          });
 	        });
 	      }
@@ -10546,9 +10544,9 @@
 	      var _this4 = this;
 
 	      if (this._categories != null) {
-	        return __guardFunc__(callback, function (f) {
-	          return f(_this4._categories);
-	        });
+	        if (typeof callback === 'function') {
+	          callback(this._categories);
+	        }
 	      } else {
 	        return setTimeout(function () {
 	          return _this4.all(callback);
@@ -10561,14 +10559,6 @@
 	}();
 
 	exports.default = EmojidexCategories;
-
-
-	function __guardFunc__(func, transform) {
-	  return typeof func === 'function' ? transform(func) : undefined;
-	}
-	function __guard__(value, transform) {
-	  return typeof value !== 'undefined' && value !== null ? transform(value) : undefined;
-	}
 
 /***/ },
 /* 4 */
@@ -11501,9 +11491,9 @@
 	      }).map(function (moji) {
 	        return moji;
 	      });
-	      __guardFunc__(callback, function (f) {
-	        return f(results);
-	      });
+	      if (typeof callback === 'function') {
+	        callback(results);
+	      }
 	      return results;
 	    }
 
@@ -11517,9 +11507,9 @@
 	      }).map(function (moji) {
 	        return moji;
 	      });
-	      __guardFunc__(callback, function (f) {
-	        return f(results);
-	      });
+	      if (typeof callback === 'function') {
+	        callback(results);
+	      }
 	      return results;
 	    }
 
@@ -11533,9 +11523,9 @@
 	      }).map(function (moji) {
 	        return moji;
 	      });
-	      __guardFunc__(callback, function (f) {
-	        return f(results);
-	      });
+	      if (typeof callback === 'function') {
+	        callback(results);
+	      }
 	      return results;
 	    }
 
@@ -11545,9 +11535,7 @@
 	    key: 'tags',
 	    value: function tags(_tags, opts) {
 	      _tags = this.EC.Util.breakout(_tags);
-	      var selection = __guard__(opts, function (x) {
-	        return x.selection;
-	      }) || this._emoji();
+	      var selection = typeof opts !== 'undefined' && typeof opts.selection !== 'undefined' ? opts.selection : this._emoji();
 	      var collect = [];
 
 	      var _loop = function _loop(i) {
@@ -11571,9 +11559,7 @@
 	    key: 'categories',
 	    value: function categories(_categories, opts) {
 	      _categories = this.EC.Util.breakout(_categories);
-	      var source = __guard__(opts, function (x) {
-	        return x.selection;
-	      }) || this._emoji();
+	      var source = typeof opts !== 'undefined' && typeof opts.selection !== 'undefined' ? opts.selection : this._emoji();
 	      var collect = [];
 
 	      var _loop2 = function _loop2(i) {
@@ -11626,14 +11612,6 @@
 	}();
 
 	exports.default = EmojidexEmoji;
-
-
-	function __guardFunc__(func, transform) {
-	  return typeof func === 'function' ? transform(func) : undefined;
-	}
-	function __guard__(value, transform) {
-	  return typeof value !== 'undefined' && value !== null ? transform(value) : undefined;
-	}
 
 /***/ },
 /* 8 */
@@ -11692,18 +11670,18 @@
 	            _this.results = [];
 	            _this.cur_page = 0;
 	            _this.count = 0;
-	            return __guardFunc__(callback, function (f) {
-	              return f([]);
-	            });
+	            if (typeof callback === 'function') {
+	              callback([]);
+	            }
 	          } else {
 	            _this.meta = response.meta;
 	            _this.results = response.emoji;
 	            _this.cur_page = response.meta.page;
 	            _this.count = response.meta.count;
 	            return _this.EC.Emoji.combine(response.emoji).then(function (data) {
-	              return __guardFunc__(callback, function (f1) {
-	                return f1(response.emoji);
-	              });
+	              if (typeof callback === 'function') {
+	                callback(response.emoji);
+	              }
 	            });
 	          }
 	        },
@@ -11711,9 +11689,9 @@
 	          _this.results = [];
 	          _this.cur_page = 0;
 	          _this.count = 0;
-	          return __guardFunc__(callback, function (f) {
-	            return f([]);
-	          });
+	          if (typeof callback === 'function') {
+	            callback([]);
+	          }
 	        } });
 	    }
 	  }, {
@@ -11752,9 +11730,9 @@
 	            loaded_emoji = loaded_emoji.concat(response);
 	            if (++loaded_num === static_type.length) {
 	              return _this2.EC.Emoji.combine(loaded_emoji).then(function (data) {
-	                return __guardFunc__(callback, function (f) {
-	                  return f(data);
-	                });
+	                if (typeof callback === 'function') {
+	                  callback(data);
+	                }
 	              });
 	            }
 	          }
@@ -11792,11 +11770,6 @@
 	}();
 
 	exports.default = EmojidexIndexes;
-
-
-	function __guardFunc__(func, transform) {
-	  return typeof func === 'function' ? transform(func) : undefined;
-	}
 
 /***/ },
 /* 9 */
@@ -12029,13 +12002,7 @@
 	  _createClass(EmojidexUser, [{
 	    key: '_autoLogin',
 	    value: function _autoLogin() {
-	      if (__guard__(__guard__(__guard__(this.EC.Data.storage.hub_cache, function (x2) {
-	        return x2.emojidex;
-	      }), function (x1) {
-	        return x1.auth_info;
-	      }), function (x) {
-	        return x.status;
-	      }) === 'verified') {
+	      if (typeof this.EC.Data.storage.hub_cache !== 'undefined' && typeof this.EC.Data.storage.hub_cache.emojidex !== 'undefined' && typeof this.EC.Data.storage.hub_cache.emojidex.auth_info !== 'undefined' && this.EC.Data.storage.hub_cache.emojidex.auth_info.status === 'verified') {
 	        this.auth_info = this.EC.Data.storage.hub_cache.emojidex.auth_info;
 	        return this.syncUserData();
 	      }
@@ -12059,13 +12026,7 @@
 	        case 'basic':
 	          return this.basicAuth(params.user, params.password, params.callback);
 	        case 'session':
-	          if (__guard__(__guard__(__guard__(this.EC.Data.storage.hub_cache, function (x2) {
-	            return x2.emojidex;
-	          }), function (x1) {
-	            return x1.auth_info;
-	          }), function (x) {
-	            return x.status;
-	          }) === 'verified') {
+	          if (typeof this.EC.Data.storage.hub_cache !== 'undefined' && typeof this.EC.Data.storage.hub_cache.emojidex !== 'undefined' && typeof this.EC.Data.storage.hub_cache.emojidex.auth_info !== 'undefined' && this.EC.Data.storage.hub_cache.emojidex.auth_info.status === 'verified') {
 	            return this.auth_info = this.EC.Data.storage.hub_cache.emojidex.auth_info;
 	          }
 	        default:
@@ -12091,9 +12052,9 @@
 	        dataType: 'json',
 	        success: function success(response) {
 	          return _this._setAuthFromResponse(response).then(function () {
-	            return __guardFunc__(callback, function (f) {
-	              return f(_this.auth_info);
-	            });
+	            if (typeof callback === 'function') {
+	              callback(_this.auth_info);
+	            }
 	          });
 	        },
 	        error: function error(response) {
@@ -12104,9 +12065,12 @@
 	            user: ''
 	          };
 	          return _this.EC.Data.auth_info(_this.EC.Data.auth_info).then(function () {
-	            return __guardFunc__(callback, function (f) {
-	              return f({ auth_info: _this.auth_info, error_info: response });
-	            });
+	            if (typeof callback === 'function') {
+	              callback({
+	                auth_info: _this.auth_info,
+	                error_info: response
+	              });
+	            }
 	          });
 	        }
 	      };
@@ -12216,14 +12180,6 @@
 
 	exports.default = EmojidexUser;
 
-
-	function __guard__(value, transform) {
-	  return typeof value !== 'undefined' && value !== null ? transform(value) : undefined;
-	}
-	function __guardFunc__(func, transform) {
-	  return typeof func === 'function' ? transform(func) : undefined;
-	}
-
 /***/ },
 /* 11 */
 /***/ function(module, exports) {
@@ -12270,9 +12226,9 @@
 	        success: function success(response) {
 	          _this._favorites = response;
 	          _this.EC.Data.favorites(response);
-	          return __guardFunc__(callback, function (f) {
-	            return f(_this._favorites);
-	          });
+	          if (typeof callback === 'function') {
+	            callback(_this._favorites);
+	          }
 	        }
 	      };
 	      return this._favoritesAPI(options);
@@ -12323,9 +12279,9 @@
 	      var _this4 = this;
 
 	      if (this._favorites != null) {
-	        __guardFunc__(callback, function (f) {
-	          return f(_this4._favorites);
-	        });
+	        if (typeof callback === 'function') {
+	          callback(this._favorites);
+	        }
 	      } else {
 	        setTimeout(function () {
 	          return _this4.all(callback);
@@ -12339,11 +12295,6 @@
 	}();
 
 	exports.default = EmojidexUserFavorites;
-
-
-	function __guardFunc__(func, transform) {
-	  return typeof func === 'function' ? transform(func) : undefined;
-	}
 
 /***/ },
 /* 12 */
@@ -12391,9 +12342,9 @@
 	        success: function success(response) {
 	          _this._history = response;
 	          _this.EC.Data.history(response);
-	          return __guardFunc__(callback, function (f) {
-	            return f(_this._history);
-	          });
+	          if (typeof callback === 'function') {
+	            callback(_this._history);
+	          }
 	        }
 	      };
 	      return this._historyAPI(options);
@@ -12433,9 +12384,9 @@
 	      var _this3 = this;
 
 	      if (this._history != null) {
-	        __guardFunc__(callback, function (f) {
-	          return f(_this3._history);
-	        });
+	        if (typeof callback === 'function') {
+	          callback(this._history);
+	        }
 	      } else {
 	        setTimeout(function () {
 	          return _this3.all(callback);
@@ -12449,11 +12400,6 @@
 	}();
 
 	exports.default = EmojidexUserHistory;
-
-
-	function __guardFunc__(func, transform) {
-	  return typeof func === 'function' ? transform(func) : undefined;
-	}
 
 /***/ },
 /* 13 */
