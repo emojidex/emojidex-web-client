@@ -3,6 +3,8 @@ export default class EmojidexUserFavorites {
     this.EC = EC;
     this.token = token;
     this._favorites = this.EC.Data.favorites();
+    this.cur_page = 1;
+    this.max_page = undefined;
   }
 
   _favoritesAPI(options) {
@@ -15,14 +17,20 @@ export default class EmojidexUserFavorites {
     }
   }
 
-  get(callback) {
+  get(callback, page = 1) {
     let options = {
       data: {
+        page: page,
+        limit: this.EC.limit,
+        detailed: this.EC.detailed,
         auth_token: this.token
       },
       success: response => {
         this._favorites = response;
+        this.cur_page = response.meta.page;
+        this.max_page = Math.ceil(response.total_count / this.EC.limit);
         this.EC.Data.favorites(response);
+        // TODO: favorites.combine
         if (typeof callback === 'function') { callback(this._favorites); }
       }
     };
@@ -72,5 +80,15 @@ export default class EmojidexUserFavorites {
       ), 500);
     }
     return this._favorites;
+  }
+
+  next(callback) {
+    if (this.max_page === this.cur_page) return;
+    return this.get(callback, this.cur_page + 1);
+  }
+
+  prev(callback) {
+    if (this.cur_page === 1) return;
+    return this.get(callback, this.cur_page - 1);
   }
 }

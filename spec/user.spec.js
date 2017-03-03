@@ -81,6 +81,34 @@ describe('EmojidexUser', function() {
         done();
       })
     );
+
+    describe('Favorites pages [require premium user]', function() {
+      if (typeof premium_user_info === 'undefined' || premium_user_info === null) { pending(); }
+      beforeEach(done => {
+          EC_spec.User.setAuth(premium_user_info.auth_user, premium_user_info.auth_token).then(() => {
+            done();
+          });
+        }
+      );
+
+      it('next', done => {
+        EC_spec.limit = 5;
+        EC_spec.User.Favorites.next(function(favorites) {
+          expect(EC_spec.User.Favorites.cur_page).toEqual(2);
+          done();
+        });
+      });
+
+      it('prev', done => {
+        EC_spec.limit = 5;
+        EC_spec.User.Favorites.next(function(favorites) {
+          EC_spec.User.Favorites.prev(function(favorites) {
+            expect(EC_spec.User.Favorites.cur_page).toEqual(1);
+            done();
+          });
+        });
+      });
+    });
   });
 
     // it 'set_favorites', (done) ->
