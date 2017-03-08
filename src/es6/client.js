@@ -7,6 +7,8 @@
 //
 // Copyright 2013 the emojidex project / K.K. GenSouSha
 
+import $ from 'jquery';
+
 export default class EmojidexClient {
   constructor(options) {
     this.env = {
@@ -46,18 +48,22 @@ export default class EmojidexClient {
     this.limit = this.options.limit;
     this.locale = this.options.locale;
 
-    // new Emojidex modules
-    this.Data = new EmojidexData(this, this.options).then(data => {
-      this.Util = new EmojidexUtil(this);
-      this.User = new EmojidexUser(this);
-      this.Indexes = new EmojidexIndexes(this);
-      this.Search = new EmojidexSearch(this);
-      this.Emoji = new EmojidexEmoji(this);
-      this.Categories = new EmojidexCategories(this);
-    }
+  }
 
-    ).then(() => {
-      this.options.onReady(this);
-    });
+  init() {
+    // // new Emojidex modules
+    // this.Data = new EmojidexData(this, this.options).then(data => {
+    //   this.Util = new EmojidexUtil(this);
+    //   this.User = new EmojidexUser(this);
+    //   this.Indexes = new EmojidexIndexes(this);
+    //   this.Search = new EmojidexSearch(this);
+    //   this.Emoji = new EmojidexEmoji(this);
+    //   this.Categories = new EmojidexCategories(this);
+    // }
+    //
+    // ).then(() => {
+    //   this.options.onReady(this);
+    // });
+    this.options.onReady(this);
   }
 }

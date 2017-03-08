@@ -1,5 +1,3 @@
-require("babel-register");
-require('babel-polyfill');
 import gulp from 'gulp';
 import pkg from './package.json';
 import header from 'gulp-header';
@@ -13,7 +11,7 @@ import uglify from 'gulp-uglify';
 import copy from 'gulp-copy';
 import eslint from 'gulp-eslint';
 import jasmine from 'gulp-jasmine-browser';
-import requireDir from 'require-dir';
+import webpack from 'webpack-stream';
 
 var banner = [
   '/**\n',
@@ -45,8 +43,7 @@ gulp.task('concat', function () {
   return gulp
     .src([
       'node_modules/babel-polyfill/dist/polyfill.js',
-      'node_modules/cross-storage/dist/client.js',
-      'build/js/**/*.js'
+      'build/js/client.js'
     ])
     .pipe(concat('emojidex-client.js'))
     .pipe(gulp.dest('dist/js'));
@@ -78,10 +75,13 @@ gulp.task('copy', function () {
 
 gulp.task('jasmine', () => {
   return gulp.src([
-    'dist/js/emojidex-client.js',
-    'build/js/client.spec.js'
+    // 'dist/js/emojidex-client.js',
+    'spec/client.spec.js'
     // 'spec/**/*.spec.js'
   ])
+  .pipe(babel())
+  .pipe(gulp.dest('spec/babel'))
+  .pipe(webpack({watch: true, output: {filename: 'spec.js'}}))
   .pipe(jasmine.specRunner())
   .pipe(jasmine.server({port: 8888}));
 });
