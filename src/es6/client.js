@@ -7,7 +7,12 @@
 //
 // Copyright 2013 the emojidex project / K.K. GenSouSha
 
+if (!global._babelPolyfill) {
+  require('babel-polyfill');
+}
 import $ from 'jquery';
+
+import EmojidexData from '../../src/es6/components/data';
 
 export default class EmojidexClient {
   constructor(options) {
@@ -51,7 +56,7 @@ export default class EmojidexClient {
   }
 
   init() {
-    // // new Emojidex modules
+    // // // new Emojidex modules
     // this.Data = new EmojidexData(this, this.options).then(data => {
     //   this.Util = new EmojidexUtil(this);
     //   this.User = new EmojidexUser(this);
@@ -59,9 +64,7 @@ export default class EmojidexClient {
     //   this.Search = new EmojidexSearch(this);
     //   this.Emoji = new EmojidexEmoji(this);
     //   this.Categories = new EmojidexCategories(this);
-    // }
-    //
-    // ).then(() => {
+    // }).then(() => {
     //   this.options.onReady(this);
     // });
     this.options.onReady(this);

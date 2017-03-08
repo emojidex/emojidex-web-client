@@ -32,6 +32,7 @@ gulp.task('clean', function () {
 });
 
 gulp.task('babel', function () {
+  // TODO: client.js only
   return gulp.src(['src/es6/**/*.js'])
     .pipe(babel({
       presets: ['es2015']
@@ -39,10 +40,10 @@ gulp.task('babel', function () {
     .pipe(gulp.dest('build/js/'));
 });
 
+// TODO: will be remove...
 gulp.task('concat', function () {
   return gulp
     .src([
-      'node_modules/babel-polyfill/dist/polyfill.js',
       'build/js/client.js'
     ])
     .pipe(concat('emojidex-client.js'))
@@ -80,10 +81,10 @@ gulp.task('jasmine', () => {
     // 'spec/**/*.spec.js'
   ])
   .pipe(babel())
-  .pipe(gulp.dest('spec/babel'))
+  .pipe(gulp.dest('build/spec'))
   .pipe(webpack({watch: true, output: {filename: 'spec.js'}}))
   .pipe(jasmine.specRunner())
-  .pipe(jasmine.server({port: 8888}));
+  .pipe(jasmine.server());
 });
 
 gulp.task('lint', () => {
@@ -94,11 +95,16 @@ gulp.task('lint', () => {
 });
 
 gulp.task('watch', function () {
-  gulp.watch('src/es6/**/*.js', [ /* dependencies */ ]);
+  gulp.watch('src/es6/**/*.js', ['onWatch']);
+  gulp.watch('spec/**/*.js', ['onWatch']);
 });
 
 gulp.task('default', function (cb) {
   runSequence("clean", ["copy", "babel"], "concat", "uglify", "banner", cb);
+});
+
+gulp.task('onWatch', function (cb) {
+  runSequence(["copy", "babel"], "concat", "uglify", "banner", cb);
 });
 
 // gulp.task('spec', ["default", "lint", "jest"]);
