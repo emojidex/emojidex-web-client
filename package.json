@@ -32,6 +32,7 @@
     "gulp-copy": "^1.0.0",
     "gulp-eslint": "^3.0.1",
     "gulp-header": "^1.8.8",
+    "gulp-jasmine-browser": "^1.7.1",
     "gulp-jest": "^1.0.0",
     "gulp-rename": "^1.2.2",
     "gulp-sourcemaps": "^2.4.1",
