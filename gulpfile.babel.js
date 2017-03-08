@@ -1,3 +1,5 @@
+require("babel-register");
+require('babel-polyfill');
 import gulp from 'gulp';
 import pkg from './package.json';
 import header from 'gulp-header';
@@ -11,6 +13,7 @@ import uglify from 'gulp-uglify';
 import copy from 'gulp-copy';
 import eslint from 'gulp-eslint';
 import jasmine from 'gulp-jasmine-browser';
+import requireDir from 'require-dir';
 
 var banner = [
   '/**\n',
@@ -31,7 +34,7 @@ gulp.task('clean', function () {
 });
 
 gulp.task('babel', function () {
-  return gulp.src('src/es6/**/*.js')
+  return gulp.src(['src/es6/**/*.js'])
     .pipe(babel({
       presets: ['es2015']
     }))
@@ -75,8 +78,8 @@ gulp.task('copy', function () {
 
 gulp.task('jasmine', () => {
   return gulp.src([
-    'src/es6/**/*.js',
-    'spec/client.spec.js'
+    'dist/js/emojidex-client.js',
+    'build/js/client.spec.js'
     // 'spec/**/*.spec.js'
   ])
   .pipe(jasmine.specRunner())

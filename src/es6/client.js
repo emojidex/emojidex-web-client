@@ -1,4 +1,4 @@
-// emojidex client
+// emojidex client aaa
 // * Provides search, index caching and combining and asset URI resolution
 //
 // =LICENSE=
@@ -7,7 +7,7 @@
 //
 // Copyright 2013 the emojidex project / K.K. GenSouSha
 
-class EmojidexClient {
+export default class EmojidexClient {
   constructor(options) {
     this.env = {
       api_ver: 1,
@@ -61,5 +61,3 @@ class EmojidexClient {
     });
   }
 }
-
-module.exports.EmojidexClient = EmojidexClient;
