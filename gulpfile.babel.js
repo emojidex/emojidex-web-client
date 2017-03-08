@@ -74,10 +74,13 @@ gulp.task('copy', function () {
 });
 
 gulp.task('jasmine', () => {
-  return gulp.src(['src/es6/**/*.js', 'spec/**/*.spec.js'])
-    .pipe(jasmine.specRunner())
-    .pipe(jasmine.server({port: 8888})
-  );
+  return gulp.src([
+    'src/es6/**/*.js',
+    'spec/client.spec.js'
+    // 'spec/**/*.spec.js'
+  ])
+  .pipe(jasmine.specRunner())
+  .pipe(jasmine.server({port: 8888}));
 });
 
 gulp.task('lint', () => {

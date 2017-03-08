@@ -1,5 +1,9 @@
+import { CrossStorageClient } from 'cross-storage';
+
 describe('EmojidexClient', function() {
+  const storage = undefined;
   beforeAll(done =>
+    storage = new CrossStorageClient
     helperChains({
       functions: [clearStorage, helperBefore],
       end: done
