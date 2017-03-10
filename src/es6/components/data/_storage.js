@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import CrossStorageClient from '../../../../node_modules/cross-storage/dist/client'
 
 export default class EmojidexDataStorage {

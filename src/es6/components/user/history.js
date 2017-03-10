@@ -1,4 +1,4 @@
-class EmojidexUserHistory {
+export default class EmojidexUserHistory {
   constructor(EC, token) {
     this.EC = EC;
     this.token = token;

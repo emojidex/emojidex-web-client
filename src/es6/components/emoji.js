@@ -1,4 +1,4 @@
-class EmojidexEmoji {
+export default class EmojidexEmoji {
   constructor(EC) {
     this.combine = this.combine.bind(this);
     this.EC = EC;

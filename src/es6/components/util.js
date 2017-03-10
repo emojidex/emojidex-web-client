@@ -1,4 +1,4 @@
-class EmojidexUtil {
+export default class EmojidexUtil {
   constructor(EC) {
     self = this;
 

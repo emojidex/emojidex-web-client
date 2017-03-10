@@ -7,12 +7,13 @@
 //
 // Copyright 2013 the emojidex project / K.K. GenSouSha
 
-if (!global._babelPolyfill) {
-  require('babel-polyfill');
-}
-import $ from 'jquery';
-
+import EmojidexCategories from '../../src/es6/components/categories';
 import EmojidexData from '../../src/es6/components/data';
+import EmojidexEmoji from '../../src/es6/components/emoji';
+import EmojidexIndexes from '../../src/es6/components/indexes';
+import EmojidexSearch  from '../../src/es6/components/search';
+import EmojidexUser from '../../src/es6/components/user';
+import EmojidexUtil from '../../src/es6/components/util';
 
 export default class EmojidexClient {
   constructor(options) {
@@ -53,21 +54,16 @@ export default class EmojidexClient {
     this.limit = this.options.limit;
     this.locale = this.options.locale;
 
-  }
-
-  init() {
     // new Emojidex modules
     this.Data = new EmojidexData(this, this.options).then(data => {
-      console.log('data ok!!!');
-    //   this.Util = new EmojidexUtil(this);
-    //   this.User = new EmojidexUser(this);
-    //   this.Indexes = new EmojidexIndexes(this);
-    //   this.Search = new EmojidexSearch(this);
-    //   this.Emoji = new EmojidexEmoji(this);
-    //   this.Categories = new EmojidexCategories(this);
+      this.Util = new EmojidexUtil(this);
+      this.User = new EmojidexUser(this);
+      this.Indexes = new EmojidexIndexes(this);
+      this.Search = new EmojidexSearch(this);
+      this.Emoji = new EmojidexEmoji(this);
+      this.Categories = new EmojidexCategories(this);
     }).then(() => {
       this.options.onReady(this);
     });
-    // this.options.onReady(this);
   }
 }

@@ -1,4 +1,4 @@
-class EmojidexCategories {
+export default class EmojidexCategories {
   constructor(EC) {
     this.EC = EC;
     this._categories = this.EC.Data.categories();

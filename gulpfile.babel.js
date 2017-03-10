@@ -75,6 +75,7 @@ gulp.task('copy', function () {
 gulp.task('jasmine', () => {
   return gulp.src([
     'dist/js/emojidex-client.js',
+    'spec/helpers/*.js',
     'spec/client.spec.js'
     // 'spec/**/*.spec.js'
   ])
@@ -105,9 +106,9 @@ gulp.task('onWatch', function (cb) {
   runSequence(["copy", "webpack"], "uglify", "banner", cb);
 });
 
-// gulp.task('spec', ["default", "lint", "jest"]);
+// TODO: lint
 gulp.task('spec', function (cb) {
-  runSequence("default", ["jasmine", "watch"], cb/*, "lint"*/);
+  runSequence("default", "jasmine", cb/*, "lint"*/);
 });
 
 gulp.task('dev', function (cb) {

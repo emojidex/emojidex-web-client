@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import EmojidexDataStorage from './data/_storage'
 
 export default class EmojidexData {

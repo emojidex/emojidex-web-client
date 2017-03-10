@@ -1,4 +1,4 @@
-class EmojidexSearch {
+export default class EmojidexSearch {
   constructor(EC) {
     this.EC = EC;
     this.results = [];

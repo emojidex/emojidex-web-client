@@ -1,4 +1,7 @@
-class EmojidexUser {
+import EmojidexUserFavorites from './user/favorites'
+import EmojidexUserHistory from './user/history'
+
+export default class EmojidexUser {
   constructor(EC) {
     this.EC = EC;
     this.auth_info = this.EC.Data._def_auth_info;

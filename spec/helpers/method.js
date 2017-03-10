@@ -1,11 +1,6 @@
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
 
-// jest.dontMock('../../dist/js/emojidex-client.js')
-global.$ = require('jquery');
-global.CrossStorageClient = require('cross-storage').CrossStorageClient;
-global.EmojidexClient = require('../../dist/js/emojidex-client.js').EmojidexClient
-
-global.EC_spec = null;
+this.EC_spec = null;
 
 let hub_path = 'https://www.emojidex.com/hub/1.0.0';
 let helperChains = function(chains_data) {
@@ -16,19 +11,19 @@ let helperChains = function(chains_data) {
     chain_function(chains_data);
   }
 };
-global.helperChains = helperChains;
+this.helperChains = helperChains;
 
 let helperBefore = function(chains_data) {
-  global.EC_spec = new EmojidexClient({
+  this.EC_spec = new EmojidexClient({
     storageHubPath: hub_path,
     onReady: EC => {
-      global.EC_spec.User.setAuth(test_user_info.auth_user, test_user_info.auth_token).then(() => {
+      this.EC_spec.User.setAuth(test_user_info.auth_user, test_user_info.auth_token).then(() => {
         helperChains(chains_data);
       });
     }
   });
 };
-global.helperBefore = helperBefore;
+this.helperBefore = helperBefore;
 
 let clearStorage = function(chains_data) {
   /*let CSC = new CrossStorageClient(hub_path,
@@ -39,17 +34,17 @@ let clearStorage = function(chains_data) {
   //}
   //);
 };
-global.clearStorage = clearStorage;
+this.clearStorage = clearStorage;
 
 let helperBeforeForEmojidexData = function(chains_data) {
-  global.EC_spec = new EmojidexClient({
+  this.EC_spec = new EmojidexClient({
     storageHubPath: hub_path,
     onReady(EC) {
       helperChains(chains_data);
     }
   });
 };
-global.helperBeforeForEmojidexData = helperBeforeForEmojidexData;
+this.helperBeforeForEmojidexData = helperBeforeForEmojidexData;
 
 let getExtendedEmojiData = chains_data =>
   $.ajax({
@@ -59,8 +54,7 @@ let getExtendedEmojiData = chains_data =>
       this.emoji_emojidex = response;
       helperChains(chains_data);
     }
-  })
-;
+  });
 
 let getFacesEmoji = chains_data =>
   $.ajax({
@@ -73,14 +67,12 @@ let getFacesEmoji = chains_data =>
       this.faces_emoji = response.emoji;
       helperChains(chains_data);
     }
-  })
-;
+  });
 
 let setPremiumUser = function(chains_data) {
-  global.EC_spec.User.setAuth(premium_user_info.auth_user, premium_user_info.auth_token).then(() => {
+  this.EC_spec.User.setAuth(premium_user_info.auth_user, premium_user_info.auth_token).then(() => {
     helperChains(chains_data);
-  }
-  );
+  });
 };
 
 let spec_timer = function(option) {
