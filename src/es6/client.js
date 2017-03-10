@@ -56,17 +56,18 @@ export default class EmojidexClient {
   }
 
   init() {
-    // // // new Emojidex modules
-    // this.Data = new EmojidexData(this, this.options).then(data => {
+    // new Emojidex modules
+    this.Data = new EmojidexData(this, this.options).then(data => {
+      console.log('data ok!!!');
     //   this.Util = new EmojidexUtil(this);
     //   this.User = new EmojidexUser(this);
     //   this.Indexes = new EmojidexIndexes(this);
     //   this.Search = new EmojidexSearch(this);
     //   this.Emoji = new EmojidexEmoji(this);
     //   this.Categories = new EmojidexCategories(this);
-    // }).then(() => {
-    //   this.options.onReady(this);
-    // });
-    this.options.onReady(this);
+    }).then(() => {
+      this.options.onReady(this);
+    });
+    // this.options.onReady(this);
   }
 }

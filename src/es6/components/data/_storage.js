@@ -1,4 +1,7 @@
-class EmojidexDataStorage {
+import $ from 'jquery';
+import CrossStorageClient from '../../../../node_modules/cross-storage/dist/client'
+
+export default class EmojidexDataStorage {
   constructor(hub_path = 'https://www.emojidex.com/hub/1.0.0') {
     this.hub = new CrossStorageClient(hub_path,
       {frameId: 'emojidex-client-storage-hub'});
@@ -91,7 +94,7 @@ class EmojidexDataStorage {
       return this.hub.get(keys);
     }
     ).then(hub_data => {
-      data = $.parseJSON(hub_data);
+      let data = $.parseJSON(hub_data);
       if (key) {
         return this.hub_cache[key] = data[key];
       } else {

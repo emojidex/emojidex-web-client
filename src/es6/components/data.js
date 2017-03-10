@@ -1,4 +1,7 @@
-class EmojidexData {
+import $ from 'jquery';
+import EmojidexDataStorage from './data/_storage'
+
+export default class EmojidexData {
   constructor(EC, options) {
     this.EC = EC;
     this.options = options;

@@ -1,4 +1,4 @@
-import EmojidexClient from '../../dist/js/emojidex-client';
+// import EmojidexClient from '../../dist/js/emojidex-client';
 
 describe('EmojidexClient', function() {
   let emojidex_client;

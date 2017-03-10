@@ -31,23 +31,21 @@ gulp.task('clean', function () {
   del.sync(['build/**/*.js', 'dist/**/*.js']);
 });
 
-gulp.task('babel', function () {
-  // TODO: client.js only
-  return gulp.src(['src/es6/**/*.js'])
-    .pipe(babel({
-      presets: ['es2015']
+gulp.task('webpack', function () {
+  return gulp.src(['src/es6/entry.js'])
+    .pipe(webpack({
+      output: { filename: 'emojidex-client.js' },
+      module: {
+        loaders: [
+          {
+            test: /\.js$/,
+            exclude: /node_modules/,
+            loader: 'babel-loader'
+          }
+        ]
+      }
     }))
-    .pipe(gulp.dest('build/js/'));
-});
-
-// TODO: will be remove...
-gulp.task('concat', function () {
-  return gulp
-    .src([
-      'build/js/client.js'
-    ])
-    .pipe(concat('emojidex-client.js'))
-    .pipe(gulp.dest('dist/js'));
+    .pipe(gulp.dest('dist/js/'));
 });
 
 gulp.task('uglify', function (cb) {
@@ -76,13 +74,13 @@ gulp.task('copy', function () {
 
 gulp.task('jasmine', () => {
   return gulp.src([
-    // 'dist/js/emojidex-client.js',
+    'dist/js/emojidex-client.js',
     'spec/client.spec.js'
     // 'spec/**/*.spec.js'
   ])
-  .pipe(babel())
-  .pipe(gulp.dest('build/spec'))
-  .pipe(webpack({watch: true, output: {filename: 'spec.js'}}))
+  // .pipe(babel())
+  // .pipe(gulp.dest('build/spec'))
+  // .pipe(webpack({watch: true, output: {filename: 'spec.js'}}))
   .pipe(jasmine.specRunner())
   .pipe(jasmine.server());
 });
@@ -100,16 +98,18 @@ gulp.task('watch', function () {
 });
 
 gulp.task('default', function (cb) {
-  runSequence("clean", ["copy", "babel"], "concat", "uglify", "banner", cb);
+  runSequence("clean", ["copy", "webpack"], "uglify", "banner", cb);
 });
 
 gulp.task('onWatch', function (cb) {
-  runSequence(["copy", "babel"], "concat", "uglify", "banner", cb);
+  runSequence(["copy", "webpack"], "uglify", "banner", cb);
 });
 
 // gulp.task('spec', ["default", "lint", "jest"]);
 gulp.task('spec', function (cb) {
-  runSequence("default", "jasmine", cb/*, "lint"*/);
+  runSequence("default", ["jasmine", "watch"], cb/*, "lint"*/);
 });
 
-gulp.task('dev', ["default", "watch"]);
+gulp.task('dev', function (cb) {
+  runSequence("default", "watch", cb);
+});
