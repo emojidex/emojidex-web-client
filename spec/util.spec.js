@@ -1,5 +1,3 @@
-require('./helpers/method.js')
-
 describe('EmojidexUtil', function() {
   beforeEach(function(done) {
     helperChains({
