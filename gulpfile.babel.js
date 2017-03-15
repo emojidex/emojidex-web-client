@@ -75,6 +75,7 @@ gulp.task('copy', function () {
 
 gulp.task('jasmine', () => {
   let testFiles = [
+    'node_modules/cross-storage/lib/client.js',
     'dist/js/emojidex-client.js',
     'spec/helpers/*.js',
     'spec/client.spec.js'
