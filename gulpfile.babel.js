@@ -12,6 +12,7 @@ import copy from 'gulp-copy';
 import eslint from 'gulp-eslint';
 import jasmine from 'gulp-jasmine-browser';
 import webpack from 'webpack-stream';
+import watch from 'gulp-watch'
 
 var banner = [
   '/**\n',
@@ -73,15 +74,17 @@ gulp.task('copy', function () {
 });
 
 gulp.task('jasmine', () => {
-  return gulp.src([
+  let testFiles = [
     'dist/js/emojidex-client.js',
     'spec/helpers/*.js',
     'spec/client.spec.js'
     // 'spec/**/*.spec.js'
-  ])
+  ];
+  return gulp.src(testFiles)
   // .pipe(babel())
   // .pipe(gulp.dest('build/spec'))
   // .pipe(webpack({watch: true, output: {filename: 'spec.js'}}))
+  .pipe(watch(testFiles))
   .pipe(jasmine.specRunner())
   .pipe(jasmine.server());
 });
