@@ -12,7 +12,8 @@ import copy from 'gulp-copy';
 import eslint from 'gulp-eslint';
 import jasmine from 'gulp-jasmine-browser';
 import webpack from 'webpack-stream';
-import watch from 'gulp-watch'
+import watch from 'gulp-watch';
+import fs from 'fs';
 
 var banner = [
   '/**\n',
@@ -73,21 +74,31 @@ gulp.task('copy', function () {
     .pipe(gulp.dest('build'));
 });
 
+gulp.task('env', () => {
+  fs.stat('.env', (err, stat) => {
+    if (err == null) {
+      return gulp.src('.env')
+        .pipe(rename('authinfo.js'))
+        .pipe(gulp.dest('tmp'));
+    }
+  });
+});
+
 gulp.task('jasmine', () => {
   let testFiles = [
     'node_modules/cross-storage/lib/client.js',
     'dist/js/emojidex-client.js',
     'spec/helpers/*.js',
-    'spec/client.spec.js'
-    // 'spec/**/*.spec.js'
+    'tmp/authinfo.js',
+    'spec/**/*.spec.js'
   ];
   return gulp.src(testFiles)
   // .pipe(babel())
   // .pipe(gulp.dest('build/spec'))
   // .pipe(webpack({watch: true, output: {filename: 'spec.js'}}))
-  .pipe(watch(testFiles))
-  .pipe(jasmine.specRunner())
-  .pipe(jasmine.server());
+    .pipe(watch(testFiles))
+    .pipe(jasmine.specRunner())
+    .pipe(jasmine.server());
 });
 
 gulp.task('lint', () => {
@@ -112,7 +123,7 @@ gulp.task('onWatch', function (cb) {
 
 // TODO: lint
 gulp.task('spec', function (cb) {
-  runSequence("default", "jasmine", cb/*, "lint"*/);
+  runSequence("default", "env", "jasmine", cb/*, "lint"*/);
 });
 
 gulp.task('dev', function (cb) {
