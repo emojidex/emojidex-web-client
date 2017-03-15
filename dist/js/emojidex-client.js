@@ -73,7 +73,6 @@
 	}
 
 	window.$ = _jquery2.default;
-
 	window.EmojidexClient = _client2.default;
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 

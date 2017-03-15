@@ -32,7 +32,7 @@ gulp.task('clean', function () {
 });
 
 gulp.task('webpack', function () {
-  return gulp.src(['src/es6/entry.js'])
+  return gulp.src(['src/es6/index.js'])
     .pipe(webpack({
       output: { filename: 'emojidex-client.js' },
       module: {
