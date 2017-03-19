@@ -34,9 +34,13 @@ gulp.task('clean', function () {
 });
 
 gulp.task('webpack', function () {
-  return gulp.src(['src/es6/index.js'])
+  let webpack_p = require('webpack-stream').webpack
+  return gulp.src(['src/es6/client.js'])
     .pipe(webpack({
-      output: { filename: 'emojidex-client.js' },
+      output: {
+        filename: 'emojidex-client.js',
+        library: 'EmojidexClient'
+      },
       module: {
         loaders: [
           {
@@ -45,7 +49,13 @@ gulp.task('webpack', function () {
             loader: 'babel-loader'
           }
         ]
-      }
+      },
+      plugins: [
+        new webpack_p.ProvidePlugin({
+          $: 'jquery',
+          'window.$': 'jquery'
+        })
+      ]
     }))
     .pipe(gulp.dest('dist/js/'));
 });
@@ -86,6 +96,7 @@ gulp.task('env', () => {
 
 gulp.task('jasmine', () => {
   let testFiles = [
+    'node_modules/jquery/dist/jquery.js',
     'node_modules/cross-storage/lib/client.js',
     'dist/js/emojidex-client.js',
     'spec/helpers/*.js',
@@ -93,9 +104,6 @@ gulp.task('jasmine', () => {
     'spec/**/*.spec.js'
   ];
   return gulp.src(testFiles)
-  // .pipe(babel())
-  // .pipe(gulp.dest('build/spec'))
-  // .pipe(webpack({watch: true, output: {filename: 'spec.js'}}))
     .pipe(watch(testFiles))
     .pipe(jasmine.specRunner())
     .pipe(jasmine.server());
