@@ -26,20 +26,19 @@ let helperBefore = function(chains_data) {
 this.helperBefore = helperBefore;
 
 let clearStorage = function(chains_data) {
-  /*let CSC = new CrossStorageClient(hub_path,
+  let CSC = new CrossStorageClient(hub_path,
     {frameId: 'emojidex-client-storage-hub'});
   CSC.onConnect().then(() => {
-    CSC.clear();*/
+    CSC.clear();
     helperChains(chains_data);
-  //}
-  //);
+  });
 };
 this.clearStorage = clearStorage;
 
 let helperBeforeForEmojidexData = function(chains_data) {
   this.EC_spec = new EmojidexClient({
     storageHubPath: hub_path,
-    onReady(EC) {
+    onReady: EC => {
       helperChains(chains_data);
     }
   });

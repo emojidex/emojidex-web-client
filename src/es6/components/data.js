@@ -80,7 +80,8 @@ export default class EmojidexData {
 
   emoji(emoji_set) {
     if (emoji_set != null) {
-      if (this.storage.hub_cache.emojidex.emoji.length > 0) {
+      if (this.storage.hub_cache.emojidex.emoji != null &&
+          this.storage.hub_cache.emojidex.emoji.length > 0) {
         let hub_emoji = this.storage.hub_cache.emojidex.emoji;
         for (let i = 0; i < emoji_set.length; i++) {
           let new_emoji = emoji_set[i];
