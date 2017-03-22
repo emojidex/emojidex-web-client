@@ -107,13 +107,59 @@ export default class EmojidexData {
   }
 
   favorites(favorites_set) {
-    if (favorites_set != null) { return this.storage.update('emojidex', {favorites: favorites_set}); }
-    return this.storage.hub_cache.favorites;
+    if (favorites_set != null) {
+      if (this.storage.hub_cache.emojidex.favorites != null &&
+          this.storage.hub_cache.emojidex.favorites.length > 0) {
+        let hub_emoji = this.storage.hub_cache.emojidex.favorites;
+        for (let i = 0; i < favorites_set.length; i++) {
+          let new_emoji = favorites_set[i];
+          for (let j = 0; j < hub_emoji.length; j++) {
+            let emoji = hub_emoji[j];
+            if (new_emoji.code === emoji.code) {
+              hub_emoji.splice(hub_emoji.indexOf(emoji), 1, new_emoji);
+              break;
+            } else if (emoji === hub_emoji[hub_emoji.length - 1]) {
+              hub_emoji.push(new_emoji);
+            }
+          }
+        }
+        return this.storage.update('emojidex', {favorites: hub_emoji});
+      } else {
+        return this.storage.update('emojidex', {favorites: favorites_set});
+      }
+    } else if (this.storage.hub_cache.emojidex.favorites != null) {
+      return this.storage.hub_cache.emojidex.favorites;
+    } else {
+      return undefined;
+    }
   }
 
   history(history_set) {
-    if (history_set != null) { return this.storage.update('emojidex', {history: history_set}); }
-    return this.storage.hub_cache.history;
+    if (history_set != null) {
+      if (this.storage.hub_cache.emojidex.history != null &&
+          this.storage.hub_cache.emojidex.history.length > 0) {
+        let hub_emoji = this.storage.hub_cache.emojidex.history;
+        for (let i = 0; i < history_set.length; i++) {
+          let new_emoji = history_set[i];
+          for (let j = 0; j < hub_emoji.length; j++) {
+            let emoji = hub_emoji[j];
+            if (new_emoji.code === emoji.code) {
+              hub_emoji.splice(hub_emoji.indexOf(emoji), 1, new_emoji);
+              break;
+            } else if (emoji === hub_emoji[hub_emoji.length - 1]) {
+              hub_emoji.push(new_emoji);
+            }
+          }
+        }
+        return this.storage.update('emojidex', {history: hub_emoji});
+      } else {
+        return this.storage.update('emojidex', {history: history_set});
+      }
+    } else if (this.storage.hub_cache.emojidex.history != null) {
+      return this.storage.hub_cache.emojidex.history;
+    } else {
+      return undefined;
+    }
   }
 
   categories(categories_set) {

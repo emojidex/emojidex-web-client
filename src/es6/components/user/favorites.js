@@ -26,12 +26,16 @@ export default class EmojidexUserFavorites {
         auth_token: this.token
       },
       success: response => {
-        this._favorites = response;
         this.cur_page = response.meta.page;
         this.max_page = Math.ceil(response.total_count / this.EC.limit);
-        this.EC.Data.favorites(response);
-        // TODO: favorites.combine
-        if (typeof callback === 'function') { callback(this._favorites); }
+        this.EC.Data.favorites(response.emoji).then(data => {
+          if (data.favorites !== undefined) {
+            this._favorites = data.favorites;
+          } else {
+            this._favorites = data;
+          }
+          if (typeof callback === 'function') { callback(this._favorites); }
+        });
       }
     };
     return this._favoritesAPI(options);

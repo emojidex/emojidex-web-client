@@ -25,6 +25,18 @@ let helperBefore = function(chains_data) {
 };
 this.helperBefore = helperBefore;
 
+let helperBeforeForPremiumUser = function(chains_data) {
+  this.EC_spec = new EmojidexClient({
+    storageHubPath: hub_path,
+    onReady: EC => {
+      this.EC_spec.User.setAuth(premium_user_info.auth_user, premium_user_info.auth_token).then(() => {
+        helperChains(chains_data);
+      });
+    }
+  });
+};
+this.helperBeforeForPremiumUser = helperBeforeForPremiumUser;
+
 let clearStorage = function(chains_data) {
   let CSC = new CrossStorageClient(hub_path,
     {frameId: 'emojidex-client-storage-hub'});

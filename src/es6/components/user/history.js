@@ -26,12 +26,16 @@ export default class EmojidexUserHistory {
         auth_token: this.token
       },
       success: response => {
-        this._history = response;
         this.cur_page = response.meta.page;
         this.max_page = Math.ceil(response.total_count / this.EC.limit);
-        this.EC.Data.history(response);
-        // TODO: History.combine
-        if (typeof callback === 'function') { callback(this._history); }
+        this.EC.Data.history(response.history).then(data => {
+          if (data.history !== undefined) {
+            this._history = data.history;
+          } else {
+            this._history = data;
+          }
+          if (typeof callback === 'function') { callback(this._history); }
+        });
       }
     };
     return this._historyAPI(options);
