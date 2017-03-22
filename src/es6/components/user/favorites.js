@@ -26,6 +26,7 @@ export default class EmojidexUserFavorites {
         auth_token: this.token
       },
       success: response => {
+        this.meta = response.meta;
         this.cur_page = response.meta.page;
         this.max_page = Math.ceil(response.total_count / this.EC.limit);
         this.EC.Data.favorites(response.emoji).then(data => {

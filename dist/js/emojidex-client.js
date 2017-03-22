@@ -12268,6 +12268,7 @@ var EmojidexClient =
 	          auth_token: this.token
 	        },
 	        success: function success(response) {
+	          _this.meta = response.meta;
 	          _this.cur_page = response.meta.page;
 	          _this.max_page = Math.ceil(response.total_count / _this.EC.limit);
 	          _this.EC.Data.favorites(response.emoji).then(function (data) {
@@ -12411,6 +12412,7 @@ var EmojidexClient =
 	          auth_token: this.token
 	        },
 	        success: function success(response) {
+	          _this.meta = response.meta;
 	          _this.cur_page = response.meta.page;
 	          _this.max_page = Math.ceil(response.total_count / _this.EC.limit);
 	          _this.EC.Data.history(response.history).then(function (data) {
