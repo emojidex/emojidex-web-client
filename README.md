@@ -17,24 +17,31 @@ cd emojidex-web-client
 ```
 
 ### Install Packages and Obtain Required Sources
+First install NPM and Yarn.
+  
+Then:
 ```shell
-npm install
+yarn
 ```
 
 ### Build
 For a regular one-off build:
 ```shell
-grunt
+gulp
 ```
 
 For development mode with dynamic compilation and dev server:
 ```shell
-grunt dev
+gulp dev
 ```
 
-The jasmin spec runner page is left after each run at
-[http://localhost:8000/build/_SpecRunner.html](http://localhost:8000/build/_SpecRunner.html).
-You can open that file and play with the client in the javascript/debug terminal.
+For running specs:
+```shell
+gulp spec
+```
+
+The jasmin spec runner page is accessable on port 8888 of your local host
+[http://localhost:8888](http://localhost:8888).
 
 Design
 ======
