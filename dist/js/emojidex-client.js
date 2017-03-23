@@ -10690,6 +10690,8 @@ var EmojidexClient =
 	  }, {
 	    key: 'favorites',
 	    value: function favorites(favorites_set) {
+	      var _this3 = this;
+
 	      if (favorites_set != null) {
 	        if (this.storage.hub_cache.emojidex.favorites != null && this.storage.hub_cache.emojidex.favorites.length > 0) {
 	          var hub_emoji = this.storage.hub_cache.emojidex.favorites;
@@ -10710,14 +10712,20 @@ var EmojidexClient =
 	          return this.storage.update('emojidex', { favorites: favorites_set });
 	        }
 	      } else if (this.storage.hub_cache.emojidex.favorites != null) {
-	        return this.storage.hub_cache.emojidex.favorites;
+	        return new Promise(function (resolve) {
+	          return resolve(_this3.storage.hub_cache.emojidex.favorites);
+	        });
 	      } else {
-	        return undefined;
+	        return new Promise(function (resolve) {
+	          return resolve([]);
+	        });
 	      }
 	    }
 	  }, {
 	    key: 'history',
 	    value: function history(history_set) {
+	      var _this4 = this;
+
 	      if (history_set != null) {
 	        if (this.storage.hub_cache.emojidex.history != null && this.storage.hub_cache.emojidex.history.length > 0) {
 	          var hub_emoji = this.storage.hub_cache.emojidex.history;
@@ -10738,9 +10746,13 @@ var EmojidexClient =
 	          return this.storage.update('emojidex', { history: history_set });
 	        }
 	      } else if (this.storage.hub_cache.emojidex.history != null) {
-	        return this.storage.hub_cache.emojidex.history;
+	        return new Promise(function (resolve) {
+	          return resolve(_this4.storage.hub_cache.emojidex.history);
+	        });
 	      } else {
-	        return undefined;
+	        return new Promise(function (resolve) {
+	          return resolve([]);
+	        });
 	      }
 	    }
 	  }, {
@@ -12268,15 +12280,11 @@ var EmojidexClient =
 	          auth_token: this.token
 	        },
 	        success: function success(response) {
+	          _this._favorites = response.emoji;
 	          _this.meta = response.meta;
 	          _this.cur_page = response.meta.page;
 	          _this.max_page = Math.ceil(response.total_count / _this.EC.limit);
 	          _this.EC.Data.favorites(response.emoji).then(function (data) {
-	            if (data.favorites !== undefined) {
-	              _this._favorites = data.favorites;
-	            } else {
-	              _this._favorites = data;
-	            }
 	            if (typeof callback === 'function') {
 	              callback(_this._favorites);
 	            }
@@ -12328,18 +12336,13 @@ var EmojidexClient =
 	  }, {
 	    key: 'all',
 	    value: function all(callback) {
-	      var _this4 = this;
-
-	      if (this._favorites != null) {
+	      return this.EC.Data.favorites().then(function (data) {
 	        if (typeof callback === 'function') {
-	          callback(this._favorites);
+	          callback(data);
+	        } else {
+	          return data;
 	        }
-	      } else {
-	        setTimeout(function () {
-	          return _this4.all(callback);
-	        }, 500);
-	      }
-	      return this._favorites;
+	      });
 	    }
 	  }, {
 	    key: 'next',
@@ -12412,15 +12415,11 @@ var EmojidexClient =
 	          auth_token: this.token
 	        },
 	        success: function success(response) {
+	          _this._history = response.history;
 	          _this.meta = response.meta;
 	          _this.cur_page = response.meta.page;
 	          _this.max_page = Math.ceil(response.total_count / _this.EC.limit);
 	          _this.EC.Data.history(response.history).then(function (data) {
-	            if (data.history !== undefined) {
-	              _this._history = data.history;
-	            } else {
-	              _this._history = data;
-	            }
 	            if (typeof callback === 'function') {
 	              callback(_this._history);
 	            }
@@ -12461,18 +12460,13 @@ var EmojidexClient =
 	  }, {
 	    key: 'all',
 	    value: function all(callback) {
-	      var _this3 = this;
-
-	      if (this._history != null) {
+	      return this.EC.Data.history().then(function (data) {
 	        if (typeof callback === 'function') {
-	          callback(this._history);
+	          callback(data);
+	        } else {
+	          return data;
 	        }
-	      } else {
-	        setTimeout(function () {
-	          return _this3.all(callback);
-	        }, 500);
-	      }
-	      return this._history;
+	      });
 	    }
 	  }, {
 	    key: 'next',

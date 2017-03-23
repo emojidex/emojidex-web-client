@@ -128,9 +128,9 @@ export default class EmojidexData {
         return this.storage.update('emojidex', {favorites: favorites_set});
       }
     } else if (this.storage.hub_cache.emojidex.favorites != null) {
-      return this.storage.hub_cache.emojidex.favorites;
+      return new Promise(resolve => resolve(this.storage.hub_cache.emojidex.favorites));
     } else {
-      return undefined;
+      return new Promise(resolve => resolve([]));
     }
   }
 
@@ -156,9 +156,9 @@ export default class EmojidexData {
         return this.storage.update('emojidex', {history: history_set});
       }
     } else if (this.storage.hub_cache.emojidex.history != null) {
-      return this.storage.hub_cache.emojidex.history;
+      return new Promise(resolve => resolve(this.storage.hub_cache.emojidex.history));
     } else {
-      return undefined;
+      return new Promise(resolve => resolve([]));
     }
   }
 
