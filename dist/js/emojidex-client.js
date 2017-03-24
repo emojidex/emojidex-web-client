@@ -12586,7 +12586,7 @@ var EmojidexClient =
 	      var emoji = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : self.results;
 	      var size_code = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : self.EC.size_code;
 
-	      for (i = 0; i < emoji.length; i++) {
+	      for (var i = 0; i < emoji.length; i++) {
 	        emoji[i].code = self.escapeTerm(emoji[i].code);
 	        emoji[i].img_url = self.EC.cdn_url + '/' + size_code + '/' + self.escapeTerm(emoji[i].code) + '.png';
 	      }
@@ -12633,7 +12633,7 @@ var EmojidexClient =
 
 	        try {
 	          for (var _iterator = targets[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	            target = _step.value;
+	            var target = _step.value;
 
 	            var snip = '' + target;
 	            self.EC.Search.find(self.EC.Data.moji_codes.moji_index[snip]).then(function (result) {
@@ -12693,7 +12693,7 @@ var EmojidexClient =
 
 	        try {
 	          var _loop = function _loop() {
-	            target = _step2.value;
+	            var target = _step2.value;
 
 	            var snip = '' + target;
 	            self.EC.Search.find(self.EC.Util.unEncapsulateCode(snip)).then(function (result) {
@@ -12713,7 +12713,7 @@ var EmojidexClient =
 
 	                try {
 	                  for (var _iterator3 = replacements[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-	                    replacement = _step3.value;
+	                    var replacement = _step3.value;
 
 	                    source = source.replace(replacement.pre, replacement.post);
 	                  }
@@ -12817,7 +12817,7 @@ var EmojidexClient =
 
 	      try {
 	        for (var _iterator4 = targets[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-	          target = _step4.value;
+	          var target = _step4.value;
 
 	          if (mojify) {
 	            var moji_code = target.match(self.emoji_moji_tag_attr_pattern);
@@ -12861,7 +12861,7 @@ var EmojidexClient =
 
 	      try {
 	        for (var _iterator5 = targets[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-	          target = _step5.value;
+	          var target = _step5.value;
 
 	          if (mojify) {
 	            var moji_code = target.match(self.emoji_moji_tag_attr_pattern);
