@@ -104,7 +104,7 @@ describe('EmojidexUser', function() {
         expect(history_info.history.length).toBeTruthy();
         done();
       })
-    
+
     );
 
     it('all', done =>

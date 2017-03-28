@@ -1,5 +1,7 @@
-class EmojidexDataStorage {
-  constructor(hub_path = 'https://www.emojidex.com/hub/0.8.2') {
+import CrossStorageClient from '../../../../node_modules/cross-storage/dist/client'
+
+export default class EmojidexDataStorage {
+  constructor(hub_path = 'https://www.emojidex.com/hub/1.0.0') {
     this.hub = new CrossStorageClient(hub_path,
       {frameId: 'emojidex-client-storage-hub'});
     this.hub_cache = {};
@@ -52,6 +54,9 @@ class EmojidexDataStorage {
     if (query.length) {
       for (let i = 0; i < query.length; i++) {
         let q = query[i];
+        if (cache[q] === undefined ) {
+          return null;
+        }
         cache = cache[q];
       }
     }
@@ -64,7 +69,7 @@ class EmojidexDataStorage {
       if (update) {
         let new_data = {};
         new_data[first_query] = data;
-        return this.hub.set(first_query, new_data);
+        return this.hub.set(first_query, JSON.stringify(new_data));
       } else {
         return this.hub.set(first_query, this._get_chained_data(query, data));
       }
@@ -88,10 +93,11 @@ class EmojidexDataStorage {
       return this.hub.get(keys);
     }
     ).then(hub_data => {
+      let data = $.parseJSON(hub_data);
       if (key) {
-        return this.hub_cache[key] = hub_data[key];
+        return this.hub_cache[key] = data[key];
       } else {
-        return this.hub_cache = hub_data;
+        return this.hub_cache = data;
       }
     }
     );

@@ -1,4 +1,4 @@
-class EmojidexCategories {
+export default class EmojidexCategories {
   constructor(EC) {
     this.EC = EC;
     this._categories = this.EC.Data.categories();
@@ -36,14 +36,14 @@ class EmojidexCategories {
         this.cur_page = response.meta.page;
         this.count = response.meta.count;
         return this.EC.Emoji.combine(response.emoji).then(() => {
-          return __guardFunc__(callback, f => f(response.emoji, {
-            category_name,
-            callback,
-            param
+          if (typeof callback === 'function') {
+            return callback(response.emoji, {
+              category_name: category_name,
+              callback: callback,
+              param: param
+            })
           }
-          ));
-        }
-        );
+        });
       }
     });
   }
@@ -67,12 +67,11 @@ class EmojidexCategories {
 
   // Gets the full list of caetgories available
   sync(callback, locale) {
-    if (__guard__(this._categories, x => x.length) != null) {
+    if (typeof this._categories !== 'undefined' && typeof this._categories.length !== 'undefined') {
       return new Promise((resolve, reject) => {
-        __guardFunc__(callback, f => f(this._categories));
+        if (typeof callback === 'function') { callback(this._categories); }
         return resolve();
-      }
-      );
+      });
     } else {
       if (typeof locale === 'undefined' || locale === null) { ({ locale } = this.EC); }
       return $.ajax({
@@ -84,17 +83,15 @@ class EmojidexCategories {
       }).then(response => {
         this._categories = response.categories;
         return this.EC.Data.categories(response.categories).then(() => {
-          return __guardFunc__(callback, f => f(this._categories));
-        }
-        );
-      }
-      );
+          if (typeof callback === 'function') { callback(this._categories); }
+        });
+      });
     }
   }
 
   all(callback) {
     if (this._categories != null) {
-      return __guardFunc__(callback, f => f(this._categories));
+      if (typeof callback === 'function') { callback(this._categories); }
     } else {
       return setTimeout((() => {
         return this.all(callback);
@@ -102,11 +99,4 @@ class EmojidexCategories {
       ), 500);
     }
   }
-}
-
-function __guardFunc__(func, transform) {
-  return typeof func === 'function' ? transform(func) : undefined;
-}
-function __guard__(value, transform) {
-  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
 }

@@ -1,4 +1,4 @@
-class EmojidexUserFavorites {
+export default class EmojidexUserFavorites {
   constructor(EC, token) {
     this.EC = EC;
     this.token = token;
@@ -23,7 +23,7 @@ class EmojidexUserFavorites {
       success: response => {
         this._favorites = response;
         this.EC.Data.favorites(response);
-        return __guardFunc__(callback, f => f(this._favorites));
+        if (typeof callback === 'function') { callback(this._favorites); }
       }
     };
     return this._favoritesAPI(options);
@@ -64,7 +64,7 @@ class EmojidexUserFavorites {
 
   all(callback) {
     if (this._favorites != null) {
-      __guardFunc__(callback, f => f(this._favorites));
+      if (typeof callback === 'function') { callback(this._favorites); }
     } else {
       setTimeout((() => {
         return this.all(callback);
@@ -73,8 +73,4 @@ class EmojidexUserFavorites {
     }
     return this._favorites;
   }
-}
-
-function __guardFunc__(func, transform) {
-  return typeof func === 'function' ? transform(func) : undefined;
 }

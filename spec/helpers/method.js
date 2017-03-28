@@ -1,6 +1,8 @@
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
 
-let hub_path = 'https://www.emojidex.com/hub/0.8.2';
+this.EC_spec = null;
+
+let hub_path = 'https://www.emojidex.com/hub/1.0.0';
 let helperChains = function(chains_data) {
   if (chains_data.functions.length === 0) {
     chains_data.end();
@@ -9,6 +11,7 @@ let helperChains = function(chains_data) {
     chain_function(chains_data);
   }
 };
+this.helperChains = helperChains;
 
 let helperBefore = function(chains_data) {
   this.EC_spec = new EmojidexClient({
@@ -20,6 +23,7 @@ let helperBefore = function(chains_data) {
     }
   });
 };
+this.helperBefore = helperBefore;
 
 let clearStorage = function(chains_data) {
   let CSC = new CrossStorageClient(hub_path,
@@ -27,18 +31,19 @@ let clearStorage = function(chains_data) {
   CSC.onConnect().then(() => {
     CSC.clear();
     helperChains(chains_data);
-  }
-  );
+  });
 };
+this.clearStorage = clearStorage;
 
 let helperBeforeForEmojidexData = function(chains_data) {
   this.EC_spec = new EmojidexClient({
     storageHubPath: hub_path,
-    onReady(EC) {
+    onReady: EC => {
       helperChains(chains_data);
     }
   });
 };
+this.helperBeforeForEmojidexData = helperBeforeForEmojidexData;
 
 let getExtendedEmojiData = chains_data =>
   $.ajax({
@@ -48,8 +53,7 @@ let getExtendedEmojiData = chains_data =>
       this.emoji_emojidex = response;
       helperChains(chains_data);
     }
-  })
-;
+  });
 
 let getFacesEmoji = chains_data =>
   $.ajax({
@@ -62,14 +66,12 @@ let getFacesEmoji = chains_data =>
       this.faces_emoji = response.emoji;
       helperChains(chains_data);
     }
-  })
-;
+  });
 
 let setPremiumUser = function(chains_data) {
   this.EC_spec.User.setAuth(premium_user_info.auth_user, premium_user_info.auth_token).then(() => {
     helperChains(chains_data);
-  }
-  );
+  });
 };
 
 let spec_timer = function(option) {

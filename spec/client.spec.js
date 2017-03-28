@@ -6,6 +6,7 @@ describe('EmojidexClient', function() {
     })
   );
 
-  it('has the EmojidexClient class defined', () => expect(EC_spec).toBeDefined()
-  );
+  it('has the EmojidexClient class defined', () => {
+    expect(EC_spec).toBeDefined()
+  });
 });

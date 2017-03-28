@@ -1,4 +1,6 @@
-class EmojidexData {
+import EmojidexDataStorage from './data/_storage'
+
+export default class EmojidexData {
   constructor(EC, options) {
     this.EC = EC;
     this.options = options;
@@ -19,9 +21,7 @@ class EmojidexData {
       this.storage = new EmojidexDataStorage();
     }
 
-    return this.storage.hub.onReadyFrame().then( () => {
-      return this.storage.hub.onConnect();
-    }).then( () => {
+    return this.storage.hub.onConnect().then( () => {
       return this.storage.hub.getKeys();
     }).then(keys => {
       if (keys.indexOf('emojidex') !== -1) {
@@ -38,13 +38,13 @@ class EmojidexData {
           favorites: this.EC.options.favorites || [],
           categories: this.EC.options.categories || [],
           auth_info: this.EC.options.auth_info || this._def_auth_info
-        })
+        });
       }
     }).then(data => {
       if(this._needUpdate()) {
-        return this._initMojiCodes()
+        return this._initMojiCodes();
       } else {
-        return this.storage.get('emojidex')
+        return this.storage.get('emojidex');
       }
     }).then(data => {
       this.moji_codes = this.storage.get('emojidex.moji_codes');
@@ -69,18 +69,19 @@ class EmojidexData {
       updated = new Date(this.storage.get('emojidex.utfInfoUpdated'));
       // ２週間に一度更新する
       if(current - updated >= 3600000 * 24 * 14) {
-        return true
+        return true;
       } else {
-        return false
+        return false;
       }
     } else {
-      return true
+      return true;
     }
   }
 
   emoji(emoji_set) {
     if (emoji_set != null) {
-      if (this.storage.hub_cache.emojidex.emoji.length > 0) {
+      if (this.storage.hub_cache.emojidex.emoji != null &&
+          this.storage.hub_cache.emojidex.emoji.length > 0) {
         let hub_emoji = this.storage.hub_cache.emojidex.emoji;
         for (let i = 0; i < emoji_set.length; i++) {
           let new_emoji = emoji_set[i];

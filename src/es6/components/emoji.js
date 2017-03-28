@@ -1,4 +1,4 @@
-class EmojidexEmoji {
+export default class EmojidexEmoji {
   constructor(EC) {
     this.combine = this.combine.bind(this);
     this.EC = EC;
@@ -42,28 +42,28 @@ class EmojidexEmoji {
   // internal collection search
   search(term, callback) {
     let results = (this._emoji().filter((moji) => moji.code.match(term)).map((moji) => moji));
-    __guardFunc__(callback, f => f(results));
+    if (typeof callback === 'function') { callback(results); }
     return results;
   }
 
   // internal collection search (starting with)
   starting(term, callback) {
     let results = (this._emoji().filter((moji) => moji.code.match(`^${term}`)).map((moji) => moji));
-    __guardFunc__(callback, f => f(results));
+    if (typeof callback === 'function') { callback(results); }
     return results;
   }
 
   // internal collection search (starting with)
   ending(term, callback) {
     let results = (this._emoji().filter((moji) => moji.code.match(term + '$')).map((moji) => moji));
-    __guardFunc__(callback, f => f(results));
+    if (typeof callback === 'function') { callback(results); }
     return results;
   }
 
   // search for emoji with the given tags
   tags(tags, opts) {
     tags = this.EC.Util.breakout(tags);
-    let selection = __guard__(opts, x => x.selection) || this._emoji();
+    let selection = (typeof opts !== 'undefined' && typeof opts.selection !== 'undefined') ? opts.selection : this._emoji();
     let collect = [];
     for (let i = 0; i < tags.length; i++) {
       let tag = tags[i];
@@ -75,7 +75,7 @@ class EmojidexEmoji {
   // gets emoji in any of the given categories
   categories(categories, opts) {
     categories = this.EC.Util.breakout(categories);
-    let source = __guard__(opts, x => x.selection) || this._emoji();
+    let source = (typeof opts !== 'undefined' && typeof opts.selection !== 'undefined') ? opts.selection : this._emoji();
     let collect = [];
     for (let i = 0; i < categories.length; i++) {
       let category = categories[i];
@@ -106,11 +106,4 @@ class EmojidexEmoji {
     this._emoji_instance = [];
     return this.EC.Data.storage._remove('emojidex.emoji');
   }
-}
-
-function __guardFunc__(func, transform) {
-  return typeof func === 'function' ? transform(func) : undefined;
-}
-function __guard__(value, transform) {
-  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
 }
