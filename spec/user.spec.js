@@ -66,21 +66,51 @@ describe('EmojidexUser', function() {
   describe('Favorites', function() {
     it('get', done =>
       EC_spec.User.Favorites.get(function(favorites) {
-        expect(favorites.emoji).toContain(
+        expect(favorites).toContain(
           jasmine.objectContaining(emoji_emoji)
         );
         done();
       })
     );
 
-    it('all', done =>
-      EC_spec.User.Favorites.all(function(favorites) {
-        expect(favorites.emoji).toContain(
-          jasmine.objectContaining(emoji_emoji)
-        );
-        done();
-      })
-    );
+    it('all', done => {
+      setTimeout(() => {  // Favorites.sync()が終わっていない時があるので
+        EC_spec.User.Favorites.all(favorites => {
+          expect(favorites).toContain(
+            jasmine.objectContaining(emoji_emoji)
+          );
+          done();
+        })
+      }, 2000);
+    });
+
+    describe('Favorites pages [require premium user]', function() {
+      if (typeof premium_user_info === 'undefined' || premium_user_info === null) { pending(); }
+      beforeEach(done =>
+        helperChains({
+          functions: [clearStorage, helperBeforeForPremiumUser],
+          end: done
+        })
+      );
+
+      it('next', done => {
+        EC_spec.limit = 5;
+        EC_spec.User.Favorites.next(favorites => {
+          expect(EC_spec.User.Favorites.cur_page).toEqual(2);
+          done();
+        });
+      });
+
+      it('prev', done => {
+        EC_spec.limit = 5;
+        EC_spec.User.Favorites.next(favorites => {
+          EC_spec.User.Favorites.prev(favorites => {
+            expect(EC_spec.User.Favorites.cur_page).toEqual(1);
+            done();
+          });
+        });
+      });
+    });
   });
 
     // it 'set_favorites', (done) ->
@@ -100,18 +130,47 @@ describe('EmojidexUser', function() {
 
   describe('History', function() {
     it('get', done =>
-      EC_spec.User.History.get(function(history_info) {
-        expect(history_info.history.length).toBeTruthy();
-        done();
-      })
-
-    );
-
-    it('all', done =>
-      EC_spec.User.History.all(function(history_data) {
-        expect(history_data.history.length).toBeTruthy();
+      EC_spec.User.History.get(history => {
+        expect(history.length).toBeTruthy();
         done();
       })
     );
+
+    it('all', done => {
+      setTimeout(() => {  // History.sync()が終わっていない時があるので
+        EC_spec.User.History.all(history => {
+          expect(history.length).toBeTruthy();
+          done();
+        })
+      }, 2000);
+    });
+
+    describe('History pages [require premium user]', function() {
+      if (typeof premium_user_info === 'undefined' || premium_user_info === null) { pending(); }
+      beforeEach(done =>
+        helperChains({
+          functions: [clearStorage, helperBeforeForPremiumUser],
+          end: done
+        })
+      );
+
+      it('next', done => {
+        EC_spec.limit = 5;
+        EC_spec.User.History.next(history => {
+          expect(EC_spec.User.History.cur_page).toEqual(2);
+          done();
+        });
+      });
+
+      it('prev', done => {
+        EC_spec.limit = 5;
+        EC_spec.User.History.next(history => {
+          EC_spec.User.History.prev(history => {
+            expect(EC_spec.User.History.cur_page).toEqual(1);
+            done();
+          });
+        });
+      });
+    });
   });
 });

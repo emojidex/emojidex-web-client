@@ -57,7 +57,7 @@ export default class EmojidexUtil {
 
   // Converts an emoji array to [{code: "moji_code", img_url: "https://cdn...moji_code.png}] format
   simplify(emoji = self.results, size_code = self.EC.size_code) {
-    for (i = 0; i < emoji.length; i++) {
+    for (let i = 0; i < emoji.length; i++) {
       emoji[i].code = self.escapeTerm(emoji[i].code);
       emoji[i].img_url = `${self.EC.cdn_url}/${size_code}/${self.escapeTerm(emoji[i].code)}.png`;
     }
@@ -86,7 +86,7 @@ export default class EmojidexUtil {
       let count = targets.length;
       let replacements = [];
 
-      for (target of targets) {
+      for (let target of targets) {
         let snip = `${target}`;
         self.EC.Search.find(self.EC.Data.moji_codes.moji_index[snip]).then((result) => {
           if (result.hasOwnProperty('code')) {
@@ -118,7 +118,7 @@ export default class EmojidexUtil {
       let count = targets.length;
       let replacements = [];
 
-      for (target of targets) {
+      for (let target of targets) {
         let snip = `${target}`;
         self.EC.Search.find(self.EC.Util.unEncapsulateCode(snip)).then((result) => {
           if (result.hasOwnProperty('code')) {
@@ -131,7 +131,7 @@ export default class EmojidexUtil {
           count -= 1;
         }).then(() => {
           if(count == 0) {
-            for (replacement of replacements) {
+            for (let replacement of replacements) {
               source = source.replace(replacement.pre, replacement.post);
             }
             resolve(source);
@@ -177,7 +177,7 @@ export default class EmojidexUtil {
     if (targets == null)
       return source;
 
-    for (target of targets) {
+    for (let target of targets) {
       if (mojify) {
         let moji_code = target.match(self.emoji_moji_tag_attr_pattern);
         if (moji_code != null && moji_code.length != 1) {
@@ -198,7 +198,7 @@ export default class EmojidexUtil {
     if (targets == null)
       return source;
 
-    for (target of targets) {
+    for (let target of targets) {
       if (mojify) {
         let moji_code = target.match(self.emoji_moji_tag_attr_pattern);
         if (moji_code != null && moji_code.length != 1) {

@@ -3,6 +3,8 @@ export default class EmojidexUserHistory {
     this.EC = EC;
     this.token = token;
     this._history = this.EC.Data.history();
+    this.cur_page = 1;
+    this.max_page = undefined;
   }
 
   _historyAPI(options) {
@@ -15,15 +17,22 @@ export default class EmojidexUserHistory {
     }
   }
 
-  get(callback) {
+  get(callback, page = 1) {
     let options = {
       data: {
+        page: page,
+        limit: this.EC.limit,
+        detailed: this.EC.detailed,
         auth_token: this.token
       },
       success: response => {
-        this._history = response;
-        this.EC.Data.history(response);
-        if (typeof callback === 'function') { callback(this._history); }
+        this._history = response.history
+        this.meta = response.meta;
+        this.cur_page = response.meta.page;
+        this.max_page = Math.ceil(response.total_count / this.EC.limit);
+        this.EC.Data.history(response.history).then(data => {
+          if (typeof callback === 'function') { callback(this._history); }
+        });
       }
     };
     return this._historyAPI(options);
@@ -55,14 +64,22 @@ export default class EmojidexUserHistory {
   }
 
   all(callback) {
-    if (this._history != null) {
-      if (typeof callback === 'function') { callback(this._history); }
-    } else {
-      setTimeout((() => {
-        return this.all(callback);
+    return this.EC.Data.history().then(data => {
+      if (typeof callback === 'function') {
+        callback(data);
+      } else {
+        return data;
       }
-      ), 500);
-    }
-    return this._history;
+    });
+  }
+
+  next(callback) {
+    if (this.max_page === this.cur_page) return;
+    return this.get(callback, this.cur_page + 1);
+  }
+
+  prev(callback) {
+    if (this.cur_page === 1) return;
+    return this.get(callback, this.cur_page - 1);
   }
 }

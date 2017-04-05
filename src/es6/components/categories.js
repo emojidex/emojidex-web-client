@@ -38,9 +38,9 @@ export default class EmojidexCategories {
         return this.EC.Emoji.combine(response.emoji).then(() => {
           if (typeof callback === 'function') {
             return callback(response.emoji, {
-              category_name: category_name,
-              callback: callback,
-              param: param
+              category_name,
+              callback,
+              param
             })
           }
         });

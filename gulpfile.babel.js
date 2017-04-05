@@ -86,10 +86,21 @@ gulp.task('copy', function () {
 
 gulp.task('env', () => {
   fs.stat('.env', (err, stat) => {
-    if (err == null) {
-      return gulp.src('.env')
-        .pipe(rename('authinfo.js'))
-        .pipe(gulp.dest('tmp'));
+    if (err === null) {
+      require('dotenv').config();
+      let output = `
+        this.user_info = {
+          auth_user: '${process.env.USERNAME}',
+          email: '${process.env.EMAIL}',
+          password: '${process.env.PASSWORD}',
+          auth_token: '${process.env.AUTH_TOKEN}'
+        };
+        this.premium_user_info = {
+          auth_user: '${process.env.USERNAME}',
+          auth_token: '${process.env.AUTH_TOKEN}'
+        };
+      `;
+      fs.writeFileSync('tmp/authinfo.js', output);
     }
   });
 });
