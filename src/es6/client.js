@@ -66,7 +66,7 @@ if (!global._babelPolyfill) {
         this.Indexes = new EmojidexIndexes(this);
         this.Search = new EmojidexSearch(this);
         this.Emoji = new EmojidexEmoji(this);
-        this.Categories = new EmojidexCategories(this);
+        return this.Categories = new EmojidexCategories(this);
       }).then(() => {
         this.options.onReady(this);
       });

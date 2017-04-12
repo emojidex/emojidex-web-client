@@ -4,8 +4,7 @@ export default class EmojidexCategories {
     this._categories = this.EC.Data.categories();
     return this.sync().then(() => {
       return this.EC.Categories = this;
-    }
-    );
+    });
   }
 
   _categoriesAPI(category_name, callback, opts, called_func) {
