@@ -10596,7 +10596,9 @@ var EmojidexClient =
 	      this.storage = new _storage2.default();
 	    }
 
-	    return this.storage.hub.onConnect().then(function () {
+	    return this.storage.hub.onReadyFrame().then(function () {
+	      return _this.storage.hub.onConnect();
+	    }).then(function () {
 	      return _this.storage.hub.getKeys();
 	    }).then(function (keys) {
 	      if (keys.indexOf('emojidex') !== -1) {

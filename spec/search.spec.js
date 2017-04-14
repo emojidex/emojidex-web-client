@@ -14,8 +14,8 @@ describe('EmojidexSearch', function() {
   );
 
   it('starting', done =>
-    EC_spec.Search.starting('kiss', function(emoji_data) {
-      expect(emoji_data).toContain(jasmine.objectContaining(emoji_kiss));
+    EC_spec.Search.starting('kissing', function(emoji_data) {
+      expect(emoji_data).toContain(jasmine.objectContaining(emoji_kissing));
       done();
     })
   );
