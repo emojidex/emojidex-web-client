@@ -166,7 +166,7 @@ export default class EmojidexData {
 
   categories(categories_set) {
     if (categories_set != null) { return this.storage.update('emojidex', {categories: categories_set}); }
-    return this.storage.hub_cache.categories;
+    return this.storage.hub_cache.emojidex.categories;
   }
 
   auth_info(auth_info_set) {
@@ -174,6 +174,6 @@ export default class EmojidexData {
       this.EC.User.auth_info = auth_info_set;
       return this.storage.update('emojidex', {auth_info: auth_info_set});
     }
-    return this.storage.hub_cache.auth_info;
+    return this.storage.hub_cache.emojidex.auth_info;
   }
 }
