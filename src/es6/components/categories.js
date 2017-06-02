@@ -70,7 +70,7 @@ export default class EmojidexCategories {
     if (typeof locale === 'undefined' || locale === null) {
       locale = this.locale;
     }
-    if (typeof this._categories !== 'undefined' && typeof this._categories.length !== 'undefined') {
+    if (typeof this._categories !== 'undefined' && typeof this._categories.length !== 'undefined' && this._categories.length != 0) {
       if(this.locale === locale) {
         return new Promise((resolve, reject) => {
           if (typeof callback === 'function') { callback(this._categories); }

@@ -16,7 +16,6 @@ export default class EmojidexUser {
         typeof this.EC.Data.storage.hub_cache.emojidex !== 'undefined' &&
         typeof this.EC.Data.storage.hub_cache.emojidex.auth_info !== 'undefined' &&
         this.EC.Data.storage.hub_cache.emojidex.auth_info.status === 'verified') {
-      this.auth_info = this.EC.Data.storage.hub_cache.emojidex.auth_info;
       return this.syncUserData();
     }
   }
@@ -36,10 +35,10 @@ export default class EmojidexUser {
       case 'basic':
         return this.basicAuth(params.user, params.password, params.callback);
       case 'session':
-      if (typeof this.EC.Data.storage.hub_cache !== 'undefined' &&
-          typeof this.EC.Data.storage.hub_cache.emojidex !== 'undefined' &&
-          typeof this.EC.Data.storage.hub_cache.emojidex.auth_info !== 'undefined' &&
-          this.EC.Data.storage.hub_cache.emojidex.auth_info.status === 'verified') {
+        if (typeof this.EC.Data.storage.hub_cache !== 'undefined' &&
+            typeof this.EC.Data.storage.hub_cache.emojidex !== 'undefined' &&
+            typeof this.EC.Data.storage.hub_cache.emojidex.auth_info !== 'undefined' &&
+            this.EC.Data.storage.hub_cache.emojidex.auth_info.status === 'verified') {
           return this.auth_info = this.EC.Data.storage.hub_cache.emojidex.auth_info;
         }
       default:
@@ -127,7 +126,6 @@ export default class EmojidexUser {
       pro,
       pro_exp
     }).then(data => {
-      this.auth_info = this.EC.Data.storage.get('emojidex.auth_info');
       this.syncUserData();
       return data;
     });
@@ -145,13 +143,13 @@ export default class EmojidexUser {
       pro: response.pro,
       pro_exp: response.pro_exp
     }).then(data=> {
-      this.auth_info = this.EC.Data.storage.get('emojidex.auth_info');
       this.syncUserData();
       return data;
     });
   }
 
   syncUserData() {
+    this.auth_info = this.EC.Data.storage.get('emojidex.auth_info');
     this.History.token = this.Favorites.token = this.auth_info.token;
     this.Favorites.sync();
     this.History.sync();
