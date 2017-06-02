@@ -66,7 +66,7 @@ export default class EmojidexCategories {
 
   // Gets the full list of caetgories available
   sync(callback, locale) {
-    if (typeof this._categories !== 'undefined' && typeof this._categories.length !== 'undefined') {
+    if (typeof this._categories !== 'undefined' && typeof this._categories.length !== 'undefined' && this._categories.length != 0) {
       return new Promise((resolve, reject) => {
         if (typeof callback === 'function') { callback(this._categories); }
         return resolve();
