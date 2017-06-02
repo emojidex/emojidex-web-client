@@ -1,5 +1,5 @@
 /**
-,* emojidex client - v0.14.1
+,* emojidex client - v0.14.2
 ,* * Provides search, index caching and combining and asset URI resolution
 ,* https://github.com/emojidex/emojidex-web-client
 ,*
@@ -10422,7 +10422,8 @@ var EmojidexClient =
 
 	    this.EC = EC;
 	    this._categories = this.EC.Data.categories();
-	    return this.sync().then(function () {
+	    this.local = this.EC.options.locale;
+	    return this.sync(null, this.locale).then(function () {
 	      return _this.EC.Categories = _this;
 	    });
 	  }
@@ -10501,37 +10502,51 @@ var EmojidexClient =
 	    value: function sync(callback, locale) {
 	      var _this3 = this;
 
-	      if (typeof this._categories !== 'undefined' && typeof this._categories.length !== 'undefined') {
-	        return new Promise(function (resolve, reject) {
-	          if (typeof callback === 'function') {
-	            callback(_this3._categories);
-	          }
-	          return resolve();
-	        });
+	      if (typeof locale === 'undefined' || locale === null) {
+	        locale = this.locale;
+	      }
+	      if (typeof this._categories !== 'undefined' && typeof this._categories.length !== 'undefined' && this._categories.length != 0) {
+	        if (this.locale === locale) {
+	          return new Promise(function (resolve, reject) {
+	            if (typeof callback === 'function') {
+	              callback(_this3._categories);
+	            }
+	            return resolve();
+	          });
+	        } else {
+	          return this._get_category(callback, locale);
+	        }
 	      } else {
 	        if (typeof locale === 'undefined' || locale === null) {
 	          locale = this.EC.locale;
 	        }
-	        return $.ajax({
-	          url: this.EC.api_url + 'categories',
-	          dataType: 'json',
-	          data: {
-	            locale: locale
-	          }
-	        }).then(function (response) {
-	          _this3._categories = response.categories;
-	          return _this3.EC.Data.categories(response.categories).then(function () {
-	            if (typeof callback === 'function') {
-	              callback(_this3._categories);
-	            }
-	          });
-	        });
+	        return this._get_category(callback, locale);
 	      }
+	    }
+	  }, {
+	    key: '_get_category',
+	    value: function _get_category(callback, locale) {
+	      var _this4 = this;
+
+	      return $.ajax({
+	        url: this.EC.api_url + 'categories',
+	        dataType: 'json',
+	        data: {
+	          locale: locale
+	        }
+	      }).then(function (response) {
+	        _this4._categories = response.categories;
+	        return _this4.EC.Data.categories(response.categories).then(function () {
+	          if (typeof callback === 'function') {
+	            callback(_this4._categories);
+	          }
+	        });
+	      });
 	    }
 	  }, {
 	    key: 'all',
 	    value: function all(callback) {
-	      var _this4 = this;
+	      var _this5 = this;
 
 	      if (this._categories != null) {
 	        if (typeof callback === 'function') {
@@ -10539,7 +10554,7 @@ var EmojidexClient =
 	        }
 	      } else {
 	        return setTimeout(function () {
-	          return _this4.all(callback);
+	          return _this5.all(callback);
 	        }, 500);
 	      }
 	    }
@@ -10763,7 +10778,7 @@ var EmojidexClient =
 	      if (categories_set != null) {
 	        return this.storage.update('emojidex', { categories: categories_set });
 	      }
-	      return this.storage.hub_cache.categories;
+	      return this.storage.hub_cache.emojidex.categories;
 	    }
 	  }, {
 	    key: 'auth_info',
@@ -10772,7 +10787,7 @@ var EmojidexClient =
 	        this.EC.User.auth_info = auth_info_set;
 	        return this.storage.update('emojidex', { auth_info: auth_info_set });
 	      }
-	      return this.storage.hub_cache.auth_info;
+	      return this.storage.hub_cache.emojidex.auth_info;
 	    }
 	  }]);
 
@@ -12091,7 +12106,6 @@ var EmojidexClient =
 	    key: '_autoLogin',
 	    value: function _autoLogin() {
 	      if (typeof this.EC.Data.storage.hub_cache !== 'undefined' && typeof this.EC.Data.storage.hub_cache.emojidex !== 'undefined' && typeof this.EC.Data.storage.hub_cache.emojidex.auth_info !== 'undefined' && this.EC.Data.storage.hub_cache.emojidex.auth_info.status === 'verified') {
-	        this.auth_info = this.EC.Data.storage.hub_cache.emojidex.auth_info;
 	        return this.syncUserData();
 	      }
 	    }
@@ -12226,7 +12240,6 @@ var EmojidexClient =
 	        pro: pro,
 	        pro_exp: pro_exp
 	      }).then(function (data) {
-	        _this2.auth_info = _this2.EC.Data.storage.get('emojidex.auth_info');
 	        _this2.syncUserData();
 	        return data;
 	      });
@@ -12249,7 +12262,6 @@ var EmojidexClient =
 	        pro: response.pro,
 	        pro_exp: response.pro_exp
 	      }).then(function (data) {
-	        _this3.auth_info = _this3.EC.Data.storage.get('emojidex.auth_info');
 	        _this3.syncUserData();
 	        return data;
 	      });
@@ -12257,6 +12269,7 @@ var EmojidexClient =
 	  }, {
 	    key: 'syncUserData',
 	    value: function syncUserData() {
+	      this.auth_info = this.EC.Data.storage.get('emojidex.auth_info');
 	      this.History.token = this.Favorites.token = this.auth_info.token;
 	      this.Favorites.sync();
 	      this.History.sync();
