@@ -2,7 +2,8 @@ export default class EmojidexCategories {
   constructor(EC) {
     this.EC = EC;
     this._categories = this.EC.Data.categories();
-    return this.sync().then(() => {
+    this.local = this.EC.options.locale
+    return this.sync(null, this.locale).then(() => {
       return this.EC.Categories = this;
     });
   }
@@ -66,26 +67,37 @@ export default class EmojidexCategories {
 
   // Gets the full list of caetgories available
   sync(callback, locale) {
+    if (typeof locale === 'undefined' || locale === null) {
+      locale = this.locale;
+    }
     if (typeof this._categories !== 'undefined' && typeof this._categories.length !== 'undefined' && this._categories.length != 0) {
-      return new Promise((resolve, reject) => {
-        if (typeof callback === 'function') { callback(this._categories); }
-        return resolve();
-      });
+      if(this.locale === locale) {
+        return new Promise((resolve, reject) => {
+          if (typeof callback === 'function') { callback(this._categories); }
+          return resolve();
+        });
+      } else {
+        return this._get_category(callback, locale);
+      }
     } else {
       if (typeof locale === 'undefined' || locale === null) { ({ locale } = this.EC); }
-      return $.ajax({
-        url: this.EC.api_url + 'categories',
-        dataType: 'json',
-        data: {
-          locale
-        }
-      }).then(response => {
-        this._categories = response.categories;
-        return this.EC.Data.categories(response.categories).then(() => {
-          if (typeof callback === 'function') { callback(this._categories); }
-        });
-      });
+      return this._get_category(callback, locale);
     }
+  }
+
+  _get_category(callback, locale) {
+    return $.ajax({
+      url: this.EC.api_url + 'categories',
+      dataType: 'json',
+      data: {
+        locale
+      }
+    }).then(response => {
+      this._categories = response.categories;
+      return this.EC.Data.categories(response.categories).then(() => {
+        if (typeof callback === 'function') { callback(this._categories); }
+      });
+    });
   }
 
   all(callback) {
