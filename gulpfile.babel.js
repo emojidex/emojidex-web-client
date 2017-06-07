@@ -12,6 +12,7 @@ import copy from 'gulp-copy';
 import eslint from 'gulp-eslint';
 import jasmine from 'gulp-jasmine-browser';
 import webpack from 'webpack-stream';
+import path from 'path';
 import watch from 'gulp-watch';
 import fs from 'fs';
 
@@ -49,6 +50,9 @@ gulp.task('webpack', function () {
             loader: 'babel-loader'
           }
         ]
+      },
+      resolveLoader: {
+        root: path.join(__dirname, 'node_modules')
       },
       plugins: [
         new webpack_p.ProvidePlugin({

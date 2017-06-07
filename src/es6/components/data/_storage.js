@@ -1,4 +1,4 @@
-import CrossStorageClient from '../../../../node_modules/cross-storage/dist/client'
+import { CrossStorageClient } from 'cross-storage'
 
 export default class EmojidexDataStorage {
   constructor(hub_path = 'https://www.emojidex.com/hub/1.0.0') {
