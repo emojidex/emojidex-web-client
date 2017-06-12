@@ -38,9 +38,10 @@ let helperBeforeForPremiumUser = function(chains_data) {
 this.helperBeforeForPremiumUser = helperBeforeForPremiumUser;
 
 let clearStorage = function(chains_data) {
-  let CSC = new CrossStorageClient(hub_path,
-    {frameId: 'emojidex-client-storage-hub'});
-  CSC.onConnect().then(() => {
+  let CSC = new CrossStorageClient(hub_path, {frameId: 'emojidex-client-storage-hub'});
+  CSC.onReadyFrame().then(() => {
+    return CSC.onConnect();
+  }).then(() => {
     CSC.clear();
     helperChains(chains_data);
   });
