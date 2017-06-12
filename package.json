@@ -47,5 +47,8 @@
   },
   "scripts": {
     "test": "gulp && gulp jasmine"
+  },
+  "dependencies": {
+    "fs-extra": "^3.0.1"
   }
 }

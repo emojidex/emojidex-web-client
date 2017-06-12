@@ -14,7 +14,7 @@ import jasmine from 'gulp-jasmine-browser';
 import webpack from 'webpack-stream';
 import path from 'path';
 import watch from 'gulp-watch';
-import fs from 'fs';
+import fs from 'fs-extra';
 
 var banner = [
   '/**\n',
@@ -91,7 +91,11 @@ gulp.task('copy', function () {
 gulp.task('env', () => {
   fs.stat('.env', (err, stat) => {
     if (err === null) {
-      require('dotenv').config();
+      const dotenv = require('dotenv')
+      const envConfig = dotenv.parse(fs.readFileSync('.env'))
+      for (var k in envConfig) {
+        process.env[k] = envConfig[k]
+      }
       let output = `
         this.user_info = {
           auth_user: '${process.env.USERNAME}',
@@ -104,6 +108,7 @@ gulp.task('env', () => {
           auth_token: '${process.env.AUTH_TOKEN}'
         };
       `;
+      fs.ensureFileSync('tmp/authinfo.js');
       fs.writeFileSync('tmp/authinfo.js', output);
     }
   });
