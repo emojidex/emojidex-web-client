@@ -43,6 +43,7 @@ let clearStorage = function(chains_data) {
     return CSC.onConnect();
   }).then(() => {
     CSC.clear();
+  }).then(() => {
     helperChains(chains_data);
   });
 };
