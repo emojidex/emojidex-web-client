@@ -2,8 +2,8 @@ export default class EmojidexUserFollow {
   constructor(EC, token) {
     this.EC = EC;
     this.token = token;
-    this.following = undefined;
-    this.followers = undefined;
+    this.following = [];
+    this.followers = [];
   }
 
   _followAPI(options) {
@@ -35,11 +35,11 @@ export default class EmojidexUserFollow {
     let options = {
       url: this.EC.api_url + 'users/following',
       type: 'POST',
-      data: {
-        username: username
-      },
+      data: { username },
       success: response => {
-        this.following.push(response.username);
+        if (response.username !== undefined && response.username !== null) {
+          this.following.push(response.username);
+        }
         if (typeof callback === 'function') { callback(this.following); }
       }
     };
@@ -52,11 +52,11 @@ export default class EmojidexUserFollow {
     let options = {
       url: this.EC.api_url + 'users/following',
       type: 'DELETE',
-      data: {
-        username: username
-      },
+      data: { username },
       success: response => {
-        this.following.splice(this.following.indexOf(username), 1);
+        if (response.username !== undefined && response.username !== null) {
+          this.following.splice(this.following.indexOf(response.username), 1);
+        }
         if (typeof callback === 'function') { callback(this.following); }
       }
     };
