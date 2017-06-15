@@ -1,5 +1,6 @@
 import EmojidexUserFavorites from './user/favorites'
 import EmojidexUserHistory from './user/history'
+import EmojidexUserFollow from './user/follow'
 
 export default class EmojidexUser {
   constructor(EC) {
@@ -7,6 +8,7 @@ export default class EmojidexUser {
     this.auth_info = this.EC.Data._def_auth_info;
     this.History = new EmojidexUserHistory(this.EC);
     this.Favorites = new EmojidexUserFavorites(this.EC);
+    this.Follow = new EmojidexUserFollow(this.EC);
   }
     // @_auto_login()
 
@@ -150,8 +152,9 @@ export default class EmojidexUser {
 
   syncUserData() {
     this.auth_info = this.EC.Data.storage.get('emojidex.auth_info');
-    this.History.token = this.Favorites.token = this.auth_info.token;
+    this.Follow.token = this.History.token = this.Favorites.token = this.auth_info.token;
     this.Favorites.sync();
     this.History.sync();
+    if (this.auth_info.premium) { this.Follow.sync(); }
   }
 }

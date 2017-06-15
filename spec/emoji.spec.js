@@ -23,7 +23,7 @@ describe('EmojidexEmoji', function() {
   });
 
   it('seed', done =>
-    EC_spec.Indexes.static(['utf_emoji', 'extended_emoji'], 'en', emoji_data => {
+    EC_spec.Emoji.seed(emoji_data => {
       expect(EC_spec.Emoji._emoji_instance).toEqual(jasmine.arrayContaining([emoji_data[0], emoji_data[emoji_data.length - 1]]));
       done();
     })
