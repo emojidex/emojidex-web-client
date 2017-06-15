@@ -1,5 +1,5 @@
 /**
-,* emojidex client - v0.14.3
+,* emojidex client - v0.15.0
 ,* * Provides search, index caching and combining and asset URI resolution
 ,* https://github.com/emojidex/emojidex-web-client
 ,*
@@ -83,7 +83,7 @@ var EmojidexClient =
 
 	var _user2 = _interopRequireDefault(_user);
 
-	var _util = __webpack_require__(14);
+	var _util = __webpack_require__(15);
 
 	var _util2 = _interopRequireDefault(_util);
 
@@ -99,7 +99,7 @@ var EmojidexClient =
 	// Copyright 2013 the emojidex project / K.K. GenSouSha
 
 	if (!global._babelPolyfill) {
-	  __webpack_require__(15);
+	  __webpack_require__(16);
 	}
 
 	(function (root) {
@@ -11184,21 +11184,31 @@ var EmojidexClient =
 
 	  CrossStorageClient.prototype.onReadyFrame = function() {
 	    var client = this;
+	    var targetOrigin = (client._origin === 'file://') ? '*' : client._origin;
+
+	    var interval_poll = setInterval(function() {
+	      if (client._connected){
+	        return clearInterval(interval_poll);
+	      }
+	      if (!client._hub) {
+	        return;
+	      }
+
+	      client._hub.postMessage('cross-storage:poll', targetOrigin);
+	    }, 1000);
 
 	    return new this._promise(function(resolve, reject) {
 	      var timeout = setTimeout(function() {
 	        reject(new Error('CrossStorageClient could not ready frame'));
 	      }, client._timeout);
 
-	      var targetOrigin = (client._origin === 'file://') ? '*' : client._origin;
-	      var interval = setInterval(function() {
+	      var interval_hub = setInterval(function() {
 	        if (typeof client._hub !== "undefined" && client._hub !== null && Object.keys(client._hub).length) {
 	          clearTimeout(timeout);
-	          clearInterval(interval);
-	          client._hub.postMessage('cross-storage:poll', targetOrigin);
+	          clearInterval(interval_hub);
 	          resolve();
 	        }
-	      }, 100)
+	      }, 100);
 
 	    });
 	  };
@@ -12379,6 +12389,10 @@ var EmojidexClient =
 
 	var _history2 = _interopRequireDefault(_history);
 
+	var _follow = __webpack_require__(14);
+
+	var _follow2 = _interopRequireDefault(_follow);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -12391,6 +12405,7 @@ var EmojidexClient =
 	    this.auth_info = this.EC.Data._def_auth_info;
 	    this.History = new _history2.default(this.EC);
 	    this.Favorites = new _favorites2.default(this.EC);
+	    this.Follow = new _follow2.default(this.EC);
 	  }
 	  // @_auto_login()
 
@@ -12565,9 +12580,12 @@ var EmojidexClient =
 	    key: 'syncUserData',
 	    value: function syncUserData() {
 	      this.auth_info = this.EC.Data.storage.get('emojidex.auth_info');
-	      this.History.token = this.Favorites.token = this.auth_info.token;
+	      this.Follow.token = this.History.token = this.Favorites.token = this.auth_info.token;
 	      this.Favorites.sync();
 	      this.History.sync();
+	      if (this.auth_info.premium) {
+	        this.Follow.sync();
+	      }
 	    }
 	  }]);
 
@@ -12838,6 +12856,136 @@ var EmojidexClient =
 
 /***/ }),
 /* 14 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function($) {'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var EmojidexUserFollow = function () {
+	  function EmojidexUserFollow(EC, token) {
+	    _classCallCheck(this, EmojidexUserFollow);
+
+	    this.EC = EC;
+	    this.token = token;
+	    this.following = [];
+	    this.followers = [];
+	  }
+
+	  _createClass(EmojidexUserFollow, [{
+	    key: '_followAPI',
+	    value: function _followAPI(options) {
+	      if (this.token === null || this.token === undefined) return;
+
+	      var ajax_obj = {
+	        dataType: 'json',
+	        data: {
+	          auth_token: this.token
+	        }
+	      };
+	      return $.ajax($.extend(true, ajax_obj, options));
+	    }
+	  }, {
+	    key: 'getFollowing',
+	    value: function getFollowing(callback) {
+	      var _this = this;
+
+	      var options = {
+	        url: this.EC.api_url + 'users/following',
+	        success: function success(response) {
+	          _this.following = response.following;
+	          if (typeof callback === 'function') {
+	            callback(_this.following);
+	          }
+	        }
+	      };
+	      return this._followAPI(options);
+	    }
+	  }, {
+	    key: 'addFollowing',
+	    value: function addFollowing(username, callback) {
+	      var _this2 = this;
+
+	      if (username === null || username === undefined) return;
+
+	      var options = {
+	        url: this.EC.api_url + 'users/following',
+	        type: 'POST',
+	        data: { username: username },
+	        success: function success(response) {
+	          if (response.username !== undefined && response.username !== null) {
+	            _this2.following.push(response.username);
+	          }
+	          if (typeof callback === 'function') {
+	            callback(_this2.following);
+	          }
+	        }
+	      };
+	      return this._followAPI(options);
+	    }
+	  }, {
+	    key: 'deleteFollowing',
+	    value: function deleteFollowing(username, callback) {
+	      var _this3 = this;
+
+	      if (username === null || username === undefined) return;
+
+	      var options = {
+	        url: this.EC.api_url + 'users/following',
+	        type: 'DELETE',
+	        data: { username: username },
+	        success: function success(response) {
+	          if (response.username !== undefined && response.username !== null) {
+	            _this3.following.splice(_this3.following.indexOf(response.username), 1);
+	          }
+	          if (typeof callback === 'function') {
+	            callback(_this3.following);
+	          }
+	        }
+	      };
+	      return this._followAPI(options);
+	    }
+	  }, {
+	    key: 'getFollowers',
+	    value: function getFollowers(callback) {
+	      var _this4 = this;
+
+	      var options = {
+	        url: this.EC.api_url + 'users/followers',
+	        success: function success(response) {
+	          _this4.followers = response.followers;
+	          if (typeof callback === 'function') {
+	            callback(_this4.followers);
+	          }
+	        }
+	      };
+	      return this._followAPI(options);
+	    }
+	  }, {
+	    key: 'sync',
+	    value: function sync() {
+	      var _this5 = this;
+
+	      $.when(this.getFollowing(), this.getFollowers()).done(function () {
+	        return _this5;
+	      });
+	    }
+	  }]);
+
+	  return EmojidexUserFollow;
+	}();
+
+	exports.default = EmojidexUserFollow;
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+
+/***/ }),
+/* 15 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -13299,16 +13447,16 @@ var EmojidexClient =
 	exports.default = EmojidexUtil;
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {"use strict";
 
-	__webpack_require__(16);
-
-	__webpack_require__(307);
+	__webpack_require__(17);
 
 	__webpack_require__(308);
+
+	__webpack_require__(309);
 
 	if (global._babelPolyfill) {
 	  throw new Error("only one instance of babel-polyfill is allowed");
@@ -13333,16 +13481,15 @@ var EmojidexClient =
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	__webpack_require__(17);
-	__webpack_require__(66);
+	__webpack_require__(18);
 	__webpack_require__(67);
 	__webpack_require__(68);
 	__webpack_require__(69);
-	__webpack_require__(71);
-	__webpack_require__(74);
+	__webpack_require__(70);
+	__webpack_require__(72);
 	__webpack_require__(75);
 	__webpack_require__(76);
 	__webpack_require__(77);
@@ -13351,34 +13498,34 @@ var EmojidexClient =
 	__webpack_require__(80);
 	__webpack_require__(81);
 	__webpack_require__(82);
-	__webpack_require__(84);
-	__webpack_require__(86);
-	__webpack_require__(88);
-	__webpack_require__(90);
-	__webpack_require__(93);
+	__webpack_require__(83);
+	__webpack_require__(85);
+	__webpack_require__(87);
+	__webpack_require__(89);
+	__webpack_require__(91);
 	__webpack_require__(94);
 	__webpack_require__(95);
-	__webpack_require__(99);
-	__webpack_require__(101);
-	__webpack_require__(103);
-	__webpack_require__(106);
+	__webpack_require__(96);
+	__webpack_require__(100);
+	__webpack_require__(102);
+	__webpack_require__(104);
 	__webpack_require__(107);
 	__webpack_require__(108);
 	__webpack_require__(109);
-	__webpack_require__(111);
+	__webpack_require__(110);
 	__webpack_require__(112);
 	__webpack_require__(113);
 	__webpack_require__(114);
 	__webpack_require__(115);
 	__webpack_require__(116);
 	__webpack_require__(117);
-	__webpack_require__(119);
+	__webpack_require__(118);
 	__webpack_require__(120);
 	__webpack_require__(121);
-	__webpack_require__(123);
+	__webpack_require__(122);
 	__webpack_require__(124);
 	__webpack_require__(125);
-	__webpack_require__(127);
+	__webpack_require__(126);
 	__webpack_require__(128);
 	__webpack_require__(129);
 	__webpack_require__(130);
@@ -13392,13 +13539,13 @@ var EmojidexClient =
 	__webpack_require__(138);
 	__webpack_require__(139);
 	__webpack_require__(140);
-	__webpack_require__(145);
+	__webpack_require__(141);
 	__webpack_require__(146);
-	__webpack_require__(150);
+	__webpack_require__(147);
 	__webpack_require__(151);
 	__webpack_require__(152);
 	__webpack_require__(153);
-	__webpack_require__(155);
+	__webpack_require__(154);
 	__webpack_require__(156);
 	__webpack_require__(157);
 	__webpack_require__(158);
@@ -13415,43 +13562,43 @@ var EmojidexClient =
 	__webpack_require__(169);
 	__webpack_require__(170);
 	__webpack_require__(171);
-	__webpack_require__(173);
+	__webpack_require__(172);
 	__webpack_require__(174);
-	__webpack_require__(180);
+	__webpack_require__(175);
 	__webpack_require__(181);
-	__webpack_require__(183);
+	__webpack_require__(182);
 	__webpack_require__(184);
 	__webpack_require__(185);
-	__webpack_require__(189);
+	__webpack_require__(186);
 	__webpack_require__(190);
 	__webpack_require__(191);
 	__webpack_require__(192);
 	__webpack_require__(193);
-	__webpack_require__(195);
+	__webpack_require__(194);
 	__webpack_require__(196);
 	__webpack_require__(197);
 	__webpack_require__(198);
-	__webpack_require__(201);
-	__webpack_require__(203);
+	__webpack_require__(199);
+	__webpack_require__(202);
 	__webpack_require__(204);
 	__webpack_require__(205);
-	__webpack_require__(207);
-	__webpack_require__(209);
-	__webpack_require__(211);
+	__webpack_require__(206);
+	__webpack_require__(208);
+	__webpack_require__(210);
 	__webpack_require__(212);
 	__webpack_require__(213);
-	__webpack_require__(215);
+	__webpack_require__(214);
 	__webpack_require__(216);
 	__webpack_require__(217);
 	__webpack_require__(218);
-	__webpack_require__(225);
-	__webpack_require__(228);
+	__webpack_require__(219);
+	__webpack_require__(226);
 	__webpack_require__(229);
-	__webpack_require__(231);
+	__webpack_require__(230);
 	__webpack_require__(232);
-	__webpack_require__(235);
+	__webpack_require__(233);
 	__webpack_require__(236);
-	__webpack_require__(238);
+	__webpack_require__(237);
 	__webpack_require__(239);
 	__webpack_require__(240);
 	__webpack_require__(241);
@@ -13470,13 +13617,13 @@ var EmojidexClient =
 	__webpack_require__(254);
 	__webpack_require__(255);
 	__webpack_require__(256);
-	__webpack_require__(258);
+	__webpack_require__(257);
 	__webpack_require__(259);
 	__webpack_require__(260);
 	__webpack_require__(261);
 	__webpack_require__(262);
 	__webpack_require__(263);
-	__webpack_require__(265);
+	__webpack_require__(264);
 	__webpack_require__(266);
 	__webpack_require__(267);
 	__webpack_require__(268);
@@ -13484,13 +13631,13 @@ var EmojidexClient =
 	__webpack_require__(270);
 	__webpack_require__(271);
 	__webpack_require__(272);
-	__webpack_require__(274);
+	__webpack_require__(273);
 	__webpack_require__(275);
-	__webpack_require__(277);
+	__webpack_require__(276);
 	__webpack_require__(278);
 	__webpack_require__(279);
 	__webpack_require__(280);
-	__webpack_require__(283);
+	__webpack_require__(281);
 	__webpack_require__(284);
 	__webpack_require__(285);
 	__webpack_require__(286);
@@ -13498,7 +13645,7 @@ var EmojidexClient =
 	__webpack_require__(288);
 	__webpack_require__(289);
 	__webpack_require__(290);
-	__webpack_require__(292);
+	__webpack_require__(291);
 	__webpack_require__(293);
 	__webpack_require__(294);
 	__webpack_require__(295);
@@ -13509,41 +13656,42 @@ var EmojidexClient =
 	__webpack_require__(300);
 	__webpack_require__(301);
 	__webpack_require__(302);
-	__webpack_require__(305);
+	__webpack_require__(303);
 	__webpack_require__(306);
-	module.exports = __webpack_require__(23);
+	__webpack_require__(307);
+	module.exports = __webpack_require__(24);
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	// ECMAScript 6 symbols shim
-	var global         = __webpack_require__(18)
-	  , has            = __webpack_require__(19)
-	  , DESCRIPTORS    = __webpack_require__(20)
-	  , $export        = __webpack_require__(22)
-	  , redefine       = __webpack_require__(32)
-	  , META           = __webpack_require__(36).KEY
-	  , $fails         = __webpack_require__(21)
-	  , shared         = __webpack_require__(37)
-	  , setToStringTag = __webpack_require__(38)
-	  , uid            = __webpack_require__(33)
-	  , wks            = __webpack_require__(39)
-	  , wksExt         = __webpack_require__(40)
-	  , wksDefine      = __webpack_require__(41)
-	  , keyOf          = __webpack_require__(43)
-	  , enumKeys       = __webpack_require__(56)
-	  , isArray        = __webpack_require__(59)
-	  , anObject       = __webpack_require__(26)
-	  , toIObject      = __webpack_require__(46)
-	  , toPrimitive    = __webpack_require__(30)
-	  , createDesc     = __webpack_require__(31)
-	  , _create        = __webpack_require__(60)
-	  , gOPNExt        = __webpack_require__(63)
-	  , $GOPD          = __webpack_require__(65)
-	  , $DP            = __webpack_require__(25)
-	  , $keys          = __webpack_require__(44)
+	var global         = __webpack_require__(19)
+	  , has            = __webpack_require__(20)
+	  , DESCRIPTORS    = __webpack_require__(21)
+	  , $export        = __webpack_require__(23)
+	  , redefine       = __webpack_require__(33)
+	  , META           = __webpack_require__(37).KEY
+	  , $fails         = __webpack_require__(22)
+	  , shared         = __webpack_require__(38)
+	  , setToStringTag = __webpack_require__(39)
+	  , uid            = __webpack_require__(34)
+	  , wks            = __webpack_require__(40)
+	  , wksExt         = __webpack_require__(41)
+	  , wksDefine      = __webpack_require__(42)
+	  , keyOf          = __webpack_require__(44)
+	  , enumKeys       = __webpack_require__(57)
+	  , isArray        = __webpack_require__(60)
+	  , anObject       = __webpack_require__(27)
+	  , toIObject      = __webpack_require__(47)
+	  , toPrimitive    = __webpack_require__(31)
+	  , createDesc     = __webpack_require__(32)
+	  , _create        = __webpack_require__(61)
+	  , gOPNExt        = __webpack_require__(64)
+	  , $GOPD          = __webpack_require__(66)
+	  , $DP            = __webpack_require__(26)
+	  , $keys          = __webpack_require__(45)
 	  , gOPD           = $GOPD.f
 	  , dP             = $DP.f
 	  , gOPN           = gOPNExt.f
@@ -13666,11 +13814,11 @@ var EmojidexClient =
 
 	  $GOPD.f = $getOwnPropertyDescriptor;
 	  $DP.f   = $defineProperty;
-	  __webpack_require__(64).f = gOPNExt.f = $getOwnPropertyNames;
-	  __webpack_require__(58).f  = $propertyIsEnumerable;
-	  __webpack_require__(57).f = $getOwnPropertySymbols;
+	  __webpack_require__(65).f = gOPNExt.f = $getOwnPropertyNames;
+	  __webpack_require__(59).f  = $propertyIsEnumerable;
+	  __webpack_require__(58).f = $getOwnPropertySymbols;
 
-	  if(DESCRIPTORS && !__webpack_require__(42)){
+	  if(DESCRIPTORS && !__webpack_require__(43)){
 	    redefine(ObjectProto, 'propertyIsEnumerable', $propertyIsEnumerable, true);
 	  }
 
@@ -13745,7 +13893,7 @@ var EmojidexClient =
 	});
 
 	// 19.4.3.4 Symbol.prototype[@@toPrimitive](hint)
-	$Symbol[PROTOTYPE][TO_PRIMITIVE] || __webpack_require__(24)($Symbol[PROTOTYPE], TO_PRIMITIVE, $Symbol[PROTOTYPE].valueOf);
+	$Symbol[PROTOTYPE][TO_PRIMITIVE] || __webpack_require__(25)($Symbol[PROTOTYPE], TO_PRIMITIVE, $Symbol[PROTOTYPE].valueOf);
 	// 19.4.3.5 Symbol.prototype[@@toStringTag]
 	setToStringTag($Symbol, 'Symbol');
 	// 20.2.1.9 Math[@@toStringTag]
@@ -13754,7 +13902,7 @@ var EmojidexClient =
 	setToStringTag(global.JSON, 'JSON', true);
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports) {
 
 	// https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
@@ -13763,7 +13911,7 @@ var EmojidexClient =
 	if(typeof __g == 'number')__g = global; // eslint-disable-line no-undef
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports) {
 
 	var hasOwnProperty = {}.hasOwnProperty;
@@ -13772,16 +13920,16 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// Thank's IE8 for his funny defineProperty
-	module.exports = !__webpack_require__(21)(function(){
+	module.exports = !__webpack_require__(22)(function(){
 	  return Object.defineProperty({}, 'a', {get: function(){ return 7; }}).a != 7;
 	});
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports) {
 
 	module.exports = function(exec){
@@ -13793,14 +13941,14 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var global    = __webpack_require__(18)
-	  , core      = __webpack_require__(23)
-	  , hide      = __webpack_require__(24)
-	  , redefine  = __webpack_require__(32)
-	  , ctx       = __webpack_require__(34)
+	var global    = __webpack_require__(19)
+	  , core      = __webpack_require__(24)
+	  , hide      = __webpack_require__(25)
+	  , redefine  = __webpack_require__(33)
+	  , ctx       = __webpack_require__(35)
 	  , PROTOTYPE = 'prototype';
 
 	var $export = function(type, name, source){
@@ -13841,19 +13989,19 @@ var EmojidexClient =
 	module.exports = $export;
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports) {
 
 	var core = module.exports = {version: '2.4.0'};
 	if(typeof __e == 'number')__e = core; // eslint-disable-line no-undef
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var dP         = __webpack_require__(25)
-	  , createDesc = __webpack_require__(31);
-	module.exports = __webpack_require__(20) ? function(object, key, value){
+	var dP         = __webpack_require__(26)
+	  , createDesc = __webpack_require__(32);
+	module.exports = __webpack_require__(21) ? function(object, key, value){
 	  return dP.f(object, key, createDesc(1, value));
 	} : function(object, key, value){
 	  object[key] = value;
@@ -13861,15 +14009,15 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var anObject       = __webpack_require__(26)
-	  , IE8_DOM_DEFINE = __webpack_require__(28)
-	  , toPrimitive    = __webpack_require__(30)
+	var anObject       = __webpack_require__(27)
+	  , IE8_DOM_DEFINE = __webpack_require__(29)
+	  , toPrimitive    = __webpack_require__(31)
 	  , dP             = Object.defineProperty;
 
-	exports.f = __webpack_require__(20) ? Object.defineProperty : function defineProperty(O, P, Attributes){
+	exports.f = __webpack_require__(21) ? Object.defineProperty : function defineProperty(O, P, Attributes){
 	  anObject(O);
 	  P = toPrimitive(P, true);
 	  anObject(Attributes);
@@ -13882,17 +14030,17 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var isObject = __webpack_require__(27);
+	var isObject = __webpack_require__(28);
 	module.exports = function(it){
 	  if(!isObject(it))throw TypeError(it + ' is not an object!');
 	  return it;
 	};
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports) {
 
 	module.exports = function(it){
@@ -13900,19 +14048,19 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 28 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	module.exports = !__webpack_require__(20) && !__webpack_require__(21)(function(){
-	  return Object.defineProperty(__webpack_require__(29)('div'), 'a', {get: function(){ return 7; }}).a != 7;
-	});
-
-/***/ }),
 /* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var isObject = __webpack_require__(27)
-	  , document = __webpack_require__(18).document
+	module.exports = !__webpack_require__(21) && !__webpack_require__(22)(function(){
+	  return Object.defineProperty(__webpack_require__(30)('div'), 'a', {get: function(){ return 7; }}).a != 7;
+	});
+
+/***/ }),
+/* 30 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	var isObject = __webpack_require__(28)
+	  , document = __webpack_require__(19).document
 	  // in old IE typeof document.createElement is 'object'
 	  , is = isObject(document) && isObject(document.createElement);
 	module.exports = function(it){
@@ -13920,11 +14068,11 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 7.1.1 ToPrimitive(input [, PreferredType])
-	var isObject = __webpack_require__(27);
+	var isObject = __webpack_require__(28);
 	// instead of the ES6 spec version, we didn't implement @@toPrimitive case
 	// and the second argument - flag - preferred type is a string
 	module.exports = function(it, S){
@@ -13937,7 +14085,7 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports) {
 
 	module.exports = function(bitmap, value){
@@ -13950,18 +14098,18 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var global    = __webpack_require__(18)
-	  , hide      = __webpack_require__(24)
-	  , has       = __webpack_require__(19)
-	  , SRC       = __webpack_require__(33)('src')
+	var global    = __webpack_require__(19)
+	  , hide      = __webpack_require__(25)
+	  , has       = __webpack_require__(20)
+	  , SRC       = __webpack_require__(34)('src')
 	  , TO_STRING = 'toString'
 	  , $toString = Function[TO_STRING]
 	  , TPL       = ('' + $toString).split(TO_STRING);
 
-	__webpack_require__(23).inspectSource = function(it){
+	__webpack_require__(24).inspectSource = function(it){
 	  return $toString.call(it);
 	};
 
@@ -13987,7 +14135,7 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports) {
 
 	var id = 0
@@ -13997,11 +14145,11 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// optional / simple context binding
-	var aFunction = __webpack_require__(35);
+	var aFunction = __webpack_require__(36);
 	module.exports = function(fn, that, length){
 	  aFunction(fn);
 	  if(that === undefined)return fn;
@@ -14022,7 +14170,7 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports) {
 
 	module.exports = function(it){
@@ -14031,18 +14179,18 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var META     = __webpack_require__(33)('meta')
-	  , isObject = __webpack_require__(27)
-	  , has      = __webpack_require__(19)
-	  , setDesc  = __webpack_require__(25).f
+	var META     = __webpack_require__(34)('meta')
+	  , isObject = __webpack_require__(28)
+	  , has      = __webpack_require__(20)
+	  , setDesc  = __webpack_require__(26).f
 	  , id       = 0;
 	var isExtensible = Object.isExtensible || function(){
 	  return true;
 	};
-	var FREEZE = !__webpack_require__(21)(function(){
+	var FREEZE = !__webpack_require__(22)(function(){
 	  return isExtensible(Object.preventExtensions({}));
 	});
 	var setMeta = function(it){
@@ -14089,10 +14237,10 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var global = __webpack_require__(18)
+	var global = __webpack_require__(19)
 	  , SHARED = '__core-js_shared__'
 	  , store  = global[SHARED] || (global[SHARED] = {});
 	module.exports = function(key){
@@ -14100,24 +14248,24 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var def = __webpack_require__(25).f
-	  , has = __webpack_require__(19)
-	  , TAG = __webpack_require__(39)('toStringTag');
+	var def = __webpack_require__(26).f
+	  , has = __webpack_require__(20)
+	  , TAG = __webpack_require__(40)('toStringTag');
 
 	module.exports = function(it, tag, stat){
 	  if(it && !has(it = stat ? it : it.prototype, TAG))def(it, TAG, {configurable: true, value: tag});
 	};
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var store      = __webpack_require__(37)('wks')
-	  , uid        = __webpack_require__(33)
-	  , Symbol     = __webpack_require__(18).Symbol
+	var store      = __webpack_require__(38)('wks')
+	  , uid        = __webpack_require__(34)
+	  , Symbol     = __webpack_require__(19).Symbol
 	  , USE_SYMBOL = typeof Symbol == 'function';
 
 	var $exports = module.exports = function(name){
@@ -14128,37 +14276,37 @@ var EmojidexClient =
 	$exports.store = store;
 
 /***/ }),
-/* 40 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	exports.f = __webpack_require__(39);
-
-/***/ }),
 /* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var global         = __webpack_require__(18)
-	  , core           = __webpack_require__(23)
-	  , LIBRARY        = __webpack_require__(42)
-	  , wksExt         = __webpack_require__(40)
-	  , defineProperty = __webpack_require__(25).f;
+	exports.f = __webpack_require__(40);
+
+/***/ }),
+/* 42 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	var global         = __webpack_require__(19)
+	  , core           = __webpack_require__(24)
+	  , LIBRARY        = __webpack_require__(43)
+	  , wksExt         = __webpack_require__(41)
+	  , defineProperty = __webpack_require__(26).f;
 	module.exports = function(name){
 	  var $Symbol = core.Symbol || (core.Symbol = LIBRARY ? {} : global.Symbol || {});
 	  if(name.charAt(0) != '_' && !(name in $Symbol))defineProperty($Symbol, name, {value: wksExt.f(name)});
 	};
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, exports) {
 
 	module.exports = false;
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var getKeys   = __webpack_require__(44)
-	  , toIObject = __webpack_require__(46);
+	var getKeys   = __webpack_require__(45)
+	  , toIObject = __webpack_require__(47);
 	module.exports = function(object, el){
 	  var O      = toIObject(object)
 	    , keys   = getKeys(O)
@@ -14169,25 +14317,25 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 19.1.2.14 / 15.2.3.14 Object.keys(O)
-	var $keys       = __webpack_require__(45)
-	  , enumBugKeys = __webpack_require__(55);
+	var $keys       = __webpack_require__(46)
+	  , enumBugKeys = __webpack_require__(56);
 
 	module.exports = Object.keys || function keys(O){
 	  return $keys(O, enumBugKeys);
 	};
 
 /***/ }),
-/* 45 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var has          = __webpack_require__(19)
-	  , toIObject    = __webpack_require__(46)
-	  , arrayIndexOf = __webpack_require__(50)(false)
-	  , IE_PROTO     = __webpack_require__(54)('IE_PROTO');
+	var has          = __webpack_require__(20)
+	  , toIObject    = __webpack_require__(47)
+	  , arrayIndexOf = __webpack_require__(51)(false)
+	  , IE_PROTO     = __webpack_require__(55)('IE_PROTO');
 
 	module.exports = function(object, names){
 	  var O      = toIObject(object)
@@ -14203,28 +14351,28 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 46 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// to indexed object, toObject with fallback for non-array-like ES3 strings
-	var IObject = __webpack_require__(47)
-	  , defined = __webpack_require__(49);
+	var IObject = __webpack_require__(48)
+	  , defined = __webpack_require__(50);
 	module.exports = function(it){
 	  return IObject(defined(it));
 	};
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// fallback for non-array-like ES3 and non-enumerable old V8 strings
-	var cof = __webpack_require__(48);
+	var cof = __webpack_require__(49);
 	module.exports = Object('z').propertyIsEnumerable(0) ? Object : function(it){
 	  return cof(it) == 'String' ? it.split('') : Object(it);
 	};
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(module, exports) {
 
 	var toString = {}.toString;
@@ -14234,7 +14382,7 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 49 */
+/* 50 */
 /***/ (function(module, exports) {
 
 	// 7.2.1 RequireObjectCoercible(argument)
@@ -14244,14 +14392,14 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 50 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// false -> Array#indexOf
 	// true  -> Array#includes
-	var toIObject = __webpack_require__(46)
-	  , toLength  = __webpack_require__(51)
-	  , toIndex   = __webpack_require__(53);
+	var toIObject = __webpack_require__(47)
+	  , toLength  = __webpack_require__(52)
+	  , toIndex   = __webpack_require__(54);
 	module.exports = function(IS_INCLUDES){
 	  return function($this, el, fromIndex){
 	    var O      = toIObject($this)
@@ -14270,18 +14418,18 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 51 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 7.1.15 ToLength
-	var toInteger = __webpack_require__(52)
+	var toInteger = __webpack_require__(53)
 	  , min       = Math.min;
 	module.exports = function(it){
 	  return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0; // pow(2, 53) - 1 == 9007199254740991
 	};
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(module, exports) {
 
 	// 7.1.4 ToInteger
@@ -14292,10 +14440,10 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var toInteger = __webpack_require__(52)
+	var toInteger = __webpack_require__(53)
 	  , max       = Math.max
 	  , min       = Math.min;
 	module.exports = function(index, length){
@@ -14304,17 +14452,17 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 54 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var shared = __webpack_require__(37)('keys')
-	  , uid    = __webpack_require__(33);
+	var shared = __webpack_require__(38)('keys')
+	  , uid    = __webpack_require__(34);
 	module.exports = function(key){
 	  return shared[key] || (shared[key] = uid(key));
 	};
 
 /***/ }),
-/* 55 */
+/* 56 */
 /***/ (function(module, exports) {
 
 	// IE 8- don't enum bug keys
@@ -14323,13 +14471,13 @@ var EmojidexClient =
 	).split(',');
 
 /***/ }),
-/* 56 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// all enumerable object keys, includes symbols
-	var getKeys = __webpack_require__(44)
-	  , gOPS    = __webpack_require__(57)
-	  , pIE     = __webpack_require__(58);
+	var getKeys = __webpack_require__(45)
+	  , gOPS    = __webpack_require__(58)
+	  , pIE     = __webpack_require__(59);
 	module.exports = function(it){
 	  var result     = getKeys(it)
 	    , getSymbols = gOPS.f;
@@ -14343,49 +14491,49 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 57 */
+/* 58 */
 /***/ (function(module, exports) {
 
 	exports.f = Object.getOwnPropertySymbols;
 
 /***/ }),
-/* 58 */
+/* 59 */
 /***/ (function(module, exports) {
 
 	exports.f = {}.propertyIsEnumerable;
 
 /***/ }),
-/* 59 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 7.2.2 IsArray(argument)
-	var cof = __webpack_require__(48);
+	var cof = __webpack_require__(49);
 	module.exports = Array.isArray || function isArray(arg){
 	  return cof(arg) == 'Array';
 	};
 
 /***/ }),
-/* 60 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
-	var anObject    = __webpack_require__(26)
-	  , dPs         = __webpack_require__(61)
-	  , enumBugKeys = __webpack_require__(55)
-	  , IE_PROTO    = __webpack_require__(54)('IE_PROTO')
+	var anObject    = __webpack_require__(27)
+	  , dPs         = __webpack_require__(62)
+	  , enumBugKeys = __webpack_require__(56)
+	  , IE_PROTO    = __webpack_require__(55)('IE_PROTO')
 	  , Empty       = function(){ /* empty */ }
 	  , PROTOTYPE   = 'prototype';
 
 	// Create object with fake `null` prototype: use iframe Object with cleared prototype
 	var createDict = function(){
 	  // Thrash, waste and sodomy: IE GC bug
-	  var iframe = __webpack_require__(29)('iframe')
+	  var iframe = __webpack_require__(30)('iframe')
 	    , i      = enumBugKeys.length
 	    , lt     = '<'
 	    , gt     = '>'
 	    , iframeDocument;
 	  iframe.style.display = 'none';
-	  __webpack_require__(62).appendChild(iframe);
+	  __webpack_require__(63).appendChild(iframe);
 	  iframe.src = 'javascript:'; // eslint-disable-line no-script-url
 	  // createDict = iframe.contentWindow.Object;
 	  // html.removeChild(iframe);
@@ -14412,14 +14560,14 @@ var EmojidexClient =
 
 
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var dP       = __webpack_require__(25)
-	  , anObject = __webpack_require__(26)
-	  , getKeys  = __webpack_require__(44);
+	var dP       = __webpack_require__(26)
+	  , anObject = __webpack_require__(27)
+	  , getKeys  = __webpack_require__(45);
 
-	module.exports = __webpack_require__(20) ? Object.defineProperties : function defineProperties(O, Properties){
+	module.exports = __webpack_require__(21) ? Object.defineProperties : function defineProperties(O, Properties){
 	  anObject(O);
 	  var keys   = getKeys(Properties)
 	    , length = keys.length
@@ -14430,18 +14578,18 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 62 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	module.exports = __webpack_require__(18).document && document.documentElement;
-
-/***/ }),
 /* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
+	module.exports = __webpack_require__(19).document && document.documentElement;
+
+/***/ }),
+/* 64 */
+/***/ (function(module, exports, __webpack_require__) {
+
 	// fallback for IE11 buggy Object.getOwnPropertyNames with iframe and window
-	var toIObject = __webpack_require__(46)
-	  , gOPN      = __webpack_require__(64).f
+	var toIObject = __webpack_require__(47)
+	  , gOPN      = __webpack_require__(65).f
 	  , toString  = {}.toString;
 
 	var windowNames = typeof window == 'object' && window && Object.getOwnPropertyNames
@@ -14461,30 +14609,30 @@ var EmojidexClient =
 
 
 /***/ }),
-/* 64 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 19.1.2.7 / 15.2.3.4 Object.getOwnPropertyNames(O)
-	var $keys      = __webpack_require__(45)
-	  , hiddenKeys = __webpack_require__(55).concat('length', 'prototype');
+	var $keys      = __webpack_require__(46)
+	  , hiddenKeys = __webpack_require__(56).concat('length', 'prototype');
 
 	exports.f = Object.getOwnPropertyNames || function getOwnPropertyNames(O){
 	  return $keys(O, hiddenKeys);
 	};
 
 /***/ }),
-/* 65 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var pIE            = __webpack_require__(58)
-	  , createDesc     = __webpack_require__(31)
-	  , toIObject      = __webpack_require__(46)
-	  , toPrimitive    = __webpack_require__(30)
-	  , has            = __webpack_require__(19)
-	  , IE8_DOM_DEFINE = __webpack_require__(28)
+	var pIE            = __webpack_require__(59)
+	  , createDesc     = __webpack_require__(32)
+	  , toIObject      = __webpack_require__(47)
+	  , toPrimitive    = __webpack_require__(31)
+	  , has            = __webpack_require__(20)
+	  , IE8_DOM_DEFINE = __webpack_require__(29)
 	  , gOPD           = Object.getOwnPropertyDescriptor;
 
-	exports.f = __webpack_require__(20) ? gOPD : function getOwnPropertyDescriptor(O, P){
+	exports.f = __webpack_require__(21) ? gOPD : function getOwnPropertyDescriptor(O, P){
 	  O = toIObject(O);
 	  P = toPrimitive(P, true);
 	  if(IE8_DOM_DEFINE)try {
@@ -14494,51 +14642,51 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 66 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	var $export = __webpack_require__(22)
-	// 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
-	$export($export.S, 'Object', {create: __webpack_require__(60)});
-
-/***/ }),
 /* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var $export = __webpack_require__(22);
-	// 19.1.2.4 / 15.2.3.6 Object.defineProperty(O, P, Attributes)
-	$export($export.S + $export.F * !__webpack_require__(20), 'Object', {defineProperty: __webpack_require__(25).f});
+	var $export = __webpack_require__(23)
+	// 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
+	$export($export.S, 'Object', {create: __webpack_require__(61)});
 
 /***/ }),
 /* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var $export = __webpack_require__(22);
-	// 19.1.2.3 / 15.2.3.7 Object.defineProperties(O, Properties)
-	$export($export.S + $export.F * !__webpack_require__(20), 'Object', {defineProperties: __webpack_require__(61)});
+	var $export = __webpack_require__(23);
+	// 19.1.2.4 / 15.2.3.6 Object.defineProperty(O, P, Attributes)
+	$export($export.S + $export.F * !__webpack_require__(21), 'Object', {defineProperty: __webpack_require__(26).f});
 
 /***/ }),
 /* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	// 19.1.2.6 Object.getOwnPropertyDescriptor(O, P)
-	var toIObject                 = __webpack_require__(46)
-	  , $getOwnPropertyDescriptor = __webpack_require__(65).f;
+	var $export = __webpack_require__(23);
+	// 19.1.2.3 / 15.2.3.7 Object.defineProperties(O, Properties)
+	$export($export.S + $export.F * !__webpack_require__(21), 'Object', {defineProperties: __webpack_require__(62)});
 
-	__webpack_require__(70)('getOwnPropertyDescriptor', function(){
+/***/ }),
+/* 70 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	// 19.1.2.6 Object.getOwnPropertyDescriptor(O, P)
+	var toIObject                 = __webpack_require__(47)
+	  , $getOwnPropertyDescriptor = __webpack_require__(66).f;
+
+	__webpack_require__(71)('getOwnPropertyDescriptor', function(){
 	  return function getOwnPropertyDescriptor(it, key){
 	    return $getOwnPropertyDescriptor(toIObject(it), key);
 	  };
 	});
 
 /***/ }),
-/* 70 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// most Object methods by ES6 should accept primitives
-	var $export = __webpack_require__(22)
-	  , core    = __webpack_require__(23)
-	  , fails   = __webpack_require__(21);
+	var $export = __webpack_require__(23)
+	  , core    = __webpack_require__(24)
+	  , fails   = __webpack_require__(22);
 	module.exports = function(KEY, exec){
 	  var fn  = (core.Object || {})[KEY] || Object[KEY]
 	    , exp = {};
@@ -14547,37 +14695,37 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 71 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 19.1.2.9 Object.getPrototypeOf(O)
-	var toObject        = __webpack_require__(72)
-	  , $getPrototypeOf = __webpack_require__(73);
+	var toObject        = __webpack_require__(73)
+	  , $getPrototypeOf = __webpack_require__(74);
 
-	__webpack_require__(70)('getPrototypeOf', function(){
+	__webpack_require__(71)('getPrototypeOf', function(){
 	  return function getPrototypeOf(it){
 	    return $getPrototypeOf(toObject(it));
 	  };
 	});
 
 /***/ }),
-/* 72 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 7.1.13 ToObject(argument)
-	var defined = __webpack_require__(49);
+	var defined = __webpack_require__(50);
 	module.exports = function(it){
 	  return Object(defined(it));
 	};
 
 /***/ }),
-/* 73 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 19.1.2.9 / 15.2.3.2 Object.getPrototypeOf(O)
-	var has         = __webpack_require__(19)
-	  , toObject    = __webpack_require__(72)
-	  , IE_PROTO    = __webpack_require__(54)('IE_PROTO')
+	var has         = __webpack_require__(20)
+	  , toObject    = __webpack_require__(73)
+	  , IE_PROTO    = __webpack_require__(55)('IE_PROTO')
 	  , ObjectProto = Object.prototype;
 
 	module.exports = Object.getPrototypeOf || function(O){
@@ -14589,53 +14737,39 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 74 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 19.1.2.14 Object.keys(O)
-	var toObject = __webpack_require__(72)
-	  , $keys    = __webpack_require__(44);
+	var toObject = __webpack_require__(73)
+	  , $keys    = __webpack_require__(45);
 
-	__webpack_require__(70)('keys', function(){
+	__webpack_require__(71)('keys', function(){
 	  return function keys(it){
 	    return $keys(toObject(it));
 	  };
 	});
 
 /***/ }),
-/* 75 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	// 19.1.2.7 Object.getOwnPropertyNames(O)
-	__webpack_require__(70)('getOwnPropertyNames', function(){
-	  return __webpack_require__(63).f;
-	});
-
-/***/ }),
 /* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	// 19.1.2.5 Object.freeze(O)
-	var isObject = __webpack_require__(27)
-	  , meta     = __webpack_require__(36).onFreeze;
-
-	__webpack_require__(70)('freeze', function($freeze){
-	  return function freeze(it){
-	    return $freeze && isObject(it) ? $freeze(meta(it)) : it;
-	  };
+	// 19.1.2.7 Object.getOwnPropertyNames(O)
+	__webpack_require__(71)('getOwnPropertyNames', function(){
+	  return __webpack_require__(64).f;
 	});
 
 /***/ }),
 /* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	// 19.1.2.17 Object.seal(O)
-	var isObject = __webpack_require__(27)
-	  , meta     = __webpack_require__(36).onFreeze;
+	// 19.1.2.5 Object.freeze(O)
+	var isObject = __webpack_require__(28)
+	  , meta     = __webpack_require__(37).onFreeze;
 
-	__webpack_require__(70)('seal', function($seal){
-	  return function seal(it){
-	    return $seal && isObject(it) ? $seal(meta(it)) : it;
+	__webpack_require__(71)('freeze', function($freeze){
+	  return function freeze(it){
+	    return $freeze && isObject(it) ? $freeze(meta(it)) : it;
 	  };
 	});
 
@@ -14643,13 +14777,13 @@ var EmojidexClient =
 /* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	// 19.1.2.15 Object.preventExtensions(O)
-	var isObject = __webpack_require__(27)
-	  , meta     = __webpack_require__(36).onFreeze;
+	// 19.1.2.17 Object.seal(O)
+	var isObject = __webpack_require__(28)
+	  , meta     = __webpack_require__(37).onFreeze;
 
-	__webpack_require__(70)('preventExtensions', function($preventExtensions){
-	  return function preventExtensions(it){
-	    return $preventExtensions && isObject(it) ? $preventExtensions(meta(it)) : it;
+	__webpack_require__(71)('seal', function($seal){
+	  return function seal(it){
+	    return $seal && isObject(it) ? $seal(meta(it)) : it;
 	  };
 	});
 
@@ -14657,12 +14791,13 @@ var EmojidexClient =
 /* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	// 19.1.2.12 Object.isFrozen(O)
-	var isObject = __webpack_require__(27);
+	// 19.1.2.15 Object.preventExtensions(O)
+	var isObject = __webpack_require__(28)
+	  , meta     = __webpack_require__(37).onFreeze;
 
-	__webpack_require__(70)('isFrozen', function($isFrozen){
-	  return function isFrozen(it){
-	    return isObject(it) ? $isFrozen ? $isFrozen(it) : false : true;
+	__webpack_require__(71)('preventExtensions', function($preventExtensions){
+	  return function preventExtensions(it){
+	    return $preventExtensions && isObject(it) ? $preventExtensions(meta(it)) : it;
 	  };
 	});
 
@@ -14670,12 +14805,12 @@ var EmojidexClient =
 /* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	// 19.1.2.13 Object.isSealed(O)
-	var isObject = __webpack_require__(27);
+	// 19.1.2.12 Object.isFrozen(O)
+	var isObject = __webpack_require__(28);
 
-	__webpack_require__(70)('isSealed', function($isSealed){
-	  return function isSealed(it){
-	    return isObject(it) ? $isSealed ? $isSealed(it) : false : true;
+	__webpack_require__(71)('isFrozen', function($isFrozen){
+	  return function isFrozen(it){
+	    return isObject(it) ? $isFrozen ? $isFrozen(it) : false : true;
 	  };
 	});
 
@@ -14683,12 +14818,12 @@ var EmojidexClient =
 /* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	// 19.1.2.11 Object.isExtensible(O)
-	var isObject = __webpack_require__(27);
+	// 19.1.2.13 Object.isSealed(O)
+	var isObject = __webpack_require__(28);
 
-	__webpack_require__(70)('isExtensible', function($isExtensible){
-	  return function isExtensible(it){
-	    return isObject(it) ? $isExtensible ? $isExtensible(it) : true : false;
+	__webpack_require__(71)('isSealed', function($isSealed){
+	  return function isSealed(it){
+	    return isObject(it) ? $isSealed ? $isSealed(it) : false : true;
 	  };
 	});
 
@@ -14696,26 +14831,39 @@ var EmojidexClient =
 /* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	// 19.1.3.1 Object.assign(target, source)
-	var $export = __webpack_require__(22);
+	// 19.1.2.11 Object.isExtensible(O)
+	var isObject = __webpack_require__(28);
 
-	$export($export.S + $export.F, 'Object', {assign: __webpack_require__(83)});
+	__webpack_require__(71)('isExtensible', function($isExtensible){
+	  return function isExtensible(it){
+	    return isObject(it) ? $isExtensible ? $isExtensible(it) : true : false;
+	  };
+	});
 
 /***/ }),
 /* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
+	// 19.1.3.1 Object.assign(target, source)
+	var $export = __webpack_require__(23);
+
+	$export($export.S + $export.F, 'Object', {assign: __webpack_require__(84)});
+
+/***/ }),
+/* 84 */
+/***/ (function(module, exports, __webpack_require__) {
+
 	'use strict';
 	// 19.1.2.1 Object.assign(target, source, ...)
-	var getKeys  = __webpack_require__(44)
-	  , gOPS     = __webpack_require__(57)
-	  , pIE      = __webpack_require__(58)
-	  , toObject = __webpack_require__(72)
-	  , IObject  = __webpack_require__(47)
+	var getKeys  = __webpack_require__(45)
+	  , gOPS     = __webpack_require__(58)
+	  , pIE      = __webpack_require__(59)
+	  , toObject = __webpack_require__(73)
+	  , IObject  = __webpack_require__(48)
 	  , $assign  = Object.assign;
 
 	// should work with symbols and should have deterministic property order (V8 bug)
-	module.exports = !$assign || __webpack_require__(21)(function(){
+	module.exports = !$assign || __webpack_require__(22)(function(){
 	  var A = {}
 	    , B = {}
 	    , S = Symbol()
@@ -14740,15 +14888,15 @@ var EmojidexClient =
 	} : $assign;
 
 /***/ }),
-/* 84 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 19.1.3.10 Object.is(value1, value2)
-	var $export = __webpack_require__(22);
-	$export($export.S, 'Object', {is: __webpack_require__(85)});
+	var $export = __webpack_require__(23);
+	$export($export.S, 'Object', {is: __webpack_require__(86)});
 
 /***/ }),
-/* 85 */
+/* 86 */
 /***/ (function(module, exports) {
 
 	// 7.2.9 SameValue(x, y)
@@ -14757,21 +14905,21 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 86 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 19.1.3.19 Object.setPrototypeOf(O, proto)
-	var $export = __webpack_require__(22);
-	$export($export.S, 'Object', {setPrototypeOf: __webpack_require__(87).set});
+	var $export = __webpack_require__(23);
+	$export($export.S, 'Object', {setPrototypeOf: __webpack_require__(88).set});
 
 /***/ }),
-/* 87 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// Works with __proto__ only. Old v8 can't work with null proto objects.
 	/* eslint-disable no-proto */
-	var isObject = __webpack_require__(27)
-	  , anObject = __webpack_require__(26);
+	var isObject = __webpack_require__(28)
+	  , anObject = __webpack_require__(27);
 	var check = function(O, proto){
 	  anObject(O);
 	  if(!isObject(proto) && proto !== null)throw TypeError(proto + ": can't set as prototype!");
@@ -14780,7 +14928,7 @@ var EmojidexClient =
 	  set: Object.setPrototypeOf || ('__proto__' in {} ? // eslint-disable-line
 	    function(test, buggy, set){
 	      try {
-	        set = __webpack_require__(34)(Function.call, __webpack_require__(65).f(Object.prototype, '__proto__').set, 2);
+	        set = __webpack_require__(35)(Function.call, __webpack_require__(66).f(Object.prototype, '__proto__').set, 2);
 	        set(test, []);
 	        buggy = !(test instanceof Array);
 	      } catch(e){ buggy = true; }
@@ -14795,27 +14943,27 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 88 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	// 19.1.3.6 Object.prototype.toString()
-	var classof = __webpack_require__(89)
+	var classof = __webpack_require__(90)
 	  , test    = {};
-	test[__webpack_require__(39)('toStringTag')] = 'z';
+	test[__webpack_require__(40)('toStringTag')] = 'z';
 	if(test + '' != '[object z]'){
-	  __webpack_require__(32)(Object.prototype, 'toString', function toString(){
+	  __webpack_require__(33)(Object.prototype, 'toString', function toString(){
 	    return '[object ' + classof(this) + ']';
 	  }, true);
 	}
 
 /***/ }),
-/* 89 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// getting tag from 19.1.3.6 Object.prototype.toString()
-	var cof = __webpack_require__(48)
-	  , TAG = __webpack_require__(39)('toStringTag')
+	var cof = __webpack_require__(49)
+	  , TAG = __webpack_require__(40)('toStringTag')
 	  // ES3 wrong here
 	  , ARG = cof(function(){ return arguments; }()) == 'Arguments';
 
@@ -14838,22 +14986,22 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 90 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	// 19.2.3.2 / 15.3.4.5 Function.prototype.bind(thisArg, args...)
-	var $export = __webpack_require__(22);
-
-	$export($export.P, 'Function', {bind: __webpack_require__(91)});
-
-/***/ }),
 /* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
+	// 19.2.3.2 / 15.3.4.5 Function.prototype.bind(thisArg, args...)
+	var $export = __webpack_require__(23);
+
+	$export($export.P, 'Function', {bind: __webpack_require__(92)});
+
+/***/ }),
+/* 92 */
+/***/ (function(module, exports, __webpack_require__) {
+
 	'use strict';
-	var aFunction  = __webpack_require__(35)
-	  , isObject   = __webpack_require__(27)
-	  , invoke     = __webpack_require__(92)
+	var aFunction  = __webpack_require__(36)
+	  , isObject   = __webpack_require__(28)
+	  , invoke     = __webpack_require__(93)
 	  , arraySlice = [].slice
 	  , factories  = {};
 
@@ -14876,7 +15024,7 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 92 */
+/* 93 */
 /***/ (function(module, exports) {
 
 	// fast apply, http://jsperf.lnkit.com/fast-apply/5
@@ -14897,12 +15045,12 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 93 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var dP         = __webpack_require__(25).f
-	  , createDesc = __webpack_require__(31)
-	  , has        = __webpack_require__(19)
+	var dP         = __webpack_require__(26).f
+	  , createDesc = __webpack_require__(32)
+	  , has        = __webpack_require__(20)
 	  , FProto     = Function.prototype
 	  , nameRE     = /^\s*function ([^ (]*)/
 	  , NAME       = 'name';
@@ -14912,7 +15060,7 @@ var EmojidexClient =
 	};
 
 	// 19.2.4.2 name
-	NAME in FProto || __webpack_require__(20) && dP(FProto, NAME, {
+	NAME in FProto || __webpack_require__(21) && dP(FProto, NAME, {
 	  configurable: true,
 	  get: function(){
 	    try {
@@ -14927,16 +15075,16 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 94 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var isObject       = __webpack_require__(27)
-	  , getPrototypeOf = __webpack_require__(73)
-	  , HAS_INSTANCE   = __webpack_require__(39)('hasInstance')
+	var isObject       = __webpack_require__(28)
+	  , getPrototypeOf = __webpack_require__(74)
+	  , HAS_INSTANCE   = __webpack_require__(40)('hasInstance')
 	  , FunctionProto  = Function.prototype;
 	// 19.2.3.6 Function.prototype[@@hasInstance](V)
-	if(!(HAS_INSTANCE in FunctionProto))__webpack_require__(25).f(FunctionProto, HAS_INSTANCE, {value: function(O){
+	if(!(HAS_INSTANCE in FunctionProto))__webpack_require__(26).f(FunctionProto, HAS_INSTANCE, {value: function(O){
 	  if(typeof this != 'function' || !isObject(O))return false;
 	  if(!isObject(this.prototype))return O instanceof this;
 	  // for environment w/o native `@@hasInstance` logic enough `instanceof`, but add this:
@@ -14945,21 +15093,21 @@ var EmojidexClient =
 	}});
 
 /***/ }),
-/* 95 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var $export   = __webpack_require__(22)
-	  , $parseInt = __webpack_require__(96);
+	var $export   = __webpack_require__(23)
+	  , $parseInt = __webpack_require__(97);
 	// 18.2.5 parseInt(string, radix)
 	$export($export.G + $export.F * (parseInt != $parseInt), {parseInt: $parseInt});
 
 /***/ }),
-/* 96 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var $parseInt = __webpack_require__(18).parseInt
-	  , $trim     = __webpack_require__(97).trim
-	  , ws        = __webpack_require__(98)
+	var $parseInt = __webpack_require__(19).parseInt
+	  , $trim     = __webpack_require__(98).trim
+	  , ws        = __webpack_require__(99)
 	  , hex       = /^[\-+]?0[xX]/;
 
 	module.exports = $parseInt(ws + '08') !== 8 || $parseInt(ws + '0x16') !== 22 ? function parseInt(str, radix){
@@ -14968,13 +15116,13 @@ var EmojidexClient =
 	} : $parseInt;
 
 /***/ }),
-/* 97 */
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var $export = __webpack_require__(22)
-	  , defined = __webpack_require__(49)
-	  , fails   = __webpack_require__(21)
-	  , spaces  = __webpack_require__(98)
+	var $export = __webpack_require__(23)
+	  , defined = __webpack_require__(50)
+	  , fails   = __webpack_require__(22)
+	  , spaces  = __webpack_require__(99)
 	  , space   = '[' + spaces + ']'
 	  , non     = '\u200b\u0085'
 	  , ltrim   = RegExp('^' + space + space + '*')
@@ -15003,55 +15151,55 @@ var EmojidexClient =
 	module.exports = exporter;
 
 /***/ }),
-/* 98 */
+/* 99 */
 /***/ (function(module, exports) {
 
 	module.exports = '\x09\x0A\x0B\x0C\x0D\x20\xA0\u1680\u180E\u2000\u2001\u2002\u2003' +
 	  '\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000\u2028\u2029\uFEFF';
 
 /***/ }),
-/* 99 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var $export     = __webpack_require__(22)
-	  , $parseFloat = __webpack_require__(100);
+	var $export     = __webpack_require__(23)
+	  , $parseFloat = __webpack_require__(101);
 	// 18.2.4 parseFloat(string)
 	$export($export.G + $export.F * (parseFloat != $parseFloat), {parseFloat: $parseFloat});
 
 /***/ }),
-/* 100 */
+/* 101 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var $parseFloat = __webpack_require__(18).parseFloat
-	  , $trim       = __webpack_require__(97).trim;
+	var $parseFloat = __webpack_require__(19).parseFloat
+	  , $trim       = __webpack_require__(98).trim;
 
-	module.exports = 1 / $parseFloat(__webpack_require__(98) + '-0') !== -Infinity ? function parseFloat(str){
+	module.exports = 1 / $parseFloat(__webpack_require__(99) + '-0') !== -Infinity ? function parseFloat(str){
 	  var string = $trim(String(str), 3)
 	    , result = $parseFloat(string);
 	  return result === 0 && string.charAt(0) == '-' ? -0 : result;
 	} : $parseFloat;
 
 /***/ }),
-/* 101 */
+/* 102 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var global            = __webpack_require__(18)
-	  , has               = __webpack_require__(19)
-	  , cof               = __webpack_require__(48)
-	  , inheritIfRequired = __webpack_require__(102)
-	  , toPrimitive       = __webpack_require__(30)
-	  , fails             = __webpack_require__(21)
-	  , gOPN              = __webpack_require__(64).f
-	  , gOPD              = __webpack_require__(65).f
-	  , dP                = __webpack_require__(25).f
-	  , $trim             = __webpack_require__(97).trim
+	var global            = __webpack_require__(19)
+	  , has               = __webpack_require__(20)
+	  , cof               = __webpack_require__(49)
+	  , inheritIfRequired = __webpack_require__(103)
+	  , toPrimitive       = __webpack_require__(31)
+	  , fails             = __webpack_require__(22)
+	  , gOPN              = __webpack_require__(65).f
+	  , gOPD              = __webpack_require__(66).f
+	  , dP                = __webpack_require__(26).f
+	  , $trim             = __webpack_require__(98).trim
 	  , NUMBER            = 'Number'
 	  , $Number           = global[NUMBER]
 	  , Base              = $Number
 	  , proto             = $Number.prototype
 	  // Opera ~12 has broken Object#toString
-	  , BROKEN_COF        = cof(__webpack_require__(60)(proto)) == NUMBER
+	  , BROKEN_COF        = cof(__webpack_require__(61)(proto)) == NUMBER
 	  , TRIM              = 'trim' in String.prototype;
 
 	// 7.1.3 ToNumber(argument)
@@ -15089,7 +15237,7 @@ var EmojidexClient =
 	      && (BROKEN_COF ? fails(function(){ proto.valueOf.call(that); }) : cof(that) != NUMBER)
 	        ? inheritIfRequired(new Base(toNumber(it)), that, $Number) : toNumber(it);
 	  };
-	  for(var keys = __webpack_require__(20) ? gOPN(Base) : (
+	  for(var keys = __webpack_require__(21) ? gOPN(Base) : (
 	    // ES3:
 	    'MAX_VALUE,MIN_VALUE,NaN,NEGATIVE_INFINITY,POSITIVE_INFINITY,' +
 	    // ES6 (in case, if modules with ES6 Number statics required before):
@@ -15102,15 +15250,15 @@ var EmojidexClient =
 	  }
 	  $Number.prototype = proto;
 	  proto.constructor = $Number;
-	  __webpack_require__(32)(global, NUMBER, $Number);
+	  __webpack_require__(33)(global, NUMBER, $Number);
 	}
 
 /***/ }),
-/* 102 */
+/* 103 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var isObject       = __webpack_require__(27)
-	  , setPrototypeOf = __webpack_require__(87).set;
+	var isObject       = __webpack_require__(28)
+	  , setPrototypeOf = __webpack_require__(88).set;
 	module.exports = function(that, target, C){
 	  var P, S = target.constructor;
 	  if(S !== C && typeof S == 'function' && (P = S.prototype) !== C.prototype && isObject(P) && setPrototypeOf){
@@ -15119,14 +15267,14 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 103 */
+/* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $export      = __webpack_require__(22)
-	  , toInteger    = __webpack_require__(52)
-	  , aNumberValue = __webpack_require__(104)
-	  , repeat       = __webpack_require__(105)
+	var $export      = __webpack_require__(23)
+	  , toInteger    = __webpack_require__(53)
+	  , aNumberValue = __webpack_require__(105)
+	  , repeat       = __webpack_require__(106)
 	  , $toFixed     = 1..toFixed
 	  , floor        = Math.floor
 	  , data         = [0, 0, 0, 0, 0, 0]
@@ -15182,7 +15330,7 @@ var EmojidexClient =
 	  0.9.toFixed(0) !== '1' ||
 	  1.255.toFixed(2) !== '1.25' ||
 	  1000000000000000128..toFixed(0) !== '1000000000000000128'
-	) || !__webpack_require__(21)(function(){
+	) || !__webpack_require__(22)(function(){
 	  // V8 ~ Android 4.3-
 	  $toFixed.call({});
 	})), 'Number', {
@@ -15237,22 +15385,22 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 104 */
+/* 105 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var cof = __webpack_require__(48);
+	var cof = __webpack_require__(49);
 	module.exports = function(it, msg){
 	  if(typeof it != 'number' && cof(it) != 'Number')throw TypeError(msg);
 	  return +it;
 	};
 
 /***/ }),
-/* 105 */
+/* 106 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var toInteger = __webpack_require__(52)
-	  , defined   = __webpack_require__(49);
+	var toInteger = __webpack_require__(53)
+	  , defined   = __webpack_require__(50);
 
 	module.exports = function repeat(count){
 	  var str = String(defined(this))
@@ -15264,13 +15412,13 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 106 */
+/* 107 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $export      = __webpack_require__(22)
-	  , $fails       = __webpack_require__(21)
-	  , aNumberValue = __webpack_require__(104)
+	var $export      = __webpack_require__(23)
+	  , $fails       = __webpack_require__(22)
+	  , aNumberValue = __webpack_require__(105)
 	  , $toPrecision = 1..toPrecision;
 
 	$export($export.P + $export.F * ($fails(function(){
@@ -15287,21 +15435,21 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 107 */
+/* 108 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 20.1.2.1 Number.EPSILON
-	var $export = __webpack_require__(22);
+	var $export = __webpack_require__(23);
 
 	$export($export.S, 'Number', {EPSILON: Math.pow(2, -52)});
 
 /***/ }),
-/* 108 */
+/* 109 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 20.1.2.2 Number.isFinite(number)
-	var $export   = __webpack_require__(22)
-	  , _isFinite = __webpack_require__(18).isFinite;
+	var $export   = __webpack_require__(23)
+	  , _isFinite = __webpack_require__(19).isFinite;
 
 	$export($export.S, 'Number', {
 	  isFinite: function isFinite(it){
@@ -15310,31 +15458,31 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 109 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	// 20.1.2.3 Number.isInteger(number)
-	var $export = __webpack_require__(22);
-
-	$export($export.S, 'Number', {isInteger: __webpack_require__(110)});
-
-/***/ }),
 /* 110 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 20.1.2.3 Number.isInteger(number)
-	var isObject = __webpack_require__(27)
+	var $export = __webpack_require__(23);
+
+	$export($export.S, 'Number', {isInteger: __webpack_require__(111)});
+
+/***/ }),
+/* 111 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	// 20.1.2.3 Number.isInteger(number)
+	var isObject = __webpack_require__(28)
 	  , floor    = Math.floor;
 	module.exports = function isInteger(it){
 	  return !isObject(it) && isFinite(it) && floor(it) === it;
 	};
 
 /***/ }),
-/* 111 */
+/* 112 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 20.1.2.4 Number.isNaN(number)
-	var $export = __webpack_require__(22);
+	var $export = __webpack_require__(23);
 
 	$export($export.S, 'Number', {
 	  isNaN: function isNaN(number){
@@ -15343,12 +15491,12 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 112 */
+/* 113 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 20.1.2.5 Number.isSafeInteger(number)
-	var $export   = __webpack_require__(22)
-	  , isInteger = __webpack_require__(110)
+	var $export   = __webpack_require__(23)
+	  , isInteger = __webpack_require__(111)
 	  , abs       = Math.abs;
 
 	$export($export.S, 'Number', {
@@ -15358,48 +15506,48 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 113 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	// 20.1.2.6 Number.MAX_SAFE_INTEGER
-	var $export = __webpack_require__(22);
-
-	$export($export.S, 'Number', {MAX_SAFE_INTEGER: 0x1fffffffffffff});
-
-/***/ }),
 /* 114 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	// 20.1.2.10 Number.MIN_SAFE_INTEGER
-	var $export = __webpack_require__(22);
+	// 20.1.2.6 Number.MAX_SAFE_INTEGER
+	var $export = __webpack_require__(23);
 
-	$export($export.S, 'Number', {MIN_SAFE_INTEGER: -0x1fffffffffffff});
+	$export($export.S, 'Number', {MAX_SAFE_INTEGER: 0x1fffffffffffff});
 
 /***/ }),
 /* 115 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var $export     = __webpack_require__(22)
-	  , $parseFloat = __webpack_require__(100);
-	// 20.1.2.12 Number.parseFloat(string)
-	$export($export.S + $export.F * (Number.parseFloat != $parseFloat), 'Number', {parseFloat: $parseFloat});
+	// 20.1.2.10 Number.MIN_SAFE_INTEGER
+	var $export = __webpack_require__(23);
+
+	$export($export.S, 'Number', {MIN_SAFE_INTEGER: -0x1fffffffffffff});
 
 /***/ }),
 /* 116 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var $export   = __webpack_require__(22)
-	  , $parseInt = __webpack_require__(96);
-	// 20.1.2.13 Number.parseInt(string, radix)
-	$export($export.S + $export.F * (Number.parseInt != $parseInt), 'Number', {parseInt: $parseInt});
+	var $export     = __webpack_require__(23)
+	  , $parseFloat = __webpack_require__(101);
+	// 20.1.2.12 Number.parseFloat(string)
+	$export($export.S + $export.F * (Number.parseFloat != $parseFloat), 'Number', {parseFloat: $parseFloat});
 
 /***/ }),
 /* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
+	var $export   = __webpack_require__(23)
+	  , $parseInt = __webpack_require__(97);
+	// 20.1.2.13 Number.parseInt(string, radix)
+	$export($export.S + $export.F * (Number.parseInt != $parseInt), 'Number', {parseInt: $parseInt});
+
+/***/ }),
+/* 118 */
+/***/ (function(module, exports, __webpack_require__) {
+
 	// 20.2.2.3 Math.acosh(x)
-	var $export = __webpack_require__(22)
-	  , log1p   = __webpack_require__(118)
+	var $export = __webpack_require__(23)
+	  , log1p   = __webpack_require__(119)
 	  , sqrt    = Math.sqrt
 	  , $acosh  = Math.acosh;
 
@@ -15417,7 +15565,7 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 118 */
+/* 119 */
 /***/ (function(module, exports) {
 
 	// 20.2.2.20 Math.log1p(x)
@@ -15426,11 +15574,11 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 119 */
+/* 120 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 20.2.2.5 Math.asinh(x)
-	var $export = __webpack_require__(22)
+	var $export = __webpack_require__(23)
 	  , $asinh  = Math.asinh;
 
 	function asinh(x){
@@ -15441,11 +15589,11 @@ var EmojidexClient =
 	$export($export.S + $export.F * !($asinh && 1 / $asinh(0) > 0), 'Math', {asinh: asinh});
 
 /***/ }),
-/* 120 */
+/* 121 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 20.2.2.7 Math.atanh(x)
-	var $export = __webpack_require__(22)
+	var $export = __webpack_require__(23)
 	  , $atanh  = Math.atanh;
 
 	// Tor Browser bug: Math.atanh(-0) -> 0 
@@ -15456,12 +15604,12 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 121 */
+/* 122 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 20.2.2.9 Math.cbrt(x)
-	var $export = __webpack_require__(22)
-	  , sign    = __webpack_require__(122);
+	var $export = __webpack_require__(23)
+	  , sign    = __webpack_require__(123);
 
 	$export($export.S, 'Math', {
 	  cbrt: function cbrt(x){
@@ -15470,7 +15618,7 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 122 */
+/* 123 */
 /***/ (function(module, exports) {
 
 	// 20.2.2.28 Math.sign(x)
@@ -15479,11 +15627,11 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 123 */
+/* 124 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 20.2.2.11 Math.clz32(x)
-	var $export = __webpack_require__(22);
+	var $export = __webpack_require__(23);
 
 	$export($export.S, 'Math', {
 	  clz32: function clz32(x){
@@ -15492,11 +15640,11 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 124 */
+/* 125 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 20.2.2.12 Math.cosh(x)
-	var $export = __webpack_require__(22)
+	var $export = __webpack_require__(23)
 	  , exp     = Math.exp;
 
 	$export($export.S, 'Math', {
@@ -15506,17 +15654,17 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 125 */
+/* 126 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 20.2.2.14 Math.expm1(x)
-	var $export = __webpack_require__(22)
-	  , $expm1  = __webpack_require__(126);
+	var $export = __webpack_require__(23)
+	  , $expm1  = __webpack_require__(127);
 
 	$export($export.S + $export.F * ($expm1 != Math.expm1), 'Math', {expm1: $expm1});
 
 /***/ }),
-/* 126 */
+/* 127 */
 /***/ (function(module, exports) {
 
 	// 20.2.2.14 Math.expm1(x)
@@ -15531,12 +15679,12 @@ var EmojidexClient =
 	} : $expm1;
 
 /***/ }),
-/* 127 */
+/* 128 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 20.2.2.16 Math.fround(x)
-	var $export   = __webpack_require__(22)
-	  , sign      = __webpack_require__(122)
+	var $export   = __webpack_require__(23)
+	  , sign      = __webpack_require__(123)
 	  , pow       = Math.pow
 	  , EPSILON   = pow(2, -52)
 	  , EPSILON32 = pow(2, -23)
@@ -15562,11 +15710,11 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 128 */
+/* 129 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 20.2.2.17 Math.hypot([value1[, value2[, … ]]])
-	var $export = __webpack_require__(22)
+	var $export = __webpack_require__(23)
 	  , abs     = Math.abs;
 
 	$export($export.S, 'Math', {
@@ -15592,15 +15740,15 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 129 */
+/* 130 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 20.2.2.18 Math.imul(x, y)
-	var $export = __webpack_require__(22)
+	var $export = __webpack_require__(23)
 	  , $imul   = Math.imul;
 
 	// some WebKit versions fails with big numbers, some has wrong arity
-	$export($export.S + $export.F * __webpack_require__(21)(function(){
+	$export($export.S + $export.F * __webpack_require__(22)(function(){
 	  return $imul(0xffffffff, 5) != -5 || $imul.length != 2;
 	}), 'Math', {
 	  imul: function imul(x, y){
@@ -15614,11 +15762,11 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 130 */
+/* 131 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 20.2.2.21 Math.log10(x)
-	var $export = __webpack_require__(22);
+	var $export = __webpack_require__(23);
 
 	$export($export.S, 'Math', {
 	  log10: function log10(x){
@@ -15627,20 +15775,20 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 131 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	// 20.2.2.20 Math.log1p(x)
-	var $export = __webpack_require__(22);
-
-	$export($export.S, 'Math', {log1p: __webpack_require__(118)});
-
-/***/ }),
 /* 132 */
 /***/ (function(module, exports, __webpack_require__) {
 
+	// 20.2.2.20 Math.log1p(x)
+	var $export = __webpack_require__(23);
+
+	$export($export.S, 'Math', {log1p: __webpack_require__(119)});
+
+/***/ }),
+/* 133 */
+/***/ (function(module, exports, __webpack_require__) {
+
 	// 20.2.2.22 Math.log2(x)
-	var $export = __webpack_require__(22);
+	var $export = __webpack_require__(23);
 
 	$export($export.S, 'Math', {
 	  log2: function log2(x){
@@ -15649,25 +15797,25 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 133 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	// 20.2.2.28 Math.sign(x)
-	var $export = __webpack_require__(22);
-
-	$export($export.S, 'Math', {sign: __webpack_require__(122)});
-
-/***/ }),
 /* 134 */
 /***/ (function(module, exports, __webpack_require__) {
 
+	// 20.2.2.28 Math.sign(x)
+	var $export = __webpack_require__(23);
+
+	$export($export.S, 'Math', {sign: __webpack_require__(123)});
+
+/***/ }),
+/* 135 */
+/***/ (function(module, exports, __webpack_require__) {
+
 	// 20.2.2.30 Math.sinh(x)
-	var $export = __webpack_require__(22)
-	  , expm1   = __webpack_require__(126)
+	var $export = __webpack_require__(23)
+	  , expm1   = __webpack_require__(127)
 	  , exp     = Math.exp;
 
 	// V8 near Chromium 38 has a problem with very small numbers
-	$export($export.S + $export.F * __webpack_require__(21)(function(){
+	$export($export.S + $export.F * __webpack_require__(22)(function(){
 	  return !Math.sinh(-2e-17) != -2e-17;
 	}), 'Math', {
 	  sinh: function sinh(x){
@@ -15678,12 +15826,12 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 135 */
+/* 136 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 20.2.2.33 Math.tanh(x)
-	var $export = __webpack_require__(22)
-	  , expm1   = __webpack_require__(126)
+	var $export = __webpack_require__(23)
+	  , expm1   = __webpack_require__(127)
 	  , exp     = Math.exp;
 
 	$export($export.S, 'Math', {
@@ -15695,11 +15843,11 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 136 */
+/* 137 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 20.2.2.34 Math.trunc(x)
-	var $export = __webpack_require__(22);
+	var $export = __webpack_require__(23);
 
 	$export($export.S, 'Math', {
 	  trunc: function trunc(it){
@@ -15708,11 +15856,11 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 137 */
+/* 138 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var $export        = __webpack_require__(22)
-	  , toIndex        = __webpack_require__(53)
+	var $export        = __webpack_require__(23)
+	  , toIndex        = __webpack_require__(54)
 	  , fromCharCode   = String.fromCharCode
 	  , $fromCodePoint = String.fromCodePoint;
 
@@ -15736,12 +15884,12 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 138 */
+/* 139 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var $export   = __webpack_require__(22)
-	  , toIObject = __webpack_require__(46)
-	  , toLength  = __webpack_require__(51);
+	var $export   = __webpack_require__(23)
+	  , toIObject = __webpack_require__(47)
+	  , toLength  = __webpack_require__(52);
 
 	$export($export.S, 'String', {
 	  // 21.1.2.4 String.raw(callSite, ...substitutions)
@@ -15759,26 +15907,26 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 139 */
+/* 140 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	// 21.1.3.25 String.prototype.trim()
-	__webpack_require__(97)('trim', function($trim){
+	__webpack_require__(98)('trim', function($trim){
 	  return function trim(){
 	    return $trim(this, 3);
 	  };
 	});
 
 /***/ }),
-/* 140 */
+/* 141 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $at  = __webpack_require__(141)(true);
+	var $at  = __webpack_require__(142)(true);
 
 	// 21.1.3.27 String.prototype[@@iterator]()
-	__webpack_require__(142)(String, 'String', function(iterated){
+	__webpack_require__(143)(String, 'String', function(iterated){
 	  this._t = String(iterated); // target
 	  this._i = 0;                // next index
 	// 21.1.5.2.1 %StringIteratorPrototype%.next()
@@ -15793,11 +15941,11 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 141 */
+/* 142 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var toInteger = __webpack_require__(52)
-	  , defined   = __webpack_require__(49);
+	var toInteger = __webpack_require__(53)
+	  , defined   = __webpack_require__(50);
 	// true  -> String#at
 	// false -> String#codePointAt
 	module.exports = function(TO_STRING){
@@ -15815,20 +15963,20 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 142 */
+/* 143 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var LIBRARY        = __webpack_require__(42)
-	  , $export        = __webpack_require__(22)
-	  , redefine       = __webpack_require__(32)
-	  , hide           = __webpack_require__(24)
-	  , has            = __webpack_require__(19)
-	  , Iterators      = __webpack_require__(143)
-	  , $iterCreate    = __webpack_require__(144)
-	  , setToStringTag = __webpack_require__(38)
-	  , getPrototypeOf = __webpack_require__(73)
-	  , ITERATOR       = __webpack_require__(39)('iterator')
+	var LIBRARY        = __webpack_require__(43)
+	  , $export        = __webpack_require__(23)
+	  , redefine       = __webpack_require__(33)
+	  , hide           = __webpack_require__(25)
+	  , has            = __webpack_require__(20)
+	  , Iterators      = __webpack_require__(144)
+	  , $iterCreate    = __webpack_require__(145)
+	  , setToStringTag = __webpack_require__(39)
+	  , getPrototypeOf = __webpack_require__(74)
+	  , ITERATOR       = __webpack_require__(40)('iterator')
 	  , BUGGY          = !([].keys && 'next' in [].keys()) // Safari has buggy iterators w/o `next`
 	  , FF_ITERATOR    = '@@iterator'
 	  , KEYS           = 'keys'
@@ -15890,23 +16038,23 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 143 */
+/* 144 */
 /***/ (function(module, exports) {
 
 	module.exports = {};
 
 /***/ }),
-/* 144 */
+/* 145 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var create         = __webpack_require__(60)
-	  , descriptor     = __webpack_require__(31)
-	  , setToStringTag = __webpack_require__(38)
+	var create         = __webpack_require__(61)
+	  , descriptor     = __webpack_require__(32)
+	  , setToStringTag = __webpack_require__(39)
 	  , IteratorPrototype = {};
 
 	// 25.1.2.1.1 %IteratorPrototype%[@@iterator]()
-	__webpack_require__(24)(IteratorPrototype, __webpack_require__(39)('iterator'), function(){ return this; });
+	__webpack_require__(25)(IteratorPrototype, __webpack_require__(40)('iterator'), function(){ return this; });
 
 	module.exports = function(Constructor, NAME, next){
 	  Constructor.prototype = create(IteratorPrototype, {next: descriptor(1, next)});
@@ -15914,12 +16062,12 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 145 */
+/* 146 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $export = __webpack_require__(22)
-	  , $at     = __webpack_require__(141)(false);
+	var $export = __webpack_require__(23)
+	  , $at     = __webpack_require__(142)(false);
 	$export($export.P, 'String', {
 	  // 21.1.3.3 String.prototype.codePointAt(pos)
 	  codePointAt: function codePointAt(pos){
@@ -15928,18 +16076,18 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 146 */
+/* 147 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 21.1.3.6 String.prototype.endsWith(searchString [, endPosition])
 	'use strict';
-	var $export   = __webpack_require__(22)
-	  , toLength  = __webpack_require__(51)
-	  , context   = __webpack_require__(147)
+	var $export   = __webpack_require__(23)
+	  , toLength  = __webpack_require__(52)
+	  , context   = __webpack_require__(148)
 	  , ENDS_WITH = 'endsWith'
 	  , $endsWith = ''[ENDS_WITH];
 
-	$export($export.P + $export.F * __webpack_require__(149)(ENDS_WITH), 'String', {
+	$export($export.P + $export.F * __webpack_require__(150)(ENDS_WITH), 'String', {
 	  endsWith: function endsWith(searchString /*, endPosition = @length */){
 	    var that = context(this, searchString, ENDS_WITH)
 	      , endPosition = arguments.length > 1 ? arguments[1] : undefined
@@ -15953,12 +16101,12 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 147 */
+/* 148 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// helper for String#{startsWith, endsWith, includes}
-	var isRegExp = __webpack_require__(148)
-	  , defined  = __webpack_require__(49);
+	var isRegExp = __webpack_require__(149)
+	  , defined  = __webpack_require__(50);
 
 	module.exports = function(that, searchString, NAME){
 	  if(isRegExp(searchString))throw TypeError('String#' + NAME + " doesn't accept regex!");
@@ -15966,23 +16114,23 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 148 */
+/* 149 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 7.2.8 IsRegExp(argument)
-	var isObject = __webpack_require__(27)
-	  , cof      = __webpack_require__(48)
-	  , MATCH    = __webpack_require__(39)('match');
+	var isObject = __webpack_require__(28)
+	  , cof      = __webpack_require__(49)
+	  , MATCH    = __webpack_require__(40)('match');
 	module.exports = function(it){
 	  var isRegExp;
 	  return isObject(it) && ((isRegExp = it[MATCH]) !== undefined ? !!isRegExp : cof(it) == 'RegExp');
 	};
 
 /***/ }),
-/* 149 */
+/* 150 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var MATCH = __webpack_require__(39)('match');
+	var MATCH = __webpack_require__(40)('match');
 	module.exports = function(KEY){
 	  var re = /./;
 	  try {
@@ -15996,16 +16144,16 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 150 */
+/* 151 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 21.1.3.7 String.prototype.includes(searchString, position = 0)
 	'use strict';
-	var $export  = __webpack_require__(22)
-	  , context  = __webpack_require__(147)
+	var $export  = __webpack_require__(23)
+	  , context  = __webpack_require__(148)
 	  , INCLUDES = 'includes';
 
-	$export($export.P + $export.F * __webpack_require__(149)(INCLUDES), 'String', {
+	$export($export.P + $export.F * __webpack_require__(150)(INCLUDES), 'String', {
 	  includes: function includes(searchString /*, position = 0 */){
 	    return !!~context(this, searchString, INCLUDES)
 	      .indexOf(searchString, arguments.length > 1 ? arguments[1] : undefined);
@@ -16013,29 +16161,29 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 151 */
+/* 152 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var $export = __webpack_require__(22);
+	var $export = __webpack_require__(23);
 
 	$export($export.P, 'String', {
 	  // 21.1.3.13 String.prototype.repeat(count)
-	  repeat: __webpack_require__(105)
+	  repeat: __webpack_require__(106)
 	});
 
 /***/ }),
-/* 152 */
+/* 153 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 21.1.3.18 String.prototype.startsWith(searchString [, position ])
 	'use strict';
-	var $export     = __webpack_require__(22)
-	  , toLength    = __webpack_require__(51)
-	  , context     = __webpack_require__(147)
+	var $export     = __webpack_require__(23)
+	  , toLength    = __webpack_require__(52)
+	  , context     = __webpack_require__(148)
 	  , STARTS_WITH = 'startsWith'
 	  , $startsWith = ''[STARTS_WITH];
 
-	$export($export.P + $export.F * __webpack_require__(149)(STARTS_WITH), 'String', {
+	$export($export.P + $export.F * __webpack_require__(150)(STARTS_WITH), 'String', {
 	  startsWith: function startsWith(searchString /*, position = 0 */){
 	    var that   = context(this, searchString, STARTS_WITH)
 	      , index  = toLength(Math.min(arguments.length > 1 ? arguments[1] : undefined, that.length))
@@ -16047,24 +16195,24 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 153 */
+/* 154 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	// B.2.3.2 String.prototype.anchor(name)
-	__webpack_require__(154)('anchor', function(createHTML){
+	__webpack_require__(155)('anchor', function(createHTML){
 	  return function anchor(name){
 	    return createHTML(this, 'a', 'name', name);
 	  }
 	});
 
 /***/ }),
-/* 154 */
+/* 155 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var $export = __webpack_require__(22)
-	  , fails   = __webpack_require__(21)
-	  , defined = __webpack_require__(49)
+	var $export = __webpack_require__(23)
+	  , fails   = __webpack_require__(22)
+	  , defined = __webpack_require__(50)
 	  , quot    = /"/g;
 	// B.2.3.2.1 CreateHTML(string, tag, attribute, value)
 	var createHTML = function(string, tag, attribute, value) {
@@ -16083,26 +16231,14 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 155 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-	// B.2.3.3 String.prototype.big()
-	__webpack_require__(154)('big', function(createHTML){
-	  return function big(){
-	    return createHTML(this, 'big', '', '');
-	  }
-	});
-
-/***/ }),
 /* 156 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	// B.2.3.4 String.prototype.blink()
-	__webpack_require__(154)('blink', function(createHTML){
-	  return function blink(){
-	    return createHTML(this, 'blink', '', '');
+	// B.2.3.3 String.prototype.big()
+	__webpack_require__(155)('big', function(createHTML){
+	  return function big(){
+	    return createHTML(this, 'big', '', '');
 	  }
 	});
 
@@ -16111,10 +16247,10 @@ var EmojidexClient =
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	// B.2.3.5 String.prototype.bold()
-	__webpack_require__(154)('bold', function(createHTML){
-	  return function bold(){
-	    return createHTML(this, 'b', '', '');
+	// B.2.3.4 String.prototype.blink()
+	__webpack_require__(155)('blink', function(createHTML){
+	  return function blink(){
+	    return createHTML(this, 'blink', '', '');
 	  }
 	});
 
@@ -16123,10 +16259,10 @@ var EmojidexClient =
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	// B.2.3.6 String.prototype.fixed()
-	__webpack_require__(154)('fixed', function(createHTML){
-	  return function fixed(){
-	    return createHTML(this, 'tt', '', '');
+	// B.2.3.5 String.prototype.bold()
+	__webpack_require__(155)('bold', function(createHTML){
+	  return function bold(){
+	    return createHTML(this, 'b', '', '');
 	  }
 	});
 
@@ -16135,10 +16271,10 @@ var EmojidexClient =
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	// B.2.3.7 String.prototype.fontcolor(color)
-	__webpack_require__(154)('fontcolor', function(createHTML){
-	  return function fontcolor(color){
-	    return createHTML(this, 'font', 'color', color);
+	// B.2.3.6 String.prototype.fixed()
+	__webpack_require__(155)('fixed', function(createHTML){
+	  return function fixed(){
+	    return createHTML(this, 'tt', '', '');
 	  }
 	});
 
@@ -16147,10 +16283,10 @@ var EmojidexClient =
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	// B.2.3.8 String.prototype.fontsize(size)
-	__webpack_require__(154)('fontsize', function(createHTML){
-	  return function fontsize(size){
-	    return createHTML(this, 'font', 'size', size);
+	// B.2.3.7 String.prototype.fontcolor(color)
+	__webpack_require__(155)('fontcolor', function(createHTML){
+	  return function fontcolor(color){
+	    return createHTML(this, 'font', 'color', color);
 	  }
 	});
 
@@ -16159,10 +16295,10 @@ var EmojidexClient =
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	// B.2.3.9 String.prototype.italics()
-	__webpack_require__(154)('italics', function(createHTML){
-	  return function italics(){
-	    return createHTML(this, 'i', '', '');
+	// B.2.3.8 String.prototype.fontsize(size)
+	__webpack_require__(155)('fontsize', function(createHTML){
+	  return function fontsize(size){
+	    return createHTML(this, 'font', 'size', size);
 	  }
 	});
 
@@ -16171,10 +16307,10 @@ var EmojidexClient =
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	// B.2.3.10 String.prototype.link(url)
-	__webpack_require__(154)('link', function(createHTML){
-	  return function link(url){
-	    return createHTML(this, 'a', 'href', url);
+	// B.2.3.9 String.prototype.italics()
+	__webpack_require__(155)('italics', function(createHTML){
+	  return function italics(){
+	    return createHTML(this, 'i', '', '');
 	  }
 	});
 
@@ -16183,10 +16319,10 @@ var EmojidexClient =
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	// B.2.3.11 String.prototype.small()
-	__webpack_require__(154)('small', function(createHTML){
-	  return function small(){
-	    return createHTML(this, 'small', '', '');
+	// B.2.3.10 String.prototype.link(url)
+	__webpack_require__(155)('link', function(createHTML){
+	  return function link(url){
+	    return createHTML(this, 'a', 'href', url);
 	  }
 	});
 
@@ -16195,10 +16331,10 @@ var EmojidexClient =
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	// B.2.3.12 String.prototype.strike()
-	__webpack_require__(154)('strike', function(createHTML){
-	  return function strike(){
-	    return createHTML(this, 'strike', '', '');
+	// B.2.3.11 String.prototype.small()
+	__webpack_require__(155)('small', function(createHTML){
+	  return function small(){
+	    return createHTML(this, 'small', '', '');
 	  }
 	});
 
@@ -16207,10 +16343,10 @@ var EmojidexClient =
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	// B.2.3.13 String.prototype.sub()
-	__webpack_require__(154)('sub', function(createHTML){
-	  return function sub(){
-	    return createHTML(this, 'sub', '', '');
+	// B.2.3.12 String.prototype.strike()
+	__webpack_require__(155)('strike', function(createHTML){
+	  return function strike(){
+	    return createHTML(this, 'strike', '', '');
 	  }
 	});
 
@@ -16219,10 +16355,10 @@ var EmojidexClient =
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	// B.2.3.14 String.prototype.sup()
-	__webpack_require__(154)('sup', function(createHTML){
-	  return function sup(){
-	    return createHTML(this, 'sup', '', '');
+	// B.2.3.13 String.prototype.sub()
+	__webpack_require__(155)('sub', function(createHTML){
+	  return function sub(){
+	    return createHTML(this, 'sub', '', '');
 	  }
 	});
 
@@ -16230,21 +16366,33 @@ var EmojidexClient =
 /* 167 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	// 20.3.3.1 / 15.9.4.4 Date.now()
-	var $export = __webpack_require__(22);
-
-	$export($export.S, 'Date', {now: function(){ return new Date().getTime(); }});
+	'use strict';
+	// B.2.3.14 String.prototype.sup()
+	__webpack_require__(155)('sup', function(createHTML){
+	  return function sup(){
+	    return createHTML(this, 'sup', '', '');
+	  }
+	});
 
 /***/ }),
 /* 168 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	'use strict';
-	var $export     = __webpack_require__(22)
-	  , toObject    = __webpack_require__(72)
-	  , toPrimitive = __webpack_require__(30);
+	// 20.3.3.1 / 15.9.4.4 Date.now()
+	var $export = __webpack_require__(23);
 
-	$export($export.P + $export.F * __webpack_require__(21)(function(){
+	$export($export.S, 'Date', {now: function(){ return new Date().getTime(); }});
+
+/***/ }),
+/* 169 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	var $export     = __webpack_require__(23)
+	  , toObject    = __webpack_require__(73)
+	  , toPrimitive = __webpack_require__(31);
+
+	$export($export.P + $export.F * __webpack_require__(22)(function(){
 	  return new Date(NaN).toJSON() !== null || Date.prototype.toJSON.call({toISOString: function(){ return 1; }}) !== 1;
 	}), 'Date', {
 	  toJSON: function toJSON(key){
@@ -16255,13 +16403,13 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 169 */
+/* 170 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	// 20.3.4.36 / 15.9.5.43 Date.prototype.toISOString()
-	var $export = __webpack_require__(22)
-	  , fails   = __webpack_require__(21)
+	var $export = __webpack_require__(23)
+	  , fails   = __webpack_require__(22)
 	  , getTime = Date.prototype.getTime;
 
 	var lz = function(num){
@@ -16288,7 +16436,7 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 170 */
+/* 171 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var DateProto    = Date.prototype
@@ -16297,28 +16445,28 @@ var EmojidexClient =
 	  , $toString    = DateProto[TO_STRING]
 	  , getTime      = DateProto.getTime;
 	if(new Date(NaN) + '' != INVALID_DATE){
-	  __webpack_require__(32)(DateProto, TO_STRING, function toString(){
+	  __webpack_require__(33)(DateProto, TO_STRING, function toString(){
 	    var value = getTime.call(this);
 	    return value === value ? $toString.call(this) : INVALID_DATE;
 	  });
 	}
 
 /***/ }),
-/* 171 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	var TO_PRIMITIVE = __webpack_require__(39)('toPrimitive')
-	  , proto        = Date.prototype;
-
-	if(!(TO_PRIMITIVE in proto))__webpack_require__(24)(proto, TO_PRIMITIVE, __webpack_require__(172));
-
-/***/ }),
 /* 172 */
 /***/ (function(module, exports, __webpack_require__) {
 
+	var TO_PRIMITIVE = __webpack_require__(40)('toPrimitive')
+	  , proto        = Date.prototype;
+
+	if(!(TO_PRIMITIVE in proto))__webpack_require__(25)(proto, TO_PRIMITIVE, __webpack_require__(173));
+
+/***/ }),
+/* 173 */
+/***/ (function(module, exports, __webpack_require__) {
+
 	'use strict';
-	var anObject    = __webpack_require__(26)
-	  , toPrimitive = __webpack_require__(30)
+	var anObject    = __webpack_require__(27)
+	  , toPrimitive = __webpack_require__(31)
 	  , NUMBER      = 'number';
 
 	module.exports = function(hint){
@@ -16327,29 +16475,29 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 173 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	// 22.1.2.2 / 15.4.3.2 Array.isArray(arg)
-	var $export = __webpack_require__(22);
-
-	$export($export.S, 'Array', {isArray: __webpack_require__(59)});
-
-/***/ }),
 /* 174 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	'use strict';
-	var ctx            = __webpack_require__(34)
-	  , $export        = __webpack_require__(22)
-	  , toObject       = __webpack_require__(72)
-	  , call           = __webpack_require__(175)
-	  , isArrayIter    = __webpack_require__(176)
-	  , toLength       = __webpack_require__(51)
-	  , createProperty = __webpack_require__(177)
-	  , getIterFn      = __webpack_require__(178);
+	// 22.1.2.2 / 15.4.3.2 Array.isArray(arg)
+	var $export = __webpack_require__(23);
 
-	$export($export.S + $export.F * !__webpack_require__(179)(function(iter){ Array.from(iter); }), 'Array', {
+	$export($export.S, 'Array', {isArray: __webpack_require__(60)});
+
+/***/ }),
+/* 175 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	var ctx            = __webpack_require__(35)
+	  , $export        = __webpack_require__(23)
+	  , toObject       = __webpack_require__(73)
+	  , call           = __webpack_require__(176)
+	  , isArrayIter    = __webpack_require__(177)
+	  , toLength       = __webpack_require__(52)
+	  , createProperty = __webpack_require__(178)
+	  , getIterFn      = __webpack_require__(179);
+
+	$export($export.S + $export.F * !__webpack_require__(180)(function(iter){ Array.from(iter); }), 'Array', {
 	  // 22.1.2.1 Array.from(arrayLike, mapfn = undefined, thisArg = undefined)
 	  from: function from(arrayLike/*, mapfn = undefined, thisArg = undefined*/){
 	    var O       = toObject(arrayLike)
@@ -16379,11 +16527,11 @@ var EmojidexClient =
 
 
 /***/ }),
-/* 175 */
+/* 176 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// call something on iterator step with safe closing on error
-	var anObject = __webpack_require__(26);
+	var anObject = __webpack_require__(27);
 	module.exports = function(iterator, fn, value, entries){
 	  try {
 	    return entries ? fn(anObject(value)[0], value[1]) : fn(value);
@@ -16396,12 +16544,12 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 176 */
+/* 177 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// check on default Array iterator
-	var Iterators  = __webpack_require__(143)
-	  , ITERATOR   = __webpack_require__(39)('iterator')
+	var Iterators  = __webpack_require__(144)
+	  , ITERATOR   = __webpack_require__(40)('iterator')
 	  , ArrayProto = Array.prototype;
 
 	module.exports = function(it){
@@ -16409,12 +16557,12 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 177 */
+/* 178 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $defineProperty = __webpack_require__(25)
-	  , createDesc      = __webpack_require__(31);
+	var $defineProperty = __webpack_require__(26)
+	  , createDesc      = __webpack_require__(32);
 
 	module.exports = function(object, index, value){
 	  if(index in object)$defineProperty.f(object, index, createDesc(0, value));
@@ -16422,23 +16570,23 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 178 */
+/* 179 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var classof   = __webpack_require__(89)
-	  , ITERATOR  = __webpack_require__(39)('iterator')
-	  , Iterators = __webpack_require__(143);
-	module.exports = __webpack_require__(23).getIteratorMethod = function(it){
+	var classof   = __webpack_require__(90)
+	  , ITERATOR  = __webpack_require__(40)('iterator')
+	  , Iterators = __webpack_require__(144);
+	module.exports = __webpack_require__(24).getIteratorMethod = function(it){
 	  if(it != undefined)return it[ITERATOR]
 	    || it['@@iterator']
 	    || Iterators[classof(it)];
 	};
 
 /***/ }),
-/* 179 */
+/* 180 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var ITERATOR     = __webpack_require__(39)('iterator')
+	var ITERATOR     = __webpack_require__(40)('iterator')
 	  , SAFE_CLOSING = false;
 
 	try {
@@ -16461,15 +16609,15 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 180 */
+/* 181 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $export        = __webpack_require__(22)
-	  , createProperty = __webpack_require__(177);
+	var $export        = __webpack_require__(23)
+	  , createProperty = __webpack_require__(178);
 
 	// WebKit Array.of isn't generic
-	$export($export.S + $export.F * __webpack_require__(21)(function(){
+	$export($export.S + $export.F * __webpack_require__(22)(function(){
 	  function F(){}
 	  return !(Array.of.call(F) instanceof F);
 	}), 'Array', {
@@ -16485,27 +16633,27 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 181 */
+/* 182 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	// 22.1.3.13 Array.prototype.join(separator)
-	var $export   = __webpack_require__(22)
-	  , toIObject = __webpack_require__(46)
+	var $export   = __webpack_require__(23)
+	  , toIObject = __webpack_require__(47)
 	  , arrayJoin = [].join;
 
 	// fallback for not array-like strings
-	$export($export.P + $export.F * (__webpack_require__(47) != Object || !__webpack_require__(182)(arrayJoin)), 'Array', {
+	$export($export.P + $export.F * (__webpack_require__(48) != Object || !__webpack_require__(183)(arrayJoin)), 'Array', {
 	  join: function join(separator){
 	    return arrayJoin.call(toIObject(this), separator === undefined ? ',' : separator);
 	  }
 	});
 
 /***/ }),
-/* 182 */
+/* 183 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var fails = __webpack_require__(21);
+	var fails = __webpack_require__(22);
 
 	module.exports = function(method, arg){
 	  return !!method && fails(function(){
@@ -16514,19 +16662,19 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 183 */
+/* 184 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $export    = __webpack_require__(22)
-	  , html       = __webpack_require__(62)
-	  , cof        = __webpack_require__(48)
-	  , toIndex    = __webpack_require__(53)
-	  , toLength   = __webpack_require__(51)
+	var $export    = __webpack_require__(23)
+	  , html       = __webpack_require__(63)
+	  , cof        = __webpack_require__(49)
+	  , toIndex    = __webpack_require__(54)
+	  , toLength   = __webpack_require__(52)
 	  , arraySlice = [].slice;
 
 	// fallback for not array-like ES3 strings and DOM objects
-	$export($export.P + $export.F * __webpack_require__(21)(function(){
+	$export($export.P + $export.F * __webpack_require__(22)(function(){
 	  if(html)arraySlice.call(html);
 	}), 'Array', {
 	  slice: function slice(begin, end){
@@ -16547,14 +16695,14 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 184 */
+/* 185 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $export   = __webpack_require__(22)
-	  , aFunction = __webpack_require__(35)
-	  , toObject  = __webpack_require__(72)
-	  , fails     = __webpack_require__(21)
+	var $export   = __webpack_require__(23)
+	  , aFunction = __webpack_require__(36)
+	  , toObject  = __webpack_require__(73)
+	  , fails     = __webpack_require__(22)
 	  , $sort     = [].sort
 	  , test      = [1, 2, 3];
 
@@ -16565,7 +16713,7 @@ var EmojidexClient =
 	  // V8 bug
 	  test.sort(null);
 	  // Old WebKit
-	}) || !__webpack_require__(182)($sort)), 'Array', {
+	}) || !__webpack_require__(183)($sort)), 'Array', {
 	  // 22.1.3.25 Array.prototype.sort(comparefn)
 	  sort: function sort(comparefn){
 	    return comparefn === undefined
@@ -16575,13 +16723,13 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 185 */
+/* 186 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $export  = __webpack_require__(22)
-	  , $forEach = __webpack_require__(186)(0)
-	  , STRICT   = __webpack_require__(182)([].forEach, true);
+	var $export  = __webpack_require__(23)
+	  , $forEach = __webpack_require__(187)(0)
+	  , STRICT   = __webpack_require__(183)([].forEach, true);
 
 	$export($export.P + $export.F * !STRICT, 'Array', {
 	  // 22.1.3.10 / 15.4.4.18 Array.prototype.forEach(callbackfn [, thisArg])
@@ -16591,7 +16739,7 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 186 */
+/* 187 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 0 -> Array#forEach
@@ -16601,11 +16749,11 @@ var EmojidexClient =
 	// 4 -> Array#every
 	// 5 -> Array#find
 	// 6 -> Array#findIndex
-	var ctx      = __webpack_require__(34)
-	  , IObject  = __webpack_require__(47)
-	  , toObject = __webpack_require__(72)
-	  , toLength = __webpack_require__(51)
-	  , asc      = __webpack_require__(187);
+	var ctx      = __webpack_require__(35)
+	  , IObject  = __webpack_require__(48)
+	  , toObject = __webpack_require__(73)
+	  , toLength = __webpack_require__(52)
+	  , asc      = __webpack_require__(188);
 	module.exports = function(TYPE, $create){
 	  var IS_MAP        = TYPE == 1
 	    , IS_FILTER     = TYPE == 2
@@ -16640,23 +16788,23 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 187 */
+/* 188 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 9.4.2.3 ArraySpeciesCreate(originalArray, length)
-	var speciesConstructor = __webpack_require__(188);
+	var speciesConstructor = __webpack_require__(189);
 
 	module.exports = function(original, length){
 	  return new (speciesConstructor(original))(length);
 	};
 
 /***/ }),
-/* 188 */
+/* 189 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var isObject = __webpack_require__(27)
-	  , isArray  = __webpack_require__(59)
-	  , SPECIES  = __webpack_require__(39)('species');
+	var isObject = __webpack_require__(28)
+	  , isArray  = __webpack_require__(60)
+	  , SPECIES  = __webpack_require__(40)('species');
 
 	module.exports = function(original){
 	  var C;
@@ -16672,32 +16820,17 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 189 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-	var $export = __webpack_require__(22)
-	  , $map    = __webpack_require__(186)(1);
-
-	$export($export.P + $export.F * !__webpack_require__(182)([].map, true), 'Array', {
-	  // 22.1.3.15 / 15.4.4.19 Array.prototype.map(callbackfn [, thisArg])
-	  map: function map(callbackfn /* , thisArg */){
-	    return $map(this, callbackfn, arguments[1]);
-	  }
-	});
-
-/***/ }),
 /* 190 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $export = __webpack_require__(22)
-	  , $filter = __webpack_require__(186)(2);
+	var $export = __webpack_require__(23)
+	  , $map    = __webpack_require__(187)(1);
 
-	$export($export.P + $export.F * !__webpack_require__(182)([].filter, true), 'Array', {
-	  // 22.1.3.7 / 15.4.4.20 Array.prototype.filter(callbackfn [, thisArg])
-	  filter: function filter(callbackfn /* , thisArg */){
-	    return $filter(this, callbackfn, arguments[1]);
+	$export($export.P + $export.F * !__webpack_require__(183)([].map, true), 'Array', {
+	  // 22.1.3.15 / 15.4.4.19 Array.prototype.map(callbackfn [, thisArg])
+	  map: function map(callbackfn /* , thisArg */){
+	    return $map(this, callbackfn, arguments[1]);
 	  }
 	});
 
@@ -16706,13 +16839,13 @@ var EmojidexClient =
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $export = __webpack_require__(22)
-	  , $some   = __webpack_require__(186)(3);
+	var $export = __webpack_require__(23)
+	  , $filter = __webpack_require__(187)(2);
 
-	$export($export.P + $export.F * !__webpack_require__(182)([].some, true), 'Array', {
-	  // 22.1.3.23 / 15.4.4.17 Array.prototype.some(callbackfn [, thisArg])
-	  some: function some(callbackfn /* , thisArg */){
-	    return $some(this, callbackfn, arguments[1]);
+	$export($export.P + $export.F * !__webpack_require__(183)([].filter, true), 'Array', {
+	  // 22.1.3.7 / 15.4.4.20 Array.prototype.filter(callbackfn [, thisArg])
+	  filter: function filter(callbackfn /* , thisArg */){
+	    return $filter(this, callbackfn, arguments[1]);
 	  }
 	});
 
@@ -16721,13 +16854,13 @@ var EmojidexClient =
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $export = __webpack_require__(22)
-	  , $every  = __webpack_require__(186)(4);
+	var $export = __webpack_require__(23)
+	  , $some   = __webpack_require__(187)(3);
 
-	$export($export.P + $export.F * !__webpack_require__(182)([].every, true), 'Array', {
-	  // 22.1.3.5 / 15.4.4.16 Array.prototype.every(callbackfn [, thisArg])
-	  every: function every(callbackfn /* , thisArg */){
-	    return $every(this, callbackfn, arguments[1]);
+	$export($export.P + $export.F * !__webpack_require__(183)([].some, true), 'Array', {
+	  // 22.1.3.23 / 15.4.4.17 Array.prototype.some(callbackfn [, thisArg])
+	  some: function some(callbackfn /* , thisArg */){
+	    return $some(this, callbackfn, arguments[1]);
 	  }
 	});
 
@@ -16736,13 +16869,13 @@ var EmojidexClient =
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $export = __webpack_require__(22)
-	  , $reduce = __webpack_require__(194);
+	var $export = __webpack_require__(23)
+	  , $every  = __webpack_require__(187)(4);
 
-	$export($export.P + $export.F * !__webpack_require__(182)([].reduce, true), 'Array', {
-	  // 22.1.3.18 / 15.4.4.21 Array.prototype.reduce(callbackfn [, initialValue])
-	  reduce: function reduce(callbackfn /* , initialValue */){
-	    return $reduce(this, callbackfn, arguments.length, arguments[1], false);
+	$export($export.P + $export.F * !__webpack_require__(183)([].every, true), 'Array', {
+	  // 22.1.3.5 / 15.4.4.16 Array.prototype.every(callbackfn [, thisArg])
+	  every: function every(callbackfn /* , thisArg */){
+	    return $every(this, callbackfn, arguments[1]);
 	  }
 	});
 
@@ -16750,10 +16883,25 @@ var EmojidexClient =
 /* 194 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var aFunction = __webpack_require__(35)
-	  , toObject  = __webpack_require__(72)
-	  , IObject   = __webpack_require__(47)
-	  , toLength  = __webpack_require__(51);
+	'use strict';
+	var $export = __webpack_require__(23)
+	  , $reduce = __webpack_require__(195);
+
+	$export($export.P + $export.F * !__webpack_require__(183)([].reduce, true), 'Array', {
+	  // 22.1.3.18 / 15.4.4.21 Array.prototype.reduce(callbackfn [, initialValue])
+	  reduce: function reduce(callbackfn /* , initialValue */){
+	    return $reduce(this, callbackfn, arguments.length, arguments[1], false);
+	  }
+	});
+
+/***/ }),
+/* 195 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	var aFunction = __webpack_require__(36)
+	  , toObject  = __webpack_require__(73)
+	  , IObject   = __webpack_require__(48)
+	  , toLength  = __webpack_require__(52);
 
 	module.exports = function(that, callbackfn, aLen, memo, isRight){
 	  aFunction(callbackfn);
@@ -16780,14 +16928,14 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 195 */
+/* 196 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $export = __webpack_require__(22)
-	  , $reduce = __webpack_require__(194);
+	var $export = __webpack_require__(23)
+	  , $reduce = __webpack_require__(195);
 
-	$export($export.P + $export.F * !__webpack_require__(182)([].reduceRight, true), 'Array', {
+	$export($export.P + $export.F * !__webpack_require__(183)([].reduceRight, true), 'Array', {
 	  // 22.1.3.19 / 15.4.4.22 Array.prototype.reduceRight(callbackfn [, initialValue])
 	  reduceRight: function reduceRight(callbackfn /* , initialValue */){
 	    return $reduce(this, callbackfn, arguments.length, arguments[1], true);
@@ -16795,16 +16943,16 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 196 */
+/* 197 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $export       = __webpack_require__(22)
-	  , $indexOf      = __webpack_require__(50)(false)
+	var $export       = __webpack_require__(23)
+	  , $indexOf      = __webpack_require__(51)(false)
 	  , $native       = [].indexOf
 	  , NEGATIVE_ZERO = !!$native && 1 / [1].indexOf(1, -0) < 0;
 
-	$export($export.P + $export.F * (NEGATIVE_ZERO || !__webpack_require__(182)($native)), 'Array', {
+	$export($export.P + $export.F * (NEGATIVE_ZERO || !__webpack_require__(183)($native)), 'Array', {
 	  // 22.1.3.11 / 15.4.4.14 Array.prototype.indexOf(searchElement [, fromIndex])
 	  indexOf: function indexOf(searchElement /*, fromIndex = 0 */){
 	    return NEGATIVE_ZERO
@@ -16815,18 +16963,18 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 197 */
+/* 198 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $export       = __webpack_require__(22)
-	  , toIObject     = __webpack_require__(46)
-	  , toInteger     = __webpack_require__(52)
-	  , toLength      = __webpack_require__(51)
+	var $export       = __webpack_require__(23)
+	  , toIObject     = __webpack_require__(47)
+	  , toInteger     = __webpack_require__(53)
+	  , toLength      = __webpack_require__(52)
 	  , $native       = [].lastIndexOf
 	  , NEGATIVE_ZERO = !!$native && 1 / [1].lastIndexOf(1, -0) < 0;
 
-	$export($export.P + $export.F * (NEGATIVE_ZERO || !__webpack_require__(182)($native)), 'Array', {
+	$export($export.P + $export.F * (NEGATIVE_ZERO || !__webpack_require__(183)($native)), 'Array', {
 	  // 22.1.3.14 / 15.4.4.15 Array.prototype.lastIndexOf(searchElement [, fromIndex])
 	  lastIndexOf: function lastIndexOf(searchElement /*, fromIndex = @[*-1] */){
 	    // convert -0 to +0
@@ -16842,25 +16990,25 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 198 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	// 22.1.3.3 Array.prototype.copyWithin(target, start, end = this.length)
-	var $export = __webpack_require__(22);
-
-	$export($export.P, 'Array', {copyWithin: __webpack_require__(199)});
-
-	__webpack_require__(200)('copyWithin');
-
-/***/ }),
 /* 199 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 22.1.3.3 Array.prototype.copyWithin(target, start, end = this.length)
+	var $export = __webpack_require__(23);
+
+	$export($export.P, 'Array', {copyWithin: __webpack_require__(200)});
+
+	__webpack_require__(201)('copyWithin');
+
+/***/ }),
+/* 200 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	// 22.1.3.3 Array.prototype.copyWithin(target, start, end = this.length)
 	'use strict';
-	var toObject = __webpack_require__(72)
-	  , toIndex  = __webpack_require__(53)
-	  , toLength = __webpack_require__(51);
+	var toObject = __webpack_require__(73)
+	  , toIndex  = __webpack_require__(54)
+	  , toLength = __webpack_require__(52);
 
 	module.exports = [].copyWithin || function copyWithin(target/*= 0*/, start/*= 0, end = @length*/){
 	  var O     = toObject(this)
@@ -16884,37 +17032,37 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 200 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	// 22.1.3.31 Array.prototype[@@unscopables]
-	var UNSCOPABLES = __webpack_require__(39)('unscopables')
-	  , ArrayProto  = Array.prototype;
-	if(ArrayProto[UNSCOPABLES] == undefined)__webpack_require__(24)(ArrayProto, UNSCOPABLES, {});
-	module.exports = function(key){
-	  ArrayProto[UNSCOPABLES][key] = true;
-	};
-
-/***/ }),
 /* 201 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	// 22.1.3.6 Array.prototype.fill(value, start = 0, end = this.length)
-	var $export = __webpack_require__(22);
-
-	$export($export.P, 'Array', {fill: __webpack_require__(202)});
-
-	__webpack_require__(200)('fill');
+	// 22.1.3.31 Array.prototype[@@unscopables]
+	var UNSCOPABLES = __webpack_require__(40)('unscopables')
+	  , ArrayProto  = Array.prototype;
+	if(ArrayProto[UNSCOPABLES] == undefined)__webpack_require__(25)(ArrayProto, UNSCOPABLES, {});
+	module.exports = function(key){
+	  ArrayProto[UNSCOPABLES][key] = true;
+	};
 
 /***/ }),
 /* 202 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 22.1.3.6 Array.prototype.fill(value, start = 0, end = this.length)
+	var $export = __webpack_require__(23);
+
+	$export($export.P, 'Array', {fill: __webpack_require__(203)});
+
+	__webpack_require__(201)('fill');
+
+/***/ }),
+/* 203 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	// 22.1.3.6 Array.prototype.fill(value, start = 0, end = this.length)
 	'use strict';
-	var toObject = __webpack_require__(72)
-	  , toIndex  = __webpack_require__(53)
-	  , toLength = __webpack_require__(51);
+	var toObject = __webpack_require__(73)
+	  , toIndex  = __webpack_require__(54)
+	  , toLength = __webpack_require__(52);
 	module.exports = function fill(value /*, start = 0, end = @length */){
 	  var O      = toObject(this)
 	    , length = toLength(O.length)
@@ -16927,13 +17075,13 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 203 */
+/* 204 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	// 22.1.3.8 Array.prototype.find(predicate, thisArg = undefined)
-	var $export = __webpack_require__(22)
-	  , $find   = __webpack_require__(186)(5)
+	var $export = __webpack_require__(23)
+	  , $find   = __webpack_require__(187)(5)
 	  , KEY     = 'find'
 	  , forced  = true;
 	// Shouldn't skip holes
@@ -16943,16 +17091,16 @@ var EmojidexClient =
 	    return $find(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
 	  }
 	});
-	__webpack_require__(200)(KEY);
+	__webpack_require__(201)(KEY);
 
 /***/ }),
-/* 204 */
+/* 205 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	// 22.1.3.9 Array.prototype.findIndex(predicate, thisArg = undefined)
-	var $export = __webpack_require__(22)
-	  , $find   = __webpack_require__(186)(6)
+	var $export = __webpack_require__(23)
+	  , $find   = __webpack_require__(187)(6)
 	  , KEY     = 'findIndex'
 	  , forced  = true;
 	// Shouldn't skip holes
@@ -16962,23 +17110,23 @@ var EmojidexClient =
 	    return $find(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
 	  }
 	});
-	__webpack_require__(200)(KEY);
-
-/***/ }),
-/* 205 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	__webpack_require__(206)('Array');
+	__webpack_require__(201)(KEY);
 
 /***/ }),
 /* 206 */
 /***/ (function(module, exports, __webpack_require__) {
 
+	__webpack_require__(207)('Array');
+
+/***/ }),
+/* 207 */
+/***/ (function(module, exports, __webpack_require__) {
+
 	'use strict';
-	var global      = __webpack_require__(18)
-	  , dP          = __webpack_require__(25)
-	  , DESCRIPTORS = __webpack_require__(20)
-	  , SPECIES     = __webpack_require__(39)('species');
+	var global      = __webpack_require__(19)
+	  , dP          = __webpack_require__(26)
+	  , DESCRIPTORS = __webpack_require__(21)
+	  , SPECIES     = __webpack_require__(40)('species');
 
 	module.exports = function(KEY){
 	  var C = global[KEY];
@@ -16989,20 +17137,20 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 207 */
+/* 208 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var addToUnscopables = __webpack_require__(200)
-	  , step             = __webpack_require__(208)
-	  , Iterators        = __webpack_require__(143)
-	  , toIObject        = __webpack_require__(46);
+	var addToUnscopables = __webpack_require__(201)
+	  , step             = __webpack_require__(209)
+	  , Iterators        = __webpack_require__(144)
+	  , toIObject        = __webpack_require__(47);
 
 	// 22.1.3.4 Array.prototype.entries()
 	// 22.1.3.13 Array.prototype.keys()
 	// 22.1.3.29 Array.prototype.values()
 	// 22.1.3.30 Array.prototype[@@iterator]()
-	module.exports = __webpack_require__(142)(Array, 'Array', function(iterated, kind){
+	module.exports = __webpack_require__(143)(Array, 'Array', function(iterated, kind){
 	  this._t = toIObject(iterated); // target
 	  this._i = 0;                   // next index
 	  this._k = kind;                // kind
@@ -17028,7 +17176,7 @@ var EmojidexClient =
 	addToUnscopables('entries');
 
 /***/ }),
-/* 208 */
+/* 209 */
 /***/ (function(module, exports) {
 
 	module.exports = function(done, value){
@@ -17036,15 +17184,15 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 209 */
+/* 210 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var global            = __webpack_require__(18)
-	  , inheritIfRequired = __webpack_require__(102)
-	  , dP                = __webpack_require__(25).f
-	  , gOPN              = __webpack_require__(64).f
-	  , isRegExp          = __webpack_require__(148)
-	  , $flags            = __webpack_require__(210)
+	var global            = __webpack_require__(19)
+	  , inheritIfRequired = __webpack_require__(103)
+	  , dP                = __webpack_require__(26).f
+	  , gOPN              = __webpack_require__(65).f
+	  , isRegExp          = __webpack_require__(149)
+	  , $flags            = __webpack_require__(211)
 	  , $RegExp           = global.RegExp
 	  , Base              = $RegExp
 	  , proto             = $RegExp.prototype
@@ -17053,8 +17201,8 @@ var EmojidexClient =
 	  // "new" creates a new object, old webkit buggy here
 	  , CORRECT_NEW       = new $RegExp(re1) !== re1;
 
-	if(__webpack_require__(20) && (!CORRECT_NEW || __webpack_require__(21)(function(){
-	  re2[__webpack_require__(39)('match')] = false;
+	if(__webpack_require__(21) && (!CORRECT_NEW || __webpack_require__(22)(function(){
+	  re2[__webpack_require__(40)('match')] = false;
 	  // RegExp constructor can alter flags and IsRegExp works correct with @@match
 	  return $RegExp(re1) != re1 || $RegExp(re2) == re2 || $RegExp(re1, 'i') != '/a/i';
 	}))){
@@ -17078,18 +17226,18 @@ var EmojidexClient =
 	  for(var keys = gOPN(Base), i = 0; keys.length > i; )proxy(keys[i++]);
 	  proto.constructor = $RegExp;
 	  $RegExp.prototype = proto;
-	  __webpack_require__(32)(global, 'RegExp', $RegExp);
+	  __webpack_require__(33)(global, 'RegExp', $RegExp);
 	}
 
-	__webpack_require__(206)('RegExp');
+	__webpack_require__(207)('RegExp');
 
 /***/ }),
-/* 210 */
+/* 211 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	// 21.2.5.3 get RegExp.prototype.flags
-	var anObject = __webpack_require__(26);
+	var anObject = __webpack_require__(27);
 	module.exports = function(){
 	  var that   = anObject(this)
 	    , result = '';
@@ -17102,23 +17250,23 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 211 */
+/* 212 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	__webpack_require__(212);
-	var anObject    = __webpack_require__(26)
-	  , $flags      = __webpack_require__(210)
-	  , DESCRIPTORS = __webpack_require__(20)
+	__webpack_require__(213);
+	var anObject    = __webpack_require__(27)
+	  , $flags      = __webpack_require__(211)
+	  , DESCRIPTORS = __webpack_require__(21)
 	  , TO_STRING   = 'toString'
 	  , $toString   = /./[TO_STRING];
 
 	var define = function(fn){
-	  __webpack_require__(32)(RegExp.prototype, TO_STRING, fn, true);
+	  __webpack_require__(33)(RegExp.prototype, TO_STRING, fn, true);
 	};
 
 	// 21.2.5.14 RegExp.prototype.toString()
-	if(__webpack_require__(21)(function(){ return $toString.call({source: 'a', flags: 'b'}) != '/a/b'; })){
+	if(__webpack_require__(22)(function(){ return $toString.call({source: 'a', flags: 'b'}) != '/a/b'; })){
 	  define(function toString(){
 	    var R = anObject(this);
 	    return '/'.concat(R.source, '/',
@@ -17132,21 +17280,21 @@ var EmojidexClient =
 	}
 
 /***/ }),
-/* 212 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	// 21.2.5.3 get RegExp.prototype.flags()
-	if(__webpack_require__(20) && /./g.flags != 'g')__webpack_require__(25).f(RegExp.prototype, 'flags', {
-	  configurable: true,
-	  get: __webpack_require__(210)
-	});
-
-/***/ }),
 /* 213 */
 /***/ (function(module, exports, __webpack_require__) {
 
+	// 21.2.5.3 get RegExp.prototype.flags()
+	if(__webpack_require__(21) && /./g.flags != 'g')__webpack_require__(26).f(RegExp.prototype, 'flags', {
+	  configurable: true,
+	  get: __webpack_require__(211)
+	});
+
+/***/ }),
+/* 214 */
+/***/ (function(module, exports, __webpack_require__) {
+
 	// @@match logic
-	__webpack_require__(214)('match', 1, function(defined, MATCH, $match){
+	__webpack_require__(215)('match', 1, function(defined, MATCH, $match){
 	  // 21.1.3.11 String.prototype.match(regexp)
 	  return [function match(regexp){
 	    'use strict';
@@ -17157,15 +17305,15 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 214 */
+/* 215 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var hide     = __webpack_require__(24)
-	  , redefine = __webpack_require__(32)
-	  , fails    = __webpack_require__(21)
-	  , defined  = __webpack_require__(49)
-	  , wks      = __webpack_require__(39);
+	var hide     = __webpack_require__(25)
+	  , redefine = __webpack_require__(33)
+	  , fails    = __webpack_require__(22)
+	  , defined  = __webpack_require__(50)
+	  , wks      = __webpack_require__(40);
 
 	module.exports = function(KEY, length, exec){
 	  var SYMBOL   = wks(KEY)
@@ -17190,11 +17338,11 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 215 */
+/* 216 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// @@replace logic
-	__webpack_require__(214)('replace', 2, function(defined, REPLACE, $replace){
+	__webpack_require__(215)('replace', 2, function(defined, REPLACE, $replace){
 	  // 21.1.3.14 String.prototype.replace(searchValue, replaceValue)
 	  return [function replace(searchValue, replaceValue){
 	    'use strict';
@@ -17207,11 +17355,11 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 216 */
+/* 217 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// @@search logic
-	__webpack_require__(214)('search', 1, function(defined, SEARCH, $search){
+	__webpack_require__(215)('search', 1, function(defined, SEARCH, $search){
 	  // 21.1.3.15 String.prototype.search(regexp)
 	  return [function search(regexp){
 	    'use strict';
@@ -17222,13 +17370,13 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 217 */
+/* 218 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// @@split logic
-	__webpack_require__(214)('split', 2, function(defined, SPLIT, $split){
+	__webpack_require__(215)('split', 2, function(defined, SPLIT, $split){
 	  'use strict';
-	  var isRegExp   = __webpack_require__(148)
+	  var isRegExp   = __webpack_require__(149)
 	    , _split     = $split
 	    , $push      = [].push
 	    , $SPLIT     = 'split'
@@ -17297,22 +17445,22 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 218 */
+/* 219 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var LIBRARY            = __webpack_require__(42)
-	  , global             = __webpack_require__(18)
-	  , ctx                = __webpack_require__(34)
-	  , classof            = __webpack_require__(89)
-	  , $export            = __webpack_require__(22)
-	  , isObject           = __webpack_require__(27)
-	  , aFunction          = __webpack_require__(35)
-	  , anInstance         = __webpack_require__(219)
-	  , forOf              = __webpack_require__(220)
-	  , speciesConstructor = __webpack_require__(221)
-	  , task               = __webpack_require__(222).set
-	  , microtask          = __webpack_require__(223)()
+	var LIBRARY            = __webpack_require__(43)
+	  , global             = __webpack_require__(19)
+	  , ctx                = __webpack_require__(35)
+	  , classof            = __webpack_require__(90)
+	  , $export            = __webpack_require__(23)
+	  , isObject           = __webpack_require__(28)
+	  , aFunction          = __webpack_require__(36)
+	  , anInstance         = __webpack_require__(220)
+	  , forOf              = __webpack_require__(221)
+	  , speciesConstructor = __webpack_require__(222)
+	  , task               = __webpack_require__(223).set
+	  , microtask          = __webpack_require__(224)()
 	  , PROMISE            = 'Promise'
 	  , TypeError          = global.TypeError
 	  , process            = global.process
@@ -17326,7 +17474,7 @@ var EmojidexClient =
 	  try {
 	    // correct subclassing with @@species support
 	    var promise     = $Promise.resolve(1)
-	      , FakePromise = (promise.constructor = {})[__webpack_require__(39)('species')] = function(exec){ exec(empty, empty); };
+	      , FakePromise = (promise.constructor = {})[__webpack_require__(40)('species')] = function(exec){ exec(empty, empty); };
 	    // unhandled rejections tracking support, NodeJS Promise without it fails @@species test
 	    return (isNode || typeof PromiseRejectionEvent == 'function') && promise.then(empty) instanceof FakePromise;
 	  } catch(e){ /* empty */ }
@@ -17504,7 +17652,7 @@ var EmojidexClient =
 	    this._h = 0;              // <- rejection state, 0 - default, 1 - handled, 2 - unhandled
 	    this._n = false;          // <- notify
 	  };
-	  Internal.prototype = __webpack_require__(224)($Promise.prototype, {
+	  Internal.prototype = __webpack_require__(225)($Promise.prototype, {
 	    // 25.4.5.3 Promise.prototype.then(onFulfilled, onRejected)
 	    then: function then(onFulfilled, onRejected){
 	      var reaction    = newPromiseCapability(speciesConstructor(this, $Promise));
@@ -17530,9 +17678,9 @@ var EmojidexClient =
 	}
 
 	$export($export.G + $export.W + $export.F * !USE_NATIVE, {Promise: $Promise});
-	__webpack_require__(38)($Promise, PROMISE);
-	__webpack_require__(206)(PROMISE);
-	Wrapper = __webpack_require__(23)[PROMISE];
+	__webpack_require__(39)($Promise, PROMISE);
+	__webpack_require__(207)(PROMISE);
+	Wrapper = __webpack_require__(24)[PROMISE];
 
 	// statics
 	$export($export.S + $export.F * !USE_NATIVE, PROMISE, {
@@ -17555,7 +17703,7 @@ var EmojidexClient =
 	    return capability.promise;
 	  }
 	});
-	$export($export.S + $export.F * !(USE_NATIVE && __webpack_require__(179)(function(iter){
+	$export($export.S + $export.F * !(USE_NATIVE && __webpack_require__(180)(function(iter){
 	  $Promise.all(iter)['catch'](empty);
 	})), PROMISE, {
 	  // 25.4.4.1 Promise.all(iterable)
@@ -17601,7 +17749,7 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 219 */
+/* 220 */
 /***/ (function(module, exports) {
 
 	module.exports = function(it, Constructor, name, forbiddenField){
@@ -17611,15 +17759,15 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 220 */
+/* 221 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var ctx         = __webpack_require__(34)
-	  , call        = __webpack_require__(175)
-	  , isArrayIter = __webpack_require__(176)
-	  , anObject    = __webpack_require__(26)
-	  , toLength    = __webpack_require__(51)
-	  , getIterFn   = __webpack_require__(178)
+	var ctx         = __webpack_require__(35)
+	  , call        = __webpack_require__(176)
+	  , isArrayIter = __webpack_require__(177)
+	  , anObject    = __webpack_require__(27)
+	  , toLength    = __webpack_require__(52)
+	  , getIterFn   = __webpack_require__(179)
 	  , BREAK       = {}
 	  , RETURN      = {};
 	var exports = module.exports = function(iterable, entries, fn, that, ITERATOR){
@@ -17641,27 +17789,27 @@ var EmojidexClient =
 	exports.RETURN = RETURN;
 
 /***/ }),
-/* 221 */
+/* 222 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 7.3.20 SpeciesConstructor(O, defaultConstructor)
-	var anObject  = __webpack_require__(26)
-	  , aFunction = __webpack_require__(35)
-	  , SPECIES   = __webpack_require__(39)('species');
+	var anObject  = __webpack_require__(27)
+	  , aFunction = __webpack_require__(36)
+	  , SPECIES   = __webpack_require__(40)('species');
 	module.exports = function(O, D){
 	  var C = anObject(O).constructor, S;
 	  return C === undefined || (S = anObject(C)[SPECIES]) == undefined ? D : aFunction(S);
 	};
 
 /***/ }),
-/* 222 */
+/* 223 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var ctx                = __webpack_require__(34)
-	  , invoke             = __webpack_require__(92)
-	  , html               = __webpack_require__(62)
-	  , cel                = __webpack_require__(29)
-	  , global             = __webpack_require__(18)
+	var ctx                = __webpack_require__(35)
+	  , invoke             = __webpack_require__(93)
+	  , html               = __webpack_require__(63)
+	  , cel                = __webpack_require__(30)
+	  , global             = __webpack_require__(19)
 	  , process            = global.process
 	  , setTask            = global.setImmediate
 	  , clearTask          = global.clearImmediate
@@ -17696,7 +17844,7 @@ var EmojidexClient =
 	    delete queue[id];
 	  };
 	  // Node.js 0.8-
-	  if(__webpack_require__(48)(process) == 'process'){
+	  if(__webpack_require__(49)(process) == 'process'){
 	    defer = function(id){
 	      process.nextTick(ctx(run, id, 1));
 	    };
@@ -17734,15 +17882,15 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 223 */
+/* 224 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var global    = __webpack_require__(18)
-	  , macrotask = __webpack_require__(222).set
+	var global    = __webpack_require__(19)
+	  , macrotask = __webpack_require__(223).set
 	  , Observer  = global.MutationObserver || global.WebKitMutationObserver
 	  , process   = global.process
 	  , Promise   = global.Promise
-	  , isNode    = __webpack_require__(48)(process) == 'process';
+	  , isNode    = __webpack_require__(49)(process) == 'process';
 
 	module.exports = function(){
 	  var head, last, notify;
@@ -17807,24 +17955,24 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 224 */
+/* 225 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var redefine = __webpack_require__(32);
+	var redefine = __webpack_require__(33);
 	module.exports = function(target, src, safe){
 	  for(var key in src)redefine(target, key, src[key], safe);
 	  return target;
 	};
 
 /***/ }),
-/* 225 */
+/* 226 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var strong = __webpack_require__(226);
+	var strong = __webpack_require__(227);
 
 	// 23.1 Map Objects
-	module.exports = __webpack_require__(227)('Map', function(get){
+	module.exports = __webpack_require__(228)('Map', function(get){
 	  return function Map(){ return get(this, arguments.length > 0 ? arguments[0] : undefined); };
 	}, {
 	  // 23.1.3.6 Map.prototype.get(key)
@@ -17839,22 +17987,22 @@ var EmojidexClient =
 	}, strong, true);
 
 /***/ }),
-/* 226 */
+/* 227 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var dP          = __webpack_require__(25).f
-	  , create      = __webpack_require__(60)
-	  , redefineAll = __webpack_require__(224)
-	  , ctx         = __webpack_require__(34)
-	  , anInstance  = __webpack_require__(219)
-	  , defined     = __webpack_require__(49)
-	  , forOf       = __webpack_require__(220)
-	  , $iterDefine = __webpack_require__(142)
-	  , step        = __webpack_require__(208)
-	  , setSpecies  = __webpack_require__(206)
-	  , DESCRIPTORS = __webpack_require__(20)
-	  , fastKey     = __webpack_require__(36).fastKey
+	var dP          = __webpack_require__(26).f
+	  , create      = __webpack_require__(61)
+	  , redefineAll = __webpack_require__(225)
+	  , ctx         = __webpack_require__(35)
+	  , anInstance  = __webpack_require__(220)
+	  , defined     = __webpack_require__(50)
+	  , forOf       = __webpack_require__(221)
+	  , $iterDefine = __webpack_require__(143)
+	  , step        = __webpack_require__(209)
+	  , setSpecies  = __webpack_require__(207)
+	  , DESCRIPTORS = __webpack_require__(21)
+	  , fastKey     = __webpack_require__(37).fastKey
 	  , SIZE        = DESCRIPTORS ? '_s' : 'size';
 
 	var getEntry = function(that, key){
@@ -17986,22 +18134,22 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 227 */
+/* 228 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var global            = __webpack_require__(18)
-	  , $export           = __webpack_require__(22)
-	  , redefine          = __webpack_require__(32)
-	  , redefineAll       = __webpack_require__(224)
-	  , meta              = __webpack_require__(36)
-	  , forOf             = __webpack_require__(220)
-	  , anInstance        = __webpack_require__(219)
-	  , isObject          = __webpack_require__(27)
-	  , fails             = __webpack_require__(21)
-	  , $iterDetect       = __webpack_require__(179)
-	  , setToStringTag    = __webpack_require__(38)
-	  , inheritIfRequired = __webpack_require__(102);
+	var global            = __webpack_require__(19)
+	  , $export           = __webpack_require__(23)
+	  , redefine          = __webpack_require__(33)
+	  , redefineAll       = __webpack_require__(225)
+	  , meta              = __webpack_require__(37)
+	  , forOf             = __webpack_require__(221)
+	  , anInstance        = __webpack_require__(220)
+	  , isObject          = __webpack_require__(28)
+	  , fails             = __webpack_require__(22)
+	  , $iterDetect       = __webpack_require__(180)
+	  , setToStringTag    = __webpack_require__(39)
+	  , inheritIfRequired = __webpack_require__(103);
 
 	module.exports = function(NAME, wrapper, methods, common, IS_MAP, IS_WEAK){
 	  var Base  = global[NAME]
@@ -18076,14 +18224,14 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 228 */
+/* 229 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var strong = __webpack_require__(226);
+	var strong = __webpack_require__(227);
 
 	// 23.2 Set Objects
-	module.exports = __webpack_require__(227)('Set', function(get){
+	module.exports = __webpack_require__(228)('Set', function(get){
 	  return function Set(){ return get(this, arguments.length > 0 ? arguments[0] : undefined); };
 	}, {
 	  // 23.2.3.1 Set.prototype.add(value)
@@ -18093,16 +18241,16 @@ var EmojidexClient =
 	}, strong);
 
 /***/ }),
-/* 229 */
+/* 230 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var each         = __webpack_require__(186)(0)
-	  , redefine     = __webpack_require__(32)
-	  , meta         = __webpack_require__(36)
-	  , assign       = __webpack_require__(83)
-	  , weak         = __webpack_require__(230)
-	  , isObject     = __webpack_require__(27)
+	var each         = __webpack_require__(187)(0)
+	  , redefine     = __webpack_require__(33)
+	  , meta         = __webpack_require__(37)
+	  , assign       = __webpack_require__(84)
+	  , weak         = __webpack_require__(231)
+	  , isObject     = __webpack_require__(28)
 	  , getWeak      = meta.getWeak
 	  , isExtensible = Object.isExtensible
 	  , uncaughtFrozenStore = weak.ufstore
@@ -18131,7 +18279,7 @@ var EmojidexClient =
 	};
 
 	// 23.3 WeakMap Objects
-	var $WeakMap = module.exports = __webpack_require__(227)('WeakMap', wrapper, methods, weak, true, true);
+	var $WeakMap = module.exports = __webpack_require__(228)('WeakMap', wrapper, methods, weak, true, true);
 
 	// IE11 WeakMap frozen keys fix
 	if(new $WeakMap().set((Object.freeze || Object)(tmp), 7).get(tmp) != 7){
@@ -18154,18 +18302,18 @@ var EmojidexClient =
 	}
 
 /***/ }),
-/* 230 */
+/* 231 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var redefineAll       = __webpack_require__(224)
-	  , getWeak           = __webpack_require__(36).getWeak
-	  , anObject          = __webpack_require__(26)
-	  , isObject          = __webpack_require__(27)
-	  , anInstance        = __webpack_require__(219)
-	  , forOf             = __webpack_require__(220)
-	  , createArrayMethod = __webpack_require__(186)
-	  , $has              = __webpack_require__(19)
+	var redefineAll       = __webpack_require__(225)
+	  , getWeak           = __webpack_require__(37).getWeak
+	  , anObject          = __webpack_require__(27)
+	  , isObject          = __webpack_require__(28)
+	  , anInstance        = __webpack_require__(220)
+	  , forOf             = __webpack_require__(221)
+	  , createArrayMethod = __webpack_require__(187)
+	  , $has              = __webpack_require__(20)
 	  , arrayFind         = createArrayMethod(5)
 	  , arrayFindIndex    = createArrayMethod(6)
 	  , id                = 0;
@@ -18242,14 +18390,14 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 231 */
+/* 232 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var weak = __webpack_require__(230);
+	var weak = __webpack_require__(231);
 
 	// 23.4 WeakSet Objects
-	__webpack_require__(227)('WeakSet', function(get){
+	__webpack_require__(228)('WeakSet', function(get){
 	  return function WeakSet(){ return get(this, arguments.length > 0 ? arguments[0] : undefined); };
 	}, {
 	  // 23.4.3.1 WeakSet.prototype.add(value)
@@ -18259,19 +18407,19 @@ var EmojidexClient =
 	}, weak, false, true);
 
 /***/ }),
-/* 232 */
+/* 233 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $export      = __webpack_require__(22)
-	  , $typed       = __webpack_require__(233)
-	  , buffer       = __webpack_require__(234)
-	  , anObject     = __webpack_require__(26)
-	  , toIndex      = __webpack_require__(53)
-	  , toLength     = __webpack_require__(51)
-	  , isObject     = __webpack_require__(27)
-	  , ArrayBuffer  = __webpack_require__(18).ArrayBuffer
-	  , speciesConstructor = __webpack_require__(221)
+	var $export      = __webpack_require__(23)
+	  , $typed       = __webpack_require__(234)
+	  , buffer       = __webpack_require__(235)
+	  , anObject     = __webpack_require__(27)
+	  , toIndex      = __webpack_require__(54)
+	  , toLength     = __webpack_require__(52)
+	  , isObject     = __webpack_require__(28)
+	  , ArrayBuffer  = __webpack_require__(19).ArrayBuffer
+	  , speciesConstructor = __webpack_require__(222)
 	  , $ArrayBuffer = buffer.ArrayBuffer
 	  , $DataView    = buffer.DataView
 	  , $isView      = $typed.ABV && ArrayBuffer.isView
@@ -18288,7 +18436,7 @@ var EmojidexClient =
 	  }
 	});
 
-	$export($export.P + $export.U + $export.F * __webpack_require__(21)(function(){
+	$export($export.P + $export.U + $export.F * __webpack_require__(22)(function(){
 	  return !new $ArrayBuffer(2).slice(1, undefined).byteLength;
 	}), ARRAY_BUFFER, {
 	  // 24.1.4.3 ArrayBuffer.prototype.slice(start, end)
@@ -18307,15 +18455,15 @@ var EmojidexClient =
 	  }
 	});
 
-	__webpack_require__(206)(ARRAY_BUFFER);
+	__webpack_require__(207)(ARRAY_BUFFER);
 
 /***/ }),
-/* 233 */
+/* 234 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var global = __webpack_require__(18)
-	  , hide   = __webpack_require__(24)
-	  , uid    = __webpack_require__(33)
+	var global = __webpack_require__(19)
+	  , hide   = __webpack_require__(25)
+	  , uid    = __webpack_require__(34)
 	  , TYPED  = uid('typed_array')
 	  , VIEW   = uid('view')
 	  , ABV    = !!(global.ArrayBuffer && global.DataView)
@@ -18341,24 +18489,24 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 234 */
+/* 235 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var global         = __webpack_require__(18)
-	  , DESCRIPTORS    = __webpack_require__(20)
-	  , LIBRARY        = __webpack_require__(42)
-	  , $typed         = __webpack_require__(233)
-	  , hide           = __webpack_require__(24)
-	  , redefineAll    = __webpack_require__(224)
-	  , fails          = __webpack_require__(21)
-	  , anInstance     = __webpack_require__(219)
-	  , toInteger      = __webpack_require__(52)
-	  , toLength       = __webpack_require__(51)
-	  , gOPN           = __webpack_require__(64).f
-	  , dP             = __webpack_require__(25).f
-	  , arrayFill      = __webpack_require__(202)
-	  , setToStringTag = __webpack_require__(38)
+	var global         = __webpack_require__(19)
+	  , DESCRIPTORS    = __webpack_require__(21)
+	  , LIBRARY        = __webpack_require__(43)
+	  , $typed         = __webpack_require__(234)
+	  , hide           = __webpack_require__(25)
+	  , redefineAll    = __webpack_require__(225)
+	  , fails          = __webpack_require__(22)
+	  , anInstance     = __webpack_require__(220)
+	  , toInteger      = __webpack_require__(53)
+	  , toLength       = __webpack_require__(52)
+	  , gOPN           = __webpack_require__(65).f
+	  , dP             = __webpack_require__(26).f
+	  , arrayFill      = __webpack_require__(203)
+	  , setToStringTag = __webpack_require__(39)
 	  , ARRAY_BUFFER   = 'ArrayBuffer'
 	  , DATA_VIEW      = 'DataView'
 	  , PROTOTYPE      = 'prototype'
@@ -18619,68 +18767,68 @@ var EmojidexClient =
 	exports[DATA_VIEW] = $DataView;
 
 /***/ }),
-/* 235 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	var $export = __webpack_require__(22);
-	$export($export.G + $export.W + $export.F * !__webpack_require__(233).ABV, {
-	  DataView: __webpack_require__(234).DataView
-	});
-
-/***/ }),
 /* 236 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	__webpack_require__(237)('Int8', 1, function(init){
-	  return function Int8Array(data, byteOffset, length){
-	    return init(this, data, byteOffset, length);
-	  };
+	var $export = __webpack_require__(23);
+	$export($export.G + $export.W + $export.F * !__webpack_require__(234).ABV, {
+	  DataView: __webpack_require__(235).DataView
 	});
 
 /***/ }),
 /* 237 */
 /***/ (function(module, exports, __webpack_require__) {
 
+	__webpack_require__(238)('Int8', 1, function(init){
+	  return function Int8Array(data, byteOffset, length){
+	    return init(this, data, byteOffset, length);
+	  };
+	});
+
+/***/ }),
+/* 238 */
+/***/ (function(module, exports, __webpack_require__) {
+
 	'use strict';
-	if(__webpack_require__(20)){
-	  var LIBRARY             = __webpack_require__(42)
-	    , global              = __webpack_require__(18)
-	    , fails               = __webpack_require__(21)
-	    , $export             = __webpack_require__(22)
-	    , $typed              = __webpack_require__(233)
-	    , $buffer             = __webpack_require__(234)
-	    , ctx                 = __webpack_require__(34)
-	    , anInstance          = __webpack_require__(219)
-	    , propertyDesc        = __webpack_require__(31)
-	    , hide                = __webpack_require__(24)
-	    , redefineAll         = __webpack_require__(224)
-	    , toInteger           = __webpack_require__(52)
-	    , toLength            = __webpack_require__(51)
-	    , toIndex             = __webpack_require__(53)
-	    , toPrimitive         = __webpack_require__(30)
-	    , has                 = __webpack_require__(19)
-	    , same                = __webpack_require__(85)
-	    , classof             = __webpack_require__(89)
-	    , isObject            = __webpack_require__(27)
-	    , toObject            = __webpack_require__(72)
-	    , isArrayIter         = __webpack_require__(176)
-	    , create              = __webpack_require__(60)
-	    , getPrototypeOf      = __webpack_require__(73)
-	    , gOPN                = __webpack_require__(64).f
-	    , getIterFn           = __webpack_require__(178)
-	    , uid                 = __webpack_require__(33)
-	    , wks                 = __webpack_require__(39)
-	    , createArrayMethod   = __webpack_require__(186)
-	    , createArrayIncludes = __webpack_require__(50)
-	    , speciesConstructor  = __webpack_require__(221)
-	    , ArrayIterators      = __webpack_require__(207)
-	    , Iterators           = __webpack_require__(143)
-	    , $iterDetect         = __webpack_require__(179)
-	    , setSpecies          = __webpack_require__(206)
-	    , arrayFill           = __webpack_require__(202)
-	    , arrayCopyWithin     = __webpack_require__(199)
-	    , $DP                 = __webpack_require__(25)
-	    , $GOPD               = __webpack_require__(65)
+	if(__webpack_require__(21)){
+	  var LIBRARY             = __webpack_require__(43)
+	    , global              = __webpack_require__(19)
+	    , fails               = __webpack_require__(22)
+	    , $export             = __webpack_require__(23)
+	    , $typed              = __webpack_require__(234)
+	    , $buffer             = __webpack_require__(235)
+	    , ctx                 = __webpack_require__(35)
+	    , anInstance          = __webpack_require__(220)
+	    , propertyDesc        = __webpack_require__(32)
+	    , hide                = __webpack_require__(25)
+	    , redefineAll         = __webpack_require__(225)
+	    , toInteger           = __webpack_require__(53)
+	    , toLength            = __webpack_require__(52)
+	    , toIndex             = __webpack_require__(54)
+	    , toPrimitive         = __webpack_require__(31)
+	    , has                 = __webpack_require__(20)
+	    , same                = __webpack_require__(86)
+	    , classof             = __webpack_require__(90)
+	    , isObject            = __webpack_require__(28)
+	    , toObject            = __webpack_require__(73)
+	    , isArrayIter         = __webpack_require__(177)
+	    , create              = __webpack_require__(61)
+	    , getPrototypeOf      = __webpack_require__(74)
+	    , gOPN                = __webpack_require__(65).f
+	    , getIterFn           = __webpack_require__(179)
+	    , uid                 = __webpack_require__(34)
+	    , wks                 = __webpack_require__(40)
+	    , createArrayMethod   = __webpack_require__(187)
+	    , createArrayIncludes = __webpack_require__(51)
+	    , speciesConstructor  = __webpack_require__(222)
+	    , ArrayIterators      = __webpack_require__(208)
+	    , Iterators           = __webpack_require__(144)
+	    , $iterDetect         = __webpack_require__(180)
+	    , setSpecies          = __webpack_require__(207)
+	    , arrayFill           = __webpack_require__(203)
+	    , arrayCopyWithin     = __webpack_require__(200)
+	    , $DP                 = __webpack_require__(26)
+	    , $GOPD               = __webpack_require__(66)
 	    , dP                  = $DP.f
 	    , gOPD                = $GOPD.f
 	    , RangeError          = global.RangeError
@@ -19122,41 +19270,31 @@ var EmojidexClient =
 	} else module.exports = function(){ /* empty */ };
 
 /***/ }),
-/* 238 */
+/* 239 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	__webpack_require__(237)('Uint8', 1, function(init){
+	__webpack_require__(238)('Uint8', 1, function(init){
 	  return function Uint8Array(data, byteOffset, length){
 	    return init(this, data, byteOffset, length);
 	  };
 	});
 
 /***/ }),
-/* 239 */
+/* 240 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	__webpack_require__(237)('Uint8', 1, function(init){
+	__webpack_require__(238)('Uint8', 1, function(init){
 	  return function Uint8ClampedArray(data, byteOffset, length){
 	    return init(this, data, byteOffset, length);
 	  };
 	}, true);
 
 /***/ }),
-/* 240 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	__webpack_require__(237)('Int16', 2, function(init){
-	  return function Int16Array(data, byteOffset, length){
-	    return init(this, data, byteOffset, length);
-	  };
-	});
-
-/***/ }),
 /* 241 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	__webpack_require__(237)('Uint16', 2, function(init){
-	  return function Uint16Array(data, byteOffset, length){
+	__webpack_require__(238)('Int16', 2, function(init){
+	  return function Int16Array(data, byteOffset, length){
 	    return init(this, data, byteOffset, length);
 	  };
 	});
@@ -19165,8 +19303,8 @@ var EmojidexClient =
 /* 242 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	__webpack_require__(237)('Int32', 4, function(init){
-	  return function Int32Array(data, byteOffset, length){
+	__webpack_require__(238)('Uint16', 2, function(init){
+	  return function Uint16Array(data, byteOffset, length){
 	    return init(this, data, byteOffset, length);
 	  };
 	});
@@ -19175,8 +19313,8 @@ var EmojidexClient =
 /* 243 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	__webpack_require__(237)('Uint32', 4, function(init){
-	  return function Uint32Array(data, byteOffset, length){
+	__webpack_require__(238)('Int32', 4, function(init){
+	  return function Int32Array(data, byteOffset, length){
 	    return init(this, data, byteOffset, length);
 	  };
 	});
@@ -19185,8 +19323,8 @@ var EmojidexClient =
 /* 244 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	__webpack_require__(237)('Float32', 4, function(init){
-	  return function Float32Array(data, byteOffset, length){
+	__webpack_require__(238)('Uint32', 4, function(init){
+	  return function Uint32Array(data, byteOffset, length){
 	    return init(this, data, byteOffset, length);
 	  };
 	});
@@ -19195,8 +19333,8 @@ var EmojidexClient =
 /* 245 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	__webpack_require__(237)('Float64', 8, function(init){
-	  return function Float64Array(data, byteOffset, length){
+	__webpack_require__(238)('Float32', 4, function(init){
+	  return function Float32Array(data, byteOffset, length){
 	    return init(this, data, byteOffset, length);
 	  };
 	});
@@ -19205,14 +19343,24 @@ var EmojidexClient =
 /* 246 */
 /***/ (function(module, exports, __webpack_require__) {
 
+	__webpack_require__(238)('Float64', 8, function(init){
+	  return function Float64Array(data, byteOffset, length){
+	    return init(this, data, byteOffset, length);
+	  };
+	});
+
+/***/ }),
+/* 247 */
+/***/ (function(module, exports, __webpack_require__) {
+
 	// 26.1.1 Reflect.apply(target, thisArgument, argumentsList)
-	var $export   = __webpack_require__(22)
-	  , aFunction = __webpack_require__(35)
-	  , anObject  = __webpack_require__(26)
-	  , rApply    = (__webpack_require__(18).Reflect || {}).apply
+	var $export   = __webpack_require__(23)
+	  , aFunction = __webpack_require__(36)
+	  , anObject  = __webpack_require__(27)
+	  , rApply    = (__webpack_require__(19).Reflect || {}).apply
 	  , fApply    = Function.apply;
 	// MS Edge argumentsList argument is optional
-	$export($export.S + $export.F * !__webpack_require__(21)(function(){
+	$export($export.S + $export.F * !__webpack_require__(22)(function(){
 	  rApply(function(){});
 	}), 'Reflect', {
 	  apply: function apply(target, thisArgument, argumentsList){
@@ -19223,18 +19371,18 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 247 */
+/* 248 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 26.1.2 Reflect.construct(target, argumentsList [, newTarget])
-	var $export    = __webpack_require__(22)
-	  , create     = __webpack_require__(60)
-	  , aFunction  = __webpack_require__(35)
-	  , anObject   = __webpack_require__(26)
-	  , isObject   = __webpack_require__(27)
-	  , fails      = __webpack_require__(21)
-	  , bind       = __webpack_require__(91)
-	  , rConstruct = (__webpack_require__(18).Reflect || {}).construct;
+	var $export    = __webpack_require__(23)
+	  , create     = __webpack_require__(61)
+	  , aFunction  = __webpack_require__(36)
+	  , anObject   = __webpack_require__(27)
+	  , isObject   = __webpack_require__(28)
+	  , fails      = __webpack_require__(22)
+	  , bind       = __webpack_require__(92)
+	  , rConstruct = (__webpack_require__(19).Reflect || {}).construct;
 
 	// MS Edge supports only 2 arguments and argumentsList argument is optional
 	// FF Nightly sets third argument as `new.target`, but does not create `this` from it
@@ -19275,17 +19423,17 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 248 */
+/* 249 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 26.1.3 Reflect.defineProperty(target, propertyKey, attributes)
-	var dP          = __webpack_require__(25)
-	  , $export     = __webpack_require__(22)
-	  , anObject    = __webpack_require__(26)
-	  , toPrimitive = __webpack_require__(30);
+	var dP          = __webpack_require__(26)
+	  , $export     = __webpack_require__(23)
+	  , anObject    = __webpack_require__(27)
+	  , toPrimitive = __webpack_require__(31);
 
 	// MS Edge has broken Reflect.defineProperty - throwing instead of returning false
-	$export($export.S + $export.F * __webpack_require__(21)(function(){
+	$export($export.S + $export.F * __webpack_require__(22)(function(){
 	  Reflect.defineProperty(dP.f({}, 1, {value: 1}), 1, {value: 2});
 	}), 'Reflect', {
 	  defineProperty: function defineProperty(target, propertyKey, attributes){
@@ -19302,13 +19450,13 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 249 */
+/* 250 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 26.1.4 Reflect.deleteProperty(target, propertyKey)
-	var $export  = __webpack_require__(22)
-	  , gOPD     = __webpack_require__(65).f
-	  , anObject = __webpack_require__(26);
+	var $export  = __webpack_require__(23)
+	  , gOPD     = __webpack_require__(66).f
+	  , anObject = __webpack_require__(27);
 
 	$export($export.S, 'Reflect', {
 	  deleteProperty: function deleteProperty(target, propertyKey){
@@ -19318,13 +19466,13 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 250 */
+/* 251 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	// 26.1.5 Reflect.enumerate(target)
-	var $export  = __webpack_require__(22)
-	  , anObject = __webpack_require__(26);
+	var $export  = __webpack_require__(23)
+	  , anObject = __webpack_require__(27);
 	var Enumerate = function(iterated){
 	  this._t = anObject(iterated); // target
 	  this._i = 0;                  // next index
@@ -19332,7 +19480,7 @@ var EmojidexClient =
 	    , key;
 	  for(key in iterated)keys.push(key);
 	};
-	__webpack_require__(144)(Enumerate, 'Object', function(){
+	__webpack_require__(145)(Enumerate, 'Object', function(){
 	  var that = this
 	    , keys = that._k
 	    , key;
@@ -19349,16 +19497,16 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 251 */
+/* 252 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 26.1.6 Reflect.get(target, propertyKey [, receiver])
-	var gOPD           = __webpack_require__(65)
-	  , getPrototypeOf = __webpack_require__(73)
-	  , has            = __webpack_require__(19)
-	  , $export        = __webpack_require__(22)
-	  , isObject       = __webpack_require__(27)
-	  , anObject       = __webpack_require__(26);
+	var gOPD           = __webpack_require__(66)
+	  , getPrototypeOf = __webpack_require__(74)
+	  , has            = __webpack_require__(20)
+	  , $export        = __webpack_require__(23)
+	  , isObject       = __webpack_require__(28)
+	  , anObject       = __webpack_require__(27);
 
 	function get(target, propertyKey/*, receiver*/){
 	  var receiver = arguments.length < 3 ? target : arguments[2]
@@ -19375,13 +19523,13 @@ var EmojidexClient =
 	$export($export.S, 'Reflect', {get: get});
 
 /***/ }),
-/* 252 */
+/* 253 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 26.1.7 Reflect.getOwnPropertyDescriptor(target, propertyKey)
-	var gOPD     = __webpack_require__(65)
-	  , $export  = __webpack_require__(22)
-	  , anObject = __webpack_require__(26);
+	var gOPD     = __webpack_require__(66)
+	  , $export  = __webpack_require__(23)
+	  , anObject = __webpack_require__(27);
 
 	$export($export.S, 'Reflect', {
 	  getOwnPropertyDescriptor: function getOwnPropertyDescriptor(target, propertyKey){
@@ -19390,13 +19538,13 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 253 */
+/* 254 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 26.1.8 Reflect.getPrototypeOf(target)
-	var $export  = __webpack_require__(22)
-	  , getProto = __webpack_require__(73)
-	  , anObject = __webpack_require__(26);
+	var $export  = __webpack_require__(23)
+	  , getProto = __webpack_require__(74)
+	  , anObject = __webpack_require__(27);
 
 	$export($export.S, 'Reflect', {
 	  getPrototypeOf: function getPrototypeOf(target){
@@ -19405,11 +19553,11 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 254 */
+/* 255 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 26.1.9 Reflect.has(target, propertyKey)
-	var $export = __webpack_require__(22);
+	var $export = __webpack_require__(23);
 
 	$export($export.S, 'Reflect', {
 	  has: function has(target, propertyKey){
@@ -19418,12 +19566,12 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 255 */
+/* 256 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 26.1.10 Reflect.isExtensible(target)
-	var $export       = __webpack_require__(22)
-	  , anObject      = __webpack_require__(26)
+	var $export       = __webpack_require__(23)
+	  , anObject      = __webpack_require__(27)
 	  , $isExtensible = Object.isExtensible;
 
 	$export($export.S, 'Reflect', {
@@ -19434,23 +19582,23 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 256 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	// 26.1.11 Reflect.ownKeys(target)
-	var $export = __webpack_require__(22);
-
-	$export($export.S, 'Reflect', {ownKeys: __webpack_require__(257)});
-
-/***/ }),
 /* 257 */
 /***/ (function(module, exports, __webpack_require__) {
 
+	// 26.1.11 Reflect.ownKeys(target)
+	var $export = __webpack_require__(23);
+
+	$export($export.S, 'Reflect', {ownKeys: __webpack_require__(258)});
+
+/***/ }),
+/* 258 */
+/***/ (function(module, exports, __webpack_require__) {
+
 	// all object keys, includes non-enumerable and symbols
-	var gOPN     = __webpack_require__(64)
-	  , gOPS     = __webpack_require__(57)
-	  , anObject = __webpack_require__(26)
-	  , Reflect  = __webpack_require__(18).Reflect;
+	var gOPN     = __webpack_require__(65)
+	  , gOPS     = __webpack_require__(58)
+	  , anObject = __webpack_require__(27)
+	  , Reflect  = __webpack_require__(19).Reflect;
 	module.exports = Reflect && Reflect.ownKeys || function ownKeys(it){
 	  var keys       = gOPN.f(anObject(it))
 	    , getSymbols = gOPS.f;
@@ -19458,12 +19606,12 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 258 */
+/* 259 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 26.1.12 Reflect.preventExtensions(target)
-	var $export            = __webpack_require__(22)
-	  , anObject           = __webpack_require__(26)
+	var $export            = __webpack_require__(23)
+	  , anObject           = __webpack_require__(27)
 	  , $preventExtensions = Object.preventExtensions;
 
 	$export($export.S, 'Reflect', {
@@ -19479,18 +19627,18 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 259 */
+/* 260 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 26.1.13 Reflect.set(target, propertyKey, V [, receiver])
-	var dP             = __webpack_require__(25)
-	  , gOPD           = __webpack_require__(65)
-	  , getPrototypeOf = __webpack_require__(73)
-	  , has            = __webpack_require__(19)
-	  , $export        = __webpack_require__(22)
-	  , createDesc     = __webpack_require__(31)
-	  , anObject       = __webpack_require__(26)
-	  , isObject       = __webpack_require__(27);
+	var dP             = __webpack_require__(26)
+	  , gOPD           = __webpack_require__(66)
+	  , getPrototypeOf = __webpack_require__(74)
+	  , has            = __webpack_require__(20)
+	  , $export        = __webpack_require__(23)
+	  , createDesc     = __webpack_require__(32)
+	  , anObject       = __webpack_require__(27)
+	  , isObject       = __webpack_require__(28);
 
 	function set(target, propertyKey, V/*, receiver*/){
 	  var receiver = arguments.length < 4 ? target : arguments[3]
@@ -19515,12 +19663,12 @@ var EmojidexClient =
 	$export($export.S, 'Reflect', {set: set});
 
 /***/ }),
-/* 260 */
+/* 261 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 26.1.14 Reflect.setPrototypeOf(target, proto)
-	var $export  = __webpack_require__(22)
-	  , setProto = __webpack_require__(87);
+	var $export  = __webpack_require__(23)
+	  , setProto = __webpack_require__(88);
 
 	if(setProto)$export($export.S, 'Reflect', {
 	  setPrototypeOf: function setPrototypeOf(target, proto){
@@ -19535,13 +19683,13 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 261 */
+/* 262 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	// https://github.com/tc39/Array.prototype.includes
-	var $export   = __webpack_require__(22)
-	  , $includes = __webpack_require__(50)(true);
+	var $export   = __webpack_require__(23)
+	  , $includes = __webpack_require__(51)(true);
 
 	$export($export.P, 'Array', {
 	  includes: function includes(el /*, fromIndex = 0 */){
@@ -19549,16 +19697,16 @@ var EmojidexClient =
 	  }
 	});
 
-	__webpack_require__(200)('includes');
+	__webpack_require__(201)('includes');
 
 /***/ }),
-/* 262 */
+/* 263 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	// https://github.com/mathiasbynens/String.prototype.at
-	var $export = __webpack_require__(22)
-	  , $at     = __webpack_require__(141)(true);
+	var $export = __webpack_require__(23)
+	  , $at     = __webpack_require__(142)(true);
 
 	$export($export.P, 'String', {
 	  at: function at(pos){
@@ -19567,13 +19715,13 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 263 */
+/* 264 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	// https://github.com/tc39/proposal-string-pad-start-end
-	var $export = __webpack_require__(22)
-	  , $pad    = __webpack_require__(264);
+	var $export = __webpack_require__(23)
+	  , $pad    = __webpack_require__(265);
 
 	$export($export.P, 'String', {
 	  padStart: function padStart(maxLength /*, fillString = ' ' */){
@@ -19582,13 +19730,13 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 264 */
+/* 265 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// https://github.com/tc39/proposal-string-pad-start-end
-	var toLength = __webpack_require__(51)
-	  , repeat   = __webpack_require__(105)
-	  , defined  = __webpack_require__(49);
+	var toLength = __webpack_require__(52)
+	  , repeat   = __webpack_require__(106)
+	  , defined  = __webpack_require__(50);
 
 	module.exports = function(that, maxLength, fillString, left){
 	  var S            = String(defined(that))
@@ -19604,13 +19752,13 @@ var EmojidexClient =
 
 
 /***/ }),
-/* 265 */
+/* 266 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	// https://github.com/tc39/proposal-string-pad-start-end
-	var $export = __webpack_require__(22)
-	  , $pad    = __webpack_require__(264);
+	var $export = __webpack_require__(23)
+	  , $pad    = __webpack_require__(265);
 
 	$export($export.P, 'String', {
 	  padEnd: function padEnd(maxLength /*, fillString = ' ' */){
@@ -19619,40 +19767,40 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 266 */
+/* 267 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	// https://github.com/sebmarkbage/ecmascript-string-left-right-trim
-	__webpack_require__(97)('trimLeft', function($trim){
+	__webpack_require__(98)('trimLeft', function($trim){
 	  return function trimLeft(){
 	    return $trim(this, 1);
 	  };
 	}, 'trimStart');
 
 /***/ }),
-/* 267 */
+/* 268 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	// https://github.com/sebmarkbage/ecmascript-string-left-right-trim
-	__webpack_require__(97)('trimRight', function($trim){
+	__webpack_require__(98)('trimRight', function($trim){
 	  return function trimRight(){
 	    return $trim(this, 2);
 	  };
 	}, 'trimEnd');
 
 /***/ }),
-/* 268 */
+/* 269 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	// https://tc39.github.io/String.prototype.matchAll/
-	var $export     = __webpack_require__(22)
-	  , defined     = __webpack_require__(49)
-	  , toLength    = __webpack_require__(51)
-	  , isRegExp    = __webpack_require__(148)
-	  , getFlags    = __webpack_require__(210)
+	var $export     = __webpack_require__(23)
+	  , defined     = __webpack_require__(50)
+	  , toLength    = __webpack_require__(52)
+	  , isRegExp    = __webpack_require__(149)
+	  , getFlags    = __webpack_require__(211)
 	  , RegExpProto = RegExp.prototype;
 
 	var $RegExpStringIterator = function(regexp, string){
@@ -19660,7 +19808,7 @@ var EmojidexClient =
 	  this._s = string;
 	};
 
-	__webpack_require__(144)($RegExpStringIterator, 'RegExp String', function next(){
+	__webpack_require__(145)($RegExpStringIterator, 'RegExp String', function next(){
 	  var match = this._r.exec(this._s);
 	  return {value: match, done: match === null};
 	});
@@ -19678,27 +19826,27 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 269 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	__webpack_require__(41)('asyncIterator');
-
-/***/ }),
 /* 270 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	__webpack_require__(41)('observable');
+	__webpack_require__(42)('asyncIterator');
 
 /***/ }),
 /* 271 */
 /***/ (function(module, exports, __webpack_require__) {
 
+	__webpack_require__(42)('observable');
+
+/***/ }),
+/* 272 */
+/***/ (function(module, exports, __webpack_require__) {
+
 	// https://github.com/tc39/proposal-object-getownpropertydescriptors
-	var $export        = __webpack_require__(22)
-	  , ownKeys        = __webpack_require__(257)
-	  , toIObject      = __webpack_require__(46)
-	  , gOPD           = __webpack_require__(65)
-	  , createProperty = __webpack_require__(177);
+	var $export        = __webpack_require__(23)
+	  , ownKeys        = __webpack_require__(258)
+	  , toIObject      = __webpack_require__(47)
+	  , gOPD           = __webpack_require__(66)
+	  , createProperty = __webpack_require__(178);
 
 	$export($export.S, 'Object', {
 	  getOwnPropertyDescriptors: function getOwnPropertyDescriptors(object){
@@ -19714,12 +19862,12 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 272 */
+/* 273 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// https://github.com/tc39/proposal-object-values-entries
-	var $export = __webpack_require__(22)
-	  , $values = __webpack_require__(273)(false);
+	var $export = __webpack_require__(23)
+	  , $values = __webpack_require__(274)(false);
 
 	$export($export.S, 'Object', {
 	  values: function values(it){
@@ -19728,12 +19876,12 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 273 */
+/* 274 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var getKeys   = __webpack_require__(44)
-	  , toIObject = __webpack_require__(46)
-	  , isEnum    = __webpack_require__(58).f;
+	var getKeys   = __webpack_require__(45)
+	  , toIObject = __webpack_require__(47)
+	  , isEnum    = __webpack_require__(59).f;
 	module.exports = function(isEntries){
 	  return function(it){
 	    var O      = toIObject(it)
@@ -19749,12 +19897,12 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 274 */
+/* 275 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// https://github.com/tc39/proposal-object-values-entries
-	var $export  = __webpack_require__(22)
-	  , $entries = __webpack_require__(273)(true);
+	var $export  = __webpack_require__(23)
+	  , $entries = __webpack_require__(274)(true);
 
 	$export($export.S, 'Object', {
 	  entries: function entries(it){
@@ -19763,49 +19911,32 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 275 */
+/* 276 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $export         = __webpack_require__(22)
-	  , toObject        = __webpack_require__(72)
-	  , aFunction       = __webpack_require__(35)
-	  , $defineProperty = __webpack_require__(25);
+	var $export         = __webpack_require__(23)
+	  , toObject        = __webpack_require__(73)
+	  , aFunction       = __webpack_require__(36)
+	  , $defineProperty = __webpack_require__(26);
 
 	// B.2.2.2 Object.prototype.__defineGetter__(P, getter)
-	__webpack_require__(20) && $export($export.P + __webpack_require__(276), 'Object', {
+	__webpack_require__(21) && $export($export.P + __webpack_require__(277), 'Object', {
 	  __defineGetter__: function __defineGetter__(P, getter){
 	    $defineProperty.f(toObject(this), P, {get: aFunction(getter), enumerable: true, configurable: true});
 	  }
 	});
 
 /***/ }),
-/* 276 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	// Forced replacement prototype accessors methods
-	module.exports = __webpack_require__(42)|| !__webpack_require__(21)(function(){
-	  var K = Math.random();
-	  // In FF throws only define methods
-	  __defineSetter__.call(null, K, function(){ /* empty */});
-	  delete __webpack_require__(18)[K];
-	});
-
-/***/ }),
 /* 277 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	'use strict';
-	var $export         = __webpack_require__(22)
-	  , toObject        = __webpack_require__(72)
-	  , aFunction       = __webpack_require__(35)
-	  , $defineProperty = __webpack_require__(25);
-
-	// B.2.2.3 Object.prototype.__defineSetter__(P, setter)
-	__webpack_require__(20) && $export($export.P + __webpack_require__(276), 'Object', {
-	  __defineSetter__: function __defineSetter__(P, setter){
-	    $defineProperty.f(toObject(this), P, {set: aFunction(setter), enumerable: true, configurable: true});
-	  }
+	// Forced replacement prototype accessors methods
+	module.exports = __webpack_require__(43)|| !__webpack_require__(22)(function(){
+	  var K = Math.random();
+	  // In FF throws only define methods
+	  __defineSetter__.call(null, K, function(){ /* empty */});
+	  delete __webpack_require__(19)[K];
 	});
 
 /***/ }),
@@ -19813,14 +19944,31 @@ var EmojidexClient =
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $export                  = __webpack_require__(22)
-	  , toObject                 = __webpack_require__(72)
-	  , toPrimitive              = __webpack_require__(30)
-	  , getPrototypeOf           = __webpack_require__(73)
-	  , getOwnPropertyDescriptor = __webpack_require__(65).f;
+	var $export         = __webpack_require__(23)
+	  , toObject        = __webpack_require__(73)
+	  , aFunction       = __webpack_require__(36)
+	  , $defineProperty = __webpack_require__(26);
+
+	// B.2.2.3 Object.prototype.__defineSetter__(P, setter)
+	__webpack_require__(21) && $export($export.P + __webpack_require__(277), 'Object', {
+	  __defineSetter__: function __defineSetter__(P, setter){
+	    $defineProperty.f(toObject(this), P, {set: aFunction(setter), enumerable: true, configurable: true});
+	  }
+	});
+
+/***/ }),
+/* 279 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	var $export                  = __webpack_require__(23)
+	  , toObject                 = __webpack_require__(73)
+	  , toPrimitive              = __webpack_require__(31)
+	  , getPrototypeOf           = __webpack_require__(74)
+	  , getOwnPropertyDescriptor = __webpack_require__(66).f;
 
 	// B.2.2.4 Object.prototype.__lookupGetter__(P)
-	__webpack_require__(20) && $export($export.P + __webpack_require__(276), 'Object', {
+	__webpack_require__(21) && $export($export.P + __webpack_require__(277), 'Object', {
 	  __lookupGetter__: function __lookupGetter__(P){
 	    var O = toObject(this)
 	      , K = toPrimitive(P, true)
@@ -19832,18 +19980,18 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 279 */
+/* 280 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var $export                  = __webpack_require__(22)
-	  , toObject                 = __webpack_require__(72)
-	  , toPrimitive              = __webpack_require__(30)
-	  , getPrototypeOf           = __webpack_require__(73)
-	  , getOwnPropertyDescriptor = __webpack_require__(65).f;
+	var $export                  = __webpack_require__(23)
+	  , toObject                 = __webpack_require__(73)
+	  , toPrimitive              = __webpack_require__(31)
+	  , getPrototypeOf           = __webpack_require__(74)
+	  , getOwnPropertyDescriptor = __webpack_require__(66).f;
 
 	// B.2.2.5 Object.prototype.__lookupSetter__(P)
-	__webpack_require__(20) && $export($export.P + __webpack_require__(276), 'Object', {
+	__webpack_require__(21) && $export($export.P + __webpack_require__(277), 'Object', {
 	  __lookupSetter__: function __lookupSetter__(P){
 	    var O = toObject(this)
 	      , K = toPrimitive(P, true)
@@ -19855,21 +20003,21 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 280 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	// https://github.com/DavidBruant/Map-Set.prototype.toJSON
-	var $export  = __webpack_require__(22);
-
-	$export($export.P + $export.R, 'Map', {toJSON: __webpack_require__(281)('Map')});
-
-/***/ }),
 /* 281 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// https://github.com/DavidBruant/Map-Set.prototype.toJSON
-	var classof = __webpack_require__(89)
-	  , from    = __webpack_require__(282);
+	var $export  = __webpack_require__(23);
+
+	$export($export.P + $export.R, 'Map', {toJSON: __webpack_require__(282)('Map')});
+
+/***/ }),
+/* 282 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	// https://github.com/DavidBruant/Map-Set.prototype.toJSON
+	var classof = __webpack_require__(90)
+	  , from    = __webpack_require__(283);
 	module.exports = function(NAME){
 	  return function toJSON(){
 	    if(classof(this) != NAME)throw TypeError(NAME + "#toJSON isn't generic");
@@ -19878,10 +20026,10 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 282 */
+/* 283 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var forOf = __webpack_require__(220);
+	var forOf = __webpack_require__(221);
 
 	module.exports = function(iter, ITERATOR){
 	  var result = [];
@@ -19891,30 +20039,30 @@ var EmojidexClient =
 
 
 /***/ }),
-/* 283 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	// https://github.com/DavidBruant/Map-Set.prototype.toJSON
-	var $export  = __webpack_require__(22);
-
-	$export($export.P + $export.R, 'Set', {toJSON: __webpack_require__(281)('Set')});
-
-/***/ }),
 /* 284 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	// https://github.com/ljharb/proposal-global
-	var $export = __webpack_require__(22);
+	// https://github.com/DavidBruant/Map-Set.prototype.toJSON
+	var $export  = __webpack_require__(23);
 
-	$export($export.S, 'System', {global: __webpack_require__(18)});
+	$export($export.P + $export.R, 'Set', {toJSON: __webpack_require__(282)('Set')});
 
 /***/ }),
 /* 285 */
 /***/ (function(module, exports, __webpack_require__) {
 
+	// https://github.com/ljharb/proposal-global
+	var $export = __webpack_require__(23);
+
+	$export($export.S, 'System', {global: __webpack_require__(19)});
+
+/***/ }),
+/* 286 */
+/***/ (function(module, exports, __webpack_require__) {
+
 	// https://github.com/ljharb/proposal-is-error
-	var $export = __webpack_require__(22)
-	  , cof     = __webpack_require__(48);
+	var $export = __webpack_require__(23)
+	  , cof     = __webpack_require__(49);
 
 	$export($export.S, 'Error', {
 	  isError: function isError(it){
@@ -19923,11 +20071,11 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 286 */
+/* 287 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// https://gist.github.com/BrendanEich/4294d5c212a6d2254703
-	var $export = __webpack_require__(22);
+	var $export = __webpack_require__(23);
 
 	$export($export.S, 'Math', {
 	  iaddh: function iaddh(x0, x1, y0, y1){
@@ -19939,11 +20087,11 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 287 */
+/* 288 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// https://gist.github.com/BrendanEich/4294d5c212a6d2254703
-	var $export = __webpack_require__(22);
+	var $export = __webpack_require__(23);
 
 	$export($export.S, 'Math', {
 	  isubh: function isubh(x0, x1, y0, y1){
@@ -19955,11 +20103,11 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 288 */
+/* 289 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// https://gist.github.com/BrendanEich/4294d5c212a6d2254703
-	var $export = __webpack_require__(22);
+	var $export = __webpack_require__(23);
 
 	$export($export.S, 'Math', {
 	  imulh: function imulh(u, v){
@@ -19976,11 +20124,11 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 289 */
+/* 290 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// https://gist.github.com/BrendanEich/4294d5c212a6d2254703
-	var $export = __webpack_require__(22);
+	var $export = __webpack_require__(23);
 
 	$export($export.S, 'Math', {
 	  umulh: function umulh(u, v){
@@ -19997,11 +20145,11 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 290 */
+/* 291 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var metadata                  = __webpack_require__(291)
-	  , anObject                  = __webpack_require__(26)
+	var metadata                  = __webpack_require__(292)
+	  , anObject                  = __webpack_require__(27)
 	  , toMetaKey                 = metadata.key
 	  , ordinaryDefineOwnMetadata = metadata.set;
 
@@ -20010,13 +20158,13 @@ var EmojidexClient =
 	}});
 
 /***/ }),
-/* 291 */
+/* 292 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var Map     = __webpack_require__(225)
-	  , $export = __webpack_require__(22)
-	  , shared  = __webpack_require__(37)('metadata')
-	  , store   = shared.store || (shared.store = new (__webpack_require__(229)));
+	var Map     = __webpack_require__(226)
+	  , $export = __webpack_require__(23)
+	  , shared  = __webpack_require__(38)('metadata')
+	  , store   = shared.store || (shared.store = new (__webpack_require__(230)));
 
 	var getOrCreateMetadataMap = function(target, targetKey, create){
 	  var targetMetadata = store.get(target);
@@ -20066,11 +20214,11 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 292 */
+/* 293 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var metadata               = __webpack_require__(291)
-	  , anObject               = __webpack_require__(26)
+	var metadata               = __webpack_require__(292)
+	  , anObject               = __webpack_require__(27)
 	  , toMetaKey              = metadata.key
 	  , getOrCreateMetadataMap = metadata.map
 	  , store                  = metadata.store;
@@ -20086,12 +20234,12 @@ var EmojidexClient =
 	}});
 
 /***/ }),
-/* 293 */
+/* 294 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var metadata               = __webpack_require__(291)
-	  , anObject               = __webpack_require__(26)
-	  , getPrototypeOf         = __webpack_require__(73)
+	var metadata               = __webpack_require__(292)
+	  , anObject               = __webpack_require__(27)
+	  , getPrototypeOf         = __webpack_require__(74)
 	  , ordinaryHasOwnMetadata = metadata.has
 	  , ordinaryGetOwnMetadata = metadata.get
 	  , toMetaKey              = metadata.key;
@@ -20108,14 +20256,14 @@ var EmojidexClient =
 	}});
 
 /***/ }),
-/* 294 */
+/* 295 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var Set                     = __webpack_require__(228)
-	  , from                    = __webpack_require__(282)
-	  , metadata                = __webpack_require__(291)
-	  , anObject                = __webpack_require__(26)
-	  , getPrototypeOf          = __webpack_require__(73)
+	var Set                     = __webpack_require__(229)
+	  , from                    = __webpack_require__(283)
+	  , metadata                = __webpack_require__(292)
+	  , anObject                = __webpack_require__(27)
+	  , getPrototypeOf          = __webpack_require__(74)
 	  , ordinaryOwnMetadataKeys = metadata.keys
 	  , toMetaKey               = metadata.key;
 
@@ -20132,11 +20280,11 @@ var EmojidexClient =
 	}});
 
 /***/ }),
-/* 295 */
+/* 296 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var metadata               = __webpack_require__(291)
-	  , anObject               = __webpack_require__(26)
+	var metadata               = __webpack_require__(292)
+	  , anObject               = __webpack_require__(27)
 	  , ordinaryGetOwnMetadata = metadata.get
 	  , toMetaKey              = metadata.key;
 
@@ -20146,11 +20294,11 @@ var EmojidexClient =
 	}});
 
 /***/ }),
-/* 296 */
+/* 297 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var metadata                = __webpack_require__(291)
-	  , anObject                = __webpack_require__(26)
+	var metadata                = __webpack_require__(292)
+	  , anObject                = __webpack_require__(27)
 	  , ordinaryOwnMetadataKeys = metadata.keys
 	  , toMetaKey               = metadata.key;
 
@@ -20159,12 +20307,12 @@ var EmojidexClient =
 	}});
 
 /***/ }),
-/* 297 */
+/* 298 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var metadata               = __webpack_require__(291)
-	  , anObject               = __webpack_require__(26)
-	  , getPrototypeOf         = __webpack_require__(73)
+	var metadata               = __webpack_require__(292)
+	  , anObject               = __webpack_require__(27)
+	  , getPrototypeOf         = __webpack_require__(74)
 	  , ordinaryHasOwnMetadata = metadata.has
 	  , toMetaKey              = metadata.key;
 
@@ -20180,11 +20328,11 @@ var EmojidexClient =
 	}});
 
 /***/ }),
-/* 298 */
+/* 299 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var metadata               = __webpack_require__(291)
-	  , anObject               = __webpack_require__(26)
+	var metadata               = __webpack_require__(292)
+	  , anObject               = __webpack_require__(27)
 	  , ordinaryHasOwnMetadata = metadata.has
 	  , toMetaKey              = metadata.key;
 
@@ -20194,12 +20342,12 @@ var EmojidexClient =
 	}});
 
 /***/ }),
-/* 299 */
+/* 300 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var metadata                  = __webpack_require__(291)
-	  , anObject                  = __webpack_require__(26)
-	  , aFunction                 = __webpack_require__(35)
+	var metadata                  = __webpack_require__(292)
+	  , anObject                  = __webpack_require__(27)
+	  , aFunction                 = __webpack_require__(36)
 	  , toMetaKey                 = metadata.key
 	  , ordinaryDefineOwnMetadata = metadata.set;
 
@@ -20214,14 +20362,14 @@ var EmojidexClient =
 	}});
 
 /***/ }),
-/* 300 */
+/* 301 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// https://github.com/rwaldron/tc39-notes/blob/master/es6/2014-09/sept-25.md#510-globalasap-for-enqueuing-a-microtask
-	var $export   = __webpack_require__(22)
-	  , microtask = __webpack_require__(223)()
-	  , process   = __webpack_require__(18).process
-	  , isNode    = __webpack_require__(48)(process) == 'process';
+	var $export   = __webpack_require__(23)
+	  , microtask = __webpack_require__(224)()
+	  , process   = __webpack_require__(19).process
+	  , isNode    = __webpack_require__(49)(process) == 'process';
 
 	$export($export.G, {
 	  asap: function asap(fn){
@@ -20231,22 +20379,22 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 301 */
+/* 302 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	// https://github.com/zenparsing/es-observable
-	var $export     = __webpack_require__(22)
-	  , global      = __webpack_require__(18)
-	  , core        = __webpack_require__(23)
-	  , microtask   = __webpack_require__(223)()
-	  , OBSERVABLE  = __webpack_require__(39)('observable')
-	  , aFunction   = __webpack_require__(35)
-	  , anObject    = __webpack_require__(26)
-	  , anInstance  = __webpack_require__(219)
-	  , redefineAll = __webpack_require__(224)
-	  , hide        = __webpack_require__(24)
-	  , forOf       = __webpack_require__(220)
+	var $export     = __webpack_require__(23)
+	  , global      = __webpack_require__(19)
+	  , core        = __webpack_require__(24)
+	  , microtask   = __webpack_require__(224)()
+	  , OBSERVABLE  = __webpack_require__(40)('observable')
+	  , aFunction   = __webpack_require__(36)
+	  , anObject    = __webpack_require__(27)
+	  , anInstance  = __webpack_require__(220)
+	  , redefineAll = __webpack_require__(225)
+	  , hide        = __webpack_require__(25)
+	  , forOf       = __webpack_require__(221)
 	  , RETURN      = forOf.RETURN;
 
 	var getMethod = function(fn){
@@ -20432,17 +20580,17 @@ var EmojidexClient =
 
 	$export($export.G, {Observable: $Observable});
 
-	__webpack_require__(206)('Observable');
+	__webpack_require__(207)('Observable');
 
 /***/ }),
-/* 302 */
+/* 303 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// ie9- setTimeout & setInterval additional parameters fix
-	var global     = __webpack_require__(18)
-	  , $export    = __webpack_require__(22)
-	  , invoke     = __webpack_require__(92)
-	  , partial    = __webpack_require__(303)
+	var global     = __webpack_require__(19)
+	  , $export    = __webpack_require__(23)
+	  , invoke     = __webpack_require__(93)
+	  , partial    = __webpack_require__(304)
 	  , navigator  = global.navigator
 	  , MSIE       = !!navigator && /MSIE .\./.test(navigator.userAgent); // <- dirty ie9- check
 	var wrap = function(set){
@@ -20460,13 +20608,13 @@ var EmojidexClient =
 	});
 
 /***/ }),
-/* 303 */
+/* 304 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var path      = __webpack_require__(304)
-	  , invoke    = __webpack_require__(92)
-	  , aFunction = __webpack_require__(35);
+	var path      = __webpack_require__(305)
+	  , invoke    = __webpack_require__(93)
+	  , aFunction = __webpack_require__(36);
 	module.exports = function(/* ...pargs */){
 	  var fn     = aFunction(this)
 	    , length = arguments.length
@@ -20488,32 +20636,32 @@ var EmojidexClient =
 	};
 
 /***/ }),
-/* 304 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	module.exports = __webpack_require__(18);
-
-/***/ }),
 /* 305 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var $export = __webpack_require__(22)
-	  , $task   = __webpack_require__(222);
+	module.exports = __webpack_require__(19);
+
+/***/ }),
+/* 306 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	var $export = __webpack_require__(23)
+	  , $task   = __webpack_require__(223);
 	$export($export.G + $export.B, {
 	  setImmediate:   $task.set,
 	  clearImmediate: $task.clear
 	});
 
 /***/ }),
-/* 306 */
+/* 307 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var $iterators    = __webpack_require__(207)
-	  , redefine      = __webpack_require__(32)
-	  , global        = __webpack_require__(18)
-	  , hide          = __webpack_require__(24)
-	  , Iterators     = __webpack_require__(143)
-	  , wks           = __webpack_require__(39)
+	var $iterators    = __webpack_require__(208)
+	  , redefine      = __webpack_require__(33)
+	  , global        = __webpack_require__(19)
+	  , hide          = __webpack_require__(25)
+	  , Iterators     = __webpack_require__(144)
+	  , wks           = __webpack_require__(40)
 	  , ITERATOR      = wks('iterator')
 	  , TO_STRING_TAG = wks('toStringTag')
 	  , ArrayValues   = Iterators.Array;
@@ -20532,7 +20680,7 @@ var EmojidexClient =
 	}
 
 /***/ }),
-/* 307 */
+/* 308 */
 /***/ (function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
@@ -21275,25 +21423,25 @@ var EmojidexClient =
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ }),
-/* 308 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	__webpack_require__(309);
-	module.exports = __webpack_require__(23).RegExp.escape;
-
-/***/ }),
 /* 309 */
 /***/ (function(module, exports, __webpack_require__) {
 
+	__webpack_require__(310);
+	module.exports = __webpack_require__(24).RegExp.escape;
+
+/***/ }),
+/* 310 */
+/***/ (function(module, exports, __webpack_require__) {
+
 	// https://github.com/benjamingr/RexExp.escape
-	var $export = __webpack_require__(22)
-	  , $re     = __webpack_require__(310)(/[\\^$*+?.()|[\]{}]/g, '\\$&');
+	var $export = __webpack_require__(23)
+	  , $re     = __webpack_require__(311)(/[\\^$*+?.()|[\]{}]/g, '\\$&');
 
 	$export($export.S, 'RegExp', {escape: function escape(it){ return $re(it); }});
 
 
 /***/ }),
-/* 310 */
+/* 311 */
 /***/ (function(module, exports) {
 
 	module.exports = function(regExp, replace){
