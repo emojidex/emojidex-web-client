@@ -43,18 +43,17 @@ describe('EmojidexUser', function() {
 
   describe('User Details', function() {
     it('has r18, pro, premium, etc.', function(done) {
-      expect(EC_spec.User.auth_info.r18).toEqual(false);
+      expect(EC_spec.User.auth_info.r18).toEqual(true);
       expect(EC_spec.User.auth_info.pro).toEqual(false);
       expect(EC_spec.User.auth_info.premium).toEqual(false);
       done();
     });
 
-    describe('[Require user info] User Details', function() {
+    describe('[Require premium user info] User Details', function() {
       if (typeof premium_user_info === 'undefined' || premium_user_info === null) { pending(); }
       it('has r18, pro, premium, etc.', done =>
         EC_spec.User.login({
           authtype: 'token', username: premium_user_info.auth_user, auth_token: premium_user_info.auth_token, callback(auth_info) {
-            expect(EC_spec.User.auth_info.r18).toEqual(true);
             expect(EC_spec.User.auth_info.premium).toEqual(true);
             done();
           }
@@ -174,8 +173,7 @@ describe('EmojidexUser', function() {
     });
   });
 
-  describe('Follow  [require premium user]', () => {
-    if (typeof premium_user_info === 'undefined' || premium_user_info === null) { pending(); }
+  describe('Follow', () => {
     beforeEach(done =>
       helperChains({
         functions: [clearStorage, helperBeforeForPremiumUser],
@@ -204,7 +202,8 @@ describe('EmojidexUser', function() {
       });
     });
 
-    it('get followers', done => {
+    it('get followers  [require premium user]', done => {
+      if (typeof premium_user_info === 'undefined' || premium_user_info === null) { pending(); }
       EC_spec.User.Follow.getFollowers(followers => {
         expect(followers).toEqual(jasmine.any(Array));
         done();

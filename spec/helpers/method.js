@@ -17,7 +17,7 @@ let helperBefore = function(chains_data) {
   this.EC_spec = new EmojidexClient({
     storageHubPath: hub_path,
     onReady: EC => {
-      this.EC_spec.User.setAuth(test_user_info.auth_user, test_user_info.auth_token).then(() => {
+      this.EC_spec.User.login({ authtype: 'token', username: test_user_info.auth_user, auth_token: test_user_info.auth_token }).then(() => {
         helperChains(chains_data);
       });
     }
@@ -29,7 +29,7 @@ let helperBeforeForPremiumUser = function(chains_data) {
   this.EC_spec = new EmojidexClient({
     storageHubPath: hub_path,
     onReady: EC => {
-      this.EC_spec.User.setAuth(premium_user_info.auth_user, premium_user_info.auth_token).then(() => {
+      this.EC_spec.User.login({ authtype: 'token', username: premium_user_info.auth_user, auth_token: premium_user_info.auth_token }).then(() => {
         helperChains(chains_data);
       });
     }

@@ -1,18 +1,20 @@
 export default class EmojidexUserFollow {
-  constructor(EC, token) {
+  constructor(EC) {
     this.EC = EC;
-    this.token = token;
     this.following = [];
     this.followers = [];
   }
 
   _followAPI(options) {
-    if (this.token === null || this.token === undefined) return;
+    if (this.EC.User.auth_info.token === null || this.EC.User.auth_info.token === undefined) return 'require auth token';
 
     let ajax_obj = {
       dataType: 'json',
       data: {
-        auth_token: this.token
+        auth_token: this.EC.User.auth_info.token
+      },
+      error: response => {
+        return response;
       }
     };
     return $.ajax($.extend(true, ajax_obj, options));
@@ -30,7 +32,7 @@ export default class EmojidexUserFollow {
   }
 
   addFollowing(username, callback) {
-    if (username === null || username === undefined) return;
+    if (username === null || username === undefined) return 'require username';
 
     let options = {
       url: this.EC.api_url + 'users/following',
@@ -47,7 +49,7 @@ export default class EmojidexUserFollow {
   }
 
   deleteFollowing(username, callback) {
-    if (username === null || username === undefined) return;
+    if (username === null || username === undefined) return 'require username';
 
     let options = {
       url: this.EC.api_url + 'users/following',
@@ -64,6 +66,8 @@ export default class EmojidexUserFollow {
   }
 
   getFollowers(callback) {
+    if (!(this.EC.User.auth_info.pro || this.EC.User.auth_info.premium)) return 'Premium or Pro accounts only';
+
     let options = {
       url: this.EC.api_url + 'users/followers',
       success: response => {
