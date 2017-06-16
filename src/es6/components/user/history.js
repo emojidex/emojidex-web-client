@@ -23,16 +23,32 @@ export default class EmojidexUserHistory {
         limit: this.EC.limit,
         detailed: this.EC.detailed,
         auth_token: this.EC.User.auth_info.token
-      },
-      success: response => {
-        this._history = response.history
-        this.meta = response.meta;
-        this.cur_page = response.meta.page;
-        this.max_page = Math.ceil(response.total_count / this.EC.limit);
-        this.EC.Data.history(response.history).then(data => {
-          if (typeof callback === 'function') { callback(this._history); }
-        });
       }
+    };
+    return this._historyAPI(options).then((response) => {
+      this._history = response.history;
+      return this.getWithEmojiInfo(callback, page);
+    }).then((response) => {
+      $.extend(true, this._history, response.emoji);
+      this.meta = response.meta;
+      this.cur_page = response.meta.page;
+      this.max_page = Math.ceil(response.total_count / this.EC.limit);
+
+      return this.EC.Data.history(this._history);
+    }).then(() => {
+      if (typeof callback === 'function') { callback(this._history); }
+    });
+  }
+
+  getWithEmojiInfo(callback, page = 1) {
+    let options = {
+      data: {
+        page: page,
+        limit: this.EC.limit,
+        detailed: this.EC.detailed,
+        auth_token: this.EC.User.auth_info.token
+      },
+      url: this.EC.api_url + 'users/history/emoji'
     };
     return this._historyAPI(options);
   }
@@ -50,9 +66,10 @@ export default class EmojidexUserHistory {
           if (entry.emoji_code === response.emoji_code) {
             this._history[i] = response;
             this.EC.Data.history(this._history);
-            return response;
+            return;
           }
         }
+        return response;
       }
     };
     return this._historyAPI(options);
