@@ -152,9 +152,8 @@ export default class EmojidexUser {
 
   syncUserData() {
     this.auth_info = this.EC.Data.storage.get('emojidex.auth_info');
-    this.Follow.token = this.History.token = this.Favorites.token = this.auth_info.token;
     this.Favorites.sync();
     this.History.sync();
-    if (this.auth_info.premium) { this.Follow.sync(); }
+    this.Follow.sync();
   }
 }

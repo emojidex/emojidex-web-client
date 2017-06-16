@@ -1,14 +1,13 @@
 export default class EmojidexUserFavorites {
-  constructor(EC, token) {
+  constructor(EC) {
     this.EC = EC;
-    this.token = token;
     this._favorites = this.EC.Data.favorites();
     this.cur_page = 1;
     this.max_page = undefined;
   }
 
   _favoritesAPI(options) {
-    if (this.token != null) {
+    if (this.EC.User.auth_info.token != null) {
       let ajax_obj = {
         url: this.EC.api_url + 'users/favorites',
         dataType: 'json'
@@ -23,7 +22,7 @@ export default class EmojidexUserFavorites {
         page: page,
         limit: this.EC.limit,
         detailed: this.EC.detailed,
-        auth_token: this.token
+        auth_token: this.EC.User.auth_info.token
       },
       success: response => {
         this._favorites = response.emoji;
@@ -42,7 +41,7 @@ export default class EmojidexUserFavorites {
     let options = {
       type: 'POST',
       data: {
-        auth_token: this.token,
+        auth_token: this.EC.User.auth_info.token,
         emoji_code
       },
       success: response => {
@@ -57,7 +56,7 @@ export default class EmojidexUserFavorites {
     let options = {
       type: 'DELETE',
       data: {
-        auth_token: this.token,
+        auth_token: this.EC.User.auth_info.token,
         emoji_code
       },
       success: response => {

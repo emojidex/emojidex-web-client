@@ -1,14 +1,13 @@
 export default class EmojidexUserHistory {
-  constructor(EC, token) {
+  constructor(EC) {
     this.EC = EC;
-    this.token = token;
     this._history = this.EC.Data.history();
     this.cur_page = 1;
     this.max_page = undefined;
   }
 
   _historyAPI(options) {
-    if (this.token != null) {
+    if (this.EC.User.auth_info.token != null) {
       let ajax_obj = {
         url: this.EC.api_url + 'users/history',
         dataType: 'json'
@@ -23,7 +22,7 @@ export default class EmojidexUserHistory {
         page: page,
         limit: this.EC.limit,
         detailed: this.EC.detailed,
-        auth_token: this.token
+        auth_token: this.EC.User.auth_info.token
       },
       success: response => {
         this._history = response.history
@@ -42,7 +41,7 @@ export default class EmojidexUserHistory {
     let options = {
       type: 'POST',
       data: {
-        auth_token: this.token,
+        auth_token: this.EC.User.auth_info.token,
         emoji_code
       },
       success: response => {
