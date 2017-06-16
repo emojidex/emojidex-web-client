@@ -1,5 +1,5 @@
 /**
-,* emojidex client - v0.15.0
+,* emojidex client - v0.15.1
 ,* * Provides search, index caching and combining and asset URI resolution
 ,* https://github.com/emojidex/emojidex-web-client
 ,*
@@ -12580,12 +12580,9 @@ var EmojidexClient =
 	    key: 'syncUserData',
 	    value: function syncUserData() {
 	      this.auth_info = this.EC.Data.storage.get('emojidex.auth_info');
-	      this.Follow.token = this.History.token = this.Favorites.token = this.auth_info.token;
 	      this.Favorites.sync();
 	      this.History.sync();
-	      if (this.auth_info.premium) {
-	        this.Follow.sync();
-	      }
+	      this.Follow.sync();
 	    }
 	  }]);
 
@@ -12610,11 +12607,10 @@ var EmojidexClient =
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	var EmojidexUserFavorites = function () {
-	  function EmojidexUserFavorites(EC, token) {
+	  function EmojidexUserFavorites(EC) {
 	    _classCallCheck(this, EmojidexUserFavorites);
 
 	    this.EC = EC;
-	    this.token = token;
 	    this._favorites = this.EC.Data.favorites();
 	    this.cur_page = 1;
 	    this.max_page = undefined;
@@ -12623,7 +12619,7 @@ var EmojidexClient =
 	  _createClass(EmojidexUserFavorites, [{
 	    key: '_favoritesAPI',
 	    value: function _favoritesAPI(options) {
-	      if (this.token != null) {
+	      if (this.EC.User.auth_info.token != null) {
 	        var ajax_obj = {
 	          url: this.EC.api_url + 'users/favorites',
 	          dataType: 'json'
@@ -12643,7 +12639,7 @@ var EmojidexClient =
 	          page: page,
 	          limit: this.EC.limit,
 	          detailed: this.EC.detailed,
-	          auth_token: this.token
+	          auth_token: this.EC.User.auth_info.token
 	        },
 	        success: function success(response) {
 	          _this._favorites = response.emoji;
@@ -12667,7 +12663,7 @@ var EmojidexClient =
 	      var options = {
 	        type: 'POST',
 	        data: {
-	          auth_token: this.token,
+	          auth_token: this.EC.User.auth_info.token,
 	          emoji_code: emoji_code
 	        },
 	        success: function success(response) {
@@ -12685,7 +12681,7 @@ var EmojidexClient =
 	      var options = {
 	        type: 'DELETE',
 	        data: {
-	          auth_token: this.token,
+	          auth_token: this.EC.User.auth_info.token,
 	          emoji_code: emoji_code
 	        },
 	        success: function success(response) {
@@ -12745,11 +12741,10 @@ var EmojidexClient =
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	var EmojidexUserHistory = function () {
-	  function EmojidexUserHistory(EC, token) {
+	  function EmojidexUserHistory(EC) {
 	    _classCallCheck(this, EmojidexUserHistory);
 
 	    this.EC = EC;
-	    this.token = token;
 	    this._history = this.EC.Data.history();
 	    this.cur_page = 1;
 	    this.max_page = undefined;
@@ -12758,7 +12753,7 @@ var EmojidexClient =
 	  _createClass(EmojidexUserHistory, [{
 	    key: '_historyAPI',
 	    value: function _historyAPI(options) {
-	      if (this.token != null) {
+	      if (this.EC.User.auth_info.token != null) {
 	        var ajax_obj = {
 	          url: this.EC.api_url + 'users/history',
 	          dataType: 'json'
@@ -12778,7 +12773,7 @@ var EmojidexClient =
 	          page: page,
 	          limit: this.EC.limit,
 	          detailed: this.EC.detailed,
-	          auth_token: this.token
+	          auth_token: this.EC.User.auth_info.token
 	        },
 	        success: function success(response) {
 	          _this._history = response.history;
@@ -12802,7 +12797,7 @@ var EmojidexClient =
 	      var options = {
 	        type: 'POST',
 	        data: {
-	          auth_token: this.token,
+	          auth_token: this.EC.User.auth_info.token,
 	          emoji_code: emoji_code
 	        },
 	        success: function success(response) {
@@ -12869,11 +12864,10 @@ var EmojidexClient =
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	var EmojidexUserFollow = function () {
-	  function EmojidexUserFollow(EC, token) {
+	  function EmojidexUserFollow(EC) {
 	    _classCallCheck(this, EmojidexUserFollow);
 
 	    this.EC = EC;
-	    this.token = token;
 	    this.following = [];
 	    this.followers = [];
 	  }
@@ -12881,12 +12875,15 @@ var EmojidexClient =
 	  _createClass(EmojidexUserFollow, [{
 	    key: '_followAPI',
 	    value: function _followAPI(options) {
-	      if (this.token === null || this.token === undefined) return;
+	      if (this.EC.User.auth_info.token === null || this.EC.User.auth_info.token === undefined) return 'require auth token';
 
 	      var ajax_obj = {
 	        dataType: 'json',
 	        data: {
-	          auth_token: this.token
+	          auth_token: this.EC.User.auth_info.token
+	        },
+	        error: function error(response) {
+	          return response;
 	        }
 	      };
 	      return $.ajax($.extend(true, ajax_obj, options));
@@ -12912,7 +12909,7 @@ var EmojidexClient =
 	    value: function addFollowing(username, callback) {
 	      var _this2 = this;
 
-	      if (username === null || username === undefined) return;
+	      if (username === null || username === undefined) return 'require username';
 
 	      var options = {
 	        url: this.EC.api_url + 'users/following',
@@ -12934,7 +12931,7 @@ var EmojidexClient =
 	    value: function deleteFollowing(username, callback) {
 	      var _this3 = this;
 
-	      if (username === null || username === undefined) return;
+	      if (username === null || username === undefined) return 'require username';
 
 	      var options = {
 	        url: this.EC.api_url + 'users/following',
@@ -12955,6 +12952,8 @@ var EmojidexClient =
 	    key: 'getFollowers',
 	    value: function getFollowers(callback) {
 	      var _this4 = this;
+
+	      if (!(this.EC.User.auth_info.pro || this.EC.User.auth_info.premium)) return 'Premium or Pro accounts only';
 
 	      var options = {
 	        url: this.EC.api_url + 'users/followers',
