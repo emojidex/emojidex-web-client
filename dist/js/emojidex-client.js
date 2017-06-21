@@ -1,5 +1,5 @@
 /**
-,* emojidex client - v0.15.3
+,* emojidex client - v0.15.4
 ,* * Provides search, index caching and combining and asset URI resolution
 ,* https://github.com/emojidex/emojidex-web-client
 ,*
@@ -12640,20 +12640,22 @@ var EmojidexClient =
 	          limit: this.EC.limit,
 	          detailed: this.EC.detailed,
 	          auth_token: this.EC.User.auth_info.token
-	        },
-	        success: function success(response) {
-	          _this._favorites = response.emoji;
-	          _this.meta = response.meta;
-	          _this.cur_page = response.meta.page;
-	          _this.max_page = Math.ceil(response.total_count / _this.EC.limit);
-	          _this.EC.Data.favorites(response.emoji).then(function (data) {
-	            if (typeof callback === 'function') {
-	              callback(_this._favorites);
-	            }
-	          });
 	        }
 	      };
-	      return this._favoritesAPI(options);
+	      return this._favoritesAPI(options).then(function (response) {
+	        _this._favorites = response.emoji;
+	        _this.meta = response.meta;
+	        _this.cur_page = response.meta.page;
+	        _this.max_page = Math.ceil(response.total_count / _this.EC.limit);
+
+	        return _this.EC.Data.favorites(_this._favorites);
+	      }).then(function () {
+	        if (typeof callback === 'function') {
+	          callback(_this._favorites);
+	        } else {
+	          return _this._favorites;
+	        }
+	      });
 	    }
 	  }, {
 	    key: 'set',
