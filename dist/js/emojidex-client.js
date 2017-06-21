@@ -11203,7 +11203,7 @@ var EmojidexClient =
 	      }, client._timeout);
 
 	      var interval_hub = setInterval(function() {
-	        if (typeof client._hub !== "undefined" && client._hub !== null) {
+	        if (typeof client._hub !== "undefined" && client._hub !== null && Object.keys(client._hub).length) {
 	          clearTimeout(timeout);
 	          clearInterval(interval_hub);
 	          resolve();
@@ -12774,18 +12774,37 @@ var EmojidexClient =
 	          limit: this.EC.limit,
 	          detailed: this.EC.detailed,
 	          auth_token: this.EC.User.auth_info.token
-	        },
-	        success: function success(response) {
-	          _this._history = response.history;
-	          _this.meta = response.meta;
-	          _this.cur_page = response.meta.page;
-	          _this.max_page = Math.ceil(response.total_count / _this.EC.limit);
-	          _this.EC.Data.history(response.history).then(function (data) {
-	            if (typeof callback === 'function') {
-	              callback(_this._history);
-	            }
-	          });
 	        }
+	      };
+	      return this._historyAPI(options).then(function (response) {
+	        _this._history = response.history;
+	        return _this.getWithEmojiInfo(callback, page);
+	      }).then(function (response) {
+	        $.extend(true, _this._history, response.emoji);
+	        _this.meta = response.meta;
+	        _this.cur_page = response.meta.page;
+	        _this.max_page = Math.ceil(response.total_count / _this.EC.limit);
+
+	        return _this.EC.Data.history(_this._history);
+	      }).then(function () {
+	        if (typeof callback === 'function') {
+	          callback(_this._history);
+	        }
+	      });
+	    }
+	  }, {
+	    key: 'getWithEmojiInfo',
+	    value: function getWithEmojiInfo(callback) {
+	      var page = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+
+	      var options = {
+	        data: {
+	          page: page,
+	          limit: this.EC.limit,
+	          detailed: this.EC.detailed,
+	          auth_token: this.EC.User.auth_info.token
+	        },
+	        url: this.EC.api_url + 'users/history/emoji'
 	      };
 	      return this._historyAPI(options);
 	    }
@@ -12806,9 +12825,10 @@ var EmojidexClient =
 	            if (entry.emoji_code === response.emoji_code) {
 	              _this2._history[i] = response;
 	              _this2.EC.Data.history(_this2._history);
-	              return response;
+	              return;
 	            }
 	          }
+	          return response;
 	        }
 	      };
 	      return this._historyAPI(options);
