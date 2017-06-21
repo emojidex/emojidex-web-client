@@ -36,7 +36,11 @@ export default class EmojidexUserHistory {
 
       return this.EC.Data.history(this._history);
     }).then(() => {
-      if (typeof callback === 'function') { callback(this._history); }
+      if (typeof callback === 'function') {
+        callback(this._history);
+      } else {
+        return this._history;
+      }
     });
   }
 
