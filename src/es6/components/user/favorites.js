@@ -23,18 +23,22 @@ export default class EmojidexUserFavorites {
         limit: this.EC.limit,
         detailed: this.EC.detailed,
         auth_token: this.EC.User.auth_info.token
-      },
-      success: response => {
-        this._favorites = response.emoji;
-        this.meta = response.meta;
-        this.cur_page = response.meta.page;
-        this.max_page = Math.ceil(response.total_count / this.EC.limit);
-        this.EC.Data.favorites(response.emoji).then(data => {
-          if (typeof callback === 'function') { callback(this._favorites); }
-        });
       }
     };
-    return this._favoritesAPI(options);
+    return this._favoritesAPI(options).then((response) => {
+      this._favorites = response.emoji;
+      this.meta = response.meta;
+      this.cur_page = response.meta.page;
+      this.max_page = Math.ceil(response.total_count / this.EC.limit);
+
+      return this.EC.Data.favorites(this._favorites);
+    }).then(() => {
+      if (typeof callback === 'function') {
+        callback(this._favorites);
+      } else {
+        return this._favorites;
+      }
+    });
   }
 
   set(emoji_code) {
