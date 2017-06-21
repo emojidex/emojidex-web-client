@@ -131,6 +131,8 @@ describe('EmojidexUser', function() {
     it('get', done =>
       EC_spec.User.History.get(history => {
         expect(history.length).toBeTruthy();
+        expect(history[0].code).toBeTruthy();
+        expect(history[0].times_used).toBeTruthy();
         done();
       })
     );
