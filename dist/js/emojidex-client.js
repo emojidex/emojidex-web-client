@@ -1,5 +1,5 @@
 /**
-,* emojidex client - v0.15.4
+,* emojidex client - v0.15.5
 ,* * Provides search, index caching and combining and asset URI resolution
 ,* https://github.com/emojidex/emojidex-web-client
 ,*
@@ -11203,7 +11203,7 @@ var EmojidexClient =
 	      }, client._timeout);
 
 	      var interval_hub = setInterval(function() {
-	        if (typeof client._hub !== "undefined" && client._hub !== null) {
+	        if (typeof client._hub !== "undefined" && client._hub !== null && Object.keys(client._hub).length) {
 	          clearTimeout(timeout);
 	          clearInterval(interval_hub);
 	          resolve();
@@ -12425,6 +12425,7 @@ var EmojidexClient =
 	    // 1. {authtype: 'plain', username: 'username', password: '****'}
 	    // 2. {authtype: 'token', username: 'username', auth_token: '****'}
 	    // 3. {authtype: 'basic', user: 'username-or-email', password: '****'}
+	    // 4. {authtype: 'session'} return auth_info in localstorage.
 	    // * if no hash is given auto login is attempted
 
 	  }, {
@@ -12526,41 +12527,12 @@ var EmojidexClient =
 	      }, callback);
 	    }
 
-	    // directly set auth credentials
-
-	  }, {
-	    key: 'setAuth',
-	    value: function setAuth(user, token) {
-	      var r18 = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-	      var premium = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
-	      var premium_exp = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
-
-	      var _this2 = this;
-
-	      var pro = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
-	      var pro_exp = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : null;
-
-	      return this.EC.Data.auth_info({
-	        status: 'verified',
-	        user: user,
-	        token: token,
-	        r18: r18,
-	        premium: premium,
-	        premium_exp: premium_exp,
-	        pro: pro,
-	        pro_exp: pro_exp
-	      }).then(function (data) {
-	        _this2.syncUserData();
-	        return data;
-	      });
-	    }
-
 	    // sets auth parameters from a successful auth request [login]
 
 	  }, {
 	    key: '_setAuthFromResponse',
 	    value: function _setAuthFromResponse(response) {
-	      var _this3 = this;
+	      var _this2 = this;
 
 	      return this.EC.Data.auth_info({
 	        status: response.auth_status,
@@ -12572,7 +12544,7 @@ var EmojidexClient =
 	        pro: response.pro,
 	        pro_exp: response.pro_exp
 	      }).then(function (data) {
-	        _this3.syncUserData();
+	        _this2.syncUserData();
 	        return data;
 	      });
 	    }
