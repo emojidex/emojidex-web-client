@@ -83,7 +83,7 @@ let getFacesEmoji = chains_data =>
   });
 
 let setPremiumUser = function(chains_data) {
-  this.EC_spec.User.setAuth(premium_user_info.auth_user, premium_user_info.auth_token).then(() => {
+  this.EC_spec.User.login({authtype: 'token', username: premium_user_info.auth_user, auth_token: premium_user_info.auth_token}).then(() => {
     helperChains(chains_data);
   });
 };

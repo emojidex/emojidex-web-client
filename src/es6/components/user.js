@@ -27,6 +27,7 @@ export default class EmojidexUser {
   // 1. {authtype: 'plain', username: 'username', password: '****'}
   // 2. {authtype: 'token', username: 'username', auth_token: '****'}
   // 3. {authtype: 'basic', user: 'username-or-email', password: '****'}
+  // 4. {authtype: 'session'} return auth_info in localstorage.
   // * if no hash is given auto login is attempted
   login(params) {
     switch (params.authtype) {
@@ -114,23 +115,6 @@ export default class EmojidexUser {
       }
     },
       callback);
-  }
-
-  // directly set auth credentials
-  setAuth(user, token, r18 = false, premium = false, premium_exp = null, pro = false, pro_exp = null) {
-    return this.EC.Data.auth_info({
-      status: 'verified',
-      user,
-      token,
-      r18,
-      premium,
-      premium_exp,
-      pro,
-      pro_exp
-    }).then(data => {
-      this.syncUserData();
-      return data;
-    });
   }
 
   // sets auth parameters from a successful auth request [login]

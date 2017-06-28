@@ -143,7 +143,7 @@ describe('EmojidexUser', function() {
           expect(history.length).toBeTruthy();
           done();
         })
-      }, 2000);
+      }, 5000);
     });
 
     describe('History pages [require premium user]', function() {
