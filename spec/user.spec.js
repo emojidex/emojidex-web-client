@@ -92,22 +92,17 @@ describe('EmojidexUser', function() {
         })
       );
 
-      it('next', done => {
+      it('next/prev', done => {
         EC_spec.limit = 5;
-        EC_spec.User.Favorites.next(favorites => {
-          expect(EC_spec.User.Favorites.cur_page).toEqual(2);
-          done();
-        });
-      });
-
-      it('prev', done => {
-        EC_spec.limit = 5;
-        EC_spec.User.Favorites.next(favorites => {
-          EC_spec.User.Favorites.prev(favorites => {
-            expect(EC_spec.User.Favorites.cur_page).toEqual(1);
-            done();
+        setTimeout(() => {  // Favorites.sync()が終わっていない時があるので
+          EC_spec.User.Favorites.next(favorites => {
+            expect(EC_spec.User.Favorites.cur_page).toEqual(2);
+            EC_spec.User.Favorites.prev(favorites => {
+              expect(EC_spec.User.Favorites.cur_page).toEqual(1);
+              done();
+            });
           });
-        });
+        }, 2000);
       });
     });
   });
@@ -137,13 +132,22 @@ describe('EmojidexUser', function() {
       })
     );
 
+    it('get (history info only)', done =>
+      EC_spec.User.History.getHistoryInfoOnly(history => {
+        expect(history.length).toBeTruthy();
+        expect(history[0].code).toBeFalsy();
+        expect(history[0].times_used).toBeTruthy();
+        done();
+      })
+    );
+
     it('all', done => {
       setTimeout(() => {  // History.sync()が終わっていない時があるので
         EC_spec.User.History.all(history => {
           expect(history.length).toBeTruthy();
           done();
         })
-      }, 5000);
+      }, 2000);
     });
 
     describe('History pages [require premium user]', function() {
@@ -155,22 +159,17 @@ describe('EmojidexUser', function() {
         })
       );
 
-      it('next', done => {
+      it('next/prev', done => {
         EC_spec.limit = 5;
-        EC_spec.User.History.next(history => {
-          expect(EC_spec.User.History.cur_page).toEqual(2);
-          done();
-        });
-      });
-
-      it('prev', done => {
-        EC_spec.limit = 5;
-        EC_spec.User.History.next(history => {
-          EC_spec.User.History.prev(history => {
-            expect(EC_spec.User.History.cur_page).toEqual(1);
-            done();
+        setTimeout(() => {  // History.sync()が終わっていない時があるので
+          EC_spec.User.History.next(history => {
+            expect(EC_spec.User.History.cur_page).toEqual(2);
+            EC_spec.User.History.prev(history => {
+              expect(EC_spec.User.History.cur_page).toEqual(1);
+              done();
+            });
           });
-        });
+        }, 2000);
       });
     });
   });
