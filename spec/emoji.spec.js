@@ -7,12 +7,14 @@ describe('EmojidexEmoji', function() {
   );
 
   describe('check update', function() {
-    it('need update', done =>
-      EC_spec.Data.storage.update('emojidex.seedUpdated', new Date('1/1/2016').toString()).then(() => {
-        expect(EC_spec.Emoji.checkUpdate()).toBe(true);
-        done();
-      })
-    );
+    it('need update', done => {
+      setTimeout(() => {  // userDataSyncが終わっていないことがあるため
+        EC_spec.Data.storage.update('emojidex.seedUpdated', new Date('1/1/2016').toString()).then(() => {
+          expect(EC_spec.Emoji.checkUpdate()).toBe(true);
+          done();
+        });
+      }, 1000);
+    });
 
     it('unnecessary update', done =>
       EC_spec.Data.storage.update('emojidex.seedUpdated', new Date().toString()).then(() => {
