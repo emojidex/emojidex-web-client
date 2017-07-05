@@ -1,5 +1,5 @@
 /**
-,* emojidex client - v0.15.5
+,* emojidex client - v0.16.0
 ,* * Provides search, index caching and combining and asset URI resolution
 ,* https://github.com/emojidex/emojidex-web-client
 ,*
@@ -12748,13 +12748,11 @@ var EmojidexClient =
 	          limit: this.EC.limit,
 	          detailed: this.EC.detailed,
 	          auth_token: this.EC.User.auth_info.token
-	        }
+	        },
+	        url: this.EC.api_url + 'users/history/emoji'
 	      };
 	      return this._historyAPI(options).then(function (response) {
-	        _this._history = response.history;
-	        return _this.getWithEmojiInfo(callback, page);
-	      }).then(function (response) {
-	        $.extend(true, _this._history, response.emoji);
+	        _this._history = response.emoji;
 	        _this.meta = response.meta;
 	        _this.cur_page = response.meta.page;
 	        _this.max_page = Math.ceil(response.total_count / _this.EC.limit);
@@ -12769,8 +12767,10 @@ var EmojidexClient =
 	      });
 	    }
 	  }, {
-	    key: 'getWithEmojiInfo',
-	    value: function getWithEmojiInfo(callback) {
+	    key: 'getHistoryInfoOnly',
+	    value: function getHistoryInfoOnly(callback) {
+	      var _this2 = this;
+
 	      var page = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
 
 	      var options = {
@@ -12779,15 +12779,25 @@ var EmojidexClient =
 	          limit: this.EC.limit,
 	          detailed: this.EC.detailed,
 	          auth_token: this.EC.User.auth_info.token
-	        },
-	        url: this.EC.api_url + 'users/history/emoji'
+	        }
 	      };
-	      return this._historyAPI(options);
+	      return this._historyAPI(options).then(function (response) {
+	        _this2._history_info = response.history;
+	        _this2.history_info_meta = response.meta;
+	        _this2.history_info_cur_page = response.meta.page;
+	        _this2.history_info_max_page = Math.ceil(response.total_count / _this2.EC.limit);
+
+	        if (typeof callback === 'function') {
+	          callback(_this2._history_info);
+	        } else {
+	          return _this2._history_info;
+	        }
+	      });
 	    }
 	  }, {
 	    key: 'set',
 	    value: function set(emoji_code) {
-	      var _this2 = this;
+	      var _this3 = this;
 
 	      var options = {
 	        type: 'POST',
@@ -12796,11 +12806,11 @@ var EmojidexClient =
 	          emoji_code: emoji_code
 	        },
 	        success: function success(response) {
-	          for (var i = 0; i < _this2._history.length; i++) {
-	            var entry = _this2._history[i];
+	          for (var i = 0; i < _this3._history.length; i++) {
+	            var entry = _this3._history[i];
 	            if (entry.emoji_code === response.emoji_code) {
-	              _this2._history[i] = response;
-	              _this2.EC.Data.history(_this2._history);
+	              _this3._history[i] = response;
+	              _this3.EC.Data.history(_this3._history);
 	              return;
 	            }
 	          }
