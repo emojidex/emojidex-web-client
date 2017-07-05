@@ -23,13 +23,11 @@ export default class EmojidexUserHistory {
         limit: this.EC.limit,
         detailed: this.EC.detailed,
         auth_token: this.EC.User.auth_info.token
-      }
+      },
+      url: this.EC.api_url + 'users/history/emoji'
     };
     return this._historyAPI(options).then((response) => {
-      this._history = response.history;
-      return this.getWithEmojiInfo(callback, page);
-    }).then((response) => {
-      $.extend(true, this._history, response.emoji);
+      this._history = response.emoji;
       this.meta = response.meta;
       this.cur_page = response.meta.page;
       this.max_page = Math.ceil(response.total_count / this.EC.limit);
@@ -44,17 +42,27 @@ export default class EmojidexUserHistory {
     });
   }
 
-  getWithEmojiInfo(callback, page = 1) {
+  getHistoryInfoOnly(callback, page = 1) {
     let options = {
       data: {
         page: page,
         limit: this.EC.limit,
         detailed: this.EC.detailed,
         auth_token: this.EC.User.auth_info.token
-      },
-      url: this.EC.api_url + 'users/history/emoji'
+      }
     };
-    return this._historyAPI(options);
+    return this._historyAPI(options).then((response) => {
+      this._history_info = response.history;
+      this.history_info_meta = response.meta;
+      this.history_info_cur_page = response.meta.page;
+      this.history_info_max_page = Math.ceil(response.total_count / this.EC.limit);
+
+      if (typeof callback === 'function') {
+        callback(this._history_info);
+      } else {
+        return this._history_info;
+      }
+    });
   }
 
   set(emoji_code) {
