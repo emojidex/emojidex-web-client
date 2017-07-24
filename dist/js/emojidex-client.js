@@ -1,5 +1,5 @@
 /**
-,* emojidex client - v0.16.0
+,* emojidex client - v0.16.1
 ,* * Provides search, index caching and combining and asset URI resolution
 ,* https://github.com/emojidex/emojidex-web-client
 ,*
@@ -11203,7 +11203,7 @@ var EmojidexClient =
 	      }, client._timeout);
 
 	      var interval_hub = setInterval(function() {
-	        if (typeof client._hub !== "undefined" && client._hub !== null && Object.keys(client._hub).length) {
+	        if (typeof client._hub !== "undefined" && client._hub !== null) {
 	          clearTimeout(timeout);
 	          clearInterval(interval_hub);
 	          resolve();
