@@ -89,7 +89,7 @@ gulp.task('lint', () => {
 });
 
 gulp.task('default', function (cb) {
-  runSequence("clean", "copy", "banner", cb);
+  runSequence("copy", "banner", cb);
 });
 
 // TODO: lint

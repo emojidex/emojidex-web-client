@@ -28,26 +28,20 @@
     "eslint-plugin-import": "^2.2.0",
     "fs-extra": "^3.0.1",
     "gulp": "~3.9.1",
-    "gulp-babel": "^7.0.1",
     "gulp-clean": "^0.3.2",
-    "gulp-concat": "^2.6.1",
-    "gulp-copy": "^1.0.0",
     "gulp-dotenv": "^0.2.1",
     "gulp-eslint": "^3.0.1",
     "gulp-header": "^1.8.8",
     "gulp-jasmine-browser": "^1.7.1",
-    "gulp-rename": "^1.2.2",
     "gulp-sourcemaps": "^2.4.1",
-    "gulp-uglify": "^2.0.1",
     "gulp-watch": "~4.3.11",
     "jquery": "^3.1.1",
-    "pump": "^1.0.2",
     "run-sequence": "^1.2.2",
     "webpack": "^4.10.1",
     "webpack-cli": "^2.1.4"
   },
   "scripts": {
-    "build": "webpack --mode development; webpack --mode production;",
+    "build": "gulp clean; webpack --mode development; webpack --mode production; gulp",
     "dev": "webpack --mode development -w",
     "test": "webpack --mode development; webpack --mode production; gulp spec"
   }
