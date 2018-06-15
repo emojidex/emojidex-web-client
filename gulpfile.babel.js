@@ -1,18 +1,10 @@
 import gulp from 'gulp';
 import pkg from './package.json';
 import header from 'gulp-header';
-import rename from 'gulp-rename';
 import del from 'del';
-import pump from 'pump';
 import runSequence from 'run-sequence';
-import babel from 'gulp-babel';
-import concat from 'gulp-concat';
-import uglify from 'gulp-uglify';
-import copy from 'gulp-copy';
 import eslint from 'gulp-eslint';
-import jasmine from 'gulp-jasmine-browser';
-import webpack from 'webpack-stream';
-import path from 'path';
+import * as jasmineBrowser from 'gulp-jasmine-browser';
 import watch from 'gulp-watch';
 import fs from 'fs-extra';
 
@@ -32,47 +24,6 @@ var banner = [
 
 gulp.task('clean', function () {
   del.sync(['build/**/*.js', 'dist/**/*.js']);
-});
-
-gulp.task('webpack', function () {
-  let webpack_p = require('webpack-stream').webpack
-  return gulp.src(['src/es6/client.js'])
-    .pipe(webpack({
-      output: {
-        filename: 'emojidex-client.js',
-        library: 'EmojidexClient'
-      },
-      module: {
-        loaders: [
-          {
-            test: /\.js$/,
-            exclude: /node_modules/,
-            loader: 'babel-loader'
-          }
-        ]
-      },
-      resolveLoader: {
-        root: path.join(__dirname, 'node_modules')
-      },
-      plugins: [
-        new webpack_p.ProvidePlugin({
-          $: 'jquery',
-          'window.$': 'jquery'
-        })
-      ]
-    }))
-    .pipe(gulp.dest('dist/js/'));
-});
-
-gulp.task('uglify', function (cb) {
-  pump([
-      gulp.src('dist/js/emojidex-client.js'),
-      rename('emojidex-client.min.js'),
-      uglify(),
-      gulp.dest('dist/js/')
-    ],
-    cb
-  );
 });
 
 gulp.task('banner', function () {
@@ -114,7 +65,7 @@ gulp.task('env', () => {
   });
 });
 
-gulp.task('jasmine', () => {
+gulp.task('jasmineBrowser', () => {
   let testFiles = [
     'node_modules/jquery/dist/jquery.js',
     'node_modules/cross-storage/lib/client.js',
@@ -125,10 +76,11 @@ gulp.task('jasmine', () => {
   ];
   return gulp.src(testFiles)
     .pipe(watch(testFiles))
-    .pipe(jasmine.specRunner())
-    .pipe(jasmine.server());
+    .pipe(jasmineBrowser.specRunner())
+    .pipe(jasmineBrowser.server());
 });
 
+// TODO: enable in tasks
 gulp.task('lint', () => {
   return gulp.src(['src/es6/**/*.js','!node_modules/**'])
     .pipe(eslint())
@@ -136,24 +88,12 @@ gulp.task('lint', () => {
     .pipe(eslint.failAfterError());
 });
 
-gulp.task('watch', function () {
-  gulp.watch('src/es6/**/*.js', ['onWatch']);
-  gulp.watch('spec/**/*.js', ['onWatch']);
-});
-
 gulp.task('default', function (cb) {
-  runSequence("clean", ["copy", "webpack"], "uglify", "banner", cb);
-});
-
-gulp.task('onWatch', function (cb) {
-  runSequence(["copy", "webpack"], "uglify", "banner", cb);
+  runSequence("copy", "banner", cb);
 });
 
 // TODO: lint
 gulp.task('spec', function (cb) {
-  runSequence("default", "env", "jasmine", cb/*, "lint"*/);
+  runSequence("env", "jasmineBrowser", cb/*, "lint"*/);
 });
 
-gulp.task('dev', function (cb) {
-  runSequence("default", "watch", cb);
-});
