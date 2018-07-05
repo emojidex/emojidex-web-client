@@ -1,11 +1,15 @@
+import GraphemeSplitter from 'grapheme-splitter';
+
 export default class EmojidexUtil {
   constructor(EC) {
+    // ↓ this process for processor of replace
     self = this;
 
     self.EC = EC;
 
     self.a_pattern_base = `<a href=["|'][^'|^"]*['|"] emoji-code=["|'][^'|^"]*['|"]><img class=["|']emojidex-emoji['|"] src=["|'][^'|^"]*['|"] (emoji-code=["|'][^'|^"]*['|"] emoji-moji=["|'][^'|^"]*['|"]|emoji-code=["|'][^'|^"]*['|"]) alt=["|'][^'|^"]*['|"]( \/>|\/>|>)<\/a>`;
     self.img_pattern_base = `<img class=["|']emojidex-emoji['|"] src=["|'][^'|^"]*['|"] (emoji-code=["|'][^'|^"]*['|"] emoji-moji=["|'][^'|^"]*['|"]|emoji-code=["|'][^'|^"]*['|"]) alt=["|'][^'|^"]*['|"]( \/>|\/>|>)`;
+
     self.a_pattern = RegExp(self.a_pattern_base, 'g');
     self.img_pattern = RegExp(self.img_pattern_base, 'g');
     self.wrapped_a_pattern = RegExp(`<span[^>]*>` + self.a_pattern_base + `</span>`, 'g');
@@ -15,7 +19,9 @@ export default class EmojidexUtil {
     self.emoji_moji_tag_attr_pattern = RegExp(`emoji-moji=["|']([^'|^"]*)['|"]`, '');
     self.ignored_characters = '\'":;@&#~{}<>\\r\\n\\[\\]\\!\\$\\+\\?\\%\\*\\/\\\\';
     self.short_code_pattern = RegExp(`:([^\\s${self.ignored_characters}][^${self.ignored_characters}]*[^${self.ignored_characters}]):|:([^${self.ignored_characters}]):`, 'g');
-    self.utf_pattern = RegExp(self.EC.Data.moji_codes.moji_array.join('|'), 'g');
+    self.utf_pattern = RegExp(self.EC.Data.moji_codes.moji_array.join('|'));
+
+    self.splitter = new GraphemeSplitter();
   }
 
   // Escapes spaces to underscore
@@ -79,33 +85,26 @@ export default class EmojidexUtil {
 
   // Convert UTF emoji using the specified processor
   emojifyMoji(source, processor = self.emojiToHTML) {
-    return new Promise((resolve, reject) => {
-      let targets = source.match(self.utf_pattern);
-      if (targets == null || targets.length == 0) { resolve(source); }
-
-      let count = targets.length;
-      let replacements = [];
-
-      for (let target of targets) {
-        let snip = `${target}`;
-        self.EC.Search.find(self.EC.Data.moji_codes.moji_index[snip]).then((result) => {
-          if (result.hasOwnProperty('code')) {
-            replacements.push(processor(result));
+    return new Promise((resolveEmojify, rejectEmojify) => {
+      let splittedSources = this.splitter.splitGraphemes(source);
+      let replacingSources = splittedSources.map((target) => {
+        return new Promise((resolveReplace, rejectReplace) => {
+          if(self.utf_pattern.test(target)) {
+            self.EC.Search.find(self.EC.Data.moji_codes.moji_index[target]).then((result) => {
+              if (result.hasOwnProperty('code')) {
+                resolveReplace(processor(result));
+              }
+            }).catch(() => {
+              resolveReplace(target);
+            })
+          } else {
+            resolveReplace(target);
           }
-          return source;
-        }).then((source) => {
-          count -= 1;
-        }).catch((response) => {
-          count -= 1;
-        }).then(() => {
-          if(count == 0) {
-            source = source.replace(self.utf_pattern, () => {
-              return replacements[count++]
-            });
-            resolve(source);
-          }
-        });
-      }
+        })
+      })
+      Promise.all(replacingSources).then((replacedSources) => {
+        resolveEmojify(replacedSources.join(''));
+      })
     });
   }
 
