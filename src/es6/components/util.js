@@ -20,6 +20,7 @@ export default class EmojidexUtil {
     self.ignored_characters = '\'":;@&#~{}<>\\r\\n\\[\\]\\!\\$\\+\\?\\%\\*\\/\\\\';
     self.short_code_pattern = RegExp(`:([^\\s${self.ignored_characters}][^${self.ignored_characters}]*[^${self.ignored_characters}]):|:([^${self.ignored_characters}]):`, 'g');
     self.utf_pattern = RegExp(self.EC.Data.moji_codes.moji_array.join('|'));
+    self.utf_pattern_global = RegExp(self.utf_pattern, 'g');
 
     self.splitter = new GraphemeSplitter();
   }
@@ -89,7 +90,31 @@ export default class EmojidexUtil {
       let splittedSources = this.splitter.splitGraphemes(source);
       let replacingSources = splittedSources.map((target) => {
         return new Promise((resolveReplace, rejectReplace) => {
-          if(self.utf_pattern.test(target)) {
+          if(/\u200d/.test(target)) {
+            // for used ZWJ emoji
+            let matchedMojis = target.match(self.utf_pattern_global, "g");
+            let matchedMojiCodes = matchedMojis.map((moji) => {
+              return self.EC.Data.moji_codes.moji_index[moji];
+            })
+
+            self.EC.Search.find(self.EC.Data.moji_codes.moji_index[matchedMojis[0]]).then((result) => {
+              if(result.combinations.length) {
+                result.combinations.forEach((combination) => {
+                  let checkComponents = [];
+                  combination.components.forEach((component) => {
+                    if(matchedMojiCodes.some((code) => { return component.includes(code) })) {
+                      matchedMojiCodes.shift();
+                      checkComponents.push(true);
+                    } else {
+                      component[component.length - 1] == '' ? checkComponents.push(null) : checkComponents.push(false);
+                    }
+                  })
+                  console.log(checkComponents)
+                })
+              }
+            })
+            resolveReplace(target)
+          } else if(self.utf_pattern.test(target)) {
             self.EC.Search.find(self.EC.Data.moji_codes.moji_index[target]).then((result) => {
               if (result.hasOwnProperty('code')) {
                 resolveReplace(processor(result));
