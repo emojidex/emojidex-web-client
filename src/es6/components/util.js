@@ -87,12 +87,12 @@ export default class EmojidexUtil {
   // Convert UTF emoji using the specified processor
   emojifyMoji(source, processor = self.emojiToHTML) {
     return new Promise((resolveEmojify, rejectEmojify) => {
-      let splittedSources = this.splitter.splitGraphemes(source);
+      let splittedSources = self.splitter.splitGraphemes(source);
       let replacingSources = splittedSources.map((target) => {
         return new Promise((resolveReplace, rejectReplace) => {
           if(/\u200d/.test(target)) {
             // for used ZWJ emoji
-            let matchedMojis = target.match(self.utf_pattern_global, "g");
+            let matchedMojis = target.match(self.utf_pattern_global);
             let matchedMojiCodes = matchedMojis.map((moji) => {
               return self.EC.Data.moji_codes.moji_index[moji];
             })
@@ -100,6 +100,7 @@ export default class EmojidexUtil {
             self.EC.Search.find(self.EC.Data.moji_codes.moji_index[matchedMojis[0]]).then((result) => {
               if(result.combinations.length) {
                 result.combinations.forEach((combination) => {
+                  // check for registered ZWJ emoji on emojidex.com
                   let checkComponents = [];
                   combination.components.forEach((component) => {
                     if(matchedMojiCodes.some((code) => { return component.includes(code) })) {
@@ -110,10 +111,47 @@ export default class EmojidexUtil {
                     }
                   })
                   console.log(checkComponents)
+                  matchedMojiCodes = matchedMojis.map((moji) => {
+                    return self.EC.Data.moji_codes.moji_index[moji];
+                  })
+                  let zwjReplacingPromises = [];
+                  if(checkComponents.includes(false)) {
+                    // for incorrect ZWJ emoji
+                    for(let i = 0; i < checkComponents.length; i++) {
+                      zwjReplacingPromises.push(new Promise((resolveReplaceZwjEmoji, rejectReplaceZwjEmoji) => {
+                        self.EC.Search.find(matchedMojiCodes[i]).then((result) => {
+                          if (result.hasOwnProperty('code')) {
+                            resolveReplaceZwjEmoji(processor(result));
+                          }
+                        })
+                      }))
+                    }
+                  } else {
+                    // for correct ZWJ emoji
+                    let matchedMojiCodesNum = 0;
+                    for(let i = 0; i < checkComponents.length; i++) {
+                      if(checkComponents[i]) {
+                        zwjReplacingPromises.push(new Promise((resolveReplaceZwjEmoji, rejectReplaceZwjEmoji) => {
+                          self.EC.Search.find(matchedMojiCodes[matchedMojiCodesNum]).then((result) => {
+                            if (result.hasOwnProperty('code')) {
+                              resolveReplaceZwjEmoji(self.zwjEmojiToHTML(result, i, combination.base));
+                            }
+                          })
+                        }))
+                        matchedMojiCodesNum++;
+                      }
+                    }
+                  }
+                  Promise.all(zwjReplacingPromises).then((zwjReplacedStrings) => {
+                    if(checkComponents.includes(false)) {
+                      resolveReplace(zwjReplacedStrings.join(''));
+                    } else {
+                      resolveReplace(`<span class='zwj-emoji'>${zwjReplacedStrings.join('')}</span>`);
+                    }
+                  })
                 })
               }
             })
-            resolveReplace(target)
           } else if(self.utf_pattern.test(target)) {
             self.EC.Search.find(self.EC.Data.moji_codes.moji_index[target]).then((result) => {
               if (result.hasOwnProperty('code')) {
@@ -178,6 +216,14 @@ export default class EmojidexUtil {
   // Returns an HTML image/link tag for an emoji from an emoji object
   emojiToHTML(emoji, size_code = self.EC.defaults.size_code) {
     let img = `<img class="emojidex-emoji" src="https://${self.EC.env.cdn_addr}/emoji/${size_code}/${self.escapeTerm(emoji.code)}.png" emoji-code="${self.escapeTerm(emoji.code)}"${(emoji.moji == null || emoji.moji == "")? "" : ' emoji-moji="' + emoji.moji + '"'} alt="${self.deEscapeTerm(emoji.code)}" />`;
+    if(emoji.link != null && emoji.link != '')
+      return `<a href="${emoji.link}" emoji-code="${self.escapeTerm(emoji.code)}">${img}</a>`;
+    return img;
+  }
+
+  // Returns an HTML image/link tag for an emoji from a ZWJ emoji object
+  zwjEmojiToHTML(emoji, componentNumber, combinationBaseName, size_code = self.EC.defaults.size_code) {
+    let img = `<img data-component-number="${componentNumber}" class="emojidex-emoji" src="https://${self.EC.env.cdn_addr}/emoji/${size_code}/${combinationBaseName}/${componentNumber}/${self.escapeTerm(emoji.code)}.png" emoji-code="${self.escapeTerm(emoji.code)}"${(emoji.moji == null || emoji.moji == "")? "" : ' emoji-moji="' + emoji.moji + '"'} alt="${self.deEscapeTerm(emoji.code)}" />`;
     if(emoji.link != null && emoji.link != '')
       return `<a href="${emoji.link}" emoji-code="${self.escapeTerm(emoji.code)}">${img}</a>`;
     return img;
