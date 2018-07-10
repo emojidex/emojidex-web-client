@@ -177,4 +177,15 @@ describe('EmojidexUtil', function() {
       done();
     });
   });
+
+  it('replace utf emoji & ZWJ emoji & plain text to html tag', function(done) {
+    test_text = "🚗aaa👨‍👩‍👦👨‍👩‍👧bbb🚗";
+
+    expected_text = '<img class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/red_car.png" emoji-code="red_car" emoji-moji="🚗" alt="red car" />aaa<span class="zwj-emoji"><img data-component-layer-order-number="0" class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/family/0/man.png" emoji-code="man" emoji-moji="👨" alt="man" /><img data-component-layer-order-number="1" class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/family/1/woman.png" emoji-code="woman" emoji-moji="👩" alt="woman" /><img data-component-layer-order-number="2" class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/family/2/boy.png" emoji-code="boy" emoji-moji="👦" alt="boy" /></span><span class="zwj-emoji"><img data-component-layer-order-number="0" class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/family/0/man.png" emoji-code="man" emoji-moji="👨" alt="man" /><img data-component-layer-order-number="1" class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/family/1/woman.png" emoji-code="woman" emoji-moji="👩" alt="woman" /><img data-component-layer-order-number="2" class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/family/2/girl.png" emoji-code="girl" emoji-moji="👧" alt="girl" /></span>bbb<img class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/red_car.png" emoji-code="red_car" emoji-moji="🚗" alt="red car" />';
+
+    EC_spec.Util.emojifyToHTML(test_text).then((processed) => {
+      expect(processed).toBe(expected_text);
+      done();
+    });
+  });
 });
