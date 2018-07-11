@@ -44,5 +44,8 @@
     "build": "gulp clean; webpack --mode development; webpack --mode production; gulp",
     "dev": "webpack --mode development -w",
     "test": "webpack --mode development; webpack --mode production; gulp spec"
+  },
+  "dependencies": {
+    "grapheme-splitter": "^1.0.2"
   }
 }
