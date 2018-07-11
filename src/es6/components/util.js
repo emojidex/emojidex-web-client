@@ -151,6 +151,20 @@ export default class EmojidexUtil {
                     }
                   })
                 })
+              } else {
+                let replaceingUtfEmojiPromises = [];
+                matchedMojiCodes.forEach((code) => {
+                  replaceingUtfEmojiPromises.push(new Promise((resolve, reject) => {
+                    self.EC.Search.find(code).then((result) => {
+                      if (result.hasOwnProperty('code')) {
+                        resolve(processor(result));
+                      }
+                    })
+                  }))
+                })
+                Promise.all(replaceingUtfEmojiPromises).then((replacedUtfEmoji) => {
+                  resolveReplace(replacedUtfEmoji.join(''));
+                })
               }
             })
           } else if(self.utf_pattern.test(target)) {
