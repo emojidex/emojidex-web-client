@@ -1,5 +1,5 @@
 /**
-,* emojidex client - v0.18.1
+,* emojidex client - v0.18.2
 ,* * Provides search, index caching and combining and asset URI resolution
 ,* https://github.com/emojidex/emojidex-web-client
 ,*
