@@ -21,8 +21,6 @@ export default class EmojidexUtil {
     self.short_code_pattern = RegExp(`:([^\\s${self.ignored_characters}][^${self.ignored_characters}]*[^${self.ignored_characters}]):|:([^${self.ignored_characters}]):`, 'g');
     self.utf_pattern = RegExp(self.acknowledgedUnicodePattern);
     self.utf_pattern_global = RegExp(self.utf_pattern, 'g');
-
-    self.splitter = new GraphemeSplitter();
   }
 
   // Escapes spaces to underscore
