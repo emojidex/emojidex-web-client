@@ -1,5 +1,3 @@
-import GraphemeSplitter from 'grapheme-splitter';
-
 export default class EmojidexUtil {
   constructor(EC) {
     // ↓ this process for processor of replace
