@@ -123,7 +123,7 @@ export default class EmojidexUtil {
             self.EC.Search.find(matchedMojiCodes.shift()).then((result) => {
               if (result.hasOwnProperty('code')) {
                 processor === self.getZwjEmojiTag
-                  ? resolve(processor(result, combination.base, i, combination.component_layer_order[i]))
+                  ? resolve(processor(result, combination.base, i))
                   : resolve(processor(result));
               }
             })
@@ -266,8 +266,8 @@ export default class EmojidexUtil {
   }
 
   // Returns an HTML image tag for an emoji from a ZWJ emoji object
-  getZwjEmojiTag(emoji, combinationBaseName, componentNumber, componentLayerOrderNumber, size_code = self.EC.defaults.size_code) {
-    return `<img data-component-layer-order-number="${componentLayerOrderNumber}" class="emojidex-emoji" src="https://${self.EC.env.cdn_addr}/emoji/${size_code}/${combinationBaseName}/${componentNumber}/${self.escapeTerm(emoji.code)}.png" emoji-code="${self.escapeTerm(emoji.code)}"${(emoji.moji == null || emoji.moji == "")? "" : ' emoji-moji="' + emoji.moji + '"'} alt="${self.deEscapeTerm(emoji.code)}" />`;
+  getZwjEmojiTag(emoji, combinationBaseName, componentNumber, size_code = self.EC.defaults.size_code) {
+    return `<img class="emojidex-emoji" src="https://${self.EC.env.cdn_addr}/emoji/${size_code}/${combinationBaseName}/${componentNumber}/${self.escapeTerm(emoji.code)}.png" emoji-code="${self.escapeTerm(emoji.code)}"${(emoji.moji == null || emoji.moji == "")? "" : ' emoji-moji="' + emoji.moji + '"'} alt="${self.deEscapeTerm(emoji.code)}" />`;
   }
 
   // Returns an HTML ZWJ emoji objects wrapped with span and base emoji link tag.
