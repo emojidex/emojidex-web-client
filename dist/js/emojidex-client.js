@@ -1,3 +1,15 @@
+/**
+,* emojidex client - v0.18.3
+,* * Provides search, index caching and combining and asset URI resolution
+,* https://github.com/emojidex/emojidex-web-client
+,*
+,* =LICENSE=
+,* Licensed under the emojidex Open License
+,* https://www.emojidex.com/emojidex/emojidex_open_license
+,*
+,* Copyright 2013 the emojidex project / K.K. GenSouSha
+,**/
+
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
