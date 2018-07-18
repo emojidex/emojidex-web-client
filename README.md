@@ -18,7 +18,7 @@ cd emojidex-web-client
 
 ### Install Packages and Obtain Required Sources
 First install NPM and Yarn.
-  
+
 Then:
 ```shell
 yarn
@@ -27,17 +27,12 @@ yarn
 ### Build
 For a regular one-off build:
 ```shell
-gulp
+yarn build
 ```
 
 For development mode with dynamic compilation and dev server:
 ```shell
-gulp dev
-```
-
-For running specs:
-```shell
-gulp spec
+yarn dev
 ```
 
 The jasmin spec runner page is accessable on port 8888 of your local host
@@ -48,28 +43,28 @@ Design
 The client is a state machine as much as it can be. Instance variables will usually apply to
 the current state and will often be automatically changed after an operation. As such:
 *DO NOT RELY ON INSTANCE VARIABLES TO BE ACCURATE AFTER CONSECUTIVE OR PARALLEL OPERATIONS*
-Either be careful not to create race conditions or make sure you obtain data solely off of 
+Either be careful not to create race conditions or make sure you obtain data solely off of
 callbacks. Utilize callbacks efficiently.
 
 _ALWAYS_ create a separate instance of the client for each widget or component you are using
 the client in. If you have two separate pieces of code operating on the same view or in the same
 module each piece of code should have a different client instance.
 
-The client is broken up into a set of nested modules:  
-Client  
-  ┣Emoji  
-  ┣Categories  
-  ┣Indexes  
-  ┣User  
-  ┃  ┣History  
-  ┃  ┗Favorites  
-  ┣Search  
-  ┣Data  
-  ┗Util  
+The client is broken up into a set of nested modules:
+Client
+  ┣Emoji
+  ┣Categories
+  ┣Indexes
+  ┣User
+  ┃  ┣History
+  ┃  ┗Favorites
+  ┣Search
+  ┣Data
+  ┗Util
 
 The Data modules should usually be ignored unless you're doing something particularly
 hackish - but be warned that messing with these could be a quick way to break user data!
-The Emoji, Search and Util modules will likely be of the most interest to most developers. 
+The Emoji, Search and Util modules will likely be of the most interest to most developers.
 If you're looking to play around with emoji these are good places to start.
 
 Argument Layout
@@ -221,28 +216,20 @@ results_for_a_list = emojidex.Util.simplify();
 simple_list_of_seal_sized_emoji = emojidex.Util.simplify(emojidex.results, 'seal');
 ```
 
-Building
-========
-Building requires node and npm. After cloning the repository, simply do:
-
-```
-npm install
-grunt
-```
 
 Testing
 =======
 There are two types of specs: regular specs that use the test account and specs that require a
-premium account with R-18 enabled. As a developer you are eligable to receive a complimentary 
-upgrade to a premium account if you are working on either an emojidex package or module or 
-integration of emojidex in your own software. Simply contact info@emojidex.com with the subject 
+premium account with R-18 enabled. As a developer you are eligable to receive a complimentary
+upgrade to a premium account if you are working on either an emojidex package or module or
+integration of emojidex in your own software. Simply contact info@emojidex.com with the subject
 "Developer Account" and list the following details:
 1. Your username on emojidex
 2. The project(s) you intend to work on
 
 .env (optional)
 ---------------
-After obtaining a permium account you can use it for testing. To do this you need to create a 
+After obtaining a permium account you can use it for testing. To do this you need to create a
 file named '.env' with the following information:
 ```
 USERNAME=Your_UserName
@@ -250,28 +237,19 @@ EMAIL=your@email.com
 PASSWORD=YourPassword123
 AUTH_TOKEN=0123456789abcdef
 ```
-replacing the Your_UserName and 0123456789abcdef etc. with your actual username and auth_token... 
-The quickest way to find your auth_token is to log in on your browser, open up your user 
-settings by clicking on your username in the top right, and scrolling down to the Auth Token 
+replacing the Your_UserName and 0123456789abcdef etc. with your actual username and auth_token...
+The quickest way to find your auth_token is to log in on your browser, open up your user
+settings by clicking on your username in the top right, and scrolling down to the Auth Token
 field (or to do an auth request with CURL as in the developer.emojidex.com documentation).
 
 Building and Running Tests
 --------------------------
-For your initial build run `grunt` once. If there are no errors run `grunt dev` to start up the 
-live development server.
+For running specs:
+```shell
+yarn test
+```
 
-Specs are using Jasmine, but due to some issues with phantomjs (async callbacks aren't supported?) 
-we currently have it disabled. To try with phantomjs simply type `grunt jasmine`, but don't expect 
-much for now.
-
-To actually run the specs open up 
-[http://localhost:8000/build/_SpecRunner.html](http://localhost:8000/build/_SpecRunner.html) 
-in your browser.
-After editing, check your terminal to make sure grunt has caught up compiling and refresh the 
-SpecRunner page in your browser.
-
-Running specs in your browser will taint your emojidex local storage entry, so be sure to log out 
-and log back in on [https://www.emojidex.com](https://www.emojidex.com) when you're done.
+and open `localhost:8888` in your browser.
 
 License
 =======
