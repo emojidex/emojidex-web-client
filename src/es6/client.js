@@ -8,6 +8,7 @@
 // Copyright 2013 the emojidex project / K.K. GenSouSha
 
 import EmojidexCategories from './components/categories';
+import EmojidexCustomizations from './components/customizations';
 import EmojidexData from './components/data';
 import EmojidexEmoji from './components/emoji';
 import EmojidexIndexes from './components/indexes';
@@ -56,6 +57,7 @@ export default class EmojidexClient {
 
     // new Emojidex modules
     this.Data = new EmojidexData(this, this.options).then(data => {
+      this.Customizations = new EmojidexCustomizations(this);
       this.Util = new EmojidexUtil(this);
       this.User = new EmojidexUser(this);
       this.Indexes = new EmojidexIndexes(this);
