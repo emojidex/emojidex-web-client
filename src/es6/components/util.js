@@ -150,12 +150,12 @@ export default class EmojidexUtil {
                   let sortedMatchedMojiCodes = [];
                   checkComponents = checkComponents.map((component, i) => {
                     if(matchedMojiCodes.length) {
-                      for(let i = 0; i < matchedMojiCodes.length; i++) {
-                        if(component.includes(matchedMojiCodes[i])) {
-                          sortedMatchedMojiCodes.push(matchedMojiCodes[i]);
-                          matchedMojiCodes[i] = false
+                      for(let j = 0; j < matchedMojiCodes.length; j++) {
+                        if(component.includes(matchedMojiCodes[j])) {
+                          sortedMatchedMojiCodes.push({ emojiCode: matchedMojiCodes[j], layerNum: combination.component_layer_order[i] });
+                          matchedMojiCodes[j] = false
                           return true
-                        } else if(i == matchedMojiCodes.length - 1) {
+                        } else if(j == matchedMojiCodes.length - 1) {
                           return component[component.length - 1] == '' ? null : false
                         }
                       }
@@ -163,12 +163,13 @@ export default class EmojidexUtil {
                   })
 
                   let zwjReplacingPromises = null;
+                  let emojiCodes = sortedMatchedMojiCodes.sort((a, b) => { return a.layerNum < b.layerNum ? -1 : 1; }).map((o) => { return o.emojiCode; });
                   if(checkComponents.includes(false)) {
                     // for incorrect ZWJ emoji
-                    zwjReplacingPromises = getJwzReplacingPromises(checkComponents, sortedMatchedMojiCodes, processor);
+                    zwjReplacingPromises = getJwzReplacingPromises(checkComponents, emojiCodes, processor);
                   } else {
                     // for correct ZWJ emoji
-                    zwjReplacingPromises = getJwzReplacingPromises(checkComponents, sortedMatchedMojiCodes, self.getZwjEmojiTag, combination);
+                    zwjReplacingPromises = getJwzReplacingPromises(checkComponents, emojiCodes, self.getZwjEmojiTag, combination);
                   }
                   Promise.all(zwjReplacingPromises).then((zwjReplacedStrings) => {
                     if(checkComponents.includes(false)) {
