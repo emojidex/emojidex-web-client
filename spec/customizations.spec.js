@@ -1,5 +1,5 @@
-describe('EmojidexCustomizations', function() {
-  beforeEach(done =>
+describe('EmojidexCustomizations', () => {
+  beforeAll(done =>
     helperChains({
       functions: [clearStorage, helperBefore],
       end: done
@@ -17,16 +17,23 @@ describe('EmojidexCustomizations', function() {
     })
   );
 
-  describe('Customizations pages', function() {
-    it('next/prev', done => {
+  describe('Customizations pages', () => {
+    beforeAll(done => {
       EC_spec.limit = 1;
-      EC_spec.Customizations.next(next => {
+      EC_spec.Customizations.get(() => done());
+    });
+
+    it('next/prev', (done) => {
+      EC_spec.Customizations.customized.callback = () => {
         expect(EC_spec.Customizations.cur_page).toEqual(2);
-        EC_spec.Customizations.prev(prev => {
+
+        EC_spec.Customizations.customized.callback = () => {
           expect(EC_spec.Customizations.cur_page).toEqual(1);
           done();
-        });
-      });
+        };
+        EC_spec.Customizations.prev();
+      };
+      EC_spec.Customizations.next();
     });
   });
 });

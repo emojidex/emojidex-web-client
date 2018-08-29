@@ -5,13 +5,19 @@ export default class EmojidexCustomizations {
     this.cur_page = 1;
   }
 
-  _customizationsAPI(callback, opts) {
+  _customizationsAPI(callback, opts, call_func) {
     const param = {
       page: 1,
       limit: this.EC.limit,
       detailed: this.EC.detailed
     };
     $.extend(param, opts);
+
+    this.customized_func = call_func.ajax;
+    this.customized = {
+      callback,
+      param
+    };
 
     return $.ajax({
       url: `${this.EC.api_url}emoji/customizations`,
@@ -38,20 +44,17 @@ export default class EmojidexCustomizations {
     });
   }
 
-  get(callback, page = 1) {
-    const opts = {
-      page: page
-    };
-    return this._customizationsAPI(callback, opts);
+  get(callback, opts) {
+    return this._customizationsAPI(callback, opts, { ajax: this.get });
   }
 
-  next(callback) {
-    if (this.max_page === this.cur_page) return;
-    return this.get(callback, this.cur_page + 1);
+  next() {
+    if (this.max_page > this.cur_page) this.customized.param.page++;
+    return this.customized_func(this.customized.callback, this.customized.param, { ajax: this.customized_func });
   }
 
-  prev(callback) {
-    if (this.cur_page === 1) return;
-    return this.get(callback, this.cur_page - 1);
+  prev() {
+    if (this.cur_page > 1) this.customized.param.page--;
+    return this.customized_func(this.customized.callback, this.customized.param, { ajax: this.customized_func });
   }
 }
