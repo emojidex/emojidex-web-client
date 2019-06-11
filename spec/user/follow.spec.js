@@ -14,6 +14,7 @@ describe('EmojidexUserFollow', function() {
   });
 
   it ('add following', done => {
+    pending('Delete API is not working');
     EC_spec.User.Follow.addFollowing('test', following => {
       expect(following).toContain('test');
       done();

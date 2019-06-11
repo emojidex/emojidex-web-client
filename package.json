@@ -21,7 +21,6 @@
     "@babel/preset-env": "^7.0.0-beta.49",
     "@babel/register": "^7.0.0-beta.49",
     "babel-loader": "^8.0.0-beta",
-    "cross-storage": "https://github.com/snowsunny/cross-storage.git",
     "del": "^2.2.2",
     "eslint": "^3.15.0",
     "eslint-config-airbnb-base": "^11.1.0",
@@ -39,6 +38,9 @@
     "run-sequence": "^1.2.2",
     "webpack": "^4.10.1",
     "webpack-cli": "^2.1.4"
+  },
+  "dependencies": {
+    "cross-storage": "https://github.com/snowsunny/cross-storage.git"
   },
   "scripts": {
     "build": "gulp clean; webpack --mode development; webpack --mode production; gulp",
