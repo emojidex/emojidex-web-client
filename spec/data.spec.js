@@ -27,11 +27,8 @@ describe('EmojidexData', function() {
       // );
 
       it('emojidex.moji_codes', function(done) {
-        $.ajax({
-          url: EC_spec.api_url + 'moji_codes',
-          dataType: 'json'
-        }).then(response => {
-          expect(EC_spec.Data.storage.get('emojidex.moji_codes')).toEqual(response);
+        axios.get(`${EC_spec.api_url}moji_codes`).then(response => {
+          expect(EC_spec.Data.storage.get('emojidex.moji_codes')).toEqual(response.data);
           done();
         })
       });
