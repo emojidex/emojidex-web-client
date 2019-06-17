@@ -1,3 +1,5 @@
+import axios from 'axios'
+
 export default class EmojidexCustomizations {
   constructor(EC) {
     this.EC = EC;
@@ -19,28 +21,24 @@ export default class EmojidexCustomizations {
       param
     };
 
-    return $.ajax({
-      url: `${this.EC.api_url}emoji/customizations`,
-      dataType: 'json',
-      data: param,
-      success: response => {
-        if (response.status != null) {
-          this.results = [];
-          this.cur_page = 0;
-          if (typeof callback === 'function') { callback([]); }
-        } else {
-          this.meta = response.meta;
-          this.results = response.emoji;
-          this.cur_page = response.meta.page;
-          this.max_page = Math.ceil(response.meta.total_count / this.EC.limit);
-          if (typeof callback === 'function') { callback(response.emoji); }
-        }
-      },
-      error: response => {
+    return axios.get(`${this.EC.api_url}emoji/customizations`, {
+      params: param
+    }).then(response => {
+      if (response.data.status != null) {
         this.results = [];
         this.cur_page = 0;
         if (typeof callback === 'function') { callback([]); }
+      } else {
+        this.meta = response.data.meta;
+        this.results = response.data.emoji;
+        this.cur_page = response.data.meta.page;
+        this.max_page = Math.ceil(response.data.meta.total_count / this.EC.limit);
+        if (typeof callback === 'function') { callback(response.data.emoji); }
       }
+    }).catch(response => {
+      this.results = [];
+      this.cur_page = 0;
+      if (typeof callback === 'function') { callback([]); }
     });
   }
 

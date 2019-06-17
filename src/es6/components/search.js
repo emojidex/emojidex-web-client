@@ -1,3 +1,5 @@
+import axios from 'axios'
+
 export default class EmojidexSearch {
   constructor(EC) {
     this.EC = EC;
@@ -12,9 +14,7 @@ export default class EmojidexSearch {
       limit: this.EC.limit,
       detailed: this.EC.detailed
     };
-    if (this.EC.User.auth_info.token !== null) {
-      $.extend(param, {auth_token: this.EC.User.auth_info.token});
-    }
+    if (this.EC.User.auth_info.token !== null) { $.extend(param, { auth_token: this.EC.User.auth_info.token }); }
     $.extend(param, opts);
 
     // TODO -------
@@ -26,34 +26,27 @@ export default class EmojidexSearch {
       param
     };
 
-    return $.ajax({
-      url: this.EC.api_url + 'search/emoji',
-      dataType: 'json',
-      data: param,
-      success: response => {
-        if (response.status != null) {
-          this.results = [];
-          this.cur_page = 0;
-          this.count = 0;
-          if (typeof callback === 'function')
-            callback([]);
-        } else {
-          this.meta = response.meta;
-          this.results = response.emoji;
-          this.cur_page = response.meta.page;
-          this.count = response.meta.count;
-          this.EC.Emoji.combine(response.emoji)
-          if (typeof callback === 'function')
-            callback(response.emoji);
-        }
-      },
-      error: response => {
+    return axios.get(`${this.EC.api_url}search/emoji`, {
+      params: param
+    }).then(response => {
+      if (response.data.status != null) {
         this.results = [];
         this.cur_page = 0;
         this.count = 0;
-        if (typeof callback === 'function')
-          callback([]);
+        if (typeof callback === 'function') { callback([]); }
+      } else {
+        this.meta = response.data.meta;
+        this.results = response.data.emoji;
+        this.cur_page = response.data.meta.page;
+        this.count = response.data.meta.count;
+        this.EC.Emoji.combine(response.data.emoji)
+        if (typeof callback === 'function') { callback(response.data.emoji); }
       }
+    }).catch(response => {
+      this.results = [];
+      this.cur_page = 0;
+      this.count = 0;
+      if (typeof callback === 'function') { callback([]); }
     });
   }
 
@@ -77,7 +70,7 @@ export default class EmojidexSearch {
 
   // Searches by tags
   tags(tags, callback, opts) {
-    opts = $.extend({"tags[]": this.EC.Util.breakout(tags)}, opts);
+    opts = $.extend({"tags": this.EC.Util.breakout(tags)}, opts);
     return this._searchAPI(tags, callback, opts, {ajax: this.tags, storage: this.EC.Emoji.tags});
   }
 
@@ -85,11 +78,11 @@ export default class EmojidexSearch {
   advanced(search_details, callback, opts) {
     let param = {
       code_cont: this.EC.Util.escapeTerm(search_details.term),
-      "tags[]": this.EC.Util.breakout(search_details.tags),
-      "categories[]": this.EC.Util.breakout(search_details.categories)
+      "tags": this.EC.Util.breakout(search_details.tags),
+      "categories": this.EC.Util.breakout(search_details.categories)
     };
     $.extend(param, opts);
-    return this._searchAPI(search_details, callback, param, {ajax: this.advanced, storage: this.EC.Emoji.advanced});
+    return this._searchAPI(search_details, callback, param, { ajax: this.advanced, storage: this.EC.Emoji.advanced });
   }
 
   // Not an actual search, just gets information on the given emoji
@@ -99,34 +92,23 @@ export default class EmojidexSearch {
     for (let i = 0; i < emoji_cache.length; i++) {
       let emoji = emoji_cache[i];
       if (emoji.code === code) {
-        if (typeof callback === 'function')
-          callback(emoji);
+        if (typeof callback === 'function') { callback(emoji); }
         return Promise.resolve(emoji);
       }
     }
 
-    let param =
-      {detailed: this.EC.detailed};
-    if (this.EC.User.auth_info.token !== null) {
-      $.extend(param, {auth_token: this.EC.User.auth_info.token});
-    }
+    let param = { detailed: this.EC.detailed };
+    if (this.EC.User.auth_info.token !== null) { $.extend(param, { auth_token: this.EC.User.auth_info.token }); }
     $.extend(param, opts);
 
-    return $.ajax({
-      url: this.EC.api_url + `emoji/${this.EC.Util.makeURLSafe(code)}`,
-      dataType: 'json',
-      data: param,
-      success: response => {
-        this.EC.Emoji.combine([response]);
-        if (typeof callback === 'function')
-          callback(response);
-        return response;
-      },
-      error: response => {
-        if (typeof callback === 'function')
-          callback(response);
-        return response;
-      }
+    return axios.get(`${this.EC.api_url}emoji/${this.EC.Util.makeURLSafe(code)}`, {
+    }).then(response => {
+      this.EC.Emoji.combine([response.data]);
+      if (typeof callback === 'function') { callback(response.data); }
+      return response.data;
+    }).catch(response => {
+      if (typeof callback === 'function') { callback(response.response); }
+      return response.response;
     });
   }
 

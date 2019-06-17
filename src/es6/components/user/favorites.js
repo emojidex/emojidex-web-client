@@ -1,3 +1,5 @@
+import axios from 'axios'
+
 export default class EmojidexUserFavorites {
   constructor(EC) {
     this.EC = EC;
@@ -8,17 +10,20 @@ export default class EmojidexUserFavorites {
 
   _favoritesAPI(options) {
     if (this.EC.User.auth_info.token != null) {
-      let ajax_obj = {
-        url: this.EC.api_url + 'users/favorites',
-        dataType: 'json'
-      };
-      return $.ajax($.extend(ajax_obj, options));
+      return axios({
+        method: options.type,
+        url: `${this.EC.api_url}users/favorites`,
+        params: options.params,
+        data: options.data
+      }).then(response => {
+        return response.data;
+      });
     }
   }
 
   get(callback, page = 1) {
     let options = {
-      data: {
+      params: {
         page: page,
         limit: this.EC.limit,
         detailed: this.EC.detailed,
@@ -44,30 +49,24 @@ export default class EmojidexUserFavorites {
   set(emoji_code) {
     let options = {
       type: 'POST',
-      data: {
-        auth_token: this.EC.User.auth_info.token,
-        emoji_code
-      },
-      success: response => {
-        this._favorites.push(response);
-        return this.EC.Data.favorites(this._favorites);
-      }
+      params: { auth_token: this.EC.User.auth_info.token },
+      data: { emoji_code }
     };
-    return this._favoritesAPI(options);
+    return this._favoritesAPI(options).then(response => {
+      this._favorites.push(response);
+      return this.EC.Data.favorites(this._favorites);
+    });
   }
 
   unset(emoji_code) {
     let options = {
       type: 'DELETE',
-      data: {
-        auth_token: this.EC.User.auth_info.token,
-        emoji_code
-      },
-      success: response => {
-        return this.sync();
-      }
+      params: { auth_token: this.EC.User.auth_info.token },
+      data: { emoji_code },
     };
-    return this._favoritesAPI(options);
+    return this._favoritesAPI(options).then(response => {
+      return this.sync();
+    });
   }
 
   sync() {

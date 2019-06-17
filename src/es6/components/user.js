@@ -1,6 +1,7 @@
 import EmojidexUserFavorites from './user/favorites'
 import EmojidexUserHistory from './user/history'
 import EmojidexUserFollow from './user/follow'
+import axios from 'axios'
 
 export default class EmojidexUser {
   constructor(EC) {
@@ -55,53 +56,44 @@ export default class EmojidexUser {
     return this.EC.Data.auth_info(this.EC.Data._def_auth_info);
   }
 
-  _authenticateAPI(options, callback) {
-    let ajax_obj = {
-      url: this.EC.api_url + 'users/authenticate',
-      dataType: 'json',
-      success: response => {
-        return this._setAuthFromResponse(response).then(() => {
-          if (typeof callback === 'function') { callback(this.auth_info); }
-        });
-      },
-      error: response => {
-        let status = JSON.parse(response.responseText);
-        this.auth_info = {
-          status: status.auth_status,
-          token: null,
-          user: ''
-        };
-        return this.EC.Data.auth_info(this.EC.Data.auth_info).then(() => {
-          if (typeof callback === 'function') {
-            callback({
-              auth_info: this.auth_info,
-              error_info: response
-            });
-          }
-        });
-      }
-    };
-
-    return $.ajax($.extend(ajax_obj, options));
+  _authenticateAPI(params, callback) {
+    return axios.get(`${this.EC.api_url}users/authenticate`, {
+      params: params
+    }).then(response => {
+      return this._setAuthFromResponse(response.data).then(() => {
+        if (typeof callback === 'function') { callback(this.auth_info); }
+      });
+    }).catch(response => {
+      let status = JSON.parse(response.response.responseText);
+      this.auth_info = {
+        status: status.auth_status,
+        token: null,
+        user: ''
+      };
+      return this.EC.Data.auth_info(this.EC.Data.auth_info).then(() => {
+        if (typeof callback === 'function') {
+          callback({
+            auth_info: this.auth_info,
+            error_info: response.response
+          });
+        }
+      });
+    });
   }
 
   // regular login with username/email and password
   plainAuth(username, password, callback) {
     return this._authenticateAPI({
-      data: {
-        username,
-        password,
-      }
+      username,
+      password,
     },
       callback);
   }
 
   tokenAuth(username, token, callback) {
     return this._authenticateAPI({
-      data: {
-        username,
-        token,
-      }
+      username,
+      token,
     },
       callback);
   }
@@ -109,10 +101,8 @@ export default class EmojidexUser {
   // auth with HTTP basic auth
   basicAuth(user, password, callback) {
     return this._authenticateAPI({
-      data: {
-        user,
-        password,
-      }
+      user,
+      password,
     },
       callback);
   }
