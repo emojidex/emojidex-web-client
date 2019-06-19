@@ -1,3 +1,5 @@
+import axios from 'axios'
+
 export default class EmojidexUserHistory {
   constructor(EC) {
     this.EC = EC;
@@ -8,17 +10,20 @@ export default class EmojidexUserHistory {
 
   _historyAPI(options) {
     if (this.EC.User.auth_info.token != null) {
-      let ajax_obj = {
-        url: this.EC.api_url + 'users/history',
-        dataType: 'json'
-      };
-      return $.ajax($.extend(ajax_obj, options));
+      return axios({
+        method: options.type,
+        url: options.url ? options.url : `${this.EC.api_url}users/history`,
+        params: options.params,
+        data: options.data
+      }).then(response => {
+        return response.data;
+      });
     }
   }
 
   get(callback, page = 1) {
     let options = {
-      data: {
+      params: {
         page: page,
         limit: this.EC.limit,
         detailed: this.EC.detailed,
@@ -44,7 +49,7 @@ export default class EmojidexUserHistory {
 
   getHistoryInfoOnly(callback, page = 1) {
     let options = {
-      data: {
+      params: {
         page: page,
         limit: this.EC.limit,
         detailed: this.EC.detailed,
@@ -68,23 +73,20 @@ export default class EmojidexUserHistory {
   set(emoji_code) {
     let options = {
       type: 'POST',
-      data: {
-        auth_token: this.EC.User.auth_info.token,
-        emoji_code
-      },
-      success: response => {
-        for (let i = 0; i < this._history.length; i++) {
-          let entry = this._history[i];
-          if (entry.emoji_code === response.emoji_code) {
-            this._history[i] = response;
-            this.EC.Data.history(this._history);
-            return;
-          }
-        }
-        return response;
-      }
+      params: { auth_token: this.EC.User.auth_info.token },
+      data: { emoji_code }
     };
-    return this._historyAPI(options);
+    return this._historyAPI(options).then(response => {
+      for (let i = 0; i < this._history.length; i++) {
+        let entry = this._history[i];
+        if (entry.emoji_code === response.emoji_code) {
+          this._history[i] = response;
+          this.EC.Data.history(this._history);
+          return;
+        }
+      }
+      return response;
+    });
   }
 
   sync() {

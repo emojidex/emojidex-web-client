@@ -40,6 +40,7 @@
     "webpack-cli": "^2.1.4"
   },
   "dependencies": {
+    "axios": "^0.19.0",
     "cross-storage": "https://github.com/snowsunny/cross-storage.git"
   },
   "scripts": {

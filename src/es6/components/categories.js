@@ -1,3 +1,5 @@
+import axios from 'axios'
+
 export default class EmojidexCategories {
   constructor(EC) {
     this.EC = EC;
@@ -26,31 +28,27 @@ export default class EmojidexCategories {
       param
     };
 
-    return $.ajax({
-      url: `${this.EC.api_url}emoji`,
-      dataType: 'json',
-      data: param,
-      success: response => {
-        this.meta = response.meta;
-        this.results = response.emoji;
-        this.cur_page = response.meta.page;
-        this.count = response.meta.count;
-        return this.EC.Emoji.combine(response.emoji).then(() => {
-          if (typeof callback === 'function') {
-            return callback(response.emoji, {
-              category_name,
-              callback,
-              param
-            })
-          }
-        });
-      }
+    return axios.get(`${this.EC.api_url}emoji`, {
+      params: param
+    }).then(response => {
+      this.meta = response.data.meta;
+      this.results = response.data.emoji;
+      this.cur_page = response.data.meta.page;
+      this.count = response.data.meta.count;
+      return this.EC.Emoji.combine(response.data.emoji).then(() => {
+        if (typeof callback === 'function') {
+          return callback(response.data.emoji, {
+            category_name,
+            callback,
+            param
+          });
+        }
+      });
     });
   }
 
   getEmoji(category_name, callback, opts){
-    let param =
-      {category: category_name};
+    let param = { category: category_name };
     $.extend(param, opts);
     return this._categoriesAPI(category_name, callback, param, this.getEmoji);
   }
@@ -86,15 +84,11 @@ export default class EmojidexCategories {
   }
 
   _get_category(callback, locale) {
-    return $.ajax({
-      url: this.EC.api_url + 'categories',
-      dataType: 'json',
-      data: {
-        locale
-      }
+    return axios.get(`${this.EC.api_url}categories`, {
+      params: { locale }
     }).then(response => {
-      this._categories = response.categories;
-      return this.EC.Data.categories(response.categories).then(() => {
+      this._categories = response.data.categories;
+      return this.EC.Data.categories(response.data.categories).then(() => {
         if (typeof callback === 'function') { callback(this._categories); }
       });
     });
@@ -106,8 +100,7 @@ export default class EmojidexCategories {
     } else {
       return setTimeout((() => {
         return this.all(callback);
-      }
-      ), 500);
+      }), 500);
     }
   }
 }

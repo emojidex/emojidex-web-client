@@ -1,4 +1,5 @@
 import EmojidexDataStorage from './data/_storage'
+import axios from 'axios'
 
 export default class EmojidexData {
   constructor(EC, options) {
@@ -56,12 +57,9 @@ export default class EmojidexData {
 
   _initMojiCodes(force = false) {
     return this.storage.update('emojidex.moji_codes_updated', new Date().toString()).then(() => {
-      return $.ajax({
-        url: this.EC.api_url + 'moji_codes' + '?locale=' + this.EC.locale,
-        dataType: 'json'
-      })
+      return axios.get(`${this.EC.api_url}moji_codes?locale=${this.EC.locale}`);
     }).then(response => {
-      return this.storage.update('emojidex.moji_codes', response);
+      return this.storage.update('emojidex.moji_codes', response.data);
     })
   }
 

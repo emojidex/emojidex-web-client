@@ -60,26 +60,17 @@ let helperBeforeForEmojidexData = function(chains_data) {
 this.helperBeforeForEmojidexData = helperBeforeForEmojidexData;
 
 let getExtendedEmojiData = chains_data =>
-  $.ajax({
-    url: 'https://www.emojidex.com/api/v1/extended_emoji',
-    dataType: 'json',
-    success: response => {
-      this.emoji_emojidex = response;
-      helperChains(chains_data);
-    }
+  axios.get('https://www.emojidex.com/api/v1/extended_emoji').then(response => {
+    this.emoji_emojidex = response.data;
+    helperChains(chains_data);
   });
 
 let getFacesEmoji = chains_data =>
-  $.ajax({
-    url: 'https://www.emojidex.com/api/v1/emoji',
-    dataType: 'json',
-    data: {
-      category: 'faces'
-    },
-    success: response => {
-      this.faces_emoji = response.emoji;
-      helperChains(chains_data);
-    }
+  axios.get('https://www.emojidex.com/api/v1/emoji', {
+    params: { category: 'faces' }
+  }).then(response => {
+    this.faces_emoji = response.data.emoji;
+    helperChains(chains_data);
   });
 
 let setPremiumUser = function(chains_data) {

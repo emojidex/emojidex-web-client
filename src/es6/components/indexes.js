@@ -1,3 +1,5 @@
+import axios from 'axios'
+
 export default class EmojidexIndexes {
   constructor(EC) {
     this.EC = EC;
@@ -26,32 +28,29 @@ export default class EmojidexIndexes {
       };
     }
 
-    return $.ajax({
-      url: this.EC.api_url + query,
-      dataType: 'json',
-      data: param,
-      success: response => {
-        if (response.status != null) {
-          this.results = [];
-          this.cur_page = 0;
-          this.count = 0;
-          if (typeof callback === 'function') { callback([]); }
-        } else {
-          this.meta = response.meta;
-          this.results = response.emoji;
-          this.cur_page = response.meta.page;
-          this.count = response.meta.count;
-          return this.EC.Emoji.combine(response.emoji).then(data => {
-            if (typeof callback === 'function') { callback(response.emoji); }
-          });
-        }
-      },
-      error: response => {
+    return axios.get(`${this.EC.api_url}${query}`, {
+      params: param
+    }).then(response => {
+      if (response.data.status != null) {
         this.results = [];
         this.cur_page = 0;
         this.count = 0;
         if (typeof callback === 'function') { callback([]); }
-      }});
+      } else {
+        this.meta = response.data.meta;
+        this.results = response.data.emoji;
+        this.cur_page = response.data.meta.page;
+        this.count = response.data.meta.count;
+        return this.EC.Emoji.combine(response.data.emoji).then(data => {
+          if (typeof callback === 'function') { callback(response.data.emoji); }
+        });
+      }
+    }).catch(response => {
+      this.results = [];
+      this.cur_page = 0;
+      this.count = 0;
+      if (typeof callback === 'function') { callback([]); }
+    });
   }
 
   index(callback, opts) {
@@ -75,16 +74,12 @@ export default class EmojidexIndexes {
     let loaded_emoji = [];
 
     let loadStatic = url_string => {
-      return $.ajax({
-        url: url_string,
-        dataType: 'json',
-        success: response => {
-          loaded_emoji = loaded_emoji.concat(response);
-          if (++loaded_num === static_type.length) {
-            return this.EC.Emoji.combine(loaded_emoji).then(data => {
-              if (typeof callback === 'function') { callback(data); }
-            });
-          }
+      return axios.get(url_string).then(response => {
+        loaded_emoji = loaded_emoji.concat(response.data);
+        if (++loaded_num === static_type.length) {
+          return this.EC.Emoji.combine(loaded_emoji).then(data => {
+            if (typeof callback === 'function') { callback(data); }
+          });
         }
       });
     };
