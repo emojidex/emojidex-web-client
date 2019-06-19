@@ -1,4 +1,5 @@
 import { CrossStorageClient } from 'cross-storage'
+import _extend from 'lodash/extend'
 
 export default class EmojidexDataStorage {
   constructor(hub_path = 'https://www.emojidex.com/hub/1.0.0') {
@@ -81,7 +82,7 @@ export default class EmojidexDataStorage {
   }
 
   update(query, data) {
-    let merged = $.extend(true, {}, this.get(query.split('.')[0]), this._get_chained_data(query, data, false));
+    let merged = _extend({}, this.get(query.split('.')[0]), this._get_chained_data(query, data, false));
     return this.set(query, merged, true);
   }
 

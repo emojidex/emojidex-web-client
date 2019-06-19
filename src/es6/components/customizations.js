@@ -1,4 +1,5 @@
 import axios from 'axios'
+import _extend from 'lodash/extend'
 
 export default class EmojidexCustomizations {
   constructor(EC) {
@@ -13,7 +14,7 @@ export default class EmojidexCustomizations {
       limit: this.EC.limit,
       detailed: this.EC.detailed
     };
-    $.extend(param, opts);
+    _extend(param, opts);
 
     this.customized_func = call_func.ajax;
     this.customized = {

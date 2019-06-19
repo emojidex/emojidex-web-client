@@ -1,4 +1,5 @@
 import axios from 'axios'
+import _extend from 'lodash/extend'
 
 export default class EmojidexIndexes {
   constructor(EC) {
@@ -15,9 +16,9 @@ export default class EmojidexIndexes {
       detailed: this.EC.detailed
     };
     if (this.EC.User.auth_info.token !== null) {
-      $.extend(param, {auth_token: this.EC.User.auth_info.token});
+      _extend(param, {auth_token: this.EC.User.auth_info.token});
     }
-    $.extend(param, opts);
+    _extend(param, opts);
 
     if (func != null) {
       this.indexed_func = func;

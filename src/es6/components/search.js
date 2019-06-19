@@ -1,4 +1,5 @@
 import axios from 'axios'
+import _extend from 'lodash/extend'
 
 export default class EmojidexSearch {
   constructor(EC) {
@@ -14,8 +15,8 @@ export default class EmojidexSearch {
       limit: this.EC.limit,
       detailed: this.EC.detailed
     };
-    if (this.EC.User.auth_info.token !== null) { $.extend(param, { auth_token: this.EC.User.auth_info.token }); }
-    $.extend(param, opts);
+    if (this.EC.User.auth_info.token !== null) { _extend(param, { auth_token: this.EC.User.auth_info.token }); }
+    _extend(param, opts);
 
     // TODO -------
     // @searched_func = unless @EC.closed_net then funx.ajax else call_func.storage
@@ -52,25 +53,25 @@ export default class EmojidexSearch {
 
   // Executes a general search (code_cont)
   search(term, callback, opts) {
-    opts = $.extend({code_cont: this.EC.Util.escapeTerm(term)}, opts);
+    opts = _extend({ code_cont: this.EC.Util.escapeTerm(term) }, opts);
     return this._searchAPI(term, callback, opts, {ajax: this.search, storage: this.EC.Emoji.search});
   }
 
   // Executes a search starting with the given term
   starting(term, callback, opts) {
-    opts = $.extend({code_sw: this.EC.Util.escapeTerm(term)}, opts);
+    opts = _extend({ code_sw: this.EC.Util.escapeTerm(term) }, opts);
     return this._searchAPI(term, callback, opts, {ajax: this.starting, storage: this.EC.Emoji.starting});
   }
 
   // Executes a search ending with the given term
   ending(term, callback, opts) {
-    opts = $.extend({code_ew: this.EC.Util.escapeTerm(term)}, opts);
+    opts = _extend({ code_ew: this.EC.Util.escapeTerm(term) }, opts);
     return this._searchAPI(term, callback, opts, {ajax: this.ending, storage: this.EC.Emoji.ending});
   }
 
   // Searches by tags
   tags(tags, callback, opts) {
-    opts = $.extend({"tags": this.EC.Util.breakout(tags)}, opts);
+    opts = _extend({ 'tags': this.EC.Util.breakout(tags) }, opts);
     return this._searchAPI(tags, callback, opts, {ajax: this.tags, storage: this.EC.Emoji.tags});
   }
 
@@ -81,7 +82,7 @@ export default class EmojidexSearch {
       "tags": this.EC.Util.breakout(search_details.tags),
       "categories": this.EC.Util.breakout(search_details.categories)
     };
-    $.extend(param, opts);
+    _extend(param, opts);
     return this._searchAPI(search_details, callback, param, { ajax: this.advanced, storage: this.EC.Emoji.advanced });
   }
 
@@ -98,8 +99,8 @@ export default class EmojidexSearch {
     }
 
     let param = { detailed: this.EC.detailed };
-    if (this.EC.User.auth_info.token !== null) { $.extend(param, { auth_token: this.EC.User.auth_info.token }); }
-    $.extend(param, opts);
+    if (this.EC.User.auth_info.token !== null) { _extend(param, { auth_token: this.EC.User.auth_info.token }); }
+    _extend(param, opts);
 
     return axios.get(`${this.EC.api_url}emoji/${this.EC.Util.makeURLSafe(code)}`, {
     }).then(response => {
