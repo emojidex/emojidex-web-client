@@ -19,8 +19,8 @@ export default class EmojidexSearch {
     _extend(param, opts);
 
     // TODO -------
-    // @searched_func = unless @EC.closed_net then funx.ajax else call_func.storage
-    this.searched_func = call_func.ajax;
+    // @searched_func = unless @EC.closed_net then func.remote else call_func.local
+    this.searched_func = call_func.remote;
     this.searched = {
       data: search_data,
       callback,
@@ -54,25 +54,25 @@ export default class EmojidexSearch {
   // Executes a general search (code_cont)
   search(term, callback, opts) {
     opts = _extend({ code_cont: this.EC.Util.escapeTerm(term) }, opts);
-    return this._searchAPI(term, callback, opts, {ajax: this.search, storage: this.EC.Emoji.search});
+    return this._searchAPI(term, callback, opts, { remote: this.search, local: this.EC.Emoji.search });
   }
 
   // Executes a search starting with the given term
   starting(term, callback, opts) {
     opts = _extend({ code_sw: this.EC.Util.escapeTerm(term) }, opts);
-    return this._searchAPI(term, callback, opts, {ajax: this.starting, storage: this.EC.Emoji.starting});
+    return this._searchAPI(term, callback, opts, { remote: this.starting, local: this.EC.Emoji.starting });
   }
 
   // Executes a search ending with the given term
   ending(term, callback, opts) {
     opts = _extend({ code_ew: this.EC.Util.escapeTerm(term) }, opts);
-    return this._searchAPI(term, callback, opts, {ajax: this.ending, storage: this.EC.Emoji.ending});
+    return this._searchAPI(term, callback, opts, { remote: this.ending, local: this.EC.Emoji.ending });
   }
 
   // Searches by tags
   tags(tags, callback, opts) {
     opts = _extend({ 'tags': this.EC.Util.breakout(tags) }, opts);
-    return this._searchAPI(tags, callback, opts, {ajax: this.tags, storage: this.EC.Emoji.tags});
+    return this._searchAPI(tags, callback, opts, { remote: this.tags, local: this.EC.Emoji.tags });
   }
 
   // Searches using an array of keys and an array of tags
@@ -83,7 +83,7 @@ export default class EmojidexSearch {
       "categories": this.EC.Util.breakout(search_details.categories)
     };
     _extend(param, opts);
-    return this._searchAPI(search_details, callback, param, { ajax: this.advanced, storage: this.EC.Emoji.advanced });
+    return this._searchAPI(search_details, callback, param, { remote: this.advanced, local: this.EC.Emoji.advanced });
   }
 
   // Not an actual search, just gets information on the given emoji
@@ -115,11 +115,11 @@ export default class EmojidexSearch {
 
   next() {
     if (this.count === this.searched.param.limit) { this.searched.param.page++; }
-    return this.searched_func(this.searched.data, this.searched.callback, this.searched.param, {ajax: this.searched_func});
+    return this.searched_func(this.searched.data, this.searched.callback, this.searched.param);
   }
 
   prev() {
     if (this.searched.param.page > 1) { this.searched.param.page--; }
-    return this.searched_func(this.searched.data, this.searched.callback, this.searched.param, {ajax: this.searched_func});
+    return this.searched_func(this.searched.data, this.searched.callback, this.searched.param);
   }
 }

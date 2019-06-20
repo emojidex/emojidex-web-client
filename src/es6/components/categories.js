@@ -56,12 +56,12 @@ export default class EmojidexCategories {
 
   next() {
     if (this.count === this.called_data.param.limit) { this.called_data.param.page++; }
-    return this.called_func(this.called_data.category_name, this.called_data.callback, this.called_data.param, {ajax: this.called_func});
+    return this.called_func(this.called_data.category_name, this.called_data.callback, this.called_data.param);
   }
 
   prev() {
     if (this.called_data.param.page > 1) { this.called_data.param.page--; }
-    return this.called_func(this.called_data.category_name, this.called_data.callback, this.called_data.param, {ajax: this.called_func});
+    return this.called_func(this.called_data.category_name, this.called_data.callback, this.called_data.param);
   }
 
   // Gets the full list of caetgories available
