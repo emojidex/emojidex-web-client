@@ -68,7 +68,6 @@ gulp.task('env', () => {
 gulp.task('jasmineBrowser', () => {
   let testFiles = [
     'node_modules/axios/dist/axios.js',
-    'node_modules/jquery/dist/jquery.js',
     'node_modules/cross-storage/lib/client.js',
     'dist/js/emojidex-client.js',
     'spec/helpers/*.js',

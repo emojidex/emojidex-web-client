@@ -25,10 +25,6 @@ module.exports = (env, argv) => ({
     ]
   },
   plugins: [
-    new webpack.ProvidePlugin({
-      $: 'jquery',
-      'window.$': 'jquery'
-    })
   ],
   node: {
     fs: 'empty'
