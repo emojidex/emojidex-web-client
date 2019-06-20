@@ -15,6 +15,7 @@ import EmojidexIndexes from './components/indexes';
 import EmojidexSearch  from './components/search';
 import EmojidexUser from './components/user';
 import EmojidexUtil from './components/util';
+import _extend from 'lodash/extend'
 
 export default class EmojidexClient {
   constructor(options) {
@@ -39,7 +40,7 @@ export default class EmojidexClient {
       onReady: arg => ({})
     };
 
-    this.options = $.extend({}, this.defaults, options);
+    this.options = _extend({}, this.defaults, options);
 
     // set closed network flag (for OSS distrobutions, intranet/private neworks, or closed license)
     // DO NOT set to true unless permitted by an emojidex License

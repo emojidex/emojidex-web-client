@@ -79,11 +79,8 @@ let setPremiumUser = function(chains_data) {
   });
 };
 
-let spec_timer = function(option) {
-  let default_option = {
-    time: 100,
-    callback: undefined
-  };
-  $.extend(default_option, option);
-  if (default_option.callback != null) { setTimeout(default_option.callback, default_option.time); }
-};
+let specTimer = function(time) {
+  return new Promise((resolve, reject) => {
+    setTimeout(resolve, time);
+  });
+}

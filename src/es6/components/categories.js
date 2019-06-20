@@ -1,4 +1,5 @@
 import axios from 'axios'
+import _extend from 'lodash/extend'
 
 export default class EmojidexCategories {
   constructor(EC) {
@@ -17,9 +18,9 @@ export default class EmojidexCategories {
       detailed: this.EC.detailed
     };
     if (this.EC.User.auth_info.token !== null) {
-      $.extend(param, {auth_token: this.EC.User.auth_info.token});
+      _extend(param, { auth_token: this.EC.User.auth_info.token });
     }
-    $.extend(param, opts);
+    _extend(param, opts);
 
     this.called_func = called_func;
     this.called_data = {
@@ -49,18 +50,18 @@ export default class EmojidexCategories {
 
   getEmoji(category_name, callback, opts){
     let param = { category: category_name };
-    $.extend(param, opts);
+    _extend(param, opts);
     return this._categoriesAPI(category_name, callback, param, this.getEmoji);
   }
 
   next() {
     if (this.count === this.called_data.param.limit) { this.called_data.param.page++; }
-    return this.called_func(this.called_data.category_name, this.called_data.callback, this.called_data.param, {ajax: this.called_func});
+    return this.called_func(this.called_data.category_name, this.called_data.callback, this.called_data.param);
   }
 
   prev() {
     if (this.called_data.param.page > 1) { this.called_data.param.page--; }
-    return this.called_func(this.called_data.category_name, this.called_data.callback, this.called_data.param, {ajax: this.called_func});
+    return this.called_func(this.called_data.category_name, this.called_data.callback, this.called_data.param);
   }
 
   // Gets the full list of caetgories available
