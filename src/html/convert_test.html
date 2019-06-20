@@ -6,15 +6,14 @@
     <title>emojidex</title>
     <meta content="" name="description">
     <meta content="width=device-width" name="viewport">
-    <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
     <script src="../../dist/js/emojidex-client.js"></script>
     <script>
-      $(() => {
+      window.onload = () => {
         let EC = new EmojidexClient();
-        $('#button').click(() => {
-          EC.Util.emojifyToHTML($('#textarea').val()).then((value) => { $('#result').html(value); });
-        });
-      });
+        document.getElementById('button').onclick = () => {
+          EC.Util.emojifyToHTML(document.getElementById('textarea').value).then((value) => { document.getElementById('result').innerHTML = value; });
+        };
+      };
     </script>
 
   <body>

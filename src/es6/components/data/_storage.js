@@ -94,7 +94,7 @@ export default class EmojidexDataStorage {
       return this.hub.get(keys);
     }
     ).then(hub_data => {
-      let data = $.parseJSON(hub_data);
+      let data = JSON.parse(hub_data);
       if (key) {
         return this.hub_cache[key] = data[key];
       } else {
