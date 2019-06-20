@@ -23,7 +23,7 @@ var banner = [
 ].join();
 
 gulp.task('clean', function () {
-  del.sync(['build/**/*.js', 'dist/**/*.js']);
+  del.sync(['dist/**/*.js']);
 });
 
 gulp.task('banner', function () {
@@ -31,12 +31,6 @@ gulp.task('banner', function () {
     .src('dist/js/*.js')
     .pipe(header(banner, {pkg: pkg}))
     .pipe(gulp.dest('dist/js/'));
-});
-
-gulp.task('copy', function () {
-  return gulp
-    .src('src/html/hub.html')
-    .pipe(gulp.dest('build'));
 });
 
 gulp.task('env', () => {
@@ -68,7 +62,6 @@ gulp.task('env', () => {
 gulp.task('jasmineBrowser', () => {
   let testFiles = [
     'node_modules/axios/dist/axios.js',
-    'node_modules/jquery/dist/jquery.js',
     'node_modules/cross-storage/lib/client.js',
     'dist/js/emojidex-client.js',
     'spec/helpers/*.js',
@@ -90,10 +83,10 @@ gulp.task('lint', () => {
 });
 
 gulp.task('default', function (cb) {
-  runSequence("copy", "banner", cb);
+  runSequence('banner', cb);
 });
 
 // TODO: lint
 gulp.task('spec', function (cb) {
-  runSequence("env", "jasmineBrowser", cb/*, "lint"*/);
+  runSequence('env', 'jasmineBrowser', cb/*, "lint"*/);
 });

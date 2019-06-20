@@ -75,10 +75,10 @@ export default class EmojidexUserFollow {
   }
 
   sync() {
-    $.when(
-      this.getFollowing(), this.getFollowers()
-    ).done(() => {
+    Promise.all(
+      [this.getFollowing(), this.getFollowers()]
+    ).then(() => {
       return this;
-    })
+    });
   }
 }

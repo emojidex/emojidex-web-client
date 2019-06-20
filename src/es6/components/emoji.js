@@ -67,7 +67,7 @@ export default class EmojidexEmoji {
     let collect = [];
     for (let i = 0; i < tags.length; i++) {
       let tag = tags[i];
-      collect = collect.concat((selection.filter((moji) => $.inArray(tag, moji.tags) >= 0).map((moji) => moji)));
+      collect = collect.concat((selection.filter((moji) => moji.tags.indexOf(tag) >= 0).map((moji) => moji)));
     }
     return collect;
   }
