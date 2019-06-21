@@ -47,7 +47,11 @@ export default class EmojidexSearch {
       this.results = [];
       this.cur_page = 0;
       this.count = 0;
-      if (typeof callback === 'function') { callback([]); }
+      if (typeof callback === 'function') {
+        callback([]);
+      } else {
+        console.error(error);
+      }
     });
   }
 

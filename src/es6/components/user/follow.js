@@ -8,7 +8,8 @@ export default class EmojidexUserFollow {
   }
 
   _followAPI(options) {
-    if (this.EC.User.auth_info.token === null || this.EC.User.auth_info.token === undefined) return 'require auth token';
+    if (this.EC.User.auth_info.token === null || this.EC.User.auth_info.token === undefined)
+      return Promise.reject(new Error('Require auth token.'));
 
     return axios({
       method: options.type,
@@ -27,11 +28,14 @@ export default class EmojidexUserFollow {
     return this._followAPI(options).then(response => {
       this.following = response.following;
       if (typeof callback === 'function') { callback(this.following); }
+    }).catch(error => {
+      console.error(error);
     });
   }
 
   addFollowing(username, callback) {
-    if (username === null || username === undefined) return 'require username';
+    if (username === null || username === undefined)
+      return Promise.reject(new Error('Require username.'));
 
     let options = {
       url: `${this.EC.api_url}users/following`,
@@ -43,14 +47,17 @@ export default class EmojidexUserFollow {
         this.following.push(response.username);
       }
       if (typeof callback === 'function') { callback(this.following); }
+    }).catch(error => {
+      console.error(error);
     });
   }
 
   deleteFollowing(username, callback) {
-    if (username === null || username === undefined) return 'require username';
+    if (username === null || username === undefined)
+      return Promise.reject(new Error('Require username.'));
 
     let options = {
-      url: this.EC.api_url + 'users/following',
+      url: `${this.EC.api_url}users/following`,
       type: 'DELETE',
       data: { username }
     };
@@ -59,18 +66,21 @@ export default class EmojidexUserFollow {
         this.following.splice(this.following.indexOf(response.username), 1);
       }
       if (typeof callback === 'function') { callback(this.following); }
+    }).catch(error => {
+      console.error(error);
     });
   }
 
   getFollowers(callback) {
-    if (!(this.EC.User.auth_info.pro || this.EC.User.auth_info.premium)) return 'Premium or Pro accounts only';
+    if (!(this.EC.User.auth_info.pro || this.EC.User.auth_info.premium))
+      return Promise.reject(new Error('Premium or Pro accounts only'));
 
-    let options = {
-      url: this.EC.api_url + 'users/followers'
-    };
+    let options = { url: `${this.EC.api_url}users/followers` };
     return this._followAPI(options).then(response => {
       this.followers = response.followers;
       if (typeof callback === 'function') { callback(this.followers); }
+    }).catch(error => {
+      console.error(error);
     });
   }
 

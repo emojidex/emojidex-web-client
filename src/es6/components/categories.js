@@ -45,6 +45,8 @@ export default class EmojidexCategories {
           });
         }
       });
+    }).catch(error => {
+      console.error(error);
     });
   }
 
@@ -92,6 +94,8 @@ export default class EmojidexCategories {
       return this.EC.Data.categories(response.data.categories).then(() => {
         if (typeof callback === 'function') { callback(this._categories); }
       });
+    }).catch(error => {
+      console.error(error);
     });
   }
 
