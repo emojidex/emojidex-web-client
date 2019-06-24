@@ -1,2 +1,2 @@
 import EmojidexClient from './client'
-export {EmojidexClient}
+export { EmojidexClient }

@@ -7,14 +7,14 @@
 //
 // Copyright 2013 the emojidex project / K.K. GenSouSha
 
-import EmojidexCategories from './components/categories';
-import EmojidexCustomizations from './components/customizations';
-import EmojidexData from './components/data';
-import EmojidexEmoji from './components/emoji';
-import EmojidexIndexes from './components/indexes';
-import EmojidexSearch  from './components/search';
-import EmojidexUser from './components/user';
-import EmojidexUtil from './components/util';
+import EmojidexCategories from './components/categories'
+import EmojidexCustomizations from './components/customizations'
+import EmojidexData from './components/data'
+import EmojidexEmoji from './components/emoji'
+import EmojidexIndexes from './components/indexes'
+import EmojidexSearch from './components/search'
+import EmojidexUser from './components/user'
+import EmojidexUtil from './components/util'
 import _extend from 'lodash/extend'
 
 export default class EmojidexClient {
@@ -25,7 +25,7 @@ export default class EmojidexClient {
       s_cdn_addr: 'cdn.emojidex.com',
       asset_addr: 'assets.emojidex.com',
       s_asset_addr: ''
-    };
+    }
 
     // sets global default value
     this.defaults = {
@@ -37,38 +37,38 @@ export default class EmojidexClient {
       size_code: 'xhdpi',
       detailed: false,
       limit: 32,
-      onReady: arg => ({})
-    };
+      onReady: () => ({})
+    }
 
-    this.options = _extend({}, this.defaults, options);
+    this.options = _extend({}, this.defaults, options)
 
     // set closed network flag (for OSS distrobutions, intranet/private neworks, or closed license)
     // DO NOT set to true unless permitted by an emojidex License
-    this.closed_net = this.options.closed_net;
+    this.closed_net = this.options.closed_net
 
     // set end points
-    this.api_url = this.options.api_url;
-    this.cdn_url = this.options.cdn_url;
-    this.size_code = this.options.size_code;
+    this.api_url = this.options.api_url
+    this.cdn_url = this.options.cdn_url
+    this.size_code = this.options.size_code
 
     // common @options
-    this.detailed = this.options.detailed;
-    this.limit = this.options.limit;
-    this.locale = this.options.locale;
+    this.detailed = this.options.detailed
+    this.limit = this.options.limit
+    this.locale = this.options.locale
 
     // new Emojidex modules
-    this.Data = new EmojidexData(this, this.options).then(data => {
-      this.Customizations = new EmojidexCustomizations(this);
-      this.Util = new EmojidexUtil(this);
-      this.User = new EmojidexUser(this);
-      this.Indexes = new EmojidexIndexes(this);
-      this.Search = new EmojidexSearch(this);
-      this.Emoji = new EmojidexEmoji(this);
-      return this.Categories = new EmojidexCategories(this);
+    this.Data = new EmojidexData(this, this.options).then(() => {
+      this.Customizations = new EmojidexCustomizations(this)
+      this.Util = new EmojidexUtil(this)
+      this.User = new EmojidexUser(this)
+      this.Indexes = new EmojidexIndexes(this)
+      this.Search = new EmojidexSearch(this)
+      this.Emoji = new EmojidexEmoji(this)
+      return this.Categories = new EmojidexCategories(this)
     }).then(() => {
-      this.options.onReady(this);
+      this.options.onReady(this)
     }).catch(error => {
-      console.error(error);
-    });
+      console.error(error)
+    })
   }
 }

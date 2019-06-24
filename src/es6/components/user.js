@@ -5,13 +5,13 @@ import axios from 'axios'
 
 export default class EmojidexUser {
   constructor(EC) {
-    this.EC = EC;
-    this.auth_info = this.EC.Data._def_auth_info;
-    this.History = new EmojidexUserHistory(this.EC);
-    this.Favorites = new EmojidexUserFavorites(this.EC);
-    this.Follow = new EmojidexUserFollow(this.EC);
+    this.EC = EC
+    this.auth_info = this.EC.Data._def_auth_info
+    this.History = new EmojidexUserHistory(this.EC)
+    this.Favorites = new EmojidexUserFavorites(this.EC)
+    this.Follow = new EmojidexUserFollow(this.EC)
   }
-    // @_auto_login()
+  // @_auto_login()
 
   // Checks for local saved login data, and if present sets the username and api_key
   _autoLogin() {
@@ -19,7 +19,7 @@ export default class EmojidexUser {
         typeof this.EC.Data.storage.hub_cache.emojidex !== 'undefined' &&
         typeof this.EC.Data.storage.hub_cache.emojidex.auth_info !== 'undefined' &&
         this.EC.Data.storage.hub_cache.emojidex.auth_info.status === 'verified') {
-      return this.syncUserData();
+      return this.syncUserData()
     }
   }
 
@@ -33,78 +33,81 @@ export default class EmojidexUser {
   login(params) {
     switch (params.authtype) {
       case 'plain':
-        return this.plainAuth(params.username, params.password, params.callback);
+        return this.plainAuth(params.username, params.password, params.callback)
       case 'token':
-        return this.tokenAuth(params.username, params.auth_token, params.callback);
+        return this.tokenAuth(params.username, params.auth_token, params.callback)
       case 'basic':
-        return this.basicAuth(params.user, params.password, params.callback);
+        return this.basicAuth(params.user, params.password, params.callback)
       case 'session':
         if (typeof this.EC.Data.storage.hub_cache !== 'undefined' &&
             typeof this.EC.Data.storage.hub_cache.emojidex !== 'undefined' &&
             typeof this.EC.Data.storage.hub_cache.emojidex.auth_info !== 'undefined' &&
             this.EC.Data.storage.hub_cache.emojidex.auth_info.status === 'verified') {
-          return this.auth_info = this.EC.Data.storage.hub_cache.emojidex.auth_info;
+          return this.auth_info = this.EC.Data.storage.hub_cache.emojidex.auth_info
         }
+
       default:
-        return this._autoLogin();
+        return this._autoLogin()
     }
   }
 
   // logout:
   // 'logs out' by clearing user data
   logout() {
-    return this.EC.Data.auth_info(this.EC.Data._def_auth_info);
+    return this.EC.Data.auth_info(this.EC.Data._def_auth_info)
   }
 
   _authenticateAPI(params, callback) {
     return axios.get(`${this.EC.api_url}users/authenticate`, {
-      params: params
+      params
     }).then(response => {
       return this._setAuthFromResponse(response.data).then(() => {
-        if (typeof callback === 'function') { callback(this.auth_info); }
-      });
-    }).catch(response => {
-      let status = JSON.parse(response.response.responseText);
+        if (typeof callback === 'function') {
+          callback(this.auth_info)
+        }
+      })
+    }).catch(error => {
+      const status = JSON.parse(error.response.responseText)
       this.auth_info = {
         status: status.auth_status,
         token: null,
         user: ''
-      };
+      }
       return this.EC.Data.auth_info(this.EC.Data.auth_info).then(() => {
         if (typeof callback === 'function') {
           callback({
             auth_info: this.auth_info,
-            error_info: response.response
-          });
+            error_info: error.response
+          })
         }
-      });
-    });
+      })
+    })
   }
 
   // regular login with username/email and password
   plainAuth(username, password, callback) {
     return this._authenticateAPI({
       username,
-      password,
+      password
     },
-      callback);
+    callback)
   }
 
   tokenAuth(username, token, callback) {
     return this._authenticateAPI({
       username,
-      token,
+      token
     },
-      callback);
+    callback)
   }
 
   // auth with HTTP basic auth
   basicAuth(user, password, callback) {
     return this._authenticateAPI({
       user,
-      password,
+      password
     },
-      callback);
+    callback)
   }
 
   // sets auth parameters from a successful auth request [login]
@@ -118,18 +121,18 @@ export default class EmojidexUser {
       premium_exp: response.premium_exp,
       pro: response.pro,
       pro_exp: response.pro_exp
-    }).then(data=> {
-      this.syncUserData();
-      return data;
+    }).then(data => {
+      this.syncUserData()
+      return data
     }).catch(error => {
-      console.error(error);
-    });
+      console.error(error)
+    })
   }
 
   syncUserData() {
-    this.auth_info = this.EC.Data.storage.get('emojidex.auth_info');
-    this.Favorites.sync();
-    this.History.sync();
-    this.Follow.sync();
+    this.auth_info = this.EC.Data.storage.get('emojidex.auth_info')
+    this.Favorites.sync()
+    this.History.sync()
+    this.Follow.sync()
   }
 }

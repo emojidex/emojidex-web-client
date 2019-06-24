@@ -3,153 +3,158 @@ import _extend from 'lodash/extend'
 
 export default class EmojidexDataStorage {
   constructor(hub_path = 'https://www.emojidex.com/hub/1.0.0') {
-    this.hub = new CrossStorageClient(hub_path, { frameId: 'emojidex-client-storage-hub' });
-    this.hub_cache = {};
+    this.hub = new CrossStorageClient(hub_path, { frameId: 'emojidex-client-storage-hub' })
+    this.hub_cache = {}
   }
 
   _get_chained_data(query, data_obj, wrap = true) {
-    query = this._get_parsed_query(query);
-    let chain_obj = (data, key) => {
+    query = this._get_parsed_query(query)
+    const chain_obj = (data, key) => {
       if (query.array.length === 0) {
-        data[key] = data_obj;
+        data[key] = data_obj
       } else {
-        data[key] = {};
-        chain_obj(data[key], query.array.shift());
+        data[key] = {}
+        chain_obj(data[key], query.array.shift())
       }
-      return data;
-    };
 
-    let chained = chain_obj({}, query.array.shift());
-    return wrap ? chained : chained[query.first];
+      return data
+    }
+
+    const chained = chain_obj({}, query.array.shift())
+    return wrap ? chained : chained[query.first]
   }
 
   _get_hub_data(query) {
-    query = query.split('.');
+    query = query.split('.')
     return this.hub.onConnect().then(() => {
-      return this.hub.get(query.shift());
+      return this.hub.get(query.shift())
     }).then(hub_data => {
       if (query.length) {
         for (let i = 0; i < query.length; i++) {
-          let q = query[i];
-          hub_data = hub_data[q];
+          const q = query[i]
+          hub_data = hub_data[q]
         }
       }
-      return hub_data;
+
+      return hub_data
     }).catch(error => {
-      console.error(error);
-    });
+      console.error(error)
+    })
   }
 
   _get_parsed_query(query) {
-    let parsed_query = query.split('.');
+    const parsed_query = query.split('.')
     return query = {
       code: query,
       array: parsed_query,
       first: parsed_query[0]
-    };
+    }
   }
 
   get(query) {
-    query = query instanceof Array ? query : query.split('.');
-    let cache = this.hub_cache;
+    query = Array.isArray(query) ? query : query.split('.')
+    let cache = this.hub_cache
     if (query.length) {
       for (let i = 0; i < query.length; i++) {
-        let q = query[i];
-        if (cache[q] === undefined ) {
-          return null;
+        const q = query[i]
+        if (cache[q] === undefined) {
+          return null
         }
-        cache = cache[q];
+
+        cache = cache[q]
       }
     }
-    return cache;
+
+    return cache
   }
 
   set(query, data, update) {
-    let first_query = query.split('.')[0];
+    const first_query = query.split('.')[0]
     return this.hub.onConnect().then(() => {
       if (update) {
-        let new_data = {};
-        new_data[first_query] = data;
-        return this.hub.set(first_query, JSON.stringify(new_data));
-      } else {
-        return this.hub.set(first_query, this._get_chained_data(query, data));
+        const new_data = {}
+        new_data[first_query] = data
+        return this.hub.set(first_query, JSON.stringify(new_data))
       }
+
+      return this.hub.set(first_query, this._get_chained_data(query, data))
     }).then(() => {
-      return this.update_cache(first_query);
+      return this.update_cache(first_query)
     }).catch(error => {
-      console.error(error);
-    });
+      console.error(error)
+    })
   }
 
   update(query, data) {
-    let merged = _extend({}, this.get(query.split('.')[0]), this._get_chained_data(query, data, false));
-    return this.set(query, merged, true);
+    const merged = _extend({}, this.get(query.split('.')[0]), this._get_chained_data(query, data, false))
+    return this.set(query, merged, true)
   }
 
   update_cache(key) {
-    return this.hub.onConnect().then( () => {
-      return key ? key : this.hub.getKeys();
+    return this.hub.onConnect().then(() => {
+      return key ? key : this.hub.getKeys()
     }).then(keys => {
-      return this.hub.get(keys);
+      return this.hub.get(keys)
     }).then(hub_data => {
-      let data = JSON.parse(hub_data);
+      const data = JSON.parse(hub_data)
       if (key) {
-        return this.hub_cache[key] = data[key];
-      } else {
-        return this.hub_cache = data;
+        return this.hub_cache[key] = data[key]
       }
+
+      return this.hub_cache = data
     }).catch(error => {
-      console.error(error);
-    });
+      console.error(error)
+    })
   }
 
   _remove(query) {
-    query = this._get_parsed_query(query);
+    query = this._get_parsed_query(query)
     if (query.array.length === 1) {
-      return this.hub.del(query.code);
-    } else {
-      let scope;
-      let target = scope = this.get(query.array.shift());
-      let i = 0;
-      while (i < query.array.length - 1) {
-        scope = scope[query.array[i]];
-        i++;
-      }
-      delete scope[query.array[i]];
-      return this.update(query.first, target);
+      return this.hub.del(query.code)
     }
+
+    let scope
+    const target = scope = this.get(query.array.shift())
+    let i = 0
+    while (i < query.array.length - 1) {
+      scope = scope[query.array[i]]
+      i++
+    }
+
+    delete scope[query.array[i]]
+    return this.update(query.first, target)
   }
 
   clear() {
     return this.hub.onConnect().then(() => {
-      return this.hub.clear();
+      return this.hub.clear()
     }).catch(error => {
-      console.error(error);
-    });
+      console.error(error)
+    })
   }
 
   keys(query) {
     if (query) {
-      let keys = [];
-      for (let key in this.get(query)) {
-        keys.push(key);
+      const keys = []
+      for (const key in this.get(query)) {
+        keys.push(key)
       }
-      return keys;
 
-    } else {
-      return this.hub.onConnect().then(() => {
-        return this.hub.getKeys();
-      }).catch(error => {
-        console.error(error);
-      });
+      return keys
     }
+
+    return this.hub.onConnect().then(() => {
+      return this.hub.getKeys()
+    }).catch(error => {
+      console.error(error)
+    })
   }
 
   isEmpty(query) {
-    return this.get(query) ? false : true;
+    return !this.get(query)
   }
 
   isSet(query) {
-    return this.get(query) ? true : false;
+    return Boolean(this.get(query))
   }
 }
