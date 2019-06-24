@@ -30,7 +30,7 @@ export default class EmojidexIndexes {
       }
     }
 
-    return axios.get(`${this.EC.api_url}${query}`, {
+    return axios.get(`${this.EC.apiUrl}${query}`, {
       params: param
     }).then(response => {
       if (response.data.status != null) {
@@ -100,8 +100,8 @@ export default class EmojidexIndexes {
 
     return static_type.map(type =>
       language ?
-        loadStatic(`${this.EC.api_url + type}?locale=${language}`) :
-        loadStatic(`${this.EC.api_url + type}`))
+        loadStatic(`${this.EC.apiUrl + type}?locale=${language}`) :
+        loadStatic(`${this.EC.apiUrl + type}`))
   }
 
   select(code, callback, opts) {

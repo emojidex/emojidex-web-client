@@ -61,10 +61,10 @@ export default class EmojidexUtil {
   }
 
   // Converts an emoji array to [{code: "moji_code", img_url: "https://cdn...moji_code.png}] format
-  simplify(emoji = self.results, size_code = self.EC.size_code) {
+  simplify(emoji = self.results, sizeCode = self.EC.sizeCode) {
     for (let i = 0; i < emoji.length; i++) {
       emoji[i].code = self.escapeTerm(emoji[i].code)
-      emoji[i].img_url = `${self.EC.cdn_url}/${size_code}/${self.escapeTerm(emoji[i].code)}.png`
+      emoji[i].img_url = `${self.EC.cdnUrl}/${sizeCode}/${self.escapeTerm(emoji[i].code)}.png`
     }
 
     return emoji
@@ -285,8 +285,8 @@ export default class EmojidexUtil {
   }
 
   // Returns an HTML image/link tag for an emoji from an emoji object
-  emojiToHTML(emoji, size_code = self.EC.defaults.size_code) {
-    const img = `<img class="emojidex-emoji" src="https://${self.EC.env.cdn_addr}/emoji/${size_code}/${self.escapeTerm(emoji.code)}.png" emoji-code="${self.escapeTerm(emoji.code)}"${(emoji.moji == null || emoji.moji == '') ? '' : ' emoji-moji="' + emoji.moji + '"'} alt="${self.deEscapeTerm(emoji.code)}" />`
+  emojiToHTML(emoji, sizeCode = self.EC.defaults.sizeCode) {
+    const img = `<img class="emojidex-emoji" src="https://${self.EC.env.cdnAddr}/emoji/${sizeCode}/${self.escapeTerm(emoji.code)}.png" emoji-code="${self.escapeTerm(emoji.code)}"${(emoji.moji == null || emoji.moji == '') ? '' : ' emoji-moji="' + emoji.moji + '"'} alt="${self.deEscapeTerm(emoji.code)}" />`
     if (emoji.link != null && emoji.link != '') {
       return `<a href="${emoji.link}" emoji-code="${self.escapeTerm(emoji.code)}">${img}</a>`
     }
@@ -295,8 +295,8 @@ export default class EmojidexUtil {
   }
 
   // Returns an HTML image tag for an emoji from a ZWJ emoji object
-  getZwjEmojiTag(emoji, combinationBaseName, componentNumber, size_code = self.EC.defaults.size_code) {
-    return `<img class="emojidex-emoji" src="https://${self.EC.env.cdn_addr}/emoji/${size_code}/${combinationBaseName}/${componentNumber}/${self.escapeTerm(emoji.code)}.png" emoji-code="${self.escapeTerm(emoji.code)}"${(emoji.moji == null || emoji.moji == '') ? '' : ' emoji-moji="' + emoji.moji + '"'} alt="${self.deEscapeTerm(emoji.code)}" />`
+  getZwjEmojiTag(emoji, combinationBaseName, componentNumber, sizeCode = self.EC.defaults.sizeCode) {
+    return `<img class="emojidex-emoji" src="https://${self.EC.env.cdnAddr}/emoji/${sizeCode}/${combinationBaseName}/${componentNumber}/${self.escapeTerm(emoji.code)}.png" emoji-code="${self.escapeTerm(emoji.code)}"${(emoji.moji == null || emoji.moji == '') ? '' : ' emoji-moji="' + emoji.moji + '"'} alt="${self.deEscapeTerm(emoji.code)}" />`
   }
 
   // Returns an HTML ZWJ emoji objects wrapped with span and base emoji link tag.
@@ -309,8 +309,8 @@ export default class EmojidexUtil {
   }
 
   // Returns a MarkDown image/link tag for an emoji from an emoji object
-  emojiToMD(emoji, size_code = self.EC.defaults.size_code) {
-    const img = `![${(emoji.moji == null || emoji.moji == '') ? emoji.code : emoji.moji}](https://${self.EC.env.cdn_addr}/emoji/${size_code}/${self.escapeTerm(emoji.code)}.png "${self.deEscapeTerm(emoji.code)}")`
+  emojiToMD(emoji, sizeCode = self.EC.defaults.sizeCode) {
+    const img = `![${(emoji.moji == null || emoji.moji == '') ? emoji.code : emoji.moji}](https://${self.EC.env.cdnAddr}/emoji/${sizeCode}/${self.escapeTerm(emoji.code)}.png "${self.deEscapeTerm(emoji.code)}")`
     if (emoji.link != null && emoji.link != '') {
       return `[${img} ](${emoji.link})`
     }

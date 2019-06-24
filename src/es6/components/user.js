@@ -58,7 +58,7 @@ export default class EmojidexUser {
   }
 
   _authenticateAPI(params, callback) {
-    return axios.get(`${this.EC.api_url}users/authenticate`, {
+    return axios.get(`${this.EC.apiUrl}users/authenticate`, {
       params
     }).then(response => {
       return this._setAuthFromResponse(response.data).then(() => {

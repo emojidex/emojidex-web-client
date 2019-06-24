@@ -15,7 +15,7 @@ export default class EmojidexUserHistory {
 
     return axios({
       method: options.type,
-      url: options.url ? options.url : `${this.EC.api_url}users/history`,
+      url: options.url ? options.url : `${this.EC.apiUrl}users/history`,
       params: options.params,
       data: options.data
     }).then(response => {
@@ -33,7 +33,7 @@ export default class EmojidexUserHistory {
         detailed: this.EC.detailed,
         auth_token: this.EC.User.auth_info.token
       },
-      url: this.EC.api_url + 'users/history/emoji'
+      url: this.EC.apiUrl + 'users/history/emoji'
     }
     return this._historyAPI(options).then(response => {
       this._history = response.emoji

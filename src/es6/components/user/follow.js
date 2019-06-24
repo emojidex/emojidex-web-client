@@ -25,7 +25,7 @@ export default class EmojidexUserFollow {
   }
 
   getFollowing(callback) {
-    const options = { url: `${this.EC.api_url}users/following` }
+    const options = { url: `${this.EC.apiUrl}users/following` }
     return this._followAPI(options).then(response => {
       this.following = response.following
       if (typeof callback === 'function') {
@@ -42,7 +42,7 @@ export default class EmojidexUserFollow {
     }
 
     const options = {
-      url: `${this.EC.api_url}users/following`,
+      url: `${this.EC.apiUrl}users/following`,
       type: 'POST',
       data: { username }
     }
@@ -65,7 +65,7 @@ export default class EmojidexUserFollow {
     }
 
     const options = {
-      url: `${this.EC.api_url}users/following`,
+      url: `${this.EC.apiUrl}users/following`,
       type: 'DELETE',
       data: { username }
     }
@@ -87,7 +87,7 @@ export default class EmojidexUserFollow {
       return Promise.reject(new Error('Premium or Pro accounts only'))
     }
 
-    const options = { url: `${this.EC.api_url}users/followers` }
+    const options = { url: `${this.EC.apiUrl}users/followers` }
     return this._followAPI(options).then(response => {
       this.followers = response.followers
       if (typeof callback === 'function') {

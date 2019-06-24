@@ -22,7 +22,7 @@ export default class EmojidexSearch {
     _extend(param, opts)
 
     // TODO -------
-    // @searched_func = unless @EC.closed_net then func.remote else call_func.local
+    // @searched_func = unless @EC.closedNet then func.remote else call_func.local
     this.searched_func = call_func.remote
     this.searched = {
       data: search_data,
@@ -30,7 +30,7 @@ export default class EmojidexSearch {
       param
     }
 
-    return axios.get(`${this.EC.api_url}search/emoji`, {
+    return axios.get(`${this.EC.apiUrl}search/emoji`, {
       params: param
     }).then(response => {
       if (response.data.status != null) {
@@ -119,7 +119,7 @@ export default class EmojidexSearch {
 
     _extend(param, opts)
 
-    return axios.get(`${this.EC.api_url}emoji/${this.EC.Util.makeURLSafe(code)}`, {
+    return axios.get(`${this.EC.apiUrl}emoji/${this.EC.Util.makeURLSafe(code)}`, {
     }).then(response => {
       this.EC.Emoji.combine([response.data])
       if (typeof callback === 'function') {

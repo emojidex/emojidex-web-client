@@ -7,7 +7,8 @@ export default class EmojidexCategories {
     this._categories = this.EC.Data.categories()
     this.local = this.EC.options.locale
     return this.sync(null, this.locale).then(() => {
-      return this.EC.Categories = this
+      this.EC.Categories = this
+      return
     })
   }
 
@@ -30,7 +31,7 @@ export default class EmojidexCategories {
       param
     }
 
-    return axios.get(`${this.EC.api_url}emoji`, {
+    return axios.get(`${this.EC.apiUrl}emoji`, {
       params: param
     }).then(response => {
       this.meta = response.data.meta
@@ -101,7 +102,7 @@ export default class EmojidexCategories {
   }
 
   _get_category(callback, locale) {
-    return axios.get(`${this.EC.api_url}categories`, {
+    return axios.get(`${this.EC.apiUrl}categories`, {
       params: { locale }
     }).then(response => {
       this._categories = response.data.categories

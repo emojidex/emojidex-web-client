@@ -22,7 +22,7 @@ export default class EmojidexCustomizations {
       param
     }
 
-    return axios.get(`${this.EC.api_url}emoji/customizations`, {
+    return axios.get(`${this.EC.apiUrl}emoji/customizations`, {
       params: param
     }).then(response => {
       if (response.data.status != null) {

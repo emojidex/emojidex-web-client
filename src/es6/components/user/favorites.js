@@ -15,7 +15,7 @@ export default class EmojidexUserFavorites {
 
     return axios({
       method: options.type,
-      url: `${this.EC.api_url}users/favorites`,
+      url: `${this.EC.apiUrl}users/favorites`,
       params: options.params,
       data: options.data
     }).then(response => {
