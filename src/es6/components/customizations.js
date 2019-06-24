@@ -36,10 +36,14 @@ export default class EmojidexCustomizations {
         this.max_page = Math.ceil(response.data.meta.total_count / this.EC.limit);
         if (typeof callback === 'function') { callback(response.data.emoji); }
       }
-    }).catch(response => {
+    }).catch(error => {
       this.results = [];
       this.cur_page = 0;
-      if (typeof callback === 'function') { callback([]); }
+      if (typeof callback === 'function') {
+        callback([]);
+      } else {
+        console.error(error);
+      }
     });
   }
 

@@ -121,6 +121,8 @@ export default class EmojidexUser {
     }).then(data=> {
       this.syncUserData();
       return data;
+    }).catch(error => {
+      console.error(error);
     });
   }
 

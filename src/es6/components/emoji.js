@@ -88,7 +88,7 @@ export default class EmojidexEmoji {
   advanced(searchs) {
     return this.categories(
       searchs.categories,
-      {selection: this.tags(searchs.tags, {selection: this.search(searchs.term)})}
+      { selection: this.tags(searchs.tags, { selection: this.search(searchs.term) }) }
     );
   }
 
@@ -96,8 +96,9 @@ export default class EmojidexEmoji {
   combine(emoji) {
     return this.EC.Data.emoji(emoji).then(hub_data => {
       return this._emoji_instance = hub_data.emoji;
-    }
-    );
+    }).catch(error => {
+      console.error(error);
+    });
   }
 
   // Clears the emoji array and emoji in storage.

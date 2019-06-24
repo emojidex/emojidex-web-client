@@ -46,11 +46,15 @@ export default class EmojidexIndexes {
           if (typeof callback === 'function') { callback(response.data.emoji); }
         });
       }
-    }).catch(response => {
+    }).catch(error => {
       this.results = [];
       this.cur_page = 0;
       this.count = 0;
-      if (typeof callback === 'function') { callback([]); }
+      if (typeof callback === 'function') {
+        callback([]);
+      } else {
+        console.error(error);
+      }
     });
   }
 
@@ -82,6 +86,8 @@ export default class EmojidexIndexes {
             if (typeof callback === 'function') { callback(data); }
           });
         }
+      }).catch(error => {
+        console.error(error);
       });
     };
 

@@ -67,6 +67,8 @@ export default class EmojidexClient {
       return this.Categories = new EmojidexCategories(this);
     }).then(() => {
       this.options.onReady(this);
+    }).catch(error => {
+      console.error(error);
     });
   }
 }

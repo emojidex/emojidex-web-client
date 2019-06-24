@@ -9,16 +9,19 @@ export default class EmojidexUserFavorites {
   }
 
   _favoritesAPI(options) {
-    if (this.EC.User.auth_info.token != null) {
-      return axios({
-        method: options.type,
-        url: `${this.EC.api_url}users/favorites`,
-        params: options.params,
-        data: options.data
-      }).then(response => {
-        return response.data;
-      });
-    }
+    if (this.EC.User.auth_info.token === null || this.EC.User.auth_info.token === undefined)
+      return Promise.reject(new Error('Require auth token.'));
+
+    return axios({
+      method: options.type,
+      url: `${this.EC.api_url}users/favorites`,
+      params: options.params,
+      data: options.data
+    }).then(response => {
+      return response.data;
+    }).catch(response => {
+      return response.response;
+    });
   }
 
   get(callback, page = 1) {
@@ -43,6 +46,8 @@ export default class EmojidexUserFavorites {
       } else {
         return this._favorites;
       }
+    }).catch(error => {
+      console.error(error);
     });
   }
 
@@ -55,6 +60,8 @@ export default class EmojidexUserFavorites {
     return this._favoritesAPI(options).then(response => {
       this._favorites.push(response);
       return this.EC.Data.favorites(this._favorites);
+    }).catch(error => {
+      console.error(error);
     });
   }
 
@@ -66,6 +73,8 @@ export default class EmojidexUserFavorites {
     };
     return this._favoritesAPI(options).then(response => {
       return this.sync();
+    }).catch(error => {
+      console.error(error);
     });
   }
 
@@ -80,6 +89,8 @@ export default class EmojidexUserFavorites {
       } else {
         return data;
       }
+    }).catch(error => {
+      console.error(error);
     });
   }
 

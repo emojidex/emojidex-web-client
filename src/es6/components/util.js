@@ -79,6 +79,8 @@ export default class EmojidexUtil {
       return self.emojifyCodes(processed, processor);
     }).then((processed) => {
       return processed;
+    }).catch(error => {
+      console.error(error);
     });
   }
 
@@ -126,7 +128,9 @@ export default class EmojidexUtil {
                   ? resolve(processor(result, combination.base, i))
                   : resolve(processor(result));
               }
-            })
+            }).catch(error => {
+              reject(error);
+            });
           }))
         }
       }
@@ -140,22 +144,22 @@ export default class EmojidexUtil {
           if(/\u200d/.test(target)) {
             // for used ZWJ emoji
             let matchedMojis = target.match(self.utf_pattern_global);
-            let matchedMojiCodes = getMojicodes(matchedMojis)
+            let matchedMojiCodes = getMojicodes(matchedMojis);
 
             self.EC.Search.find(self.EC.Data.moji_codes.moji_index[matchedMojis[0]]).then((result) => {
-              if(result.combinations.length) {
+              if (result.combinations.length) {
                 result.combinations.forEach((combination) => {
                   // check for registered ZWJ emoji on emojidex.com
                   let checkComponents = combination.components;
                   let sortedMatchedMojiCodes = [];
                   checkComponents = checkComponents.map((component, i) => {
-                    if(matchedMojiCodes.length) {
-                      for(let j = 0; j < matchedMojiCodes.length; j++) {
-                        if(component.includes(matchedMojiCodes[j])) {
+                    if (matchedMojiCodes.length) {
+                      for (let j = 0; j < matchedMojiCodes.length; j++) {
+                        if (component.includes(matchedMojiCodes[j])) {
                           sortedMatchedMojiCodes.push({ emojiCode: matchedMojiCodes[j], layerNum: combination.component_layer_order[i] });
                           matchedMojiCodes[j] = false
                           return true
-                        } else if(j == matchedMojiCodes.length - 1) {
+                        } else if (j == matchedMojiCodes.length - 1) {
                           return component[component.length - 1] == '' ? null : false
                         }
                       }
@@ -164,7 +168,7 @@ export default class EmojidexUtil {
 
                   let zwjReplacingPromises = null;
                   let emojiCodes = sortedMatchedMojiCodes.sort((a, b) => { return a.layerNum < b.layerNum ? -1 : 1; }).map((o) => { return o.emojiCode; });
-                  if(checkComponents.includes(false)) {
+                  if (checkComponents.includes(false)) {
                     // for incorrect ZWJ emoji
                     zwjReplacingPromises = getJwzReplacingPromises(checkComponents, emojiCodes, processor);
                   } else {
@@ -172,14 +176,14 @@ export default class EmojidexUtil {
                     zwjReplacingPromises = getJwzReplacingPromises(checkComponents, emojiCodes, self.getZwjEmojiTag, combination);
                   }
                   Promise.all(zwjReplacingPromises).then((zwjReplacedStrings) => {
-                    if(checkComponents.includes(false)) {
+                    if (checkComponents.includes(false)) {
                       resolveReplace(zwjReplacedStrings.join(''));
                     } else {
                       self.EC.Search.find(combination.base).then((baseEmoji) => {
                         resolveReplace(self.getZwjEmojiSpanTag(baseEmoji, zwjReplacedStrings.join('')));
                       });
                     }
-                  })
+                  });
                 })
               } else {
                 let replaceingUtfEmojiPromises = [];
@@ -189,30 +193,34 @@ export default class EmojidexUtil {
                       if (result.hasOwnProperty('code')) {
                         resolve(processor(result));
                       }
-                    })
-                  }))
+                    });
+                  }));
                 })
                 Promise.all(replaceingUtfEmojiPromises).then((replacedUtfEmoji) => {
                   resolveReplace(replacedUtfEmoji.join(''));
-                })
+                });
               }
-            })
-          } else if(self.utf_pattern.test(target)) {
+            }).catch(error => {
+              rejectReplace(error);
+            });
+          } else if (self.utf_pattern.test(target)) {
             self.EC.Search.find(self.EC.Data.moji_codes.moji_index[target]).then((result) => {
               if (result.hasOwnProperty('code')) {
                 resolveReplace(processor(result));
               }
             }).catch(() => {
               resolveReplace(target);
-            })
+            });
           } else {
             resolveReplace(target);
           }
-        })
-      })
+        });
+      });
       Promise.all(replacingSources).then((replacedSources) => {
         resolveEmojify(replacedSources.join(''));
-      })
+      }).catch(error => {
+        rejectEmojify(error);
+      });
     });
   }
 
@@ -243,6 +251,8 @@ export default class EmojidexUtil {
             }
             resolve(source);
           }
+        }).catch(error => {
+          reject(error);
         });
       }
     });

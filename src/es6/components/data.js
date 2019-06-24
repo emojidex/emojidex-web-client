@@ -24,7 +24,7 @@ export default class EmojidexData {
 
     return this.storage.hub.onReadyFrame().then( () => {
       return this.storage.hub.onConnect();
-    }).then( () => {
+    }).then(() => {
       return this.storage.hub.getKeys();
     }).then(keys => {
       if (keys.indexOf('emojidex') !== -1) {
@@ -44,7 +44,7 @@ export default class EmojidexData {
         });
       }
     }).then(data => {
-      if(this._needUpdate()) {
+      if (this._needUpdate()) {
         return this._initMojiCodes();
       } else {
         return this.storage.get('emojidex');
@@ -52,6 +52,8 @@ export default class EmojidexData {
     }).then(data => {
       this.moji_codes = this.storage.get('emojidex.moji_codes');
       return this.EC.Data = this;
+    }).catch(error => {
+      console.error(error);
     });
   }
 
@@ -60,15 +62,17 @@ export default class EmojidexData {
       return axios.get(`${this.EC.api_url}moji_codes?locale=${this.EC.locale}`);
     }).then(response => {
       return this.storage.update('emojidex.moji_codes', response.data);
-    })
+    }).catch(error => {
+      console.error(error);
+    });
   }
 
   _needUpdate() {
-    if(this.storage.isSet('emojidex.utfInfoUpdated')) {
+    if (this.storage.isSet('emojidex.utfInfoUpdated')) {
       current = new Date();
       updated = new Date(this.storage.get('emojidex.utfInfoUpdated'));
       // ２週間に一度更新する
-      if(current - updated >= 3600000 * 24 * 14) {
+      if (current - updated >= 3600000 * 24 * 14) {
         return true;
       } else {
         return false;
@@ -95,9 +99,9 @@ export default class EmojidexData {
             }
           }
         }
-        return this.storage.update('emojidex', {emoji: hub_emoji});
+        return this.storage.update('emojidex', { emoji: hub_emoji });
       } else {
-        return this.storage.update('emojidex', {emoji: emoji_set});
+        return this.storage.update('emojidex', { emoji: emoji_set });
       }
     } else if (this.storage.hub_cache.emojidex.emoji != null) {
       return this.storage.hub_cache.emojidex.emoji;
@@ -123,9 +127,9 @@ export default class EmojidexData {
             }
           }
         }
-        return this.storage.update('emojidex', {favorites: hub_emoji});
+        return this.storage.update('emojidex', { favorites: hub_emoji });
       } else {
-        return this.storage.update('emojidex', {favorites: favorites_set});
+        return this.storage.update('emojidex', { favorites: favorites_set });
       }
     } else if (this.storage.hub_cache.emojidex.favorites != null) {
       return new Promise(resolve => resolve(this.storage.hub_cache.emojidex.favorites));
@@ -151,9 +155,9 @@ export default class EmojidexData {
             }
           }
         }
-        return this.storage.update('emojidex', {history: hub_emoji});
+        return this.storage.update('emojidex', { history: hub_emoji });
       } else {
-        return this.storage.update('emojidex', {history: history_set});
+        return this.storage.update('emojidex', { history: history_set });
       }
     } else if (this.storage.hub_cache.emojidex.history != null) {
       return new Promise(resolve => resolve(this.storage.hub_cache.emojidex.history));
@@ -170,7 +174,7 @@ export default class EmojidexData {
   auth_info(auth_info_set) {
     if (auth_info_set != null) {
       this.EC.User.auth_info = auth_info_set;
-      return this.storage.update('emojidex', {auth_info: auth_info_set});
+      return this.storage.update('emojidex', { auth_info: auth_info_set });
     }
     return this.storage.hub_cache.emojidex.auth_info;
   }

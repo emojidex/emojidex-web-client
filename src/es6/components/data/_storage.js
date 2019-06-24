@@ -3,14 +3,13 @@ import _extend from 'lodash/extend'
 
 export default class EmojidexDataStorage {
   constructor(hub_path = 'https://www.emojidex.com/hub/1.0.0') {
-    this.hub = new CrossStorageClient(hub_path,
-      {frameId: 'emojidex-client-storage-hub'});
+    this.hub = new CrossStorageClient(hub_path, { frameId: 'emojidex-client-storage-hub' });
     this.hub_cache = {};
   }
 
-  _get_chained_data(query, data_obj, wrap=true) {
+  _get_chained_data(query, data_obj, wrap = true) {
     query = this._get_parsed_query(query);
-    let chain_obj = function(data, key) {
+    let chain_obj = (data, key) => {
       if (query.array.length === 0) {
         data[key] = data_obj;
       } else {
@@ -28,8 +27,7 @@ export default class EmojidexDataStorage {
     query = query.split('.');
     return this.hub.onConnect().then(() => {
       return this.hub.get(query.shift());
-    }
-    ).then(function(hub_data){
+    }).then(hub_data => {
       if (query.length) {
         for (let i = 0; i < query.length; i++) {
           let q = query[i];
@@ -37,6 +35,8 @@ export default class EmojidexDataStorage {
         }
       }
       return hub_data;
+    }).catch(error => {
+      console.error(error);
     });
   }
 
@@ -66,7 +66,7 @@ export default class EmojidexDataStorage {
 
   set(query, data, update) {
     let first_query = query.split('.')[0];
-    return this.hub.onConnect().then( () => {
+    return this.hub.onConnect().then(() => {
       if (update) {
         let new_data = {};
         new_data[first_query] = data;
@@ -74,11 +74,11 @@ export default class EmojidexDataStorage {
       } else {
         return this.hub.set(first_query, this._get_chained_data(query, data));
       }
-    }
-    ).then(() => {
+    }).then(() => {
       return this.update_cache(first_query);
-    }
-    );
+    }).catch(error => {
+      console.error(error);
+    });
   }
 
   update(query, data) {
@@ -88,20 +88,19 @@ export default class EmojidexDataStorage {
 
   update_cache(key) {
     return this.hub.onConnect().then( () => {
-      if (key) { return key; } else { return this.hub.getKeys(); }
-    }
-    ).then(keys => {
+      return key ? key : this.hub.getKeys();
+    }).then(keys => {
       return this.hub.get(keys);
-    }
-    ).then(hub_data => {
+    }).then(hub_data => {
       let data = JSON.parse(hub_data);
       if (key) {
         return this.hub_cache[key] = data[key];
       } else {
         return this.hub_cache = data;
       }
-    }
-    );
+    }).catch(error => {
+      console.error(error);
+    });
   }
 
   _remove(query) {
@@ -124,8 +123,9 @@ export default class EmojidexDataStorage {
   clear() {
     return this.hub.onConnect().then(() => {
       return this.hub.clear();
-    }
-    );
+    }).catch(error => {
+      console.error(error);
+    });
   }
 
   keys(query) {
@@ -139,16 +139,17 @@ export default class EmojidexDataStorage {
     } else {
       return this.hub.onConnect().then(() => {
         return this.hub.getKeys();
-      }
-      );
+      }).catch(error => {
+        console.error(error);
+      });
     }
   }
 
   isEmpty(query) {
-    if (this.get(query)) { return false; } else { return true; }
+    return this.get(query) ? false : true;
   }
 
   isSet(query) {
-    if (this.get(query)) { return true; } else { return false; }
+    return this.get(query) ? true : false;
   }
 }

@@ -9,16 +9,19 @@ export default class EmojidexUserHistory {
   }
 
   _historyAPI(options) {
-    if (this.EC.User.auth_info.token != null) {
-      return axios({
-        method: options.type,
-        url: options.url ? options.url : `${this.EC.api_url}users/history`,
-        params: options.params,
-        data: options.data
-      }).then(response => {
-        return response.data;
-      });
-    }
+    if (this.EC.User.auth_info.token === null || this.EC.User.auth_info.token === undefined)
+      return Promise.reject(new Error('Require auth token.'));
+      
+    return axios({
+      method: options.type,
+      url: options.url ? options.url : `${this.EC.api_url}users/history`,
+      params: options.params,
+      data: options.data
+    }).then(response => {
+      return response.data;
+    }).catch(response => {
+      return response.response;
+    });
   }
 
   get(callback, page = 1) {
@@ -44,6 +47,8 @@ export default class EmojidexUserHistory {
       } else {
         return this._history;
       }
+    }).catch(error => {
+      console.error(error);
     });
   }
 
@@ -67,6 +72,8 @@ export default class EmojidexUserHistory {
       } else {
         return this._history_info;
       }
+    }).catch(error => {
+      console.error(error);
     });
   }
 
@@ -86,6 +93,8 @@ export default class EmojidexUserHistory {
         }
       }
       return response;
+    }).catch(error => {
+      console.error(error);
     });
   }
 
@@ -100,6 +109,8 @@ export default class EmojidexUserHistory {
       } else {
         return data;
       }
+    }).catch(error => {
+      console.error(error);
     });
   }
 
