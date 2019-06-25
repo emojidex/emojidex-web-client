@@ -107,8 +107,8 @@ export default class EmojidexEmoji {
 
   // Concatenates and flattens the given emoji array into the @emoji array
   combine(emoji) {
-    return this.EC.Data.emoji(emoji).then(hub_data => {
-      return this._emoji_instance = hub_data.emoji
+    return this.EC.Data.emoji(emoji).then(hubData => {
+      return this._emoji_instance = hubData.emoji
     }).catch(error => {
       console.error(error)
     })

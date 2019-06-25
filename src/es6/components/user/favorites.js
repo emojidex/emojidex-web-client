@@ -9,7 +9,7 @@ export default class EmojidexUserFavorites {
   }
 
   _favoritesAPI(options) {
-    if (this.EC.User.auth_info.token === null || this.EC.User.auth_info.token === undefined) {
+    if (this.EC.User.authInfo.token === null || this.EC.User.authInfo.token === undefined) {
       return Promise.reject(new Error('Require auth token.'))
     }
 
@@ -31,7 +31,7 @@ export default class EmojidexUserFavorites {
         page,
         limit: this.EC.limit,
         detailed: this.EC.detailed,
-        auth_token: this.EC.User.auth_info.token
+        auth_token: this.EC.User.authInfo.token
       }
     }
     return this._favoritesAPI(options).then(response => {
@@ -55,7 +55,7 @@ export default class EmojidexUserFavorites {
   set(emoji_code) {
     const options = {
       type: 'POST',
-      params: { auth_token: this.EC.User.auth_info.token },
+      params: { auth_token: this.EC.User.authInfo.token },
       data: { emoji_code }
     }
     return this._favoritesAPI(options).then(response => {
@@ -69,7 +69,7 @@ export default class EmojidexUserFavorites {
   unset(emoji_code) {
     const options = {
       type: 'DELETE',
-      params: { auth_token: this.EC.User.auth_info.token },
+      params: { auth_token: this.EC.User.authInfo.token },
       data: { emoji_code }
     }
     return this._favoritesAPI(options).then(response => {

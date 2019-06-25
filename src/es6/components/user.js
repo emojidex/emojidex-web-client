@@ -6,7 +6,7 @@ import axios from 'axios'
 export default class EmojidexUser {
   constructor(EC) {
     this.EC = EC
-    this.auth_info = this.EC.Data._def_auth_info
+    this.authInfo = this.EC.Data.defaultAuthInfo
     this.History = new EmojidexUserHistory(this.EC)
     this.Favorites = new EmojidexUserFavorites(this.EC)
     this.Follow = new EmojidexUserFollow(this.EC)
@@ -15,10 +15,10 @@ export default class EmojidexUser {
 
   // Checks for local saved login data, and if present sets the username and api_key
   _autoLogin() {
-    if (typeof this.EC.Data.storage.hub_cache !== 'undefined' &&
-        typeof this.EC.Data.storage.hub_cache.emojidex !== 'undefined' &&
-        typeof this.EC.Data.storage.hub_cache.emojidex.auth_info !== 'undefined' &&
-        this.EC.Data.storage.hub_cache.emojidex.auth_info.status === 'verified') {
+    if (typeof this.EC.Data.storage.hubCache !== 'undefined' &&
+        typeof this.EC.Data.storage.hubCache.emojidex !== 'undefined' &&
+        typeof this.EC.Data.storage.hubCache.emojidex.auth_info !== 'undefined' &&
+        this.EC.Data.storage.hubCache.emojidex.auth_info.status === 'verified') {
       return this.syncUserData()
     }
   }
@@ -39,13 +39,15 @@ export default class EmojidexUser {
       case 'basic':
         return this.basicAuth(params.user, params.password, params.callback)
       case 'session':
-        if (typeof this.EC.Data.storage.hub_cache !== 'undefined' &&
-            typeof this.EC.Data.storage.hub_cache.emojidex !== 'undefined' &&
-            typeof this.EC.Data.storage.hub_cache.emojidex.auth_info !== 'undefined' &&
-            this.EC.Data.storage.hub_cache.emojidex.auth_info.status === 'verified') {
-          return this.auth_info = this.EC.Data.storage.hub_cache.emojidex.auth_info
+        if (typeof this.EC.Data.storage.hubCache !== 'undefined' &&
+            typeof this.EC.Data.storage.hubCache.emojidex !== 'undefined' &&
+            typeof this.EC.Data.storage.hubCache.emojidex.auth_info !== 'undefined' &&
+            this.EC.Data.storage.hubCache.emojidex.auth_info.status === 'verified') {
+          this.authInfo = this.EC.Data.storage.hubCache.emojidex.auth_info
+          return this.authInfo
         }
 
+        break
       default:
         return this._autoLogin()
     }
@@ -54,7 +56,7 @@ export default class EmojidexUser {
   // logout:
   // 'logs out' by clearing user data
   logout() {
-    return this.EC.Data.auth_info(this.EC.Data._def_auth_info)
+    return this.EC.Data.authInfo(this.EC.Data.defaultAuthInfo)
   }
 
   _authenticateAPI(params, callback) {
@@ -63,21 +65,20 @@ export default class EmojidexUser {
     }).then(response => {
       return this._setAuthFromResponse(response.data).then(() => {
         if (typeof callback === 'function') {
-          callback(this.auth_info)
+          callback(this.authInfo)
         }
       })
     }).catch(error => {
-      const status = JSON.parse(error.response.responseText)
-      this.auth_info = {
-        status: status.auth_status,
+      this.authInfo = {
+        status: error.response.data.auth_status,
         token: null,
         user: ''
       }
-      return this.EC.Data.auth_info(this.EC.Data.auth_info).then(() => {
+      return this.EC.Data.authInfo(this.EC.Data.authInfo).then(() => {
         if (typeof callback === 'function') {
           callback({
-            auth_info: this.auth_info,
-            error_info: error.response
+            authInfo: this.authInfo,
+            errorInfo: error.response
           })
         }
       })
@@ -112,15 +113,15 @@ export default class EmojidexUser {
 
   // sets auth parameters from a successful auth request [login]
   _setAuthFromResponse(response) {
-    return this.EC.Data.auth_info({
+    return this.EC.Data.authInfo({
       status: response.auth_status,
       token: response.auth_token,
       user: response.auth_user,
       r18: response.r18,
       premium: response.premium,
-      premium_exp: response.premium_exp,
+      premiumExp: response.premium_exp,
       pro: response.pro,
-      pro_exp: response.pro_exp
+      proExp: response.pro_exp
     }).then(data => {
       this.syncUserData()
       return data
@@ -130,7 +131,7 @@ export default class EmojidexUser {
   }
 
   syncUserData() {
-    this.auth_info = this.EC.Data.storage.get('emojidex.auth_info')
+    this.authInfo = this.EC.Data.storage.get('emojidex.auth_info')
     this.Favorites.sync()
     this.History.sync()
     this.Follow.sync()

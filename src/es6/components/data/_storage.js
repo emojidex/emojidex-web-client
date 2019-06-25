@@ -2,58 +2,58 @@ import { CrossStorageClient } from 'cross-storage'
 import _extend from 'lodash/extend'
 
 export default class EmojidexDataStorage {
-  constructor(hub_path = 'https://www.emojidex.com/hub/1.0.0') {
-    this.hub = new CrossStorageClient(hub_path, { frameId: 'emojidex-client-storage-hub' })
-    this.hub_cache = {}
+  constructor(hubPath = 'https://www.emojidex.com/hub/1.0.0') {
+    this.hub = new CrossStorageClient(hubPath, { frameId: 'emojidex-client-storage-hub' })
+    this.hubCache = {}
   }
 
-  _get_chained_data(query, data_obj, wrap = true) {
-    query = this._get_parsed_query(query)
-    const chain_obj = (data, key) => {
+  _getChainedData(query, dataObj, wrap = true) {
+    query = this._getParsedQuery(query)
+    const chainObj = (data, key) => {
       if (query.array.length === 0) {
-        data[key] = data_obj
+        data[key] = dataObj
       } else {
         data[key] = {}
-        chain_obj(data[key], query.array.shift())
+        chainObj(data[key], query.array.shift())
       }
 
       return data
     }
 
-    const chained = chain_obj({}, query.array.shift())
+    const chained = chainObj({}, query.array.shift())
     return wrap ? chained : chained[query.first]
   }
 
-  _get_hub_data(query) {
+  _getHubData(query) {
     query = query.split('.')
     return this.hub.onConnect().then(() => {
       return this.hub.get(query.shift())
-    }).then(hub_data => {
+    }).then(hubData => {
       if (query.length) {
         for (let i = 0; i < query.length; i++) {
           const q = query[i]
-          hub_data = hub_data[q]
+          hubData = hubData[q]
         }
       }
 
-      return hub_data
+      return hubData
     }).catch(error => {
       console.error(error)
     })
   }
 
-  _get_parsed_query(query) {
-    const parsed_query = query.split('.')
-    return query = {
+  _getParsedQuery(query) {
+    const parsedQuery = query.split('.')
+    return {
       code: query,
-      array: parsed_query,
-      first: parsed_query[0]
+      array: parsedQuery,
+      first: parsedQuery[0]
     }
   }
 
   get(query) {
     query = Array.isArray(query) ? query : query.split('.')
-    let cache = this.hub_cache
+    let cache = this.hubCache
     if (query.length) {
       for (let i = 0; i < query.length; i++) {
         const q = query[i]
@@ -69,52 +69,54 @@ export default class EmojidexDataStorage {
   }
 
   set(query, data, update) {
-    const first_query = query.split('.')[0]
+    const firstQuery = query.split('.')[0]
     return this.hub.onConnect().then(() => {
       if (update) {
-        const new_data = {}
-        new_data[first_query] = data
-        return this.hub.set(first_query, JSON.stringify(new_data))
+        const newData = {}
+        newData[firstQuery] = data
+        return this.hub.set(firstQuery, JSON.stringify(newData))
       }
 
-      return this.hub.set(first_query, this._get_chained_data(query, data))
+      return this.hub.set(firstQuery, this._getChainedData(query, data))
     }).then(() => {
-      return this.update_cache(first_query)
+      return this.updateCache(firstQuery)
     }).catch(error => {
       console.error(error)
     })
   }
 
   update(query, data) {
-    const merged = _extend({}, this.get(query.split('.')[0]), this._get_chained_data(query, data, false))
+    const merged = _extend({}, this.get(query.split('.')[0]), this._getChainedData(query, data, false))
     return this.set(query, merged, true)
   }
 
-  update_cache(key) {
+  updateCache(key) {
     return this.hub.onConnect().then(() => {
       return key ? key : this.hub.getKeys()
     }).then(keys => {
       return this.hub.get(keys)
-    }).then(hub_data => {
-      const data = JSON.parse(hub_data)
+    }).then(hubData => {
+      const data = JSON.parse(hubData)
       if (key) {
-        return this.hub_cache[key] = data[key]
+        this.hubCache[key] = data[key]
+        return this.hubCache[key]
       }
 
-      return this.hub_cache = data
+      this.hubCache = data
+      return this.hubCache
     }).catch(error => {
       console.error(error)
     })
   }
 
   _remove(query) {
-    query = this._get_parsed_query(query)
+    query = this._getParsedQuery(query)
     if (query.array.length === 1) {
       return this.hub.del(query.code)
     }
 
-    let scope
-    const target = scope = this.get(query.array.shift())
+    let scope = this.get(query.array.shift())
+    const target = scope
     let i = 0
     while (i < query.array.length - 1) {
       scope = scope[query.array[i]]
@@ -136,8 +138,11 @@ export default class EmojidexDataStorage {
   keys(query) {
     if (query) {
       const keys = []
-      for (const key in this.get(query)) {
-        keys.push(key)
+      const cache = this.get(query)
+      for (const key in cache) {
+        if (Object.prototype.hasOwnProperty.call(cache, key)) {
+          keys.push(key)
+        }
       }
 
       return keys

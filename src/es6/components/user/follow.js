@@ -8,14 +8,14 @@ export default class EmojidexUserFollow {
   }
 
   _followAPI(options) {
-    if (this.EC.User.auth_info.token === null || this.EC.User.auth_info.token === undefined) {
+    if (this.EC.User.authInfo.token === null || this.EC.User.authInfo.token === undefined) {
       return Promise.reject(new Error('Require auth token.'))
     }
 
     return axios({
       method: options.type,
       url: options.url,
-      params: { auth_token: this.EC.User.auth_info.token },
+      params: { auth_token: this.EC.User.authInfo.token },
       data: options.data
     }).then(response => {
       return response.data
@@ -83,7 +83,7 @@ export default class EmojidexUserFollow {
   }
 
   getFollowers(callback) {
-    if (!(this.EC.User.auth_info.pro || this.EC.User.auth_info.premium)) {
+    if (!(this.EC.User.authInfo.pro || this.EC.User.authInfo.premium)) {
       return Promise.reject(new Error('Premium or Pro accounts only'))
     }
 

@@ -18,8 +18,8 @@ export default class EmojidexCategories {
       limit: this.EC.limit,
       detailed: this.EC.detailed
     }
-    if (this.EC.User.auth_info.token !== null) {
-      _extend(param, { auth_token: this.EC.User.auth_info.token })
+    if (this.EC.User.authInfo.token !== null) {
+      _extend(param, { auth_token: this.EC.User.authInfo.token })
     }
 
     _extend(param, opts)

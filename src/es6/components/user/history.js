@@ -9,7 +9,7 @@ export default class EmojidexUserHistory {
   }
 
   _historyAPI(options) {
-    if (this.EC.User.auth_info.token === null || this.EC.User.auth_info.token === undefined) {
+    if (this.EC.User.authInfo.token === null || this.EC.User.authInfo.token === undefined) {
       return Promise.reject(new Error('Require auth token.'))
     }
 
@@ -31,7 +31,7 @@ export default class EmojidexUserHistory {
         page,
         limit: this.EC.limit,
         detailed: this.EC.detailed,
-        auth_token: this.EC.User.auth_info.token
+        auth_token: this.EC.User.authInfo.token
       },
       url: this.EC.apiUrl + 'users/history/emoji'
     }
@@ -59,7 +59,7 @@ export default class EmojidexUserHistory {
         page,
         limit: this.EC.limit,
         detailed: this.EC.detailed,
-        auth_token: this.EC.User.auth_info.token
+        auth_token: this.EC.User.authInfo.token
       }
     }
     return this._historyAPI(options).then(response => {
@@ -81,7 +81,7 @@ export default class EmojidexUserHistory {
   set(emoji_code) {
     const options = {
       type: 'POST',
-      params: { auth_token: this.EC.User.auth_info.token },
+      params: { auth_token: this.EC.User.authInfo.token },
       data: { emoji_code }
     }
     return this._historyAPI(options).then(response => {

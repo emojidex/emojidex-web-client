@@ -5,15 +5,15 @@ export default class EmojidexData {
   constructor(EC, options) {
     this.EC = EC
     this.options = options
-    this._def_auth_info = {
+    this.defaultAuthInfo = {
       status: 'none',
       user: '',
       token: null,
       r18: false,
       premium: false,
-      premium_exp: null,
+      premiumExp: null,
       pro: false,
-      pro_exp: null
+      proExp: null
     }
 
     if (this.options.storageHubPath != null) {
@@ -28,7 +28,7 @@ export default class EmojidexData {
       return this.storage.hub.getKeys()
     }).then(keys => {
       if (keys.indexOf('emojidex') !== -1) {
-        return this.storage.update_cache('emojidex')
+        return this.storage.updateCache('emojidex')
       }
 
       return this.storage.update('emojidex', {
@@ -41,7 +41,7 @@ export default class EmojidexData {
         history: this.EC.options.history || [],
         favorites: this.EC.options.favorites || [],
         categories: this.EC.options.categories || [],
-        auth_info: this.EC.options.auth_info || this._def_auth_info
+        auth_info: this.EC.options.authInfo || this.defaultAuthInfo
       })
     }).then(data => {
       if (this._needUpdate()) {
@@ -84,9 +84,9 @@ export default class EmojidexData {
 
   emoji(emoji_set) {
     if (emoji_set != null) {
-      if (this.storage.hub_cache.emojidex.emoji != null &&
-          this.storage.hub_cache.emojidex.emoji.length > 0) {
-        const hub_emoji = this.storage.hub_cache.emojidex.emoji
+      if (this.storage.hubCache.emojidex.emoji != null &&
+          this.storage.hubCache.emojidex.emoji.length > 0) {
+        const hub_emoji = this.storage.hubCache.emojidex.emoji
         for (let i = 0; i < emoji_set.length; i++) {
           const new_emoji = emoji_set[i]
           for (let j = 0; j < hub_emoji.length; j++) {
@@ -106,8 +106,8 @@ export default class EmojidexData {
       return this.storage.update('emojidex', { emoji: emoji_set })
     }
 
-    if (this.storage.hub_cache.emojidex.emoji != null) {
-      return this.storage.hub_cache.emojidex.emoji
+    if (this.storage.hubCache.emojidex.emoji != null) {
+      return this.storage.hubCache.emojidex.emoji
     }
 
     return undefined
@@ -115,9 +115,9 @@ export default class EmojidexData {
 
   favorites(favorites_set) {
     if (favorites_set != null) {
-      if (this.storage.hub_cache.emojidex.favorites != null &&
-          this.storage.hub_cache.emojidex.favorites.length > 0) {
-        const hub_emoji = this.storage.hub_cache.emojidex.favorites
+      if (this.storage.hubCache.emojidex.favorites != null &&
+          this.storage.hubCache.emojidex.favorites.length > 0) {
+        const hub_emoji = this.storage.hubCache.emojidex.favorites
         for (let i = 0; i < favorites_set.length; i++) {
           const new_emoji = favorites_set[i]
           for (let j = 0; j < hub_emoji.length; j++) {
@@ -137,8 +137,8 @@ export default class EmojidexData {
       return this.storage.update('emojidex', { favorites: favorites_set })
     }
 
-    if (this.storage.hub_cache.emojidex.favorites != null) {
-      return new Promise(resolve => resolve(this.storage.hub_cache.emojidex.favorites))
+    if (this.storage.hubCache.emojidex.favorites != null) {
+      return new Promise(resolve => resolve(this.storage.hubCache.emojidex.favorites))
     }
 
     return new Promise(resolve => resolve([]))
@@ -146,9 +146,9 @@ export default class EmojidexData {
 
   history(history_set) {
     if (history_set != null) {
-      if (this.storage.hub_cache.emojidex.history != null &&
-          this.storage.hub_cache.emojidex.history.length > 0) {
-        const hub_emoji = this.storage.hub_cache.emojidex.history
+      if (this.storage.hubCache.emojidex.history != null &&
+          this.storage.hubCache.emojidex.history.length > 0) {
+        const hub_emoji = this.storage.hubCache.emojidex.history
         for (let i = 0; i < history_set.length; i++) {
           const new_emoji = history_set[i]
           for (let j = 0; j < hub_emoji.length; j++) {
@@ -168,8 +168,8 @@ export default class EmojidexData {
       return this.storage.update('emojidex', { history: history_set })
     }
 
-    if (this.storage.hub_cache.emojidex.history != null) {
-      return new Promise(resolve => resolve(this.storage.hub_cache.emojidex.history))
+    if (this.storage.hubCache.emojidex.history != null) {
+      return new Promise(resolve => resolve(this.storage.hubCache.emojidex.history))
     }
 
     return new Promise(resolve => resolve([]))
@@ -180,15 +180,15 @@ export default class EmojidexData {
       return this.storage.update('emojidex', { categories: categories_set })
     }
 
-    return this.storage.hub_cache.emojidex.categories
+    return this.storage.hubCache.emojidex.categories
   }
 
-  auth_info(auth_info_set) {
-    if (auth_info_set != null) {
-      this.EC.User.auth_info = auth_info_set
-      return this.storage.update('emojidex', { auth_info: auth_info_set })
+  authInfo(authInfoSet) {
+    if (authInfoSet != null) {
+      this.EC.User.authInfo = authInfoSet
+      return this.storage.update('emojidex', { auth_info: authInfoSet })
     }
 
-    return this.storage.hub_cache.emojidex.auth_info
+    return this.storage.hubCache.emojidex.auth_info
   }
 }
