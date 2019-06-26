@@ -8,25 +8,25 @@ export default class EmojidexCategories {
     this.local = this.EC.options.locale
     return this.sync(null, this.locale).then(() => {
       this.EC.Categories = this
-      return
+      return this.EC.Categories
     })
   }
 
-  _categoriesAPI(category_name, callback, opts, called_func) {
+  _categoriesAPI(categoryName, callback, opts, calledFunc) {
     const param = {
       page: 1,
       limit: this.EC.limit,
       detailed: this.EC.detailed
     }
-    if (this.EC.User.authInfo.token !== null) {
-      _extend(param, { auth_token: this.EC.User.authInfo.token })
+    if (this.EC.User.authInfo.token) {
+      _extend(param, { auth_token: this.EC.User.authInfo.token }) // eslint-disable-line camelcase
     }
 
     _extend(param, opts)
 
-    this.called_func = called_func
-    this.called_data = {
-      category_name,
+    this.calledFunc = calledFunc
+    this.calledData = {
+      categoryName,
       callback,
       param
     }
@@ -36,12 +36,12 @@ export default class EmojidexCategories {
     }).then(response => {
       this.meta = response.data.meta
       this.results = response.data.emoji
-      this.cur_page = response.data.meta.page
+      this.curPage = response.data.meta.page
       this.count = response.data.meta.count
       return this.EC.Emoji.combine(response.data.emoji).then(() => {
         if (typeof callback === 'function') {
           return callback(response.data.emoji, {
-            category_name,
+            categoryName,
             callback,
             param
           })
@@ -52,37 +52,33 @@ export default class EmojidexCategories {
     })
   }
 
-  getEmoji(category_name, callback, opts) {
-    const param = { category: category_name }
+  getEmoji(categoryName, callback, opts) {
+    const param = { category: categoryName }
     _extend(param, opts)
-    return this._categoriesAPI(category_name, callback, param, this.getEmoji)
+    return this._categoriesAPI(categoryName, callback, param, this.getEmoji)
   }
 
   next() {
-    if (this.count === this.called_data.param.limit) {
-      this.called_data.param.page++
+    if (this.count === this.calledData.param.limit) {
+      this.calledData.param.page++
     }
 
-    return this.called_func(this.called_data.category_name, this.called_data.callback, this.called_data.param)
+    return this.calledFunc(this.calledData.categoryName, this.calledData.callback, this.calledData.param)
   }
 
   prev() {
-    if (this.called_data.param.page > 1) {
-      this.called_data.param.page--
+    if (this.calledData.param.page > 1) {
+      this.calledData.param.page--
     }
 
-    return this.called_func(this.called_data.category_name, this.called_data.callback, this.called_data.param)
+    return this.calledFunc(this.calledData.categoryName, this.calledData.callback, this.calledData.param)
   }
 
   // Gets the full list of caetgories available
-  sync(callback, locale) {
-    if (typeof locale === 'undefined' || locale === null) {
-      locale = this.locale
-    }
-
-    if (typeof this._categories !== 'undefined' && typeof this._categories.length !== 'undefined' && this._categories.length != 0) {
+  sync(callback, locale = this.locale) {
+    if (typeof this._categories !== 'undefined' && typeof this._categories.length !== 'undefined' && this._categories.length !== 0) {
       if (this.locale === locale) {
-        return new Promise((resolve, reject) => {
+        return new Promise(resolve => {
           if (typeof callback === 'function') {
             callback(this._categories)
           }
@@ -91,17 +87,17 @@ export default class EmojidexCategories {
         })
       }
 
-      return this._get_category(callback, locale)
+      return this._getCategory(callback, locale)
     }
 
     if (typeof locale === 'undefined' || locale === null) {
       ({ locale } = this.EC)
     }
 
-    return this._get_category(callback, locale)
+    return this._getCategory(callback, locale)
   }
 
-  _get_category(callback, locale) {
+  _getCategory(callback, locale) {
     return axios.get(`${this.EC.apiUrl}categories`, {
       params: { locale }
     }).then(response => {
@@ -117,7 +113,7 @@ export default class EmojidexCategories {
   }
 
   all(callback) {
-    if (this._categories != null) {
+    if (this._categories) {
       if (typeof callback === 'function') {
         callback(this._categories)
       }

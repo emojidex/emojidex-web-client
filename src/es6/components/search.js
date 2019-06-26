@@ -5,7 +5,7 @@ export default class EmojidexSearch {
   constructor(EC) {
     this.EC = EC
     this.results = []
-    this.cur_page = 1
+    this.curPage = 1
     this.count = 0
   }
 
@@ -35,7 +35,7 @@ export default class EmojidexSearch {
     }).then(response => {
       if (response.data.status != null) {
         this.results = []
-        this.cur_page = 0
+        this.curPage = 0
         this.count = 0
         if (typeof callback === 'function') {
           callback([])
@@ -43,7 +43,7 @@ export default class EmojidexSearch {
       } else {
         this.meta = response.data.meta
         this.results = response.data.emoji
-        this.cur_page = response.data.meta.page
+        this.curPage = response.data.meta.page
         this.count = response.data.meta.count
         this.EC.Emoji.combine(response.data.emoji)
         if (typeof callback === 'function') {
@@ -52,7 +52,7 @@ export default class EmojidexSearch {
       }
     }).catch(error => {
       this.results = []
-      this.cur_page = 0
+      this.curPage = 0
       this.count = 0
       if (typeof callback === 'function') {
         callback([])

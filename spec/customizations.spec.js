@@ -7,9 +7,9 @@ describe('EmojidexCustomizations', () => {
   );
 
   it('get', done =>
-    EC_spec.Customizations.get(customization_emojis => {
-      expect(customization_emojis.length).toBeTruthy();
-      const result = customization_emojis.every((emoji) => {
+    EC_spec.Customizations.get(customizationEmojis => {
+      expect(customizationEmojis.length).toBeTruthy();
+      const result = customizationEmojis.every((emoji) => {
         return emoji.customizations.length;
       });
       expect(result).toBeTruthy();
@@ -25,10 +25,10 @@ describe('EmojidexCustomizations', () => {
 
     it('next/prev', (done) => {
       EC_spec.Customizations.customized.callback = () => {
-        expect(EC_spec.Customizations.cur_page).toEqual(2);
+        expect(EC_spec.Customizations.curPage).toEqual(2);
 
         EC_spec.Customizations.customized.callback = () => {
-          expect(EC_spec.Customizations.cur_page).toEqual(1);
+          expect(EC_spec.Customizations.curPage).toEqual(1);
           done();
         };
         EC_spec.Customizations.prev();

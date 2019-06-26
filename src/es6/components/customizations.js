@@ -5,10 +5,10 @@ export default class EmojidexCustomizations {
   constructor(EC) {
     this.EC = EC
     this.results = []
-    this.cur_page = 1
+    this.curPage = 1
   }
 
-  _customizationsAPI(callback, opts, called_func) {
+  _customizationsAPI(callback, opts, calledFunc) {
     const param = {
       page: 1,
       limit: this.EC.limit,
@@ -16,7 +16,7 @@ export default class EmojidexCustomizations {
     }
     _extend(param, opts)
 
-    this.customized_func = called_func
+    this.customizedFunc = calledFunc
     this.customized = {
       callback,
       param
@@ -25,24 +25,24 @@ export default class EmojidexCustomizations {
     return axios.get(`${this.EC.apiUrl}emoji/customizations`, {
       params: param
     }).then(response => {
-      if (response.data.status != null) {
-        this.results = []
-        this.cur_page = 0
-        if (typeof callback === 'function') {
-          callback([])
-        }
-      } else {
+      if (response.data.emoji) {
         this.meta = response.data.meta
         this.results = response.data.emoji
-        this.cur_page = response.data.meta.page
-        this.max_page = Math.ceil(response.data.meta.total_count / this.EC.limit)
+        this.curPage = response.data.meta.page
+        this.maxPage = Math.ceil(response.data.meta.total_count / this.EC.limit)
         if (typeof callback === 'function') {
           callback(response.data.emoji)
+        }
+      } else {
+        this.results = []
+        this.curPage = 0
+        if (typeof callback === 'function') {
+          callback([])
         }
       }
     }).catch(error => {
       this.results = []
-      this.cur_page = 0
+      this.curPage = 0
       if (typeof callback === 'function') {
         callback([])
       } else {
@@ -56,18 +56,18 @@ export default class EmojidexCustomizations {
   }
 
   next() {
-    if (this.max_page > this.cur_page) {
+    if (this.maxPage > this.curPage) {
       this.customized.param.page++
     }
 
-    return this.customized_func(this.customized.callback, this.customized.param)
+    return this.customizedFunc(this.customized.callback, this.customized.param)
   }
 
   prev() {
-    if (this.cur_page > 1) {
+    if (this.curPage > 1) {
       this.customized.param.page--
     }
 
-    return this.customized_func(this.customized.callback, this.customized.param)
+    return this.customizedFunc(this.customized.callback, this.customized.param)
   }
 }

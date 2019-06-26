@@ -4,8 +4,8 @@ export default class EmojidexUserFavorites {
   constructor(EC) {
     this.EC = EC
     this._favorites = this.EC.Data.favorites()
-    this.cur_page = 1
-    this.max_page = undefined
+    this.curPage = 1
+    this.maxPage = undefined
   }
 
   _favoritesAPI(options) {
@@ -37,8 +37,8 @@ export default class EmojidexUserFavorites {
     return this._favoritesAPI(options).then(response => {
       this._favorites = response.emoji
       this.meta = response.meta
-      this.cur_page = response.meta.page
-      this.max_page = Math.ceil(response.total_count / this.EC.limit)
+      this.curPage = response.meta.page
+      this.maxPage = Math.ceil(response.total_count / this.EC.limit)
 
       return this.EC.Data.favorites(this._favorites)
     }).then(() => {
@@ -96,18 +96,18 @@ export default class EmojidexUserFavorites {
   }
 
   next(callback) {
-    if (this.max_page === this.cur_page) {
+    if (this.maxPage === this.curPage) {
       return
     }
 
-    return this.get(callback, this.cur_page + 1)
+    return this.get(callback, this.curPage + 1)
   }
 
   prev(callback) {
-    if (this.cur_page === 1) {
+    if (this.curPage === 1) {
       return
     }
 
-    return this.get(callback, this.cur_page - 1)
+    return this.get(callback, this.curPage - 1)
   }
 }

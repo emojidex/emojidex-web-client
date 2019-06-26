@@ -4,8 +4,8 @@ export default class EmojidexUserHistory {
   constructor(EC) {
     this.EC = EC
     this._history = this.EC.Data.history()
-    this.cur_page = 1
-    this.max_page = undefined
+    this.curPage = 1
+    this.maxPage = undefined
   }
 
   _historyAPI(options) {
@@ -38,8 +38,8 @@ export default class EmojidexUserHistory {
     return this._historyAPI(options).then(response => {
       this._history = response.emoji
       this.meta = response.meta
-      this.cur_page = response.meta.page
-      this.max_page = Math.ceil(response.total_count / this.EC.limit)
+      this.curPage = response.meta.page
+      this.maxPage = Math.ceil(response.total_count / this.EC.limit)
 
       return this.EC.Data.history(this._history)
     }).then(() => {
@@ -65,8 +65,8 @@ export default class EmojidexUserHistory {
     return this._historyAPI(options).then(response => {
       this._history_info = response.history
       this.history_info_meta = response.meta
-      this.history_info_cur_page = response.meta.page
-      this.history_info_max_page = Math.ceil(response.total_count / this.EC.limit)
+      this.history_info_curPage = response.meta.page
+      this.history_info_maxPage = Math.ceil(response.total_count / this.EC.limit)
 
       if (typeof callback === 'function') {
         callback(this._history_info)
@@ -117,18 +117,18 @@ export default class EmojidexUserHistory {
   }
 
   next(callback) {
-    if (this.max_page === this.cur_page) {
+    if (this.maxPage === this.curPage) {
       return
     }
 
-    return this.get(callback, this.cur_page + 1)
+    return this.get(callback, this.curPage + 1)
   }
 
   prev(callback) {
-    if (this.cur_page === 1) {
+    if (this.curPage === 1) {
       return
     }
 
-    return this.get(callback, this.cur_page - 1)
+    return this.get(callback, this.curPage - 1)
   }
 }

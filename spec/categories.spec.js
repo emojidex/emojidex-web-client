@@ -7,24 +7,24 @@ describe('EmojidexCategories', function() {
   );
 
   it('getEmoji', done =>
-    EC_spec.Categories.getEmoji('faces', function(emojis, called_data) {
-      expect(called_data.category_name).toEqual('faces');
+    EC_spec.Categories.getEmoji('faces', function(emojis, calledData) {
+      expect(calledData.categoryName).toEqual('faces');
       expect(emojis).toContain(jasmine.objectContaining(faces_emoji[0]));
       done();
     })
   );
 
   it('next', function(done) {
-    EC_spec.Categories.called_data.callback = function() {
-      expect(EC_spec.Categories.cur_page).toEqual(2);
+    EC_spec.Categories.calledData.callback = function() {
+      expect(EC_spec.Categories.curPage).toEqual(2);
       done();
     };
     EC_spec.Categories.next();
   });
 
   it('prev', function(done) {
-    EC_spec.Categories.called_data.callback = function() {
-      expect(EC_spec.Categories.cur_page).toEqual(1);
+    EC_spec.Categories.calledData.callback = function() {
+      expect(EC_spec.Categories.curPage).toEqual(1);
       done();
     };
     EC_spec.Categories.prev();
