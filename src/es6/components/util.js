@@ -5,22 +5,22 @@ export default class EmojidexUtil {
 
     self.EC = EC
 
-    self.acknowledgedUnicodePattern = self.EC.Data.moji_codes.moji_array.join('|')
+    self.acknowledgedUnicodePattern = self.EC.Data.mojiCodes.moji_array.join('|')
 
-    self.a_pattern_base = '<a href=["|\'][^\'|^"]*[\'|"] emoji-code=["|\'][^\'|^"]*[\'|"]><img class=["|\']emojidex-emoji[\'|"] src=["|\'][^\'|^"]*[\'|"] (emoji-code=["|\'][^\'|^"]*[\'|"] emoji-moji=["|\'][^\'|^"]*[\'|"]|emoji-code=["|\'][^\'|^"]*[\'|"]) alt=["|\'][^\'|^"]*[\'|"]( \/>|\/>|>)<\/a>'
-    self.img_pattern_base = '<img class=["|\']emojidex-emoji[\'|"] src=["|\'][^\'|^"]*[\'|"] (emoji-code=["|\'][^\'|^"]*[\'|"] emoji-moji=["|\'][^\'|^"]*[\'|"]|emoji-code=["|\'][^\'|^"]*[\'|"]) alt=["|\'][^\'|^"]*[\'|"]( \/>|\/>|>)'
+    self.patternBase = '<a href=["|\'][^\'|^"]*[\'|"] emoji-code=["|\'][^\'|^"]*[\'|"]><img class=["|\']emojidex-emoji[\'|"] src=["|\'][^\'|^"]*[\'|"] (emoji-code=["|\'][^\'|^"]*[\'|"] emoji-moji=["|\'][^\'|^"]*[\'|"]|emoji-code=["|\'][^\'|^"]*[\'|"]) alt=["|\'][^\'|^"]*[\'|"]( \/>|\/>|>)<\/a>'
+    self.imgPatternBase = '<img class=["|\']emojidex-emoji[\'|"] src=["|\'][^\'|^"]*[\'|"] (emoji-code=["|\'][^\'|^"]*[\'|"] emoji-moji=["|\'][^\'|^"]*[\'|"]|emoji-code=["|\'][^\'|^"]*[\'|"]) alt=["|\'][^\'|^"]*[\'|"]( \/>|\/>|>)'
 
-    self.a_pattern = new RegExp(self.a_pattern_base, 'g')
-    self.img_pattern = new RegExp(self.img_pattern_base, 'g')
-    self.wrapped_a_pattern = new RegExp('<span[^>]*>' + self.a_pattern_base + '</span>', 'g')
-    self.wrapped_img_pattern = new RegExp('<span[^>]*>' + self.img_pattern_base + '</span>', 'g')
-    self.garbage_tags = new RegExp('<span></span>', 'g')
-    self.emoji_code_tag_attr_pattern = new RegExp('emoji-code=["|\']([^\'|^"]*)[\'|"]', '')
-    self.emoji_moji_tag_attr_pattern = new RegExp('emoji-moji=["|\']([^\'|^"]*)[\'|"]', '')
-    self.ignored_characters = '\'":;@&#~{}<>\\r\\n\\[\\]\\!\\$\\+\\?\\%\\*\\/\\\\'
-    self.short_code_pattern = new RegExp(`:([^\\s${self.ignored_characters}][^${self.ignored_characters}]*[^${self.ignored_characters}]):|:([^${self.ignored_characters}]):`, 'g')
-    self.utf_pattern = new RegExp(self.acknowledgedUnicodePattern)
-    self.utf_pattern_global = new RegExp(self.utf_pattern, 'g')
+    self.pattern = new RegExp(self.patternBase, 'g')
+    self.imgPattern = new RegExp(self.imgPatternBase, 'g')
+    self.wrappedPattern = new RegExp('<span[^>]*>' + self.patternBase + '</span>', 'g')
+    self.wrappedImgPattern = new RegExp('<span[^>]*>' + self.imgPatternBase + '</span>', 'g')
+    self.garbageTags = new RegExp('<span></span>', 'g')
+    self.emojiCodeTagAttrPattern = new RegExp('emoji-code=["|\']([^\'|^"]*)[\'|"]', '')
+    self.emojiMojiTagAttrPattern = new RegExp('emoji-moji=["|\']([^\'|^"]*)[\'|"]', '')
+    self.ignoredCharacters = '\'":;@&#~{}<>\\r\\n\\[\\]\\!\\$\\+\\?\\%\\*\\/\\\\'
+    self.shortCodePattern = new RegExp(`:([^\\s${self.ignoredCharacters}][^${self.ignoredCharacters}]*[^${self.ignoredCharacters}]):|:([^${self.ignoredCharacters}]):`, 'g')
+    self.utfPattern = new RegExp(self.acknowledgedUnicodePattern)
+    self.utfPatternGlobal = new RegExp(self.utfPattern, 'g')
   }
 
   // Escapes spaces to underscore
@@ -49,7 +49,7 @@ export default class EmojidexUtil {
 
   // Breakout into an array
   breakout(items) {
-    if (items != null) {
+    if (items) {
       if (Array.isArray(items)) {
         return items
       }
@@ -60,11 +60,11 @@ export default class EmojidexUtil {
     return []
   }
 
-  // Converts an emoji array to [{code: "moji_code", img_url: "https://cdn...moji_code.png}] format
+  // Converts an emoji array to [{code: "moji_code", imgUrl: "https://cdn...moji_code.png}] format
   simplify(emoji = self.results, sizeCode = self.EC.sizeCode) {
     for (let i = 0; i < emoji.length; i++) {
       emoji[i].code = self.escapeTerm(emoji[i].code)
-      emoji[i].img_url = `${self.EC.cdnUrl}/${sizeCode}/${self.escapeTerm(emoji[i].code)}.png`
+      emoji[i].imgUrl = `${self.EC.cdnUrl}/${sizeCode}/${self.escapeTerm(emoji[i].code)}.png`
     }
 
     return emoji
@@ -117,7 +117,7 @@ export default class EmojidexUtil {
   emojifyMoji(source, processor = self.emojiToHTML) {
     const getMojicodes = mojis => {
       return mojis.map(moji => {
-        return self.EC.Data.moji_codes.moji_index[moji]
+        return self.EC.Data.mojiCodes.moji_index[moji]
       })
     }
 
@@ -127,10 +127,12 @@ export default class EmojidexUtil {
         if (checkComponents[i] || checkComponents.includes(false)) {
           promises.push(new Promise((resolve, reject) => {
             self.EC.Search.find(matchedMojiCodes.shift()).then(result => {
-              if (result.hasOwnProperty('code')) {
-                processor === self.getZwjEmojiTag ?
-                  resolve(processor(result, combination.base, i)) :
+              if (Object.prototype.hasOwnProperty.call(result, 'code')) {
+                if (processor === self.getZwjEmojiTag) {
+                  resolve(processor(result, combination.base, i))
+                } else {
                   resolve(processor(result))
+                }
               }
             }).catch(error => {
               reject(error)
@@ -148,10 +150,10 @@ export default class EmojidexUtil {
         return new Promise((resolveReplace, rejectReplace) => {
           if (/\u200D/.test(target)) {
             // for used ZWJ emoji
-            const matchedMojis = target.match(self.utf_pattern_global)
+            const matchedMojis = target.match(self.utfPatternGlobal)
             const matchedMojiCodes = getMojicodes(matchedMojis)
 
-            self.EC.Search.find(self.EC.Data.moji_codes.moji_index[matchedMojis[0]]).then(result => {
+            self.EC.Search.find(self.EC.Data.mojiCodes.moji_index[matchedMojis[0]]).then(result => {
               if (result.combinations.length) {
                 result.combinations.forEach(combination => {
                   // check for registered ZWJ emoji on emojidex.com
@@ -166,11 +168,13 @@ export default class EmojidexUtil {
                           return true
                         }
 
-                        if (j == matchedMojiCodes.length - 1) {
-                          return component[component.length - 1] == '' ? null : false
+                        if (j === matchedMojiCodes.length - 1) {
+                          return component[component.length - 1] === '' ? null : false
                         }
                       }
                     }
+
+                    return null
                   })
 
                   let zwjReplacingPromises = null
@@ -200,9 +204,9 @@ export default class EmojidexUtil {
               } else {
                 const replaceingUtfEmojiPromises = []
                 matchedMojiCodes.forEach(code => {
-                  replaceingUtfEmojiPromises.push(new Promise((resolve, reject) => {
+                  replaceingUtfEmojiPromises.push(new Promise(resolve => {
                     self.EC.Search.find(code).then(result => {
-                      if (result.hasOwnProperty('code')) {
+                      if (Object.prototype.hasOwnProperty.call(result, 'code')) {
                         resolve(processor(result))
                       }
                     })
@@ -215,9 +219,9 @@ export default class EmojidexUtil {
             }).catch(error => {
               rejectReplace(error)
             })
-          } else if (self.utf_pattern.test(target)) {
-            self.EC.Search.find(self.EC.Data.moji_codes.moji_index[target]).then(result => {
-              if (result.hasOwnProperty('code')) {
+          } else if (self.utfPattern.test(target)) {
+            self.EC.Search.find(self.EC.Data.mojiCodes.moji_index[target]).then(result => {
+              if (Object.prototype.hasOwnProperty.call(result, 'code')) {
                 resolveReplace(processor(result))
               }
             }).catch(() => {
@@ -239,8 +243,8 @@ export default class EmojidexUtil {
   // Convert emoji short codes using the specified processor
   emojifyCodes(source, processor = self.emojiToHTML) {
     return new Promise((resolve, reject) => {
-      const targets = source.match(self.short_code_pattern)
-      if (targets == null || targets.length == 0) {
+      const targets = source.match(self.shortCodePattern)
+      if (targets === null || targets.length === 0) {
         resolve(source)
       }
 
@@ -250,17 +254,17 @@ export default class EmojidexUtil {
       for (const target of targets) {
         const snip = `${target}`
         self.EC.Search.find(self.EC.Util.unEncapsulateCode(snip)).then(result => {
-          if (result.hasOwnProperty('code')) {
+          if (Object.prototype.hasOwnProperty.call(result, 'code')) {
             replacements.push({ pre: snip, post: processor(result) })
           }
 
           return source
-        }).then(source => {
+        }).then(() => {
           count -= 1
-        }).catch(response => {
+        }).catch(() => {
           count -= 1
         }).then(() => {
-          if (count == 0) {
+          if (count === 0) {
             for (const replacement of replacements) {
               source = source.replace(replacement.pre, replacement.post)
             }
@@ -286,8 +290,8 @@ export default class EmojidexUtil {
 
   // Returns an HTML image/link tag for an emoji from an emoji object
   emojiToHTML(emoji, sizeCode = self.EC.defaults.sizeCode) {
-    const img = `<img class="emojidex-emoji" src="https://${self.EC.env.cdnAddr}/emoji/${sizeCode}/${self.escapeTerm(emoji.code)}.png" emoji-code="${self.escapeTerm(emoji.code)}"${(emoji.moji == null || emoji.moji == '') ? '' : ' emoji-moji="' + emoji.moji + '"'} alt="${self.deEscapeTerm(emoji.code)}" />`
-    if (emoji.link != null && emoji.link != '') {
+    const img = `<img class="emojidex-emoji" src="https://${self.EC.env.cdnAddr}/emoji/${sizeCode}/${self.escapeTerm(emoji.code)}.png" emoji-code="${self.escapeTerm(emoji.code)}"${(emoji.moji === null || emoji.moji === '') ? '' : ' emoji-moji="' + emoji.moji + '"'} alt="${self.deEscapeTerm(emoji.code)}" />`
+    if (emoji.link && emoji.link !== '') {
       return `<a href="${emoji.link}" emoji-code="${self.escapeTerm(emoji.code)}">${img}</a>`
     }
 
@@ -296,12 +300,12 @@ export default class EmojidexUtil {
 
   // Returns an HTML image tag for an emoji from a ZWJ emoji object
   getZwjEmojiTag(emoji, combinationBaseName, componentNumber, sizeCode = self.EC.defaults.sizeCode) {
-    return `<img class="emojidex-emoji" src="https://${self.EC.env.cdnAddr}/emoji/${sizeCode}/${combinationBaseName}/${componentNumber}/${self.escapeTerm(emoji.code)}.png" emoji-code="${self.escapeTerm(emoji.code)}"${(emoji.moji == null || emoji.moji == '') ? '' : ' emoji-moji="' + emoji.moji + '"'} alt="${self.deEscapeTerm(emoji.code)}" />`
+    return `<img class="emojidex-emoji" src="https://${self.EC.env.cdnAddr}/emoji/${sizeCode}/${combinationBaseName}/${componentNumber}/${self.escapeTerm(emoji.code)}.png" emoji-code="${self.escapeTerm(emoji.code)}"${(emoji.moji === null || emoji.moji === '') ? '' : ' emoji-moji="' + emoji.moji + '"'} alt="${self.deEscapeTerm(emoji.code)}" />`
   }
 
   // Returns an HTML ZWJ emoji objects wrapped with span and base emoji link tag.
   getZwjEmojiSpanTag(baseEmoji, zwjReplacedStrings) {
-    if (baseEmoji.link != null && baseEmoji.link != '') {
+    if (baseEmoji.link && baseEmoji.link !== '') {
       return `<span class="zwj-emoji"><a href="${baseEmoji.link}" emoji-code="${self.escapeTerm(baseEmoji.code)}">${zwjReplacedStrings}</a></span>`
     }
 
@@ -310,8 +314,8 @@ export default class EmojidexUtil {
 
   // Returns a MarkDown image/link tag for an emoji from an emoji object
   emojiToMD(emoji, sizeCode = self.EC.defaults.sizeCode) {
-    const img = `![${(emoji.moji == null || emoji.moji == '') ? emoji.code : emoji.moji}](https://${self.EC.env.cdnAddr}/emoji/${sizeCode}/${self.escapeTerm(emoji.code)}.png "${self.deEscapeTerm(emoji.code)}")`
-    if (emoji.link != null && emoji.link != '') {
+    const img = `![${(emoji.moji === null || emoji.moji === '') ? emoji.code : emoji.moji}](https://${self.EC.env.cdnAddr}/emoji/${sizeCode}/${self.escapeTerm(emoji.code)}.png "${self.deEscapeTerm(emoji.code)}")`
+    if (emoji.link && emoji.link !== '') {
       return `[${img} ](${emoji.link})`
     }
 
@@ -324,22 +328,22 @@ export default class EmojidexUtil {
   deEmojifyHTML(source, mojify = true) {
     source = self._deEmojifyWrappedHTML(`${source}`, mojify)
     source = self.deLinkHTML(source)
-    const targets = source.match(self.img_pattern)
-    if (targets == null) {
+    const targets = source.match(self.imgPattern)
+    if (targets === null) {
       return source
     }
 
     for (const target of targets) {
       if (mojify) {
-        const moji_code = target.match(self.emoji_moji_tag_attr_pattern)
-        if (moji_code != null && moji_code.length != 1) {
-          source = source.replace(target, moji_code[1])
+        const mojiCode = target.match(self.emojiMojiTagAttrPattern)
+        if (mojiCode && mojiCode.length !== 1) {
+          source = source.replace(target, mojiCode[1])
           continue
         }
       }
 
-      const emoji_code = target.match(self.emoji_code_tag_attr_pattern)
-      source = source.replace(target, self.encapsulateCode(emoji_code[1]))
+      const emojiCode = target.match(self.emojiCodeTagAttrPattern)
+      source = source.replace(target, self.encapsulateCode(emojiCode[1]))
     }
 
     return self._scrubGarbageTags(source)
@@ -347,22 +351,22 @@ export default class EmojidexUtil {
 
   _deEmojifyWrappedHTML(source, mojify = true) {
     source = self.deLinkHTML(source)
-    const targets = source.match(self.wrapped_img_pattern)
-    if (targets == null) {
+    const targets = source.match(self.wrappedImgPattern)
+    if (targets === null) {
       return source
     }
 
     for (const target of targets) {
       if (mojify) {
-        const moji_code = target.match(self.emoji_moji_tag_attr_pattern)
-        if (moji_code != null && moji_code.length != 1) {
-          source = source.replace(target, moji_code[1])
+        const mojiCode = target.match(self.emojiMojiTagAttrPattern)
+        if (mojiCode && mojiCode.length !== 1) {
+          source = source.replace(target, mojiCode[1])
           continue
         }
       }
 
-      const emoji_code = target.match(self.emoji_code_tag_attr_pattern)
-      source = source.replace(target, self.encapsulateCode(emoji_code[1]))
+      const emojiCode = target.match(self.emojiCodeTagAttrPattern)
+      source = source.replace(target, self.encapsulateCode(emojiCode[1]))
     }
 
     return source
@@ -370,8 +374,8 @@ export default class EmojidexUtil {
 
   // Scrubs junk left by at.js
   _scrubGarbageTags(source) {
-    const targets = source.match(self.garbage_tags)
-    if (targets == null) {
+    const targets = source.match(self.garbageTags)
+    if (targets === null) {
       return source
     }
 
@@ -386,26 +390,26 @@ export default class EmojidexUtil {
   // *Only do self if you need to remove links for functionality.
   deLinkHTML(source) {
     source = self._deLinkWrappedHTML(`${source}`)
-    const targets = source.match(self.a_pattern)
-    if (targets == null) {
+    const targets = source.match(self.pattern)
+    if (targets === null) {
       return source
     }
 
     for (let i = 0; i < targets.length; i++) {
-      source = source.replace(targets[i], targets[i].match(self.img_pattern)[0])
+      source = source.replace(targets[i], targets[i].match(self.imgPattern)[0])
     }
 
     return source
   }
 
   _deLinkWrappedHTML(source) {
-    const targets = source.match(self.wrapped_a_pattern)
-    if (targets == null) {
+    const targets = source.match(self.wrappedPattern)
+    if (targets === null) {
       return source
     }
 
     for (let i = 0; i < targets.length; i++) {
-      source = source.replace(targets[i], targets[i].match(self.img_pattern)[0])
+      source = source.replace(targets[i], targets[i].match(self.imgPattern)[0])
     }
 
     return source

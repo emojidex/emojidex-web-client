@@ -28,7 +28,7 @@ describe('EmojidexUtil', function() {
   it('simplifies an emoji object array for easy processing with simplify', function() {
     let emoji = EC_spec.Util.simplify([emoji_kissing]);
     expect(emoji[0].code).toBe('kissing');
-    expect(emoji[0].img_url).toBe(`${EC_spec.cdnUrl}/${EC_spec.sizeCode}/${emoji[0].code}.png`);
+    expect(emoji[0].imgUrl).toBe(`${EC_spec.cdnUrl}/${EC_spec.sizeCode}/${emoji[0].code}.png`);
   });
 
   it('converts an emoji object into an HTML tag set', done =>
