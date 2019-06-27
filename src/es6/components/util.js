@@ -1,26 +1,23 @@
 export default class EmojidexUtil {
   constructor(EC) {
-    // ↓ this process for processor of replace
-    self = this
+    this.EC = EC
 
-    self.EC = EC
+    this.acknowledgedUnicodePattern = this.EC.Data.mojiCodes.moji_array.join('|')
 
-    self.acknowledgedUnicodePattern = self.EC.Data.mojiCodes.moji_array.join('|')
+    this.anchorPatternBase = '<a href=["|\'][^\'|^"]*[\'|"] emoji-code=["|\'][^\'|^"]*[\'|"]><img class=["|\']emojidex-emoji[\'|"] src=["|\'][^\'|^"]*[\'|"] (emoji-code=["|\'][^\'|^"]*[\'|"] emoji-moji=["|\'][^\'|^"]*[\'|"]|emoji-code=["|\'][^\'|^"]*[\'|"]) alt=["|\'][^\'|^"]*[\'|"]( />|/>|>)</a>'
+    this.imgPatternBase = '<img class=["|\']emojidex-emoji[\'|"] src=["|\'][^\'|^"]*[\'|"] (emoji-code=["|\'][^\'|^"]*[\'|"] emoji-moji=["|\'][^\'|^"]*[\'|"]|emoji-code=["|\'][^\'|^"]*[\'|"]) alt=["|\'][^\'|^"]*[\'|"]( />|/>|>)'
 
-    self.anchorPatternBase = '<a href=["|\'][^\'|^"]*[\'|"] emoji-code=["|\'][^\'|^"]*[\'|"]><img class=["|\']emojidex-emoji[\'|"] src=["|\'][^\'|^"]*[\'|"] (emoji-code=["|\'][^\'|^"]*[\'|"] emoji-moji=["|\'][^\'|^"]*[\'|"]|emoji-code=["|\'][^\'|^"]*[\'|"]) alt=["|\'][^\'|^"]*[\'|"]( />|/>|>)</a>'
-    self.imgPatternBase = '<img class=["|\']emojidex-emoji[\'|"] src=["|\'][^\'|^"]*[\'|"] (emoji-code=["|\'][^\'|^"]*[\'|"] emoji-moji=["|\'][^\'|^"]*[\'|"]|emoji-code=["|\'][^\'|^"]*[\'|"]) alt=["|\'][^\'|^"]*[\'|"]( />|/>|>)'
-
-    self.anchorPattern = new RegExp(self.anchorPatternBase, 'g')
-    self.imgPattern = new RegExp(self.imgPatternBase, 'g')
-    self.wrappedPattern = new RegExp('<span[^>]*>' + self.anchorPatternBase + '</span>', 'g')
-    self.wrappedImgPattern = new RegExp('<span[^>]*>' + self.imgPatternBase + '</span>', 'g')
-    self.garbageTags = new RegExp('<span></span>', 'g')
-    self.emojiCodeTagAttrPattern = new RegExp('emoji-code=["|\']([^\'|^"]*)[\'|"]', '')
-    self.emojiMojiTagAttrPattern = new RegExp('emoji-moji=["|\']([^\'|^"]*)[\'|"]', '')
-    self.ignoredCharacters = '\'":;@&#~{}<>\\r\\n\\[\\]\\!\\$\\+\\?\\%\\*\\/\\\\'
-    self.shortCodePattern = new RegExp(`:([^\\s${self.ignoredCharacters}][^${self.ignoredCharacters}]*[^${self.ignoredCharacters}]):|:([^${self.ignoredCharacters}]):`, 'g')
-    self.utfPattern = new RegExp(self.acknowledgedUnicodePattern)
-    self.utfPatternGlobal = new RegExp(self.utfPattern, 'g')
+    this.anchorPattern = new RegExp(this.anchorPatternBase, 'g')
+    this.imgPattern = new RegExp(this.imgPatternBase, 'g')
+    this.wrappedPattern = new RegExp('<span[^>]*>' + this.anchorPatternBase + '</span>', 'g')
+    this.wrappedImgPattern = new RegExp('<span[^>]*>' + this.imgPatternBase + '</span>', 'g')
+    this.garbageTags = new RegExp('<span></span>', 'g')
+    this.emojiCodeTagAttrPattern = new RegExp('emoji-code=["|\']([^\'|^"]*)[\'|"]', '')
+    this.emojiMojiTagAttrPattern = new RegExp('emoji-moji=["|\']([^\'|^"]*)[\'|"]', '')
+    this.ignoredCharacters = '\'":;@&#~{}<>\\r\\n\\[\\]\\!\\$\\+\\?\\%\\*\\/\\\\'
+    this.shortCodePattern = new RegExp(`:([^\\s${this.ignoredCharacters}][^${this.ignoredCharacters}]*[^${this.ignoredCharacters}]):|:([^${this.ignoredCharacters}]):`, 'g')
+    this.utfPattern = new RegExp(this.acknowledgedUnicodePattern)
+    this.utfPatternGlobal = new RegExp(this.utfPattern, 'g')
   }
 
   // Escapes spaces to underscore
@@ -34,12 +31,12 @@ export default class EmojidexUtil {
   }
 
   makeURLSafe(term) {
-    return self.escapeTerm(term).replace(/\(/g, '%28').replace(/\)/g, '%29')
+    return this.escapeTerm(term).replace(/\(/g, '%28').replace(/\)/g, '%29')
   }
 
   // Adds colons around a code
   encapsulateCode(code) {
-    return `:${self.unEncapsulateCode(code)}:`
+    return `:${this.unEncapsulateCode(code)}:`
   }
 
   // Removes colons around a code
@@ -61,10 +58,10 @@ export default class EmojidexUtil {
   }
 
   // Converts an emoji array to [{code: "moji_code", imgUrl: "https://cdn...moji_code.png}] format
-  simplify(emoji = self.results, sizeCode = self.EC.sizeCode) {
+  simplify(emoji, sizeCode = this.EC.sizeCode) {
     for (let i = 0; i < emoji.length; i++) {
-      emoji[i].code = self.escapeTerm(emoji[i].code)
-      emoji[i].imgUrl = `${self.EC.cdnUrl}/${sizeCode}/${self.escapeTerm(emoji[i].code)}.png`
+      emoji[i].code = this.escapeTerm(emoji[i].code)
+      emoji[i].imgUrl = `${this.EC.cdnUrl}/${sizeCode}/${this.escapeTerm(emoji[i].code)}.png`
     }
 
     return emoji
@@ -74,9 +71,9 @@ export default class EmojidexUtil {
   // format is retrurned by the method passed as the processor parameter.
   // An emoji object is passed to the processor and formatted text should be returned.
   // Default processor converts to HTML tags.
-  emojify(source, processor = self.emojiToHTML) {
-    return self.emojifyMoji(source, processor).then(processed => {
-      return self.emojifyCodes(processed, processor)
+  emojify(source, processor = this.emojiToHTML) {
+    return this.emojifyMoji(source, processor).then(processed => {
+      return this.emojifyCodes(processed, processor)
     }).then(processed => {
       return processed
     }).catch(error => {
@@ -85,10 +82,10 @@ export default class EmojidexUtil {
   }
 
   splitTextWithAcknowledgedEmoji(sourceText) {
-    let splittedSources = sourceText.match(new RegExp(`[${self.acknowledgedUnicodePattern}]+|[^${self.acknowledgedUnicodePattern}]+`, 'gu'))
+    let splittedSources = sourceText.match(new RegExp(`[${this.acknowledgedUnicodePattern}]+|[^${this.acknowledgedUnicodePattern}]+`, 'gu'))
     splittedSources = splittedSources.map(source => {
       if (/\u200D/.test(source)) {
-        const sources = source.match(new RegExp(`${self.acknowledgedUnicodePattern}|\u200D`, 'gu'))
+        const sources = source.match(new RegExp(`${this.acknowledgedUnicodePattern}|\u200D`, 'gu'))
         const emojis = []
         let zwjEmojis = []
         for (let i = 0; i < sources.length; i++) {
@@ -104,8 +101,8 @@ export default class EmojidexUtil {
         return emojis
       }
 
-      if (new RegExp(`${self.acknowledgedUnicodePattern}`, 'gu').test(source)) {
-        return source.match(new RegExp(`${self.acknowledgedUnicodePattern}`, 'gu'))
+      if (new RegExp(`${this.acknowledgedUnicodePattern}`, 'gu').test(source)) {
+        return source.match(new RegExp(`${this.acknowledgedUnicodePattern}`, 'gu'))
       }
 
       return source
@@ -114,10 +111,12 @@ export default class EmojidexUtil {
   }
 
   // Convert UTF emoji using the specified processor
-  emojifyMoji(source, processor = self.emojiToHTML) {
+  emojifyMoji(source, processor = this.emojiToHTML) {
+    processor = processor.bind(this)
+
     const getMojicodes = mojis => {
       return mojis.map(moji => {
-        return self.EC.Data.mojiCodes.moji_index[moji]
+        return this.EC.Data.mojiCodes.moji_index[moji]
       })
     }
 
@@ -126,12 +125,12 @@ export default class EmojidexUtil {
       for (let i = 0; i < checkComponents.length; i++) {
         if (checkComponents[i] || checkComponents.includes(false)) {
           promises.push(new Promise((resolve, reject) => {
-            self.EC.Search.find(matchedMojiCodes.shift()).then(result => {
+            this.EC.Search.find(matchedMojiCodes.shift()).then(result => {
               if (Object.prototype.hasOwnProperty.call(result, 'code')) {
-                if (processor === self.getZwjEmojiTag) {
-                  resolve(processor(result, combination.base, i))
+                if (processor === this.getZwjEmojiTag) {
+                  resolve(processor.call(this, result, combination.base, i))
                 } else {
-                  resolve(processor(result))
+                  resolve(processor.call(this, result))
                 }
               }
             }).catch(error => {
@@ -145,15 +144,15 @@ export default class EmojidexUtil {
     }
 
     return new Promise((resolveEmojify, rejectEmojify) => {
-      const splittedSources = self.splitTextWithAcknowledgedEmoji(source)
+      const splittedSources = this.splitTextWithAcknowledgedEmoji(source)
       const replacingSources = splittedSources.map(target => {
         return new Promise((resolveReplace, rejectReplace) => {
           if (/\u200D/.test(target)) {
             // for used ZWJ emoji
-            const matchedMojis = target.match(self.utfPatternGlobal)
+            const matchedMojis = target.match(this.utfPatternGlobal)
             const matchedMojiCodes = getMojicodes(matchedMojis)
 
-            self.EC.Search.find(self.EC.Data.mojiCodes.moji_index[matchedMojis[0]]).then(result => {
+            this.EC.Search.find(this.EC.Data.mojiCodes.moji_index[matchedMojis[0]]).then(result => {
               if (result.combinations.length) {
                 result.combinations.forEach(combination => {
                   // check for registered ZWJ emoji on emojidex.com
@@ -188,15 +187,15 @@ export default class EmojidexUtil {
                     zwjReplacingPromises = getJwzReplacingPromises(checkComponents, emojiCodes, processor)
                   } else {
                     // for correct ZWJ emoji
-                    zwjReplacingPromises = getJwzReplacingPromises(checkComponents, emojiCodes, self.getZwjEmojiTag, combination)
+                    zwjReplacingPromises = getJwzReplacingPromises(checkComponents, emojiCodes, this.getZwjEmojiTag, combination)
                   }
 
                   Promise.all(zwjReplacingPromises).then(zwjReplacedStrings => {
                     if (checkComponents.includes(false)) {
                       resolveReplace(zwjReplacedStrings.join(''))
                     } else {
-                      self.EC.Search.find(combination.base).then(baseEmoji => {
-                        resolveReplace(self.getZwjEmojiSpanTag(baseEmoji, zwjReplacedStrings.join('')))
+                      this.EC.Search.find(combination.base).then(baseEmoji => {
+                        resolveReplace(this.getZwjEmojiSpanTag(baseEmoji, zwjReplacedStrings.join('')))
                       })
                     }
                   })
@@ -205,7 +204,7 @@ export default class EmojidexUtil {
                 const replaceingUtfEmojiPromises = []
                 matchedMojiCodes.forEach(code => {
                   replaceingUtfEmojiPromises.push(new Promise(resolve => {
-                    self.EC.Search.find(code).then(result => {
+                    this.EC.Search.find(code).then(result => {
                       if (Object.prototype.hasOwnProperty.call(result, 'code')) {
                         resolve(processor(result))
                       }
@@ -219,8 +218,8 @@ export default class EmojidexUtil {
             }).catch(error => {
               rejectReplace(error)
             })
-          } else if (self.utfPattern.test(target)) {
-            self.EC.Search.find(self.EC.Data.mojiCodes.moji_index[target]).then(result => {
+          } else if (this.utfPattern.test(target)) {
+            this.EC.Search.find(this.EC.Data.mojiCodes.moji_index[target]).then(result => {
               if (Object.prototype.hasOwnProperty.call(result, 'code')) {
                 resolveReplace(processor(result))
               }
@@ -241,9 +240,11 @@ export default class EmojidexUtil {
   }
 
   // Convert emoji short codes using the specified processor
-  emojifyCodes(source, processor = self.emojiToHTML) {
+  emojifyCodes(source, processor = this.emojiToHTML) {
+    processor = processor.bind(this)
+
     return new Promise((resolve, reject) => {
-      const targets = source.match(self.shortCodePattern)
+      const targets = source.match(this.shortCodePattern)
       if (targets === null || targets.length === 0) {
         resolve(source)
       }
@@ -253,7 +254,7 @@ export default class EmojidexUtil {
 
       for (const target of targets) {
         const snip = `${target}`
-        self.EC.Search.find(self.EC.Util.unEncapsulateCode(snip)).then(result => {
+        this.EC.Search.find(this.EC.Util.unEncapsulateCode(snip)).then(result => {
           if (Object.prototype.hasOwnProperty.call(result, 'code')) {
             replacements.push({ pre: snip, post: processor(result) })
           }
@@ -280,41 +281,41 @@ export default class EmojidexUtil {
 
   // Shortcut to emojify with emojiToHTML as the processor
   emojifyToHTML(source) {
-    return self.emojify(source, self.emojiToHTML)
+    return this.emojify(source, this.emojiToHTML)
   }
 
   // Shortcut to emojify with emojiToMD as the processor
   emojifyToMD(source) {
-    return self.emojify(source, self.emojiToMD)
+    return this.emojify(source, this.emojiToMD)
   }
 
   // Returns an HTML image/link tag for an emoji from an emoji object
-  emojiToHTML(emoji, sizeCode = self.EC.defaults.sizeCode) {
-    const img = `<img class="emojidex-emoji" src="https://${self.EC.env.cdnAddr}/emoji/${sizeCode}/${self.escapeTerm(emoji.code)}.png" emoji-code="${self.escapeTerm(emoji.code)}"${(emoji.moji === null || emoji.moji === '') ? '' : ' emoji-moji="' + emoji.moji + '"'} alt="${self.deEscapeTerm(emoji.code)}" />`
+  emojiToHTML(emoji, sizeCode = this.EC.defaults.sizeCode) {
+    const img = `<img class="emojidex-emoji" src="https://${this.EC.env.cdnAddr}/emoji/${sizeCode}/${this.escapeTerm(emoji.code)}.png" emoji-code="${this.escapeTerm(emoji.code)}"${(emoji.moji === null || emoji.moji === '') ? '' : ' emoji-moji="' + emoji.moji + '"'} alt="${this.deEscapeTerm(emoji.code)}" />`
     if (emoji.link && emoji.link !== '') {
-      return `<a href="${emoji.link}" emoji-code="${self.escapeTerm(emoji.code)}">${img}</a>`
+      return `<a href="${emoji.link}" emoji-code="${this.escapeTerm(emoji.code)}">${img}</a>`
     }
 
     return img
   }
 
   // Returns an HTML image tag for an emoji from a ZWJ emoji object
-  getZwjEmojiTag(emoji, combinationBaseName, componentNumber, sizeCode = self.EC.defaults.sizeCode) {
-    return `<img class="emojidex-emoji" src="https://${self.EC.env.cdnAddr}/emoji/${sizeCode}/${combinationBaseName}/${componentNumber}/${self.escapeTerm(emoji.code)}.png" emoji-code="${self.escapeTerm(emoji.code)}"${(emoji.moji === null || emoji.moji === '') ? '' : ' emoji-moji="' + emoji.moji + '"'} alt="${self.deEscapeTerm(emoji.code)}" />`
+  getZwjEmojiTag(emoji, combinationBaseName, componentNumber, sizeCode = this.EC.defaults.sizeCode) {
+    return `<img class="emojidex-emoji" src="https://${this.EC.env.cdnAddr}/emoji/${sizeCode}/${combinationBaseName}/${componentNumber}/${this.escapeTerm(emoji.code)}.png" emoji-code="${this.escapeTerm(emoji.code)}"${(emoji.moji === null || emoji.moji === '') ? '' : ' emoji-moji="' + emoji.moji + '"'} alt="${this.deEscapeTerm(emoji.code)}" />`
   }
 
   // Returns an HTML ZWJ emoji objects wrapped with span and base emoji link tag.
   getZwjEmojiSpanTag(baseEmoji, zwjReplacedStrings) {
     if (baseEmoji.link && baseEmoji.link !== '') {
-      return `<span class="zwj-emoji"><a href="${baseEmoji.link}" emoji-code="${self.escapeTerm(baseEmoji.code)}">${zwjReplacedStrings}</a></span>`
+      return `<span class="zwj-emoji"><a href="${baseEmoji.link}" emoji-code="${this.escapeTerm(baseEmoji.code)}">${zwjReplacedStrings}</a></span>`
     }
 
     return `<span class="zwj-emoji">${zwjReplacedStrings}</span>`
   }
 
   // Returns a MarkDown image/link tag for an emoji from an emoji object
-  emojiToMD(emoji, sizeCode = self.EC.defaults.sizeCode) {
-    const img = `![${(emoji.moji === null || emoji.moji === '') ? emoji.code : emoji.moji}](https://${self.EC.env.cdnAddr}/emoji/${sizeCode}/${self.escapeTerm(emoji.code)}.png "${self.deEscapeTerm(emoji.code)}")`
+  emojiToMD(emoji, sizeCode = this.EC.defaults.sizeCode) {
+    const img = `![${(emoji.moji === null || emoji.moji === '') ? emoji.code : emoji.moji}](https://${this.EC.env.cdnAddr}/emoji/${sizeCode}/${this.escapeTerm(emoji.code)}.png "${this.deEscapeTerm(emoji.code)}")`
     if (emoji.link && emoji.link !== '') {
       return `[${img} ](${emoji.link})`
     }
@@ -326,47 +327,47 @@ export default class EmojidexUtil {
   // *This method takes a string and returns a string, such as the contents of
   // a text box/content editable element, NOT a DOM object.
   deEmojifyHTML(source, mojify = true) {
-    source = self._deEmojifyWrappedHTML(`${source}`, mojify)
-    source = self.deLinkHTML(source)
-    const targets = source.match(self.imgPattern)
+    source = this._deEmojifyWrappedHTML(`${source}`, mojify)
+    source = this.deLinkHTML(source)
+    const targets = source.match(this.imgPattern)
     if (targets === null) {
       return source
     }
 
     for (const target of targets) {
       if (mojify) {
-        const mojiCode = target.match(self.emojiMojiTagAttrPattern)
+        const mojiCode = target.match(this.emojiMojiTagAttrPattern)
         if (mojiCode && mojiCode.length !== 1) {
           source = source.replace(target, mojiCode[1])
           continue
         }
       }
 
-      const emojiCode = target.match(self.emojiCodeTagAttrPattern)
-      source = source.replace(target, self.encapsulateCode(emojiCode[1]))
+      const emojiCode = target.match(this.emojiCodeTagAttrPattern)
+      source = source.replace(target, this.encapsulateCode(emojiCode[1]))
     }
 
-    return self._scrubGarbageTags(source)
+    return this._scrubGarbageTags(source)
   }
 
   _deEmojifyWrappedHTML(source, mojify = true) {
-    source = self.deLinkHTML(source)
-    const targets = source.match(self.wrappedImgPattern)
+    source = this.deLinkHTML(source)
+    const targets = source.match(this.wrappedImgPattern)
     if (targets === null) {
       return source
     }
 
     for (const target of targets) {
       if (mojify) {
-        const mojiCode = target.match(self.emojiMojiTagAttrPattern)
+        const mojiCode = target.match(this.emojiMojiTagAttrPattern)
         if (mojiCode && mojiCode.length !== 1) {
           source = source.replace(target, mojiCode[1])
           continue
         }
       }
 
-      const emojiCode = target.match(self.emojiCodeTagAttrPattern)
-      source = source.replace(target, self.encapsulateCode(emojiCode[1]))
+      const emojiCode = target.match(this.emojiCodeTagAttrPattern)
+      source = source.replace(target, this.encapsulateCode(emojiCode[1]))
     }
 
     return source
@@ -374,7 +375,7 @@ export default class EmojidexUtil {
 
   // Scrubs junk left by at.js
   _scrubGarbageTags(source) {
-    const targets = source.match(self.garbageTags)
+    const targets = source.match(this.garbageTags)
     if (targets === null) {
       return source
     }
@@ -387,29 +388,29 @@ export default class EmojidexUtil {
   }
 
   // Remove links from wrapped emoji images in HTML
-  // *Only do self if you need to remove links for functionality.
+  // *Only do this if you need to remove links for functionality.
   deLinkHTML(source) {
-    source = self._deLinkWrappedHTML(`${source}`)
-    const targets = source.match(self.anchorPattern)
+    source = this._deLinkWrappedHTML(`${source}`)
+    const targets = source.match(this.anchorPattern)
     if (targets === null) {
       return source
     }
 
     for (let i = 0; i < targets.length; i++) {
-      source = source.replace(targets[i], targets[i].match(self.imgPattern)[0])
+      source = source.replace(targets[i], targets[i].match(this.imgPattern)[0])
     }
 
     return source
   }
 
   _deLinkWrappedHTML(source) {
-    const targets = source.match(self.wrappedPattern)
+    const targets = source.match(this.wrappedPattern)
     if (targets === null) {
       return source
     }
 
     for (let i = 0; i < targets.length; i++) {
-      source = source.replace(targets[i], targets[i].match(self.imgPattern)[0])
+      source = source.replace(targets[i], targets[i].match(this.imgPattern)[0])
     }
 
     return source
@@ -418,6 +419,6 @@ export default class EmojidexUtil {
   // Get's the 'this' context for this Util instance
   // Generally should not be necessary, but with JS you never know...
   getContext() {
-    return self
+    return this
   }
 }
