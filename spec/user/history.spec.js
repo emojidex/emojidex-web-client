@@ -46,9 +46,9 @@ describe('EmojidexUserHistory', function() {
       EC_spec.limit = 5;
       setTimeout(() => {  // History.sync()が終わっていない時があるので
         EC_spec.User.History.next(history => {
-          expect(EC_spec.User.History.cur_page).toEqual(2);
+          expect(EC_spec.User.History.curPage).toEqual(2);
           EC_spec.User.History.prev(history => {
-            expect(EC_spec.User.History.cur_page).toEqual(1);
+            expect(EC_spec.User.History.curPage).toEqual(1);
             done();
           });
         });

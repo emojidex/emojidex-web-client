@@ -31,7 +31,7 @@ export default class EmojidexUserFavorites {
         page,
         limit: this.EC.limit,
         detailed: this.EC.detailed,
-        auth_token: this.EC.User.authInfo.token
+        auth_token: this.EC.User.authInfo.token // eslint-disable-line camelcase
       }
     }
     return this._favoritesAPI(options).then(response => {
@@ -52,11 +52,11 @@ export default class EmojidexUserFavorites {
     })
   }
 
-  set(emoji_code) {
+  set(emojiCode) {
     const options = {
       type: 'POST',
-      params: { auth_token: this.EC.User.authInfo.token },
-      data: { emoji_code }
+      params: { auth_token: this.EC.User.authInfo.token }, // eslint-disable-line camelcase
+      data: { emojiCode }
     }
     return this._favoritesAPI(options).then(response => {
       this._favorites.push(response)
@@ -66,13 +66,13 @@ export default class EmojidexUserFavorites {
     })
   }
 
-  unset(emoji_code) {
+  unset(emojiCode) {
     const options = {
       type: 'DELETE',
-      params: { auth_token: this.EC.User.authInfo.token },
-      data: { emoji_code }
+      params: { auth_token: this.EC.User.authInfo.token }, // eslint-disable-line camelcase
+      data: { emojiCode }
     }
-    return this._favoritesAPI(options).then(response => {
+    return this._favoritesAPI(options).then(() => {
       return this.sync()
     }).catch(error => {
       console.error(error)

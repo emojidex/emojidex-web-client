@@ -12,7 +12,7 @@ let emojiKissing = {
   category: 'faces'
 };
 
-let emoji_emoji = {
+let emojiEmoji = {
   code: 'emoji',
   category: 'symbols'
 };

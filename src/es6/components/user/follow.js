@@ -15,7 +15,7 @@ export default class EmojidexUserFollow {
     return axios({
       method: options.type,
       url: options.url,
-      params: { auth_token: this.EC.User.authInfo.token },
+      params: { auth_token: this.EC.User.authInfo.token }, // eslint-disable-line camelcase
       data: options.data
     }).then(response => {
       return response.data

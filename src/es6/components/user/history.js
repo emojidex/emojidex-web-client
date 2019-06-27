@@ -31,7 +31,7 @@ export default class EmojidexUserHistory {
         page,
         limit: this.EC.limit,
         detailed: this.EC.detailed,
-        auth_token: this.EC.User.authInfo.token
+        auth_token: this.EC.User.authInfo.token // eslint-disable-line camelcase
       },
       url: this.EC.apiUrl + 'users/history/emoji'
     }
@@ -59,30 +59,30 @@ export default class EmojidexUserHistory {
         page,
         limit: this.EC.limit,
         detailed: this.EC.detailed,
-        auth_token: this.EC.User.authInfo.token
+        auth_token: this.EC.User.authInfo.token // eslint-disable-line camelcase
       }
     }
     return this._historyAPI(options).then(response => {
-      this._history_info = response.history
-      this.history_info_meta = response.meta
-      this.history_info_curPage = response.meta.page
-      this.history_info_maxPage = Math.ceil(response.total_count / this.EC.limit)
+      this._historyInfo = response.history
+      this.historyInfoMeta = response.meta
+      this.historyInfoCurPage = response.meta.page
+      this.historyInfoMaxPage = Math.ceil(response.total_count / this.EC.limit)
 
       if (typeof callback === 'function') {
-        callback(this._history_info)
+        callback(this._historyInfo)
       } else {
-        return this._history_info
+        return this._historyInfo
       }
     }).catch(error => {
       console.error(error)
     })
   }
 
-  set(emoji_code) {
+  set(emojiCode) {
     const options = {
       type: 'POST',
-      params: { auth_token: this.EC.User.authInfo.token },
-      data: { emoji_code }
+      params: { auth_token: this.EC.User.authInfo.token }, // eslint-disable-line camelcase
+      data: { emojiCode }
     }
     return this._historyAPI(options).then(response => {
       for (let i = 0; i < this._history.length; i++) {

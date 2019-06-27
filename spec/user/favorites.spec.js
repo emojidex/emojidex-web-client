@@ -9,7 +9,7 @@ describe('EmojidexUserFavorites', function() {
   it('get', done =>
     EC_spec.User.Favorites.get(function(favorites) {
       expect(favorites).toContain(
-        jasmine.objectContaining(emoji_emoji)
+        jasmine.objectContaining(emojiEmoji)
       );
       done();
     })
@@ -19,7 +19,7 @@ describe('EmojidexUserFavorites', function() {
     setTimeout(() => {  // Favorites.sync()が終わっていない時があるので
       EC_spec.User.Favorites.all(favorites => {
         expect(favorites).toContain(
-          jasmine.objectContaining(emoji_emoji)
+          jasmine.objectContaining(emojiEmoji)
         );
         done();
       })
@@ -39,9 +39,9 @@ describe('EmojidexUserFavorites', function() {
       EC_spec.limit = 5;
       setTimeout(() => {  // Favorites.sync()が終わっていない時があるので
         EC_spec.User.Favorites.next(favorites => {
-          expect(EC_spec.User.Favorites.cur_page).toEqual(2);
+          expect(EC_spec.User.Favorites.curPage).toEqual(2);
           EC_spec.User.Favorites.prev(favorites => {
-            expect(EC_spec.User.Favorites.cur_page).toEqual(1);
+            expect(EC_spec.User.Favorites.curPage).toEqual(1);
             done();
           });
         });
