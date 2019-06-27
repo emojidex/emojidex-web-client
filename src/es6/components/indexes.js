@@ -43,13 +43,13 @@ export default class EmojidexIndexes {
             callback(response.data.emoji)
           }
         })
-      } else {
-        this.results = []
-        this.curPage = 0
-        this.count = 0
-        if (typeof callback === 'function') {
-          callback([])
-        }
+      }
+
+      this.results = []
+      this.curPage = 0
+      this.count = 0
+      if (typeof callback === 'function') {
+        callback([])
       }
     }).catch(error => {
       this.results = []

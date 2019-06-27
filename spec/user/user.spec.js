@@ -1,64 +1,75 @@
-describe('EmojidexUser', function() {
+/* eslint-disable no-undef */
+describe('EmojidexUser', () => {
   beforeEach(done =>
     helperChains({
       functions: [clearStorage, helperBefore],
       end: done
     })
-  );
+  )
 
-  describe('Login', function() {
+  describe('Login', () => {
     it('logs in by auth token', done =>
-      EC_spec.User.login({
+      ECSpec.User.login({
         authtype: 'token',
-        username: test_user_info.auth_user,
-        auth_token: test_user_info.auth_token,
+        username: testUserInfo.auth_user,
+        auth_token: testUserInfo.auth_token, // eslint-disable-line camelcase
         callback(authInfo) {
-          expect(authInfo.status).toEqual('verified');
-          done();
+          expect(authInfo.status).toEqual('verified')
+          done()
         }
       })
-    );
+    )
 
-    describe('[Require user info]', function() {
-      if (typeof user_info === 'undefined' || user_info === null) { pending(); }
+    describe('[Require user info]', () => {
+      if (typeof userInfo === 'undefined' || userInfo === null) {
+        pending()
+      }
+
       it('logs in by plain authentication (username, password)', done =>
-        EC_spec.User.login({
-          authtype: 'plain', username: user_info.auth_user, password: user_info.password, callback(authInfo) {
-            expect(authInfo.status).toEqual('verified');
-            done();
+        ECSpec.User.login({
+          authtype: 'plain', username: userInfo.auth_user, password: userInfo.password, callback(authInfo) {
+            expect(authInfo.status).toEqual('verified')
+            done()
           }
         })
-      );
+      )
 
       it('logs in through a basic login scheme (email, password)', done =>
-        EC_spec.User.login({
-          authtype: 'basic', user: user_info.email, password: user_info.password, callback(authInfo) {
-            expect(authInfo.status).toEqual('verified');
-            done();
+        ECSpec.User.login({
+          authtype: 'basic', user: userInfo.email, password: userInfo.password, callback(authInfo) {
+            expect(authInfo.status).toEqual('verified')
+            done()
           }
         })
-      );
-    });
-  });
+      )
+    })
+  })
 
-  describe('User Details', function() {
-    it('has r18, pro, premium, etc.', function(done) {
-      expect(EC_spec.User.authInfo.r18).toEqual(true);
-      expect(EC_spec.User.authInfo.pro).toEqual(false);
-      expect(EC_spec.User.authInfo.premium).toEqual(false);
-      done();
-    });
+  describe('User Details', () => {
+    it('has r18, pro, premium, etc.', done => {
+      expect(ECSpec.User.authInfo.r18).toEqual(true)
+      expect(ECSpec.User.authInfo.pro).toEqual(false)
+      expect(ECSpec.User.authInfo.premium).toEqual(false)
+      done()
+    })
 
-    describe('[Require premium user info] User Details', function() {
-      if (typeof premium_user_info === 'undefined' || premium_user_info === null) { pending(); }
+    describe('[Require premium user info] User Details', () => {
+      if (typeof premiumUserInfo === 'undefined' || premiumUserInfo === null) {
+        pending()
+      }
+
       it('has r18, pro, premium, etc.', done =>
-        EC_spec.User.login({
-          authtype: 'token', username: premium_user_info.auth_user, auth_token: premium_user_info.auth_token, callback(authInfo) {
-            expect(authInfo.premium).toEqual(true);
-            done();
+        ECSpec.User.login({
+          authtype: 'token',
+          username: premiumUserInfo.auth_user,
+          auth_token: premiumUserInfo.auth_token, // eslint-disable-line camelcase
+          callback(authInfo) {
+            expect(authInfo.premium).toEqual(true)
+            done()
           }
         })
-      );
-    });
-  });
-});
+      )
+    })
+  })
+})
+/* eslint-enable no-undef */

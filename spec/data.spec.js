@@ -1,42 +1,44 @@
-describe('EmojidexData', function() {
+/* eslint-disable no-undef */
+describe('EmojidexData', () => {
   beforeAll(done =>
     helperChains({
       functions: [clearStorage, helperBeforeForEmojidexData],
       end: done
     })
-  );
+  )
 
-  it('has the Data class defined', () => expect(EC_spec.Data).toBeDefined());
+  it('has the Data class defined', () => expect(ECSpec.Data).toBeDefined())
 
-  describe('initialize', function() {
-    it('first access to storage', () => expect(EC_spec.Data.storage.isEmpty('emojidex')).toBe(false));
+  describe('initialize', () => {
+    it('first access to storage', () => expect(ECSpec.Data.storage.isEmpty('emojidex')).toBe(false))
 
-    describe('check initialize data', function() {
-      it('emojidex.emoji', () => expect(EC_spec.Data.storage.get('emojidex.emoji')).toEqual([])
-      );
+    describe('check initialize data', () => {
+      it('emojidex.emoji', () => expect(ECSpec.Data.storage.get('emojidex.emoji')).toEqual([])
+      )
       // TODO: this example is not correct.
-      // it('emojidex.history', () => expect(EC_spec.Data.storage.get('emojidex.history')).toEqual([])
+      // it('emojidex.history', () => expect(ECSpec.Data.storage.get('emojidex.history')).toEqual([])
       // );
-      // it('emojidex.favorites', () => expect(EC_spec.Data.storage.get('emojidex.favorites')).toEqual([])
+      // it('emojidex.favorites', () => expect(ECSpec.Data.storage.get('emojidex.favorites')).toEqual([])
       // );
       // it 'emojidex.categories', ->
-      //   expect(EC_spec.Data.storage.get 'emojidex.categories').toEqual([])
+      //   expect(ECSpec.Data.storage.get 'emojidex.categories').toEqual([])
       // it('emojidex.auth_info', () =>
-      //   expect(EC_spec.Data.storage.get('emojidex.auth_info')).toEqual({status: 'none', user: '',
+      //   expect(ECSpec.Data.storage.get('emojidex.auth_info')).toEqual({status: 'none', user: '',
       //   token: null, r18: false, premium: false, premium_exp: null, pro: false, pro_exp: null})
       // );
 
-      it('emojidex.moji_codes', function(done) {
-        axios.get(`${EC_spec.apiUrl}moji_codes`).then(response => {
-          expect(EC_spec.Data.storage.get('emojidex.moji_codes')).toEqual(response.data);
-          done();
+      it('emojidex.moji_codes', done => {
+        axios.get(`${ECSpec.apiUrl}moji_codes`).then(response => {
+          expect(ECSpec.Data.storage.get('emojidex.moji_codes')).toEqual(response.data)
+          done()
         })
-      });
-    });
+      })
+    })
 
-    it('after', function() {
-      expect(EC_spec.Data.storage.isEmpty('emojidex')).toBe(false);
-      expect(EC_spec.Data.storage.keys('emojidex')).toEqual(['moji_codes', 'emoji', 'history', 'favorites', 'categories', 'auth_info', 'moji_codes_updated']);
-    });
-  });
-});
+    it('after', () => {
+      expect(ECSpec.Data.storage.isEmpty('emojidex')).toBe(false)
+      expect(ECSpec.Data.storage.keys('emojidex')).toEqual(['moji_codes', 'emoji', 'history', 'favorites', 'categories', 'auth_info', 'moji_codes_updated'])
+    })
+  })
+})
+/* eslint-enable no-undef */

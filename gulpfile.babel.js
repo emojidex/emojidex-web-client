@@ -42,13 +42,13 @@ gulp.task('env', () => {
         process.env[k] = envConfig[k]
       }
       let output = `
-        let user_info = {
+        let userInfo = {
           auth_user: '${process.env.USERNAME}',
           email: '${process.env.EMAIL}',
           password: '${process.env.PASSWORD}',
           auth_token: '${process.env.AUTH_TOKEN}'
         };
-        let premium_user_info = {
+        let premiumUserInfo = {
           auth_user: '${process.env.USERNAME}',
           auth_token: '${process.env.AUTH_TOKEN}'
         };
@@ -64,8 +64,8 @@ gulp.task('jasmineBrowser', () => {
     'node_modules/axios/dist/axios.js',
     'node_modules/cross-storage/lib/client.js',
     'dist/js/emojidex-client.js',
-    'spec/helpers/*.js',
     'tmp/authinfo.js',
+    'spec/helpers/*.js',
     'spec/**/*.spec.js'
   ];
   return gulp.src(testFiles)

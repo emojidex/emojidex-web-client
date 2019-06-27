@@ -1,12 +1,14 @@
-describe('EmojidexClient', function() {
+/* eslint-disable no-undef */
+describe('EmojidexClient', () => {
   beforeAll(done =>
     helperChains({
       functions: [clearStorage, helperBefore],
       end: done
     })
-  );
+  )
 
   it('has the EmojidexClient class defined', () => {
-    expect(EC_spec).toBeDefined()
-  });
-});
+    expect(ECSpec).toBeDefined()
+  })
+})
+/* eslint-enable no-undef */
