@@ -7,12 +7,12 @@ export default class EmojidexUtil {
 
     self.acknowledgedUnicodePattern = self.EC.Data.mojiCodes.moji_array.join('|')
 
-    self.patternBase = '<a href=["|\'][^\'|^"]*[\'|"] emoji-code=["|\'][^\'|^"]*[\'|"]><img class=["|\']emojidex-emoji[\'|"] src=["|\'][^\'|^"]*[\'|"] (emoji-code=["|\'][^\'|^"]*[\'|"] emoji-moji=["|\'][^\'|^"]*[\'|"]|emoji-code=["|\'][^\'|^"]*[\'|"]) alt=["|\'][^\'|^"]*[\'|"]( \/>|\/>|>)<\/a>'
-    self.imgPatternBase = '<img class=["|\']emojidex-emoji[\'|"] src=["|\'][^\'|^"]*[\'|"] (emoji-code=["|\'][^\'|^"]*[\'|"] emoji-moji=["|\'][^\'|^"]*[\'|"]|emoji-code=["|\'][^\'|^"]*[\'|"]) alt=["|\'][^\'|^"]*[\'|"]( \/>|\/>|>)'
+    self.anchorPatternBase = '<a href=["|\'][^\'|^"]*[\'|"] emoji-code=["|\'][^\'|^"]*[\'|"]><img class=["|\']emojidex-emoji[\'|"] src=["|\'][^\'|^"]*[\'|"] (emoji-code=["|\'][^\'|^"]*[\'|"] emoji-moji=["|\'][^\'|^"]*[\'|"]|emoji-code=["|\'][^\'|^"]*[\'|"]) alt=["|\'][^\'|^"]*[\'|"]( />|/>|>)</a>'
+    self.imgPatternBase = '<img class=["|\']emojidex-emoji[\'|"] src=["|\'][^\'|^"]*[\'|"] (emoji-code=["|\'][^\'|^"]*[\'|"] emoji-moji=["|\'][^\'|^"]*[\'|"]|emoji-code=["|\'][^\'|^"]*[\'|"]) alt=["|\'][^\'|^"]*[\'|"]( />|/>|>)'
 
-    self.pattern = new RegExp(self.patternBase, 'g')
+    self.anchorPattern = new RegExp(self.anchorPatternBase, 'g')
     self.imgPattern = new RegExp(self.imgPatternBase, 'g')
-    self.wrappedPattern = new RegExp('<span[^>]*>' + self.patternBase + '</span>', 'g')
+    self.wrappedPattern = new RegExp('<span[^>]*>' + self.anchorPatternBase + '</span>', 'g')
     self.wrappedImgPattern = new RegExp('<span[^>]*>' + self.imgPatternBase + '</span>', 'g')
     self.garbageTags = new RegExp('<span></span>', 'g')
     self.emojiCodeTagAttrPattern = new RegExp('emoji-code=["|\']([^\'|^"]*)[\'|"]', '')
@@ -44,7 +44,7 @@ export default class EmojidexUtil {
 
   // Removes colons around a code
   unEncapsulateCode(code) {
-    return code.replace(/\:/g, '')
+    return code.replace(/:/g, '')
   }
 
   // Breakout into an array
@@ -110,7 +110,7 @@ export default class EmojidexUtil {
 
       return source
     })
-    return [].concat.apply([], splittedSources)
+    return [].concat(...splittedSources)
   }
 
   // Convert UTF emoji using the specified processor
@@ -390,7 +390,7 @@ export default class EmojidexUtil {
   // *Only do self if you need to remove links for functionality.
   deLinkHTML(source) {
     source = self._deLinkWrappedHTML(`${source}`)
-    const targets = source.match(self.pattern)
+    const targets = source.match(self.anchorPattern)
     if (targets === null) {
       return source
     }

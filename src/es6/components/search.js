@@ -21,8 +21,7 @@ export default class EmojidexSearch {
 
     _extend(param, opts)
 
-    // TODO -------
-    // @searchedFunc = unless @EC.closedNet then func.remote else callFunc.local
+    // TODO: @searchedFunc = unless @EC.closedNet then func.remote else callFunc.local
     this.searchedFunc = callFunc.remote
     this.searched = {
       data: searchData,

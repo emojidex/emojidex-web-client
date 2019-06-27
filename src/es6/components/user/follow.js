@@ -100,7 +100,7 @@ export default class EmojidexUserFollow {
 
   sync() {
     Promise.all(
-      [this.getFollowing(), this.getFollowers()]
+      this.EC.User.authInfo.premium || this.EC.User.authInfo.pro ? [this.getFollowing(), this.getFollowers()] : [this.getFollowing()]
     ).then(() => {
       return this
     })
