@@ -7,64 +7,64 @@ describe('EmojidexSearch', function() {
   );
 
   it('search', done =>
-    EC_spec.Search.search('kissing', function(emoji_data) {
-      expect(emoji_data).toContain(jasmine.objectContaining({ code: 'kissing', moji: '😗', unicode: '1f617', category: 'faces' }));
+    EC_spec.Search.search('kissing', function(emojiData) {
+      expect(emojiData).toContain(jasmine.objectContaining({ code: 'kissing', moji: '😗', unicode: '1f617', category: 'faces' }));
       done();
     })
   );
 
   it('starting', done =>
-    EC_spec.Search.starting('kissing', function(emoji_data) {
-      expect(emoji_data).toContain(jasmine.objectContaining(emoji_kissing));
+    EC_spec.Search.starting('kissing', function(emojiData) {
+      expect(emojiData).toContain(jasmine.objectContaining(emojiKissing));
       done();
     })
   );
 
   it('ending', done =>
-    EC_spec.Search.ending('kiss', function(emoji_data) {
-      expect(emoji_data).toContain(jasmine.objectContaining(emoji_kiss));
+    EC_spec.Search.ending('kiss', function(emojiData) {
+      expect(emojiData).toContain(jasmine.objectContaining(emojiKiss));
       done();
     })
   );
 
   it('tags', done =>
-    EC_spec.Search.tags('', function(emoji_data) {
-      expect(emoji_data).toBeTruthy();
+    EC_spec.Search.tags('', function(emojiData) {
+      expect(emojiData).toBeTruthy();
       done();
     })
   );
 
   it('advanced: term', done =>
-    EC_spec.Search.advanced({term: 'kissing'}, function(emoji_data) {
-      expect(emoji_data).toContain(jasmine.objectContaining({ code: 'kissing', moji: '😗', unicode: '1f617', category: 'faces' }));
+    EC_spec.Search.advanced({term: 'kissing'}, function(emojiData) {
+      expect(emojiData).toContain(jasmine.objectContaining({ code: 'kissing', moji: '😗', unicode: '1f617', category: 'faces' }));
       done();
     })
   );
 
   it('advanced: categories', done =>
-    EC_spec.Search.advanced({term: 'kiss', categories: ["objects"]}, function(emoji_data) {
-      expect(emoji_data).toContain(jasmine.objectContaining(emoji_kiss));
+    EC_spec.Search.advanced({ term: 'kiss', categories: ["objects"] }, function(emojiData) {
+      expect(emojiData).toContain(jasmine.objectContaining(emojiKiss));
       done();
     })
   );
 
   it('find: use cached emoji', done =>
-    EC_spec.Search.find('kiss', function(emoji_data) {
-      expect(emoji_data).toEqual(jasmine.objectContaining(emoji_kiss));
+    EC_spec.Search.find('kiss', function(emojiData) {
+      expect(emojiData).toEqual(jasmine.objectContaining(emojiKiss));
       done();
     })
   );
 
   it('find: use ajax', done =>
-    EC_spec.Search.find('dragon', function(emoji_data) {
-      expect(emoji_data).toEqual(jasmine.objectContaining(emoji_dragon));
+    EC_spec.Search.find('dragon', function(emojiData) {
+      expect(emojiData).toEqual(jasmine.objectContaining(emoji_dragon));
       done();
     })
   );
 
   it('find: use ajax and auto escaping', done =>
-    EC_spec.Search.find('thinking face(p)', function(emoji_data) {
-      expect(emoji_data).toEqual(jasmine.objectContaining(emoji_thinking_face_p));
+    EC_spec.Search.find('thinking face(p)', function(emojiData) {
+      expect(emojiData).toEqual(jasmine.objectContaining(emoji_thinking_face_p));
       done();
     })
   );
@@ -83,7 +83,7 @@ describe('EmojidexSearch', function() {
 
     it('next', function(done) {
       EC_spec.Search.searched.callback = function() {
-        expect(EC_spec.Search.cur_page).toEqual(2);
+        expect(EC_spec.Search.curPage).toEqual(2);
         done();
       };
       EC_spec.Search.next();
@@ -91,7 +91,7 @@ describe('EmojidexSearch', function() {
 
     it('prev', function(done) {
       EC_spec.Search.searched.callback = function() {
-        expect(EC_spec.Search.cur_page).toEqual(1);
+        expect(EC_spec.Search.curPage).toEqual(1);
         done();
       };
       EC_spec.Search.prev();
@@ -100,7 +100,7 @@ describe('EmojidexSearch', function() {
 });
 
   // it 'advanced: tags', (done) ->
-  //   EC_spec.Search.advanced '', ["Star Trek"], [], (emoji_data) ->
-  //     console.dir emoji_data
-  //     expect(emoji_data).toContain(jasmine.objectContaining emoji_kiss)
+  //   EC_spec.Search.advanced '', ["Star Trek"], [], (emojiData) ->
+  //     console.dir emojiData
+  //     expect(emojiData).toContain(jasmine.objectContaining emojiKiss)
   //     done()

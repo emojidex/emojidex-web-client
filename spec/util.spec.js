@@ -7,12 +7,12 @@ describe('EmojidexUtil', function() {
   });
 
   it('escapes a term with escapeTerm', function() {
-    expect(EC_spec.Util.escapeTerm('emoji kiss(p)')).toBe('emoji_kiss(p)');
+    expect(EC_spec.Util.escapeTerm('emoji kiss(p)')).toBe('emojiKiss(p)');
     expect(EC_spec.Util.escapeTerm('うんち　テスト (p)')).toBe('うんち_テスト_(p)');
   });
 
   it('de-escapes a term with deEscapeTerm', function() {
-    expect(EC_spec.Util.deEscapeTerm('emoji_kiss(p)')).toBe('emoji kiss(p)');
+    expect(EC_spec.Util.deEscapeTerm('emojiKiss(p)')).toBe('emoji kiss(p)');
     expect(EC_spec.Util.deEscapeTerm('うんち_テスト_(p)')).toBe('うんち テスト (p)');
   });
 
@@ -26,7 +26,7 @@ describe('EmojidexUtil', function() {
   });
 
   it('simplifies an emoji object array for easy processing with simplify', function() {
-    let emoji = EC_spec.Util.simplify([emoji_kissing]);
+    let emoji = EC_spec.Util.simplify([emojiKissing]);
     expect(emoji[0].code).toBe('kissing');
     expect(emoji[0].imgUrl).toBe(`${EC_spec.cdnUrl}/${EC_spec.sizeCode}/${emoji[0].code}.png`);
   });

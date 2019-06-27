@@ -61,7 +61,7 @@ this.helperBeforeForEmojidexData = helperBeforeForEmojidexData;
 
 let getExtendedEmojiData = chains_data =>
   axios.get('https://www.emojidex.com/api/v1/extended_emoji').then(response => {
-    this.emoji_emojidex = response.data;
+    this.emojiEmojidex = response.data;
     helperChains(chains_data);
   });
 

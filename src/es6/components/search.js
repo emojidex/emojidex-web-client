@@ -9,23 +9,23 @@ export default class EmojidexSearch {
     this.count = 0
   }
 
-  _searchAPI(search_data, callback, opts, call_func) {
+  _searchAPI(searchData, callback, opts, callFunc) {
     const param = {
       page: 1,
       limit: this.EC.limit,
       detailed: this.EC.detailed
     }
     if (this.EC.User.authInfo.token !== null) {
-      _extend(param, { auth_token: this.EC.User.authInfo.token })
+      _extend(param, { auth_token: this.EC.User.authInfo.token }) // eslint-disable-line camelcase
     }
 
     _extend(param, opts)
 
     // TODO -------
-    // @searched_func = unless @EC.closedNet then func.remote else call_func.local
-    this.searched_func = call_func.remote
+    // @searchedFunc = unless @EC.closedNet then func.remote else callFunc.local
+    this.searchedFunc = callFunc.remote
     this.searched = {
-      data: search_data,
+      data: searchData,
       callback,
       param
     }
@@ -33,14 +33,7 @@ export default class EmojidexSearch {
     return axios.get(`${this.EC.apiUrl}search/emoji`, {
       params: param
     }).then(response => {
-      if (response.data.status != null) {
-        this.results = []
-        this.curPage = 0
-        this.count = 0
-        if (typeof callback === 'function') {
-          callback([])
-        }
-      } else {
+      if (response.data.emoji) {
         this.meta = response.data.meta
         this.results = response.data.emoji
         this.curPage = response.data.meta.page
@@ -48,6 +41,13 @@ export default class EmojidexSearch {
         this.EC.Emoji.combine(response.data.emoji)
         if (typeof callback === 'function') {
           callback(response.data.emoji)
+        }
+      } else {
+        this.results = []
+        this.curPage = 0
+        this.count = 0
+        if (typeof callback === 'function') {
+          callback([])
         }
       }
     }).catch(error => {
@@ -64,19 +64,19 @@ export default class EmojidexSearch {
 
   // Executes a general search (code_cont)
   search(term, callback, opts) {
-    opts = _extend({ code_cont: this.EC.Util.escapeTerm(term) }, opts)
+    opts = _extend({ code_cont: this.EC.Util.escapeTerm(term) }, opts) // eslint-disable-line camelcase
     return this._searchAPI(term, callback, opts, { remote: this.search, local: this.EC.Emoji.search })
   }
 
   // Executes a search starting with the given term
   starting(term, callback, opts) {
-    opts = _extend({ code_sw: this.EC.Util.escapeTerm(term) }, opts)
+    opts = _extend({ code_sw: this.EC.Util.escapeTerm(term) }, opts) // eslint-disable-line camelcase
     return this._searchAPI(term, callback, opts, { remote: this.starting, local: this.EC.Emoji.starting })
   }
 
   // Executes a search ending with the given term
   ending(term, callback, opts) {
-    opts = _extend({ code_ew: this.EC.Util.escapeTerm(term) }, opts)
+    opts = _extend({ code_ew: this.EC.Util.escapeTerm(term) }, opts) // eslint-disable-line camelcase
     return this._searchAPI(term, callback, opts, { remote: this.ending, local: this.EC.Emoji.ending })
   }
 
@@ -87,22 +87,25 @@ export default class EmojidexSearch {
   }
 
   // Searches using an array of keys and an array of tags
-  advanced(search_details, callback, opts) {
+  advanced(searchDetails, callback, opts) {
+    /* eslint-disable camelcase */
     const param = {
-      code_cont: this.EC.Util.escapeTerm(search_details.term),
-      tags: this.EC.Util.breakout(search_details.tags),
-      categories: this.EC.Util.breakout(search_details.categories)
+      code_cont: this.EC.Util.escapeTerm(searchDetails.term),
+      tags: this.EC.Util.breakout(searchDetails.tags),
+      categories: this.EC.Util.breakout(searchDetails.categories)
     }
+    /* eslint-enable camelcase */
+
     _extend(param, opts)
-    return this._searchAPI(search_details, callback, param, { remote: this.advanced, local: this.EC.Emoji.advanced })
+    return this._searchAPI(searchDetails, callback, param, { remote: this.advanced, local: this.EC.Emoji.advanced })
   }
 
   // Not an actual search, just gets information on the given emoji
   find(code, callback = null, opts) {
-    const emoji_cache = this.EC.Data.emoji()
+    const emojiCache = this.EC.Data.emoji()
     code = this.EC.Util.deEscapeTerm(code)
-    for (let i = 0; i < emoji_cache.length; i++) {
-      const emoji = emoji_cache[i]
+    for (let i = 0; i < emojiCache.length; i++) {
+      const emoji = emojiCache[i]
       if (emoji.code === code) {
         if (typeof callback === 'function') {
           callback(emoji)
@@ -114,7 +117,7 @@ export default class EmojidexSearch {
 
     const param = { detailed: this.EC.detailed }
     if (this.EC.User.authInfo.token !== null) {
-      _extend(param, { auth_token: this.EC.User.authInfo.token })
+      _extend(param, { auth_token: this.EC.User.authInfo.token }) // eslint-disable-line camelcase
     }
 
     _extend(param, opts)
@@ -141,7 +144,7 @@ export default class EmojidexSearch {
       this.searched.param.page++
     }
 
-    return this.searched_func(this.searched.data, this.searched.callback, this.searched.param)
+    return this.searchedFunc(this.searched.data, this.searched.callback, this.searched.param)
   }
 
   prev() {
@@ -149,6 +152,6 @@ export default class EmojidexSearch {
       this.searched.param.page--
     }
 
-    return this.searched_func(this.searched.data, this.searched.callback, this.searched.param)
+    return this.searchedFunc(this.searched.data, this.searched.callback, this.searched.param)
   }
 }

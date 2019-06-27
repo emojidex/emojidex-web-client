@@ -7,36 +7,36 @@ describe('EmojidexIndexes', function() {
   );
 
   it('user', done =>
-    EC_spec.Indexes.user('emojidex', emoji_data => {
-      expect(emoji_data).toContain(emoji_emojidex[0]);
+    EC_spec.Indexes.user('emojidex', emojiData => {
+      expect(emojiData).toContain(emojiEmojidex[0]);
       done();
     })
   );
 
   it('index', done =>
-    EC_spec.Indexes.index(function(emoji_data) {
-      expect(emoji_data.length).toBeTruthy();
+    EC_spec.Indexes.index(function(emojiData) {
+      expect(emojiData.length).toBeTruthy();
       done();
     })
   );
 
   it('static', done =>
-    EC_spec.Indexes.static(['utf_emoji', 'extended_emoji'], 'en', function(emoji_data) {
-      expect(EC_spec.Emoji._emoji_instance).toEqual(jasmine.arrayContaining([emoji_data[0], emoji_data[emoji_data.length - 1]]));
+    EC_spec.Indexes.static(['utf_emoji', 'extended_emoji'], 'en', function(emojiData) {
+      expect(EC_spec.Emoji._emojiInstance).toEqual(jasmine.arrayContaining([emojiData[0], emojiData[emojiData.length - 1]]));
       done();
     })
   );
 
   it('select', done =>
-    EC_spec.Indexes.select('kiss', function(emoji_data) {
-      expect(emoji_data.code).toEqual('kiss');
+    EC_spec.Indexes.select('kiss', function(emojiData) {
+      expect(emojiData.code).toEqual('kiss');
       done();
     })
   );
 
   it('next', function(done) {
     EC_spec.Indexes.indexed.callback = function() {
-      expect(EC_spec.Indexes.cur_page).toEqual(2);
+      expect(EC_spec.Indexes.curPage).toEqual(2);
       done();
     };
     EC_spec.Indexes.next();
@@ -44,7 +44,7 @@ describe('EmojidexIndexes', function() {
 
   it('prev', function(done) {
     EC_spec.Indexes.indexed.callback = function() {
-      expect(EC_spec.Indexes.cur_page).toEqual(1);
+      expect(EC_spec.Indexes.curPage).toEqual(1);
       done();
     };
     EC_spec.Indexes.prev();
@@ -52,15 +52,15 @@ describe('EmojidexIndexes', function() {
 
 
   it('can not get newest index because user is not premium', done =>
-    EC_spec.Indexes.newest(function(emoji_data) {
-      expect(emoji_data.length).toEqual(0);
+    EC_spec.Indexes.newest(function(emojiData) {
+      expect(emojiData.length).toEqual(0);
       done();
     })
   );
 
   it('can not get popular index because user is not premium', done =>
-    EC_spec.Indexes.popular(function(emoji_data) {
-      expect(emoji_data.length).toEqual(0);
+    EC_spec.Indexes.popular(function(emojiData) {
+      expect(emojiData.length).toEqual(0);
       done();
     })
   );
@@ -75,15 +75,15 @@ describe('EmojidexIndexes', function() {
     });
 
     it('gets newest index', done =>
-      EC_spec.Indexes.newest(function(emoji_data) {
-        expect(emoji_data.length).toBeTruthy();
+      EC_spec.Indexes.newest(function(emojiData) {
+        expect(emojiData.length).toBeTruthy();
         done();
       })
     );
 
     it('gets popular index', done =>
-      EC_spec.Indexes.popular(function(emoji_data) {
-        expect(emoji_data.length).toBeTruthy();
+      EC_spec.Indexes.popular(function(emojiData) {
+        expect(emojiData.length).toBeTruthy();
         done();
       })
     );

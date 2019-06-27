@@ -1,11 +1,11 @@
-let emoji_kiss = {
+let emojiKiss = {
   code: 'kiss',
   moji: '💋',
   unicode: '1f48b',
   category: 'objects'
 };
 
-let emoji_kissing = {
+let emojiKissing = {
   code: 'kissing',
   moji: '😗',
   unicode: '1f617',

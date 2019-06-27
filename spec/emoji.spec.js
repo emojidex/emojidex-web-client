@@ -25,8 +25,8 @@ describe('EmojidexEmoji', function() {
   });
 
   it('seed', done =>
-    EC_spec.Emoji.seed(emoji_data => {
-      expect(EC_spec.Emoji._emoji_instance).toEqual(jasmine.arrayContaining([emoji_data[0], emoji_data[emoji_data.length - 1]]));
+    EC_spec.Emoji.seed(emojiData => {
+      expect(EC_spec.Emoji._emojiInstance).toEqual(jasmine.arrayContaining([emojiData[0], emojiData[emojiData.length - 1]]));
       done();
     })
   );
@@ -37,22 +37,22 @@ describe('EmojidexEmoji', function() {
   });
 
   it('search', done =>
-    EC_spec.Emoji.search('kissing', function(emoji_data) {
-      expect(emoji_data).toContain(jasmine.objectContaining({ code: 'kissing', moji: '😗', unicode: '1f617', category: 'faces' }));
+    EC_spec.Emoji.search('kissing', function(emojiData) {
+      expect(emojiData).toContain(jasmine.objectContaining({ code: 'kissing', moji: '😗', unicode: '1f617', category: 'faces' }));
       done();
     })
   );
 
   it('starting', done =>
-    EC_spec.Emoji.starting('kiss', function(emoji_data) {
-      expect(emoji_data).toContain(jasmine.objectContaining(emoji_kiss));
+    EC_spec.Emoji.starting('kiss', function(emojiData) {
+      expect(emojiData).toContain(jasmine.objectContaining(emojiKiss));
       done();
     })
   );
 
   it('ending', done =>
-    EC_spec.Emoji.ending('kiss', function(emoji_data) {
-      expect(emoji_data).toContain(jasmine.objectContaining(emoji_kiss));
+    EC_spec.Emoji.ending('kiss', function(emojiData) {
+      expect(emojiData).toContain(jasmine.objectContaining(emojiKiss));
       done();
     })
   );

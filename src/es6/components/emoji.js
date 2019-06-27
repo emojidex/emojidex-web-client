@@ -2,12 +2,12 @@ export default class EmojidexEmoji {
   constructor(EC) {
     this.combine = this.combine.bind(this)
     this.EC = EC
-    this._emoji_instance = []
+    this._emojiInstance = []
   }
 
   _emoji() {
-    if (this._emoji_instance != null) {
-      return this._emoji_instance
+    if (this._emojiInstance) {
+      return this._emojiInstance
     }
 
     if (this.checkUpdate()) {
@@ -15,7 +15,8 @@ export default class EmojidexEmoji {
       return this.seed()
     }
 
-    return this._emoji_instance = this.EC.Data.storage.get('emojidex.emoji')
+    this._emojiInstance = this.EC.Data.storage.get('emojidex.emoji')
+    return this._emojiInstance
   }
 
   checkUpdate() {
@@ -108,7 +109,8 @@ export default class EmojidexEmoji {
   // Concatenates and flattens the given emoji array into the @emoji array
   combine(emoji) {
     return this.EC.Data.emoji(emoji).then(hubData => {
-      return this._emoji_instance = hubData.emoji
+      this._emojiInstance = hubData.emoji
+      return this._emojiInstance
     }).catch(error => {
       console.error(error)
     })
@@ -117,7 +119,7 @@ export default class EmojidexEmoji {
   // Clears the emoji array and emoji in storage.
   // DO NOT call this unless you have a really good reason!
   flush() {
-    this._emoji_instance = []
+    this._emojiInstance = []
     return this.EC.Data.storage._remove('emojidex.emoji')
   }
 }

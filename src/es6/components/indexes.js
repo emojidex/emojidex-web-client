@@ -16,13 +16,13 @@ export default class EmojidexIndexes {
       detailed: this.EC.detailed
     }
     if (this.EC.User.authInfo.token !== null) {
-      _extend(param, { auth_token: this.EC.User.authInfo.token })
+      _extend(param, { auth_token: this.EC.User.authInfo.token }) // eslint-disable-line camelcase
     }
 
     _extend(param, opts)
 
-    if (func != null) {
-      this.indexed_func = func
+    if (func) {
+      this.indexedFunc = func
       this.indexed = {
         query,
         callback,
@@ -33,23 +33,23 @@ export default class EmojidexIndexes {
     return axios.get(`${this.EC.apiUrl}${query}`, {
       params: param
     }).then(response => {
-      if (response.data.status != null) {
+      if (response.data.emoji) {
+        this.meta = response.data.meta
+        this.results = response.data.emoji
+        this.curPage = response.data.meta.page
+        this.count = response.data.meta.count
+        return this.EC.Emoji.combine(response.data.emoji).then(() => {
+          if (typeof callback === 'function') {
+            callback(response.data.emoji)
+          }
+        })
+      } else {
         this.results = []
         this.curPage = 0
         this.count = 0
         if (typeof callback === 'function') {
           callback([])
         }
-      } else {
-        this.meta = response.data.meta
-        this.results = response.data.emoji
-        this.curPage = response.data.meta.page
-        this.count = response.data.meta.count
-        return this.EC.Emoji.combine(response.data.emoji).then(data => {
-          if (typeof callback === 'function') {
-            callback(response.data.emoji)
-          }
-        })
       }
     }).catch(error => {
       this.results = []
@@ -79,15 +79,15 @@ export default class EmojidexIndexes {
     return this._indexesAPI(`users/${username}/emoji`, callback, opts)
   }
 
-  static(static_type, language, callback) {
-    let loaded_num = 0
-    let loaded_emoji = []
+  static(staticType, language, callback) {
+    let loadedNum = 0
+    let loadedEmoji = []
 
-    const loadStatic = url_string => {
-      return axios.get(url_string).then(response => {
-        loaded_emoji = loaded_emoji.concat(response.data)
-        if (++loaded_num === static_type.length) {
-          return this.EC.Emoji.combine(loaded_emoji).then(data => {
+    const loadStatic = urlString => {
+      return axios.get(urlString).then(response => {
+        loadedEmoji = loadedEmoji.concat(response.data)
+        if (++loadedNum === staticType.length) {
+          return this.EC.Emoji.combine(loadedEmoji).then(data => {
             if (typeof callback === 'function') {
               callback(data)
             }
@@ -98,7 +98,7 @@ export default class EmojidexIndexes {
       })
     }
 
-    return static_type.map(type =>
+    return staticType.map(type =>
       language ?
         loadStatic(`${this.EC.apiUrl + type}?locale=${language}`) :
         loadStatic(`${this.EC.apiUrl + type}`))
@@ -113,7 +113,7 @@ export default class EmojidexIndexes {
       this.indexed.param.page++
     }
 
-    return this.indexed_func(this.indexed.callback, this.indexed.param, this.indexed_func)
+    return this.indexedFunc(this.indexed.callback, this.indexed.param, this.indexedFunc)
   }
 
   prev() {
@@ -121,6 +121,6 @@ export default class EmojidexIndexes {
       this.indexed.param.page--
     }
 
-    return this.indexed_func(this.indexed.callback, this.indexed.param, this.indexed_func)
+    return this.indexedFunc(this.indexed.callback, this.indexed.param, this.indexedFunc)
   }
 }
