@@ -16,8 +16,14 @@ const helperChains = function (chainsData) {
 this.helperChains = helperChains
 
 /* eslint-disable camelcase */
-const testUserToken = { authtype: 'token', username: testUserInfo.auth_user, auth_token: testUserInfo.auth_token }
-const premiumUserToken = { authtype: 'token', username: premiumUserInfo.auth_user, auth_token: premiumUserInfo.auth_token }
+let testUserToken = null
+if (typeof testUserInfo !== 'undefined' && testUserInfo != null) {
+  testUserToken = { authtype: 'token', username: testUserInfo.auth_user, auth_token: testUserInfo.auth_token }
+}
+let premiumUserToken = null
+if (typeof premiumUserInfo !== 'undefined' && premiumUserInfo != null) {
+  premiumUserToken = { authtype: 'token', username: premiumUserInfo.auth_user, auth_token: premiumUserInfo.auth_token }
+}
 /* eslint-enable camelcase */
 
 const helperBefore = function (chainsData) {
@@ -48,10 +54,10 @@ this.helperBeforeForPremiumUser = helperBeforeForPremiumUser
 
 const clearStorage = function (chainsData) {
   const CSC = new CrossStorageClient(hubPath, { frameId: 'emojidex-client-storage-hub' })
-  CSC.onReadyFrame().then(() => {
+  return CSC.onReadyFrame().then(() => {
     return CSC.onConnect()
   }).then(() => {
-    CSC.clear()
+    return CSC.clear()
   }).then(() => {
     helperChains(chainsData)
   })

@@ -68,10 +68,6 @@ describe('EmojidexIndexes', () => {
   )
 
   describe('[Premium user only]', () => {
-    if (typeof premiumUserInfo === 'undefined' || premiumUserInfo === null) {
-      pending()
-    }
-
     beforeEach(done => {
       helperChains({
         functions: [setPremiumUser],
@@ -79,19 +75,21 @@ describe('EmojidexIndexes', () => {
       })
     })
 
-    it('gets newest index', done =>
-      ECSpec.Indexes.newest(emojiData => {
-        expect(emojiData.length).toBeTruthy()
-        done()
-      })
-    )
+    if (typeof premiumUserInfo !== 'undefined' && premiumUserInfo !== null) {
+      it('gets newest index', done =>
+        ECSpec.Indexes.newest(emojiData => {
+          expect(emojiData.length).toBeTruthy()
+          done()
+        })
+      )
 
-    it('gets popular index', done =>
-      ECSpec.Indexes.popular(emojiData => {
-        expect(emojiData.length).toBeTruthy()
-        done()
-      })
-    )
+      it('gets popular index', done =>
+        ECSpec.Indexes.popular(emojiData => {
+          expect(emojiData.length).toBeTruthy()
+          done()
+        })
+      )
+    }
   })
 })
 /* eslint-enable no-undef */

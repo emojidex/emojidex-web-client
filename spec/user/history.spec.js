@@ -35,10 +35,6 @@ describe('EmojidexUserHistory', () => {
   })
 
   describe('History pages [require premium user]', () => {
-    if (typeof premiumUserInfo === 'undefined' || premiumUserInfo === null) {
-      pending()
-    }
-
     beforeEach(done =>
       helperChains({
         functions: [clearStorage, helperBeforeForPremiumUser],
@@ -46,18 +42,20 @@ describe('EmojidexUserHistory', () => {
       })
     )
 
-    it('next/prev', done => {
-      ECSpec.limit = 5
-      setTimeout(() => { // History.sync()が終わっていない時があるので
-        ECSpec.User.History.next(() => {
-          expect(ECSpec.User.History.curPage).toEqual(2)
-          ECSpec.User.History.prev(() => {
-            expect(ECSpec.User.History.curPage).toEqual(1)
-            done()
+    if (typeof premiumUserInfo !== 'undefined' && premiumUserInfo !== null) {
+      it('next/prev', done => {
+        ECSpec.limit = 5
+        setTimeout(() => { // History.sync()が終わっていない時があるので
+          ECSpec.User.History.next(() => {
+            expect(ECSpec.User.History.curPage).toEqual(2)
+            ECSpec.User.History.prev(() => {
+              expect(ECSpec.User.History.curPage).toEqual(1)
+              done()
+            })
           })
-        })
-      }, 2000)
-    })
+        }, 2000)
+      })
+    }
   })
 })
 /* eslint-enable no-undef */

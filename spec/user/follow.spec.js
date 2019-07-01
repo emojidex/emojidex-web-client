@@ -14,16 +14,16 @@ describe('EmojidexUserFollow', () => {
     })
   })
 
-  it('add following', done => {
-    pending('Delete API is not working')
+  // TODO: Delete API is not working
+  xit('add following', done => {
     ECSpec.User.Follow.addFollowing('test', following => {
       expect(following).toContain('test')
       done()
     })
   })
 
-  it('delete following', done => {
-    pending('503 error')
+  // TODO: 503 error
+  xit('delete following', done => {
     ECSpec.User.Follow.deleteFollowing('test', following => {
       expect(following).not.toContain('test')
       done()
@@ -31,10 +31,6 @@ describe('EmojidexUserFollow', () => {
   })
 
   describe('Followers  [require premium user]', () => {
-    if (typeof premiumUserInfo === 'undefined' || premiumUserInfo === null) {
-      pending()
-    }
-
     beforeEach(done =>
       helperChains({
         functions: [clearStorage, helperBeforeForPremiumUser],
@@ -42,12 +38,14 @@ describe('EmojidexUserFollow', () => {
       })
     )
 
-    it('get followers', done => {
-      ECSpec.User.Follow.getFollowers(followers => {
-        expect(followers).toEqual(jasmine.any(Array))
-        done()
+    if (typeof premiumUserInfo !== 'undefined' && premiumUserInfo !== null) {
+      it('get followers', done => {
+        ECSpec.User.Follow.getFollowers(followers => {
+          expect(followers).toEqual(jasmine.any(Array))
+          done()
+        })
       })
-    })
+    }
   })
 })
 /* eslint-enable no-undef */

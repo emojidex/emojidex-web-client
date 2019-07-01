@@ -28,10 +28,6 @@ describe('EmojidexUserFavorites', () => {
   })
 
   describe('Favorites pages [require premium user]', () => {
-    if (typeof premiumUserInfo === 'undefined' || premiumUserInfo === null) {
-      pending()
-    }
-
     beforeEach(done =>
       helperChains({
         functions: [clearStorage, helperBeforeForPremiumUser],
@@ -39,18 +35,20 @@ describe('EmojidexUserFavorites', () => {
       })
     )
 
-    it('next/prev', done => {
-      ECSpec.limit = 5
-      setTimeout(() => { // Favorites.sync()が終わっていない時があるので
-        ECSpec.User.Favorites.next(() => {
-          expect(ECSpec.User.Favorites.curPage).toEqual(2)
-          ECSpec.User.Favorites.prev(() => {
-            expect(ECSpec.User.Favorites.curPage).toEqual(1)
-            done()
+    if (typeof premiumUserInfo !== 'undefined' && premiumUserInfo !== null) {
+      it('next/prev', done => {
+        ECSpec.limit = 5
+        setTimeout(() => { // Favorites.sync()が終わっていない時があるので
+          ECSpec.User.Favorites.next(() => {
+            expect(ECSpec.User.Favorites.curPage).toEqual(2)
+            ECSpec.User.Favorites.prev(() => {
+              expect(ECSpec.User.Favorites.curPage).toEqual(1)
+              done()
+            })
           })
-        })
-      }, 2000)
-    })
+        }, 2000)
+      })
+    }
   })
 
   // it 'set_favorites', (done) ->
