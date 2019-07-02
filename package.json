@@ -56,7 +56,7 @@
   "scripts": {
     "build": "gulp clean; webpack --mode development; webpack --mode production; gulp",
     "dev": "webpack --mode development -w",
-    "test": "webpack --mode development; webpack --mode production; karma start --single-run",
+    "test": "webpack --mode development; webpack --mode production; gulp env; karma start --single-run",
     "test-watch": "webpack --mode development; webpack --mode production; karma start"
   }
 }

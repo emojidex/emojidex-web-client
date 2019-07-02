@@ -18,5 +18,9 @@ jobs:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
-
+      
+      - run:
+          name: create .env
+          command:
+            echo -e ${env} >> .env      
       - run: yarn test
