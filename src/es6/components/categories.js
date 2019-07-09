@@ -40,11 +40,13 @@ export default class EmojidexCategories {
       this.count = response.data.meta.count
       return this.EC.Emoji.combine(response.data.emoji).then(() => {
         if (typeof callback === 'function') {
-          return callback(response.data.emoji, {
+          callback(response.data.emoji, {
             categoryName,
             callback,
             param
           })
+        } else {
+          return response.data
         }
       })
     }).catch(error => {
@@ -83,7 +85,7 @@ export default class EmojidexCategories {
             callback(this._categories)
           }
 
-          return resolve()
+          return resolve(this._categories)
         })
       }
 
@@ -105,6 +107,8 @@ export default class EmojidexCategories {
       return this.EC.Data.categories(response.data.categories).then(() => {
         if (typeof callback === 'function') {
           callback(this._categories)
+        } else {
+          return this._categories
         }
       })
     }).catch(error => {
@@ -116,6 +120,8 @@ export default class EmojidexCategories {
     if (this._categories) {
       if (typeof callback === 'function') {
         callback(this._categories)
+      } else {
+        return this._categories
       }
     } else {
       return setTimeout((() => {

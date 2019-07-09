@@ -66,6 +66,8 @@ export default class EmojidexUser {
       return this._setAuthFromResponse(response.data).then(() => {
         if (typeof callback === 'function') {
           callback(this.authInfo)
+        } else {
+          return this.authInfo
         }
       })
     }).catch(error => {
@@ -80,6 +82,11 @@ export default class EmojidexUser {
             authInfo: this.authInfo,
             errorInfo: error.response
           })
+        } else {
+          return {
+            authInfo: this.authInfo,
+            errorInfo: error.response
+          }
         }
       })
     })

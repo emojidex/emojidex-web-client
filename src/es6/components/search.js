@@ -40,6 +40,8 @@ export default class EmojidexSearch {
         this.EC.Emoji.combine(response.data.emoji)
         if (typeof callback === 'function') {
           callback(response.data.emoji)
+        } else {
+          return response.data
         }
       } else {
         this.results = []
@@ -47,6 +49,8 @@ export default class EmojidexSearch {
         this.count = 0
         if (typeof callback === 'function') {
           callback([])
+        } else {
+          return []
         }
       }
     }).catch(error => {
@@ -57,6 +61,7 @@ export default class EmojidexSearch {
         callback([])
       } else {
         console.error(error)
+        return []
       }
     })
   }

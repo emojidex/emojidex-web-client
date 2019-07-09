@@ -41,6 +41,8 @@ export default class EmojidexIndexes {
         return this.EC.Emoji.combine(response.data.emoji).then(() => {
           if (typeof callback === 'function') {
             callback(response.data.emoji)
+          } else {
+            return response.data
           }
         })
       }
@@ -50,6 +52,8 @@ export default class EmojidexIndexes {
       this.count = 0
       if (typeof callback === 'function') {
         callback([])
+      } else {
+        return response.data
       }
     }).catch(error => {
       this.results = []
@@ -59,6 +63,7 @@ export default class EmojidexIndexes {
         callback([])
       } else {
         console.error(error)
+        return []
       }
     })
   }
@@ -90,6 +95,8 @@ export default class EmojidexIndexes {
           return this.EC.Emoji.combine(loadedEmoji).then(data => {
             if (typeof callback === 'function') {
               callback(data)
+            } else {
+              return data
             }
           })
         }

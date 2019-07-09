@@ -32,12 +32,16 @@ export default class EmojidexCustomizations {
         this.maxPage = Math.ceil(response.data.meta.total_count / this.EC.limit)
         if (typeof callback === 'function') {
           callback(response.data.emoji)
+        } else {
+          return response.data
         }
       } else {
         this.results = []
         this.curPage = 0
         if (typeof callback === 'function') {
           callback([])
+        } else {
+          return []
         }
       }
     }).catch(error => {
@@ -47,6 +51,7 @@ export default class EmojidexCustomizations {
         callback([])
       } else {
         console.error(error)
+        return []
       }
     })
   }

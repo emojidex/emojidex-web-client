@@ -30,6 +30,8 @@ export default class EmojidexUserFollow {
       this.following = response.following
       if (typeof callback === 'function') {
         callback(this.following)
+      } else {
+        return this.following
       }
     }).catch(error => {
       console.error(error)
@@ -53,6 +55,8 @@ export default class EmojidexUserFollow {
 
       if (typeof callback === 'function') {
         callback(this.following)
+      } else {
+        return this.following
       }
     }).catch(error => {
       console.error(error)
@@ -76,6 +80,8 @@ export default class EmojidexUserFollow {
 
       if (typeof callback === 'function') {
         callback(this.following)
+      } else {
+        return this.following
       }
     }).catch(error => {
       console.error(error)
@@ -92,6 +98,8 @@ export default class EmojidexUserFollow {
       this.followers = response.followers
       if (typeof callback === 'function') {
         callback(this.followers)
+      } else {
+        return this.followers
       }
     }).catch(error => {
       console.error(error)
