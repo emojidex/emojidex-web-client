@@ -3,109 +3,130 @@ import _extend from 'lodash/extend'
 
 export default class EmojidexCategories {
   constructor(EC) {
-    this.EC = EC;
-    this._categories = this.EC.Data.categories();
+    this.EC = EC
+    this._categories = this.EC.Data.categories()
     this.local = this.EC.options.locale
     return this.sync(null, this.locale).then(() => {
-      return this.EC.Categories = this;
-    });
+      this.EC.Categories = this
+      return this.EC.Categories
+    })
   }
 
-  _categoriesAPI(category_name, callback, opts, called_func) {
-    let param = {
+  _categoriesAPI(categoryName, callback, opts, calledFunc) {
+    const param = {
       page: 1,
       limit: this.EC.limit,
       detailed: this.EC.detailed
-    };
-    if (this.EC.User.auth_info.token !== null) {
-      _extend(param, { auth_token: this.EC.User.auth_info.token });
     }
-    _extend(param, opts);
+    if (this.EC.User.authInfo.token) {
+      _extend(param, { auth_token: this.EC.User.authInfo.token }) // eslint-disable-line camelcase
+    }
 
-    this.called_func = called_func;
-    this.called_data = {
-      category_name,
+    _extend(param, opts)
+
+    this.calledFunc = calledFunc
+    this.calledData = {
+      categoryName,
       callback,
       param
-    };
+    }
 
-    return axios.get(`${this.EC.api_url}emoji`, {
+    return axios.get(`${this.EC.apiUrl}emoji`, {
       params: param
     }).then(response => {
-      this.meta = response.data.meta;
-      this.results = response.data.emoji;
-      this.cur_page = response.data.meta.page;
-      this.count = response.data.meta.count;
+      this.meta = response.data.meta
+      this.results = response.data.emoji
+      this.curPage = response.data.meta.page
+      this.count = response.data.meta.count
       return this.EC.Emoji.combine(response.data.emoji).then(() => {
         if (typeof callback === 'function') {
-          return callback(response.data.emoji, {
-            category_name,
+          callback(response.data.emoji, {
+            categoryName,
             callback,
             param
-          });
+          })
+        } else {
+          return response.data
         }
-      });
+      })
     }).catch(error => {
-      console.error(error);
-    });
+      console.error(error)
+    })
   }
 
-  getEmoji(category_name, callback, opts){
-    let param = { category: category_name };
-    _extend(param, opts);
-    return this._categoriesAPI(category_name, callback, param, this.getEmoji);
+  getEmoji(categoryName, callback, opts) {
+    const param = { category: categoryName }
+    _extend(param, opts)
+    return this._categoriesAPI(categoryName, callback, param, this.getEmoji)
   }
 
   next() {
-    if (this.count === this.called_data.param.limit) { this.called_data.param.page++; }
-    return this.called_func(this.called_data.category_name, this.called_data.callback, this.called_data.param);
+    if (this.count === this.calledData.param.limit) {
+      this.calledData.param.page++
+    }
+
+    return this.calledFunc(this.calledData.categoryName, this.calledData.callback, this.calledData.param)
   }
 
   prev() {
-    if (this.called_data.param.page > 1) { this.called_data.param.page--; }
-    return this.called_func(this.called_data.category_name, this.called_data.callback, this.called_data.param);
+    if (this.calledData.param.page > 1) {
+      this.calledData.param.page--
+    }
+
+    return this.calledFunc(this.calledData.categoryName, this.calledData.callback, this.calledData.param)
   }
 
   // Gets the full list of caetgories available
-  sync(callback, locale) {
-    if (typeof locale === 'undefined' || locale === null) {
-      locale = this.locale;
-    }
-    if (typeof this._categories !== 'undefined' && typeof this._categories.length !== 'undefined' && this._categories.length != 0) {
-      if(this.locale === locale) {
-        return new Promise((resolve, reject) => {
-          if (typeof callback === 'function') { callback(this._categories); }
-          return resolve();
-        });
-      } else {
-        return this._get_category(callback, locale);
+  sync(callback, locale = this.locale) {
+    if (typeof this._categories !== 'undefined' && typeof this._categories.length !== 'undefined' && this._categories.length !== 0) {
+      if (this.locale === locale) {
+        return new Promise(resolve => {
+          if (typeof callback === 'function') {
+            callback(this._categories)
+          }
+
+          return resolve(this._categories)
+        })
       }
-    } else {
-      if (typeof locale === 'undefined' || locale === null) { ({ locale } = this.EC); }
-      return this._get_category(callback, locale);
+
+      return this._getCategory(callback, locale)
     }
+
+    if (typeof locale === 'undefined' || locale === null) {
+      ({ locale } = this.EC)
+    }
+
+    return this._getCategory(callback, locale)
   }
 
-  _get_category(callback, locale) {
-    return axios.get(`${this.EC.api_url}categories`, {
+  _getCategory(callback, locale) {
+    return axios.get(`${this.EC.apiUrl}categories`, {
       params: { locale }
     }).then(response => {
-      this._categories = response.data.categories;
+      this._categories = response.data.categories
       return this.EC.Data.categories(response.data.categories).then(() => {
-        if (typeof callback === 'function') { callback(this._categories); }
-      });
+        if (typeof callback === 'function') {
+          callback(this._categories)
+        } else {
+          return this._categories
+        }
+      })
     }).catch(error => {
-      console.error(error);
-    });
+      console.error(error)
+    })
   }
 
   all(callback) {
-    if (this._categories != null) {
-      if (typeof callback === 'function') { callback(this._categories); }
+    if (this._categories) {
+      if (typeof callback === 'function') {
+        callback(this._categories)
+      } else {
+        return this._categories
+      }
     } else {
       return setTimeout((() => {
-        return this.all(callback);
-      }), 500);
+        return this.all(callback)
+      }), 500)
     }
   }
 }

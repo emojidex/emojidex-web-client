@@ -1,66 +1,69 @@
-describe('EmojidexUserFavorites', function() {
+/* eslint-disable no-undef */
+describe('EmojidexUserFavorites', () => {
   beforeEach(done =>
     helperChains({
       functions: [clearStorage, helperBefore],
       end: done
     })
-  );
+  )
 
   it('get', done =>
-    EC_spec.User.Favorites.get(function(favorites) {
+    ECSpec.User.Favorites.get(favorites => {
       expect(favorites).toContain(
-        jasmine.objectContaining(emoji_emoji)
-      );
-      done();
+        jasmine.objectContaining(emojiEmoji)
+      )
+      done()
     })
-  );
+  )
 
   it('all', done => {
-    setTimeout(() => {  // Favorites.sync()が終わっていない時があるので
-      EC_spec.User.Favorites.all(favorites => {
+    setTimeout(() => { // Favorites.sync()が終わっていない時があるので
+      ECSpec.User.Favorites.all(favorites => {
         expect(favorites).toContain(
-          jasmine.objectContaining(emoji_emoji)
-        );
-        done();
+          jasmine.objectContaining(emojiEmoji)
+        )
+        done()
       })
-    }, 2000);
-  });
+    }, 2000)
+  })
 
-  describe('Favorites pages [require premium user]', function() {
-    if (typeof premium_user_info === 'undefined' || premium_user_info === null) { pending(); }
+  describe('Favorites pages [require premium user]', () => {
     beforeEach(done =>
       helperChains({
         functions: [clearStorage, helperBeforeForPremiumUser],
         end: done
       })
-    );
+    )
 
-    it('next/prev', done => {
-      EC_spec.limit = 5;
-      setTimeout(() => {  // Favorites.sync()が終わっていない時があるので
-        EC_spec.User.Favorites.next(favorites => {
-          expect(EC_spec.User.Favorites.cur_page).toEqual(2);
-          EC_spec.User.Favorites.prev(favorites => {
-            expect(EC_spec.User.Favorites.cur_page).toEqual(1);
-            done();
-          });
-        });
-      }, 2000);
-    });
-  });
+    if (typeof premiumUserInfo !== 'undefined' && premiumUserInfo !== null) {
+      it('next/prev', done => {
+        ECSpec.limit = 5
+        setTimeout(() => { // Favorites.sync()が終わっていない時があるので
+          ECSpec.User.Favorites.next(() => {
+            expect(ECSpec.User.Favorites.curPage).toEqual(2)
+            ECSpec.User.Favorites.prev(() => {
+              expect(ECSpec.User.Favorites.curPage).toEqual(1)
+              done()
+            })
+          })
+        }, 2000)
+      })
+    }
+  })
 
   // it 'set_favorites', (done) ->
-  //   EC_spec.set_favorites 'emoji', (favorites)->
-  //     expect(EC_spec.favorites).toContain(
+  //   ECSpec.set_favorites 'emoji', (favorites)->
+  //     expect(ECSpec.favorites).toContain(
   //       jasmine.objectContaining(emoji)
   //     )
   //     done()
   //
   // Not working on PhantomJS, browser is OK.
   // it 'unset_favorites', (done) ->
-  //   EC_spec.unset_favorites 'emoji', (favorites)->
-  //     expect(EC_spec.favorites).not.toContain(
+  //   ECSpec.unset_favorites 'emoji', (favorites)->
+  //     expect(ECSpec.favorites).not.toContain(
   //       jasmine.objectContaining(emoji)
   //     )
   //     done()
-});
+})
+/* eslint-enable no-undef */

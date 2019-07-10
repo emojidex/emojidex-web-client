@@ -1,106 +1,111 @@
-describe('EmojidexSearch', function() {
+/* eslint-disable no-undef */
+describe('EmojidexSearch', () => {
   beforeAll(done =>
     helperChains({
       functions: [clearStorage, helperBefore],
       end: done
     })
-  );
+  )
 
   it('search', done =>
-    EC_spec.Search.search('kissing', function(emoji_data) {
-      expect(emoji_data).toContain(jasmine.objectContaining({ code: 'kissing', moji: '😗', unicode: '1f617', category: 'faces' }));
-      done();
+    ECSpec.Search.search('kissing', emojiData => {
+      expect(emojiData).toContain(jasmine.objectContaining({ code: 'kissing', moji: '😗', unicode: '1f617', category: 'faces' }))
+      done()
     })
-  );
+  )
 
   it('starting', done =>
-    EC_spec.Search.starting('kissing', function(emoji_data) {
-      expect(emoji_data).toContain(jasmine.objectContaining(emoji_kissing));
-      done();
+    ECSpec.Search.starting('kissing', emojiData => {
+      expect(emojiData).toContain(jasmine.objectContaining(emojiKissing))
+      done()
     })
-  );
+  )
 
   it('ending', done =>
-    EC_spec.Search.ending('kiss', function(emoji_data) {
-      expect(emoji_data).toContain(jasmine.objectContaining(emoji_kiss));
-      done();
+    ECSpec.Search.ending('kiss', emojiData => {
+      expect(emojiData).toContain(jasmine.objectContaining(emojiKiss))
+      done()
     })
-  );
+  )
 
   it('tags', done =>
-    EC_spec.Search.tags('', function(emoji_data) {
-      expect(emoji_data).toBeTruthy();
-      done();
+    ECSpec.Search.tags('', emojiData => {
+      expect(emojiData).toBeTruthy()
+      done()
     })
-  );
+  )
 
   it('advanced: term', done =>
-    EC_spec.Search.advanced({term: 'kissing'}, function(emoji_data) {
-      expect(emoji_data).toContain(jasmine.objectContaining({ code: 'kissing', moji: '😗', unicode: '1f617', category: 'faces' }));
-      done();
+    ECSpec.Search.advanced({ term: 'kissing' }, emojiData => {
+      expect(emojiData).toContain(jasmine.objectContaining({ code: 'kissing', moji: '😗', unicode: '1f617', category: 'faces' }))
+      done()
     })
-  );
+  )
 
   it('advanced: categories', done =>
-    EC_spec.Search.advanced({term: 'kiss', categories: ["objects"]}, function(emoji_data) {
-      expect(emoji_data).toContain(jasmine.objectContaining(emoji_kiss));
-      done();
+    ECSpec.Search.advanced({ term: 'kiss', categories: ['objects'] }, emojiData => {
+      expect(emojiData).toContain(jasmine.objectContaining(emojiKiss))
+      done()
     })
-  );
+  )
 
   it('find: use cached emoji', done =>
-    EC_spec.Search.find('kiss', function(emoji_data) {
-      expect(emoji_data).toEqual(jasmine.objectContaining(emoji_kiss));
-      done();
+    ECSpec.Search.find('kiss', emojiData => {
+      expect(emojiData).toEqual(jasmine.objectContaining(emojiKiss))
+      done()
     })
-  );
+  )
 
   it('find: use ajax', done =>
-    EC_spec.Search.find('dragon', function(emoji_data) {
-      expect(emoji_data).toEqual(jasmine.objectContaining(emoji_dragon));
-      done();
+    ECSpec.Search.find('dragon', emojiData => {
+      expect(emojiData).toEqual(jasmine.objectContaining(emojiDragon))
+      done()
     })
-  );
+  )
 
   it('find: use ajax and auto escaping', done =>
-    EC_spec.Search.find('thinking face(p)', function(emoji_data) {
-      expect(emoji_data).toEqual(jasmine.objectContaining(emoji_thinking_face_p));
-      done();
+    ECSpec.Search.find('thinking face(p)', emojiData => {
+      expect(emojiData).toEqual(jasmine.objectContaining(emojiThinkingFaceP))
+      done()
     })
-  );
+  )
 
   it('find: not found', done =>
-    EC_spec.Search.find('aaaaaaaa', function(response) {
-      expect(response.statusText).toEqual('Not Found');
-      done();
+    ECSpec.Search.find('aaaaaaaa', response => {
+      expect(response.statusText).toEqual('Not Found')
+      done()
     })
-  );
+  )
 
-  return describe('Search and page transition', function() {
+  return describe('Search and page transition', () => {
     beforeAll(done =>
-      EC_spec.Search.starting('a', () => done())
-    );
+      ECSpec.Search.starting('a', () => done())
+    )
 
-    it('next', function(done) {
-      EC_spec.Search.searched.callback = function() {
-        expect(EC_spec.Search.cur_page).toEqual(2);
-        done();
-      };
-      EC_spec.Search.next();
-    });
+    it('next', done => {
+      ECSpec.Search.searched.callback = function () {
+        expect(ECSpec.Search.curPage).toEqual(2)
+        done()
+      }
 
-    it('prev', function(done) {
-      EC_spec.Search.searched.callback = function() {
-        expect(EC_spec.Search.cur_page).toEqual(1);
-        done();
-      };
-      EC_spec.Search.prev();
-    });
-  });
-});
+      ECSpec.Search.next()
+    })
 
-  // it 'advanced: tags', (done) ->
-  //   EC_spec.Search.advanced '', ["Star Trek"], [], (emoji_data) ->
-  //     console.dir emoji_data
-  //     expect(emoji_data).toContain(jasmine.objectContaining emoji_kiss)
-  //     done()
+    it('prev', done => {
+      ECSpec.Search.searched.callback = function () {
+        expect(ECSpec.Search.curPage).toEqual(1)
+        done()
+      }
+
+      ECSpec.Search.prev()
+    })
+  })
+})
+
+// it 'advanced: tags', (done) ->
+//   ECSpec.Search.advanced '', ["Star Trek"], [], (emojiData) ->
+//     console.dir emojiData
+//     expect(emojiData).toContain(jasmine.objectContaining emojiKiss)
+//     done()
+
+/* eslint-enable no-undef */

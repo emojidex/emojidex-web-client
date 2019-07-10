@@ -1,48 +1,51 @@
-describe('EmojidexUserFollow', function() {
+/* eslint-disable no-undef */
+describe('EmojidexUserFollow', () => {
   beforeEach(done =>
     helperChains({
       functions: [clearStorage, helperBefore],
       end: done
     })
-  );
+  )
 
-  it ('get following', done => {
-    EC_spec.User.Follow.getFollowing(following => {
-      expect(following).toEqual(jasmine.any(Array));
-      done();
-    });
-  });
+  it('get following', done => {
+    ECSpec.User.Follow.getFollowing(following => {
+      expect(following).toEqual(jasmine.any(Array))
+      done()
+    })
+  })
 
-  it ('add following', done => {
-    pending('Delete API is not working');
-    EC_spec.User.Follow.addFollowing('test', following => {
-      expect(following).toContain('test');
-      done();
-    });
-  });
+  // TODO: Delete API is not working
+  xit('add following', done => {
+    ECSpec.User.Follow.addFollowing('test', following => {
+      expect(following).toContain('test')
+      done()
+    })
+  })
 
-  it ('delete following', done => {
-    pending('503 error');
-    EC_spec.User.Follow.deleteFollowing('test', following => {
-      expect(following).not.toContain('test');
-      done();
-    });
-  });
+  // TODO: 503 error
+  xit('delete following', done => {
+    ECSpec.User.Follow.deleteFollowing('test', following => {
+      expect(following).not.toContain('test')
+      done()
+    })
+  })
 
-  describe('Followers  [require premium user]', () =>{
-    if (typeof premium_user_info === 'undefined' || premium_user_info === null) { pending(); }
+  describe('Followers  [require premium user]', () => {
     beforeEach(done =>
       helperChains({
         functions: [clearStorage, helperBeforeForPremiumUser],
         end: done
       })
-    );
+    )
 
-    it('get followers', done => {
-      EC_spec.User.Follow.getFollowers(followers => {
-        expect(followers).toEqual(jasmine.any(Array));
-        done();
-      });
-    });
-  });
-});
+    if (typeof premiumUserInfo !== 'undefined' && premiumUserInfo !== null) {
+      it('get followers', done => {
+        ECSpec.User.Follow.getFollowers(followers => {
+          expect(followers).toEqual(jasmine.any(Array))
+          done()
+        })
+      })
+    }
+  })
+})
+/* eslint-enable no-undef */

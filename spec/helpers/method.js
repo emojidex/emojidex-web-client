@@ -1,86 +1,106 @@
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
+/* eslint-disable no-undef */
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000
 
-this.EC_spec = null;
+this.ECSpec = null
 
-let hub_path = 'https://www.emojidex.com/hub/1.0.0';
-let helperChains = function(chains_data) {
-  if (chains_data.functions.length === 0) {
-    chains_data.end();
+const hubPath = 'https://www.emojidex.com/hub/1.0.0'
+const helperChains = function (chainsData) {
+  if (chainsData.functions.length === 0) {
+    chainsData.end()
   } else {
-    let chain_function = chains_data.functions.shift();
-    chain_function(chains_data);
+    const chainFunction = chainsData.functions.shift()
+    chainFunction(chainsData)
   }
-};
-this.helperChains = helperChains;
+}
 
-let helperBefore = function(chains_data) {
-  this.EC_spec = new EmojidexClient({
-    storageHubPath: hub_path,
+this.helperChains = helperChains
+
+/* eslint-disable camelcase */
+let testUserToken = null
+if (typeof testUserInfo !== 'undefined' && testUserInfo != null) {
+  testUserToken = { authtype: 'token', username: testUserInfo.auth_user, auth_token: testUserInfo.auth_token }
+}
+let premiumUserToken = null
+if (typeof premiumUserInfo !== 'undefined' && premiumUserInfo != null) {
+  premiumUserToken = { authtype: 'token', username: premiumUserInfo.auth_user, auth_token: premiumUserInfo.auth_token }
+}
+/* eslint-enable camelcase */
+
+const helperBefore = function (chainsData) {
+  this.ECSpec = new EmojidexClient({
+    storageHubPath: hubPath,
     onReady: EC => {
-      EC.User.login({ authtype: 'token', username: test_user_info.auth_user, auth_token: test_user_info.auth_token }).then(() => {
-        helperChains(chains_data);
-      });
+      EC.User.login(testUserToken).then(() => {
+        helperChains(chainsData)
+      })
     }
-  });
-};
-this.helperBefore = helperBefore;
+  })
+}
 
-let helperBeforeForPremiumUser = function(chains_data) {
-  this.EC_spec = new EmojidexClient({
-    storageHubPath: hub_path,
-    onReady: EC => {
-      this.EC_spec.User.login({ authtype: 'token', username: premium_user_info.auth_user, auth_token: premium_user_info.auth_token }).then(() => {
-        helperChains(chains_data);
-      });
+this.helperBefore = helperBefore
+
+const helperBeforeForPremiumUser = function (chainsData) {
+  this.ECSpec = new EmojidexClient({
+    storageHubPath: hubPath,
+    onReady: () => {
+      this.ECSpec.User.login(premiumUserToken).then(() => {
+        helperChains(chainsData)
+      })
     }
-  });
-};
-this.helperBeforeForPremiumUser = helperBeforeForPremiumUser;
+  })
+}
 
-let clearStorage = function(chains_data) {
-  let CSC = new CrossStorageClient(hub_path, {frameId: 'emojidex-client-storage-hub'});
-  CSC.onReadyFrame().then(() => {
-    return CSC.onConnect();
+this.helperBeforeForPremiumUser = helperBeforeForPremiumUser
+
+const clearStorage = function (chainsData) {
+  const CSC = new CrossStorageClient(hubPath, { frameId: 'emojidex-client-storage-hub' })
+  return CSC.onReadyFrame().then(() => {
+    return CSC.onConnect()
   }).then(() => {
-    CSC.clear();
+    return CSC.clear()
   }).then(() => {
-    helperChains(chains_data);
-  });
-};
-this.clearStorage = clearStorage;
+    helperChains(chainsData)
+  })
+}
 
-let helperBeforeForEmojidexData = function(chains_data) {
-  this.EC_spec = new EmojidexClient({
-    storageHubPath: hub_path,
-    onReady: EC => {
-      helperChains(chains_data);
+this.clearStorage = clearStorage
+
+const helperBeforeForEmojidexData = function (chainsData) {
+  this.ECSpec = new EmojidexClient({
+    storageHubPath: hubPath,
+    onReady: () => {
+      helperChains(chainsData)
     }
-  });
-};
-this.helperBeforeForEmojidexData = helperBeforeForEmojidexData;
+  })
+}
 
-let getExtendedEmojiData = chains_data =>
+this.helperBeforeForEmojidexData = helperBeforeForEmojidexData
+
+/* eslint-disable no-unused-vars */
+const getExtendedEmojiData = chainsData =>
   axios.get('https://www.emojidex.com/api/v1/extended_emoji').then(response => {
-    this.emoji_emojidex = response.data;
-    helperChains(chains_data);
-  });
+    this.emojiEmojidex = response.data
+    helperChains(chainsData)
+  })
 
-let getFacesEmoji = chains_data =>
+const getFacesEmoji = chainsData =>
   axios.get('https://www.emojidex.com/api/v1/emoji', {
     params: { category: 'faces' }
   }).then(response => {
-    this.faces_emoji = response.data.emoji;
-    helperChains(chains_data);
-  });
+    this.facesEmoji = response.data.emoji
+    helperChains(chainsData)
+  })
 
-let setPremiumUser = function(chains_data) {
-  this.EC_spec.User.login({authtype: 'token', username: premium_user_info.auth_user, auth_token: premium_user_info.auth_token}).then(() => {
-    helperChains(chains_data);
-  });
-};
-
-let specTimer = function(time) {
-  return new Promise((resolve, reject) => {
-    setTimeout(resolve, time);
-  });
+const setPremiumUser = function (chainsData) {
+  this.ECSpec.User.login(premiumUserToken).then(() => {
+    helperChains(chainsData)
+  })
 }
+
+const specTimer = function (time) {
+  return new Promise(resolve => {
+    setTimeout(resolve, time)
+  })
+}
+/* eslint-enable no-unused-vars */
+/* eslint-enable no-undef */

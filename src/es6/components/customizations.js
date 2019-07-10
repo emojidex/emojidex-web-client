@@ -3,61 +3,76 @@ import _extend from 'lodash/extend'
 
 export default class EmojidexCustomizations {
   constructor(EC) {
-    this.EC = EC;
-    this.results = [];
-    this.cur_page = 1;
+    this.EC = EC
+    this.results = []
+    this.curPage = 1
   }
 
-  _customizationsAPI(callback, opts, called_func) {
+  _customizationsAPI(callback, opts, calledFunc) {
     const param = {
       page: 1,
       limit: this.EC.limit,
       detailed: this.EC.detailed
-    };
-    _extend(param, opts);
+    }
+    _extend(param, opts)
 
-    this.customized_func = called_func;
+    this.customizedFunc = calledFunc
     this.customized = {
       callback,
       param
-    };
+    }
 
-    return axios.get(`${this.EC.api_url}emoji/customizations`, {
+    return axios.get(`${this.EC.apiUrl}emoji/customizations`, {
       params: param
     }).then(response => {
-      if (response.data.status != null) {
-        this.results = [];
-        this.cur_page = 0;
-        if (typeof callback === 'function') { callback([]); }
+      if (response.data.emoji) {
+        this.meta = response.data.meta
+        this.results = response.data.emoji
+        this.curPage = response.data.meta.page
+        this.maxPage = Math.ceil(response.data.meta.total_count / this.EC.limit)
+        if (typeof callback === 'function') {
+          callback(response.data.emoji)
+        } else {
+          return response.data
+        }
       } else {
-        this.meta = response.data.meta;
-        this.results = response.data.emoji;
-        this.cur_page = response.data.meta.page;
-        this.max_page = Math.ceil(response.data.meta.total_count / this.EC.limit);
-        if (typeof callback === 'function') { callback(response.data.emoji); }
+        this.results = []
+        this.curPage = 0
+        if (typeof callback === 'function') {
+          callback([])
+        } else {
+          return []
+        }
       }
     }).catch(error => {
-      this.results = [];
-      this.cur_page = 0;
+      this.results = []
+      this.curPage = 0
       if (typeof callback === 'function') {
-        callback([]);
+        callback([])
       } else {
-        console.error(error);
+        console.error(error)
+        return []
       }
-    });
+    })
   }
 
   get(callback, opts) {
-    return this._customizationsAPI(callback, opts, this.get);
+    return this._customizationsAPI(callback, opts, this.get)
   }
 
   next() {
-    if (this.max_page > this.cur_page) this.customized.param.page++;
-    return this.customized_func(this.customized.callback, this.customized.param);
+    if (this.maxPage > this.curPage) {
+      this.customized.param.page++
+    }
+
+    return this.customizedFunc(this.customized.callback, this.customized.param)
   }
 
   prev() {
-    if (this.cur_page > 1) this.customized.param.page--;
-    return this.customized_func(this.customized.callback, this.customized.param);
+    if (this.curPage > 1) {
+      this.customized.param.page--
+    }
+
+    return this.customizedFunc(this.customized.callback, this.customized.param)
   }
 }

@@ -1,58 +1,61 @@
-describe('EmojidexUserHistory', function() {
+/* eslint-disable no-undef */
+describe('EmojidexUserHistory', () => {
   beforeEach(done =>
     helperChains({
       functions: [clearStorage, helperBefore],
       end: done
     })
-  );
+  )
 
   it('get', done =>
-    EC_spec.User.History.get(history => {
-      expect(history.length).toBeTruthy();
-      expect(history[0].code).toBeTruthy();
-      expect(history[0].times_used).toBeTruthy();
-      done();
+    ECSpec.User.History.get(history => {
+      expect(history.length).toBeTruthy()
+      expect(history[0].code).toBeTruthy()
+      expect(history[0].times_used).toBeTruthy()
+      done()
     })
-  );
+  )
 
   it('get (history info only)', done =>
-    EC_spec.User.History.getHistoryInfoOnly(history => {
-      expect(history.length).toBeTruthy();
-      expect(history[0].code).toBeFalsy();
-      expect(history[0].times_used).toBeTruthy();
-      done();
+    ECSpec.User.History.getHistoryInfoOnly(history => {
+      expect(history.length).toBeTruthy()
+      expect(history[0].code).toBeFalsy()
+      expect(history[0].times_used).toBeTruthy()
+      done()
     })
-  );
+  )
 
   it('all', done => {
-    setTimeout(() => {  // History.sync()が終わっていない時があるので
-      EC_spec.User.History.all(history => {
-        expect(history.length).toBeTruthy();
-        done();
+    setTimeout(() => { // History.sync()が終わっていない時があるので
+      ECSpec.User.History.all(history => {
+        expect(history.length).toBeTruthy()
+        done()
       })
-    }, 2000);
-  });
+    }, 2000)
+  })
 
-  describe('History pages [require premium user]', function() {
-    if (typeof premium_user_info === 'undefined' || premium_user_info === null) { pending(); }
+  describe('History pages [require premium user]', () => {
     beforeEach(done =>
       helperChains({
         functions: [clearStorage, helperBeforeForPremiumUser],
         end: done
       })
-    );
+    )
 
-    it('next/prev', done => {
-      EC_spec.limit = 5;
-      setTimeout(() => {  // History.sync()が終わっていない時があるので
-        EC_spec.User.History.next(history => {
-          expect(EC_spec.User.History.cur_page).toEqual(2);
-          EC_spec.User.History.prev(history => {
-            expect(EC_spec.User.History.cur_page).toEqual(1);
-            done();
-          });
-        });
-      }, 2000);
-    });
-  });
-});
+    if (typeof premiumUserInfo !== 'undefined' && premiumUserInfo !== null) {
+      it('next/prev', done => {
+        ECSpec.limit = 5
+        setTimeout(() => { // History.sync()が終わっていない時があるので
+          ECSpec.User.History.next(() => {
+            expect(ECSpec.User.History.curPage).toEqual(2)
+            ECSpec.User.History.prev(() => {
+              expect(ECSpec.User.History.curPage).toEqual(1)
+              done()
+            })
+          })
+        }, 2000)
+      })
+    }
+  })
+})
+/* eslint-enable no-undef */
