@@ -16,8 +16,7 @@ export default class EmojidexUserHistory {
     return axios({
       method: options.type,
       url: options.url ? options.url : `${this.EC.apiUrl}users/history`,
-      params: options.params,
-      data: options.data
+      params: options.params
     }).then(response => {
       return response.data
     }).catch(error => {
@@ -81,8 +80,7 @@ export default class EmojidexUserHistory {
   set(emojiCode) {
     const options = {
       type: 'POST',
-      params: { auth_token: this.EC.User.authInfo.token }, // eslint-disable-line camelcase
-      data: { emojiCode }
+      params: { auth_token: this.EC.User.authInfo.token, emoji_code: emojiCode } // eslint-disable-line camelcase
     }
     return this._historyAPI(options).then(response => {
       for (let i = 0; i < this._history.length; i++) {

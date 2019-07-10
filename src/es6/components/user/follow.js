@@ -15,8 +15,7 @@ export default class EmojidexUserFollow {
     return axios({
       method: options.type,
       url: options.url,
-      params: { auth_token: this.EC.User.authInfo.token }, // eslint-disable-line camelcase
-      data: options.data
+      params: { auth_token: this.EC.User.authInfo.token } // eslint-disable-line camelcase
     }).then(response => {
       return response.data
     }).catch(error => {
@@ -46,7 +45,7 @@ export default class EmojidexUserFollow {
     const options = {
       url: `${this.EC.apiUrl}users/following`,
       type: 'POST',
-      data: { username }
+      params: { username }
     }
     return this._followAPI(options).then(response => {
       if (response.username !== undefined && response.username !== null) {
@@ -71,7 +70,7 @@ export default class EmojidexUserFollow {
     const options = {
       url: `${this.EC.apiUrl}users/following`,
       type: 'DELETE',
-      data: { username }
+      params: { username }
     }
     return this._followAPI(options).then(response => {
       if (response.username !== undefined && response.username !== null) {

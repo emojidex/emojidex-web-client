@@ -16,8 +16,7 @@ export default class EmojidexUserFavorites {
     return axios({
       method: options.type,
       url: `${this.EC.apiUrl}users/favorites`,
-      params: options.params,
-      data: options.data
+      params: options.params
     }).then(response => {
       return response.data
     }).catch(error => {
@@ -55,8 +54,7 @@ export default class EmojidexUserFavorites {
   set(emojiCode) {
     const options = {
       type: 'POST',
-      params: { auth_token: this.EC.User.authInfo.token }, // eslint-disable-line camelcase
-      data: { emojiCode }
+      params: { auth_token: this.EC.User.authInfo.token, emoji_code: emojiCode } // eslint-disable-line camelcase
     }
     return this._favoritesAPI(options).then(response => {
       this._favorites.push(response)
@@ -69,8 +67,7 @@ export default class EmojidexUserFavorites {
   unset(emojiCode) {
     const options = {
       type: 'DELETE',
-      params: { auth_token: this.EC.User.authInfo.token }, // eslint-disable-line camelcase
-      data: { emojiCode }
+      params: { auth_token: this.EC.User.authInfo.token, emoji_code: emojiCode } // eslint-disable-line camelcase
     }
     return this._favoritesAPI(options).then(() => {
       return this.sync()
