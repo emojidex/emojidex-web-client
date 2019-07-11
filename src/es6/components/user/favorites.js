@@ -37,7 +37,7 @@ export default class EmojidexUserFavorites {
       this._favorites = response.emoji
       this.meta = response.meta
       this.curPage = response.meta.page
-      this.maxPage = Math.ceil(response.total_count / this.EC.limit)
+      this.maxPage = Math.ceil(response.meta.total_count / this.EC.limit)
 
       return this.EC.Data.favorites(this._favorites)
     }).then(() => {
