@@ -38,7 +38,7 @@ export default class EmojidexUserHistory {
       this._history = response.emoji
       this.meta = response.meta
       this.curPage = response.meta.page
-      this.maxPage = Math.ceil(response.total_count / this.EC.limit)
+      this.maxPage = Math.ceil(response.meta.total_count / this.EC.limit)
 
       return this.EC.Data.history(this._history)
     }).then(() => {
@@ -65,7 +65,7 @@ export default class EmojidexUserHistory {
       this._historyInfo = response.history
       this.historyInfoMeta = response.meta
       this.historyInfoCurPage = response.meta.page
-      this.historyInfoMaxPage = Math.ceil(response.total_count / this.EC.limit)
+      this.historyInfoMaxPage = Math.ceil(response.meta.total_count / this.EC.limit)
 
       if (typeof callback === 'function') {
         callback(this._historyInfo)

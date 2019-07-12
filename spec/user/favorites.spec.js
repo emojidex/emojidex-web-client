@@ -37,7 +37,7 @@ describe('EmojidexUserFavorites', () => {
 
     if (typeof premiumUserInfo !== 'undefined' && premiumUserInfo !== null) {
       it('next/prev', done => {
-        ECSpec.limit = 5
+        ECSpec.limit = 1
         setTimeout(() => { // Favorites.sync()が終わっていない時があるので
           ECSpec.User.Favorites.next(() => {
             expect(ECSpec.User.Favorites.curPage).toEqual(2)
