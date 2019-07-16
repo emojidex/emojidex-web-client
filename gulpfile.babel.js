@@ -2,7 +2,6 @@ import gulp from 'gulp';
 import pkg from './package.json';
 import header from 'gulp-header';
 import del from 'del';
-import runSequence from 'run-sequence';
 import eslint from 'gulp-eslint';
 import * as jasmineBrowser from 'gulp-jasmine-browser';
 import watch from 'gulp-watch';
