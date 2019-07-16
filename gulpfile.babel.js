@@ -21,8 +21,9 @@ var banner = [
   '**/\n\n'
 ].join();
 
-gulp.task('clean', function () {
+gulp.task('clean', function (done) {
   del.sync(['dist/**/*.js']);
+  done();
 });
 
 gulp.task('banner', function () {
