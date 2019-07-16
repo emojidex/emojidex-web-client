@@ -33,7 +33,7 @@ gulp.task('banner', function () {
     .pipe(gulp.dest('dist/js/'));
 });
 
-gulp.task('env', () => {
+gulp.task('env', (done) => {
   fs.stat('.env', (err, stat) => {
     if (err === null) {
       const dotenv = require('dotenv')
@@ -57,6 +57,7 @@ gulp.task('env', () => {
       fs.writeFileSync('tmp/authinfo.js', output);
     }
   });
+  done()
 });
 
 gulp.task('jasmineBrowser', () => {
@@ -74,19 +75,10 @@ gulp.task('jasmineBrowser', () => {
     .pipe(jasmineBrowser.server());
 });
 
-// TODO: enable in tasks
-gulp.task('lint', () => {
-  return gulp.src(['src/es6/**/*.js','!node_modules/**'])
-    .pipe(eslint())
-    .pipe(eslint.format())
-    .pipe(eslint.failAfterError());
-});
+gulp.task('default',
+  gulp.series('banner')
+);
 
-gulp.task('default', function (cb) {
-  runSequence('banner', cb);
-});
-
-// TODO: lint
-gulp.task('spec', function (cb) {
-  runSequence('env', 'jasmineBrowser', cb/*, "lint"*/);
-});
+gulp.task('spec',
+  gulp.series('env', 'jasmineBrowser')
+);
