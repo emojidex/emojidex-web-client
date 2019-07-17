@@ -51,16 +51,16 @@ the client in. If you have two separate pieces of code operating on the same vie
 module each piece of code should have a different client instance.
 
 The client is broken up into a set of nested modules:
-Client
-  ┣Emoji
-  ┣Categories
-  ┣Indexes
-  ┣User
-  ┃  ┣History
-  ┃  ┗Favorites
-  ┣Search
-  ┣Data
-  ┗Util
+Client  
+  ┣Emoji  
+  ┣Categories  
+  ┣Indexes  
+  ┣User  
+  ┃  ┣History  
+  ┃  ┗Favorites  
+  ┣Search  
+  ┣Data  
+  ┗Util  
 
 The Data modules should usually be ignored unless you're doing something particularly
 hackish - but be warned that messing with these could be a quick way to break user data!
