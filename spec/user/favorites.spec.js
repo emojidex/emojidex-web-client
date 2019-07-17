@@ -15,6 +15,23 @@ describe('EmojidexUserFavorites', () => {
       done()
     })
   )
+  
+  // NOTE: 現在のAPIで、setはできているけどunsetが機能してない
+  // it('set', done => {
+  //   ECSpec.User.Favorites.set('emoji').then(response => {
+  //     const codes = response.favorites.map(emoji => { return emoji.code })
+  //     expect(codes).toContain('emoji')
+  //     done()
+  //   })
+  // })
+  // 
+  // it('unset', done => {
+  //   ECSpec.User.Favorites.unset('emoji').then(response => {
+  //     const codes = response.map(emoji => { return emoji.code })
+  //     expect(codes).not.toContain('emoji')
+  //     done()
+  //   })
+  // })
 
   it('all', done => {
     setTimeout(() => { // Favorites.sync()が終わっていない時があるので
