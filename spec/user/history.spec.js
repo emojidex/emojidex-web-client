@@ -24,6 +24,14 @@ describe('EmojidexUserHistory', () => {
       done()
     })
   )
+  
+  // NOTE: 現在のAPIで、setはできているけどレスポンスが返ってこない状態
+  // it('set', done => {
+  //   ECSpec.User.History.set('heart').then(response => {
+  //     expect(response.emoji_code).toEqual('heart')
+  //     done()
+  //   })
+  // })
 
   it('all', done => {
     setTimeout(() => { // History.sync()が終わっていない時があるので
