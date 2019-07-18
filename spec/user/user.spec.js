@@ -41,6 +41,45 @@ describe('EmojidexUser', () => {
         )
       }
     })
+    
+    it('logs in by session', done => {
+      ECSpec.User.login({
+        authtype: 'token',
+        username: testUserInfo.auth_user,
+        auth_token: testUserInfo.auth_token
+      }).then(() => {
+        return ECSpec.User.login({ authtype: 'session' })
+      }).then(authInfo => {
+        expect(authInfo.status).toEqual('verified')
+        done()
+      })
+    })
+    
+    it('logs in by auto', done => {
+      ECSpec.User.login({
+        authtype: 'token',
+        username: testUserInfo.auth_user,
+        auth_token: testUserInfo.auth_token
+      }).then(() => {
+        return ECSpec.User.login()
+      }).then(() => {
+        expect(ECSpec.User.authInfo.status).toEqual('verified')
+        done()
+      })
+    })
+    
+    it('logs out', done => {
+      ECSpec.User.login({
+        authtype: 'token',
+        username: testUserInfo.auth_user,
+        auth_token: testUserInfo.auth_token
+      }).then(() => {
+        return ECSpec.User.logout()
+      }).then(() => {
+        expect(ECSpec.User.authInfo.status).toEqual('none')
+        done()
+      })
+    })
   })
 
   describe('User Details', () => {
