@@ -80,6 +80,18 @@ describe('EmojidexUser', () => {
         done()
       })
     })
+    
+    it('failure', done => {
+      ECSpec.User.login({
+        authtype: 'token',
+        username: 'aaa',
+        auth_token: 'aaa'
+      }).then(response => {
+        expect(response.errorInfo.status).toEqual(401)
+        expect(response.errorInfo.statusText).toEqual('Unauthorized')
+        done()
+      })
+    })
   })
 
   describe('User Details', () => {
