@@ -47,6 +47,13 @@ const emojiThinkingFaceP = {
   r18: false
 }
 
+const gakuEngine = {
+  code: 'GAKUEngine',
+  moji: null,
+  unicode: null,
+  category: 'symbols',
+  tags: ['education', 'school', 'open source', 'GAKUEngine']
+}
 /* eslint-disable camelcase */
 
 const testUserInfo = {

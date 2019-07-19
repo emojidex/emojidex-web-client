@@ -48,6 +48,12 @@ describe('EmojidexSearch', () => {
       done()
     })
   )
+  it('advanced: tags', done =>
+    ECSpec.Search.advanced({ tags: ['GAKUEngine'] }, emojiData => {
+      expect(emojiData).toContain(jasmine.objectContaining(gakuEngine))
+      done()
+    })
+  )
 
   it('find: use cached emoji', done =>
     ECSpec.Search.find('kiss', emojiData => {
@@ -101,11 +107,4 @@ describe('EmojidexSearch', () => {
     })
   })
 })
-
-// it 'advanced: tags', (done) ->
-//   ECSpec.Search.advanced '', ["Star Trek"], [], (emojiData) ->
-//     console.dir emojiData
-//     expect(emojiData).toContain(jasmine.objectContaining emojiKiss)
-//     done()
-
 /* eslint-enable no-undef */
