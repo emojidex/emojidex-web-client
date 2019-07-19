@@ -7,9 +7,21 @@ export default class EmojidexIndexes {
     this.results = []
     this.curPage = 1
     this.count = 0
+    this.maxPage = 0
   }
 
   _indexesAPI(query, callback, opts, func) {
+    const onFalsyProcess = callback => {
+      this.results = []
+      this.curPage = 0
+      this.count = 0
+      if (typeof callback === 'function') {
+        callback([])
+      } else {
+        return []
+      }
+    }
+
     const param = {
       page: 1,
       limit: this.EC.limit,
@@ -38,6 +50,11 @@ export default class EmojidexIndexes {
         this.results = response.data.emoji
         this.curPage = response.data.meta.page
         this.count = response.data.meta.count
+        this.maxPage = Math.floor(this.meta.total_count / this.indexed.param.limit) // eslint-disable-line camelcase
+        if (this.meta.total_count % this.indexed.param.limit > 0) { // eslint-disable-line camelcase
+          this.maxPage++
+        }
+
         return this.EC.Emoji.combine(response.data.emoji).then(() => {
           if (typeof callback === 'function') {
             callback(response.data.emoji)
@@ -47,24 +64,10 @@ export default class EmojidexIndexes {
         })
       }
 
-      this.results = []
-      this.curPage = 0
-      this.count = 0
-      if (typeof callback === 'function') {
-        callback([])
-      } else {
-        return response.data
-      }
+      return onFalsyProcess(callback)
     }).catch(error => {
-      this.results = []
-      this.curPage = 0
-      this.count = 0
-      if (typeof callback === 'function') {
-        callback([])
-      } else {
-        console.error(error)
-        return []
-      }
+      console.error(error)
+      return onFalsyProcess(callback)
     })
   }
 
@@ -116,18 +119,16 @@ export default class EmojidexIndexes {
   }
 
   next() {
-    if (this.count === this.indexed.param.limit) {
+    if (this.maxPage > this.curPage) {
       this.indexed.param.page++
+      return this.indexedFunc(this.indexed.callback, this.indexed.param, this.indexedFunc)
     }
-
-    return this.indexedFunc(this.indexed.callback, this.indexed.param, this.indexedFunc)
   }
 
   prev() {
     if (this.indexed.param.page > 1) {
       this.indexed.param.page--
+      return this.indexedFunc(this.indexed.callback, this.indexed.param, this.indexedFunc)
     }
-
-    return this.indexedFunc(this.indexed.callback, this.indexed.param, this.indexedFunc)
   }
 }
