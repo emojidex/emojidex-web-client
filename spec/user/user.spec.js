@@ -21,7 +21,7 @@ describe('EmojidexUser', () => {
     )
 
     describe('[Require user info]', () => {
-      if (typeof userInfo !== 'undefined' && userInfo !== null) {
+      if (hasUserAccount()) {
         it('logs in by plain authentication (username, password)', done =>
           ECSpec.User.login({
             authtype: 'plain', username: userInfo.auth_user, password: userInfo.password, callback(authInfo) {
@@ -103,7 +103,7 @@ describe('EmojidexUser', () => {
     })
 
     describe('[Require premium user info] User Details', () => {
-      if (typeof premiumUserInfo !== 'undefined' && premiumUserInfo !== null) {
+      if (hasPremiumAccount()) {
         it('has r18, pro, premium, etc.', done =>
           ECSpec.User.login({
             authtype: 'token',

@@ -15,13 +15,18 @@ const helperChains = function (chainsData) {
 
 this.helperChains = helperChains
 
-/* eslint-disable camelcase */
-let testUserToken = null
-if (typeof testUserInfo !== 'undefined' && testUserInfo != null) {
-  testUserToken = { authtype: 'token', username: testUserInfo.auth_user, auth_token: testUserInfo.auth_token }
+const hasUserAccount = function () {
+  return typeof userInfo !== 'undefined' && userInfo !== null
 }
+
+const hasPremiumAccount = function () {
+  return typeof premiumUserInfo !== 'undefined' && premiumUserInfo !== null
+}
+
+/* eslint-disable camelcase */
+const testUserToken = { authtype: 'token', username: testUserInfo.auth_user, auth_token: testUserInfo.auth_token }
 let premiumUserToken = null
-if (typeof premiumUserInfo !== 'undefined' && premiumUserInfo != null) {
+if (hasPremiumAccount()) {
   premiumUserToken = { authtype: 'token', username: premiumUserInfo.auth_user, auth_token: premiumUserInfo.auth_token }
 }
 /* eslint-enable camelcase */

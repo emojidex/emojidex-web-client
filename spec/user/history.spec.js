@@ -50,7 +50,7 @@ describe('EmojidexUserHistory', () => {
       })
     )
 
-    if (typeof premiumUserInfo !== 'undefined' && premiumUserInfo !== null) {
+    if (hasPremiumAccount()) {
       it('next/prev', done => {
         ECSpec.limit = 1
         setTimeout(() => { // History.sync()が終わっていない時があるので

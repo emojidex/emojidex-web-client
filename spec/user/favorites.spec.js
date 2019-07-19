@@ -52,7 +52,7 @@ describe('EmojidexUserFavorites', () => {
       })
     )
 
-    if (typeof premiumUserInfo !== 'undefined' && premiumUserInfo !== null) {
+    if (hasPremiumAccount()) {
       it('next/prev', done => {
         ECSpec.limit = 1
         setTimeout(() => { // Favorites.sync()が終わっていない時があるので
