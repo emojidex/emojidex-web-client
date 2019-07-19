@@ -25,7 +25,7 @@ export default class EmojidexSearch {
 
     // process for nothing search string, exclude advanced function
     if (!searchString) {
-      return onFalsyProcess()
+      return onFalsyProcess(callback)
     }
 
     const param = {

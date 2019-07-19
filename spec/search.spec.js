@@ -29,8 +29,8 @@ describe('EmojidexSearch', () => {
   )
 
   it('tags', done =>
-    ECSpec.Search.tags('', emojiData => {
-      expect(emojiData).toBeTruthy()
+    ECSpec.Search.tags('GAKUEngine', emojiData => {
+      expect(emojiData).toBeTruthy(jasmine.objectContaining(gakuEngine))
       done()
     })
   )

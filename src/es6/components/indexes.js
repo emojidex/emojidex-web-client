@@ -33,13 +33,11 @@ export default class EmojidexIndexes {
 
     _extend(param, opts)
 
-    if (func) {
-      this.indexedFunc = func
-      this.indexed = {
-        query,
-        callback,
-        param
-      }
+    this.indexedFunc = func
+    this.indexed = {
+      query,
+      callback,
+      param
     }
 
     return axios.get(`${this.EC.apiUrl}${query}`, {
