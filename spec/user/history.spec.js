@@ -25,7 +25,7 @@ describe('EmojidexUserHistory', () => {
     })
   )
   
-  // NOTE: 現在のAPIで、setはできているけどレスポンスが返ってこない状態
+  // NOTE: 現在のemojidex.comのAPIで、setはできているけどレスポンスが返ってこない状態
   // it('set', done => {
   //   ECSpec.User.History.set('heart').then(response => {
   //     expect(response.emoji_code).toEqual('heart')

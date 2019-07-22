@@ -16,7 +16,7 @@ describe('EmojidexUserFavorites', () => {
     })
   )
   
-  // NOTE: 現在のAPIで、setはできているけどunsetが機能してない
+  // NOTE: 現在のemojidex.comのAPIで、setはできているけどunsetが機能してない
   // it('set', done => {
   //   ECSpec.User.Favorites.set('emoji').then(response => {
   //     const codes = response.favorites.map(emoji => { return emoji.code })
