@@ -7,9 +7,27 @@ export default class EmojidexSearch {
     this.results = []
     this.curPage = 1
     this.count = 0
+    this.maxPage = 0
   }
 
-  _searchAPI(searchData, callback, opts, callFunc) {
+  _searchAPI(searchString, callback, opts, callFunc) {
+    const onFalsyProcess = callback => {
+      this.results = []
+      this.curPage = 0
+      this.count = 0
+      this.maxPage = 0
+      if (typeof callback === 'function') {
+        callback([])
+      } else {
+        return []
+      }
+    }
+
+    // process for nothing search string, exclude advanced function
+    if (!searchString) {
+      return onFalsyProcess(callback)
+    }
+
     const param = {
       page: 1,
       limit: this.EC.limit,
@@ -24,7 +42,7 @@ export default class EmojidexSearch {
     // TODO: @searchedFunc = unless @EC.closedNet then func.remote else callFunc.local
     this.searchedFunc = callFunc.remote
     this.searched = {
-      data: searchData,
+      data: searchString,
       callback,
       param
     }
@@ -37,6 +55,11 @@ export default class EmojidexSearch {
         this.results = response.data.emoji
         this.curPage = response.data.meta.page
         this.count = response.data.meta.count
+        this.maxPage = Math.floor(this.meta.total_count / this.searched.param.limit) // eslint-disable-line camelcase
+        if (this.meta.total_count % this.searched.param.limit > 0) { // eslint-disable-line camelcase
+          this.maxPage++
+        }
+
         this.EC.Emoji.combine(response.data.emoji)
         if (typeof callback === 'function') {
           callback(response.data.emoji)
@@ -44,25 +67,11 @@ export default class EmojidexSearch {
           return response.data
         }
       } else {
-        this.results = []
-        this.curPage = 0
-        this.count = 0
-        if (typeof callback === 'function') {
-          callback([])
-        } else {
-          return []
-        }
+        return onFalsyProcess(callback)
       }
     }).catch(error => {
-      this.results = []
-      this.curPage = 0
-      this.count = 0
-      if (typeof callback === 'function') {
-        callback([])
-      } else {
-        console.error(error)
-        return []
-      }
+      console.error(error)
+      return onFalsyProcess(callback)
     })
   }
 
@@ -144,18 +153,16 @@ export default class EmojidexSearch {
   }
 
   next() {
-    if (this.count === this.searched.param.limit) {
+    if (this.maxPage > this.curPage) {
       this.searched.param.page++
+      return this.searchedFunc(this.searched.data, this.searched.callback, this.searched.param)
     }
-
-    return this.searchedFunc(this.searched.data, this.searched.callback, this.searched.param)
   }
 
   prev() {
     if (this.searched.param.page > 1) {
       this.searched.param.page--
+      return this.searchedFunc(this.searched.data, this.searched.callback, this.searched.param)
     }
-
-    return this.searchedFunc(this.searched.data, this.searched.callback, this.searched.param)
   }
 }

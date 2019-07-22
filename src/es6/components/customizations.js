@@ -9,6 +9,16 @@ export default class EmojidexCustomizations {
   }
 
   _customizationsAPI(callback, opts, calledFunc) {
+    const onFalsyProcess = callback => {
+      this.results = []
+      this.curPage = 0
+      if (typeof callback === 'function') {
+        callback([])
+      } else {
+        return []
+      }
+    }
+
     const param = {
       page: 1,
       limit: this.EC.limit,
@@ -29,30 +39,22 @@ export default class EmojidexCustomizations {
         this.meta = response.data.meta
         this.results = response.data.emoji
         this.curPage = response.data.meta.page
-        this.maxPage = Math.ceil(response.data.meta.total_count / this.EC.limit)
+        this.maxPage = Math.ceil(this.meta.total_count / this.customized.param.limit)
+        if (this.meta.total_count % this.customized.param.limit > 0) { // eslint-disable-line camelcase
+          this.maxPage++
+        }
+
         if (typeof callback === 'function') {
           callback(response.data.emoji)
         } else {
           return response.data
         }
       } else {
-        this.results = []
-        this.curPage = 0
-        if (typeof callback === 'function') {
-          callback([])
-        } else {
-          return []
-        }
+        return onFalsyProcess(callback)
       }
     }).catch(error => {
-      this.results = []
-      this.curPage = 0
-      if (typeof callback === 'function') {
-        callback([])
-      } else {
-        console.error(error)
-        return []
-      }
+      console.error(error)
+      return onFalsyProcess(callback)
     })
   }
 

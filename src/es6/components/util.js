@@ -22,16 +22,16 @@ export default class EmojidexUtil {
 
   // Escapes spaces to underscore
   escapeTerm(term) {
-    return term.replace(/\s/g, '_')
+    return term ? term.replace(/\s/g, '_') : ''
   }
 
   // De-Escapes underscores to spaces
   deEscapeTerm(term) {
-    return term.replace(/_/g, ' ')
+    return term ? term.replace(/_/g, ' ') : ''
   }
 
   makeURLSafe(term) {
-    return this.escapeTerm(term).replace(/\(/g, '%28').replace(/\)/g, '%29')
+    return term ? this.escapeTerm(term).replace(/\(/g, '%28').replace(/\)/g, '%29') : ''
   }
 
   // Adds colons around a code
@@ -41,7 +41,7 @@ export default class EmojidexUtil {
 
   // Removes colons around a code
   unEncapsulateCode(code) {
-    return code.replace(/:/g, '')
+    return code ? code.replace(/:/g, '') : ''
   }
 
   // Breakout into an array
@@ -254,7 +254,7 @@ export default class EmojidexUtil {
 
       for (const target of targets) {
         const snip = `${target}`
-        this.EC.Search.find(this.EC.Util.unEncapsulateCode(snip)).then(result => {
+        this.EC.Search.find(this.unEncapsulateCode(snip)).then(result => {
           if (Object.prototype.hasOwnProperty.call(result, 'code')) {
             replacements.push({ pre: snip, post: processor(result) })
           }

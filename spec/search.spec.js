@@ -29,8 +29,8 @@ describe('EmojidexSearch', () => {
   )
 
   it('tags', done =>
-    ECSpec.Search.tags('', emojiData => {
-      expect(emojiData).toBeTruthy()
+    ECSpec.Search.tags('GAKUEngine', emojiData => {
+      expect(emojiData).toBeTruthy(jasmine.objectContaining(gakuEngine))
       done()
     })
   )
@@ -45,6 +45,12 @@ describe('EmojidexSearch', () => {
   it('advanced: categories', done =>
     ECSpec.Search.advanced({ term: 'kiss', categories: ['objects'] }, emojiData => {
       expect(emojiData).toContain(jasmine.objectContaining(emojiKiss))
+      done()
+    })
+  )
+  it('advanced: tags', done =>
+    ECSpec.Search.advanced({ tags: ['GAKUEngine'] }, emojiData => {
+      expect(emojiData).toContain(jasmine.objectContaining(gakuEngine))
       done()
     })
   )
@@ -101,11 +107,4 @@ describe('EmojidexSearch', () => {
     })
   })
 })
-
-// it 'advanced: tags', (done) ->
-//   ECSpec.Search.advanced '', ["Star Trek"], [], (emojiData) ->
-//     console.dir emojiData
-//     expect(emojiData).toContain(jasmine.objectContaining emojiKiss)
-//     done()
-
 /* eslint-enable no-undef */

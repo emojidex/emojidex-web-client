@@ -75,7 +75,7 @@ describe('EmojidexIndexes', () => {
       })
     })
 
-    if (typeof premiumUserInfo !== 'undefined' && premiumUserInfo !== null) {
+    if (hasPremiumAccount()) {
       it('gets newest index', done =>
         ECSpec.Indexes.newest(emojiData => {
           expect(emojiData.length).toBeTruthy()

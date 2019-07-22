@@ -31,6 +31,10 @@ export default class EmojidexUser {
   // 4. {authtype: 'session'} return auth_info in localstorage.
   // * if no hash is given auto login is attempted
   login(params) {
+    if (!params) {
+      return this._autoLogin()
+    }
+
     switch (params.authtype) {
       case 'plain':
         return this.plainAuth(params.username, params.password, params.callback)

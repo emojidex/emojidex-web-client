@@ -24,6 +24,14 @@ describe('EmojidexUserHistory', () => {
       done()
     })
   )
+  
+  // NOTE: 現在のemojidex.comのAPIで、setはできているけどレスポンスが返ってこない状態
+  // it('set', done => {
+  //   ECSpec.User.History.set('heart').then(response => {
+  //     expect(response.emoji_code).toEqual('heart')
+  //     done()
+  //   })
+  // })
 
   it('all', done => {
     setTimeout(() => { // History.sync()が終わっていない時があるので
@@ -42,7 +50,7 @@ describe('EmojidexUserHistory', () => {
       })
     )
 
-    if (typeof premiumUserInfo !== 'undefined' && premiumUserInfo !== null) {
+    if (hasPremiumAccount()) {
       it('next/prev', done => {
         ECSpec.limit = 1
         setTimeout(() => { // History.sync()が終わっていない時があるので

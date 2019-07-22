@@ -21,7 +21,7 @@ describe('EmojidexUser', () => {
     )
 
     describe('[Require user info]', () => {
-      if (typeof userInfo !== 'undefined' && userInfo !== null) {
+      if (hasUserAccount()) {
         it('logs in by plain authentication (username, password)', done =>
           ECSpec.User.login({
             authtype: 'plain', username: userInfo.auth_user, password: userInfo.password, callback(authInfo) {
@@ -41,6 +41,57 @@ describe('EmojidexUser', () => {
         )
       }
     })
+    
+    it('logs in by session', done => {
+      ECSpec.User.login({
+        authtype: 'token',
+        username: testUserInfo.auth_user,
+        auth_token: testUserInfo.auth_token
+      }).then(() => {
+        return ECSpec.User.login({ authtype: 'session' })
+      }).then(authInfo => {
+        expect(authInfo.status).toEqual('verified')
+        done()
+      })
+    })
+    
+    it('logs in by auto', done => {
+      ECSpec.User.login({
+        authtype: 'token',
+        username: testUserInfo.auth_user,
+        auth_token: testUserInfo.auth_token
+      }).then(() => {
+        return ECSpec.User.login()
+      }).then(() => {
+        expect(ECSpec.User.authInfo.status).toEqual('verified')
+        done()
+      })
+    })
+    
+    it('logs out', done => {
+      ECSpec.User.login({
+        authtype: 'token',
+        username: testUserInfo.auth_user,
+        auth_token: testUserInfo.auth_token
+      }).then(() => {
+        return ECSpec.User.logout()
+      }).then(() => {
+        expect(ECSpec.User.authInfo.status).toEqual('none')
+        done()
+      })
+    })
+    
+    it('failure', done => {
+      ECSpec.User.login({
+        authtype: 'token',
+        username: 'aaa',
+        auth_token: 'aaa'
+      }).then(response => {
+        expect(response.errorInfo.status).toEqual(401)
+        expect(response.errorInfo.statusText).toEqual('Unauthorized')
+        done()
+      })
+    })
   })
 
   describe('User Details', () => {
@@ -52,7 +103,7 @@ describe('EmojidexUser', () => {
     })
 
     describe('[Require premium user info] User Details', () => {
-      if (typeof premiumUserInfo !== 'undefined' && premiumUserInfo !== null) {
+      if (hasPremiumAccount()) {
         it('has r18, pro, premium, etc.', done =>
           ECSpec.User.login({
             authtype: 'token',

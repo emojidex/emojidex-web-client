@@ -38,7 +38,7 @@ describe('EmojidexUserFollow', () => {
       })
     )
 
-    if (typeof premiumUserInfo !== 'undefined' && premiumUserInfo !== null) {
+    if (hasPremiumAccount()) {
       it('get followers', done => {
         ECSpec.User.Follow.getFollowers(followers => {
           expect(followers).toEqual(jasmine.any(Array))
