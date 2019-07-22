@@ -23,7 +23,6 @@ export default class EmojidexUtil {
   // Escapes spaces to underscore
   escapeTerm(term) {
     return term ? term.replace(/\s/g, '_') : ''
-    // return term.replace(/\s/g, '_')
   }
 
   // De-Escapes underscores to spaces
