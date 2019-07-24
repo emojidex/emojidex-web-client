@@ -7,39 +7,34 @@ describe('EmojidexUserHistory', () => {
     })
   )
 
-  it('get', done =>
-    ECSpec.User.History.get(history => {
-      expect(history.length).toBeTruthy()
-      expect(history[0].code).toBeTruthy()
-      expect(history[0].times_used).toBeTruthy()
-      done()
-    })
-  )
+  it('get', async done => {
+    const history = await ECSpec.User.History.get()
+    expect(history.length).toBeTruthy()
+    expect(history[0].code).toBeTruthy()
+    expect(history[0].times_used).toBeTruthy()
+    done()
+  })
 
-  it('get (history info only)', done =>
-    ECSpec.User.History.getHistoryInfoOnly(history => {
-      expect(history.length).toBeTruthy()
-      expect(history[0].code).toBeFalsy()
-      expect(history[0].times_used).toBeTruthy()
-      done()
-    })
-  )
+  it('get (history info only)', async done => {
+    const history = await ECSpec.User.History.getHistoryInfoOnly()
+    expect(history.length).toBeTruthy()
+    expect(history[0].code).toBeFalsy()
+    expect(history[0].times_used).toBeTruthy()
+    done()
+  })
   
   // NOTE: 現在のemojidex.comのAPIで、setはできているけどレスポンスが返ってこない状態
-  // it('set', done => {
-  //   ECSpec.User.History.set('heart').then(response => {
-  //     expect(response.emoji_code).toEqual('heart')
-  //     done()
-  //   })
+  // it('set', async done => {
+  //   const response = await ECSpec.User.History.set('heart')
+  //   expect(response.emoji_code).toEqual('heart')
+  //   done()
   // })
 
-  it('all', done => {
-    setTimeout(() => { // History.sync()が終わっていない時があるので
-      ECSpec.User.History.all(history => {
-        expect(history.length).toBeTruthy()
-        done()
-      })
-    }, 2000)
+  it('all', async done => {
+    await specTimer(2000) // History.sync()が終わっていない時があるので
+    const history = await ECSpec.User.History.all()
+    expect(history.length).toBeTruthy()
+    done()
   })
 
   describe('History pages [require premium user]', () => {
@@ -51,16 +46,13 @@ describe('EmojidexUserHistory', () => {
     )
 
     if (hasPremiumAccount()) {
-      it('next/prev', done => {
-        setTimeout(() => { // History.sync()が終わっていない時があるので
-          ECSpec.User.History.next(() => {
-            expect(ECSpec.User.History.curPage).toEqual(2)
-            ECSpec.User.History.prev(() => {
-              expect(ECSpec.User.History.curPage).toEqual(1)
-              done()
-            })
-          })
-        }, 2000)
+      it('next/prev', async done => {
+        await specTimer(2000) // History.sync()が終わっていない時があるので
+        await ECSpec.User.History.next()
+        expect(ECSpec.User.History.curPage).toEqual(2)
+        await ECSpec.User.History.prev()
+        expect(ECSpec.User.History.curPage).toEqual(1)
+        done()
       })
     }
   })

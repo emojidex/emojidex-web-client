@@ -118,66 +118,47 @@ export default class EmojidexData {
     return undefined
   }
 
-  favorites(favoritesSet) {
+  async favorites(favoritesSet) {
     if (favoritesSet) {
-      if (this.storage.hubCache.emojidex.favorites &&
-          this.storage.hubCache.emojidex.favorites.length > 0) {
-        const hubEmoji = this.storage.hubCache.emojidex.favorites
-        for (let i = 0; i < favoritesSet.length; i++) {
-          const newEmoji = favoritesSet[i]
-          for (let j = 0; j < hubEmoji.length; j++) {
-            const emoji = hubEmoji[j]
-            if (newEmoji.code === emoji.code) {
-              hubEmoji.splice(hubEmoji.indexOf(emoji), 1, newEmoji)
-              break
-            } else if (emoji === hubEmoji[hubEmoji.length - 1]) {
-              hubEmoji.push(newEmoji)
-            }
-          }
-        }
-
-        return this.storage.update('emojidex', { favorites: hubEmoji })
+      if (this.storage.hubCache.emojidex.favorites && this.storage.hubCache.emojidex.favorites.length > 0) {
+        const hubEmoji = this.createEmojisForUpdate(this.storage.hubCache.emojidex.favorites, favoritesSet)
+        await this.storage.update('emojidex', { favorites: hubEmoji })
+      } else {
+        await this.storage.update('emojidex', { favorites: favoritesSet })
       }
-
-      return this.storage.update('emojidex', { favorites: favoritesSet })
     }
 
-    if (this.storage.hubCache.emojidex.favorites) {
-      return new Promise(resolve => resolve(this.storage.hubCache.emojidex.favorites))
-    }
-
-    return new Promise(resolve => resolve([]))
+    return this.storage.hubCache.emojidex.favorites || []
   }
 
-  history(historySet) {
+  async history(historySet) {
     if (historySet) {
-      if (this.storage.hubCache.emojidex.history &&
-          this.storage.hubCache.emojidex.history.length > 0) {
-        const hubEmoji = this.storage.hubCache.emojidex.history
-        for (let i = 0; i < historySet.length; i++) {
-          const newEmoji = historySet[i]
-          for (let j = 0; j < hubEmoji.length; j++) {
-            const emoji = hubEmoji[j]
-            if (newEmoji.code === emoji.code) {
-              hubEmoji.splice(hubEmoji.indexOf(emoji), 1, newEmoji)
-              break
-            } else if (emoji === hubEmoji[hubEmoji.length - 1]) {
-              hubEmoji.push(newEmoji)
-            }
-          }
-        }
-
-        return this.storage.update('emojidex', { history: hubEmoji })
+      if (this.storage.hubCache.emojidex.history && this.storage.hubCache.emojidex.history.length > 0) {
+        const hubEmoji = this.createEmojisForUpdate(this.storage.hubCache.emojidex.history, historySet)
+        await this.storage.update('emojidex', { history: hubEmoji })
+      } else {
+        await this.storage.update('emojidex', { history: historySet })
       }
-
-      return this.storage.update('emojidex', { history: historySet })
     }
 
-    if (this.storage.hubCache.emojidex.history) {
-      return new Promise(resolve => resolve(this.storage.hubCache.emojidex.history))
+    return this.storage.hubCache.emojidex.history || []
+  }
+
+  createEmojisForUpdate(localEmojis, remoteEmojis) {
+    for (let i = 0; i < remoteEmojis.length; i++) {
+      const remoteEmoji = remoteEmojis[i]
+      for (let j = 0; j < localEmojis.length; j++) {
+        const localEmoji = localEmojis[j]
+        if (remoteEmoji.code === localEmoji.code) {
+          localEmojis[j] = remoteEmoji
+          break
+        } else if (localEmojis.length === j + 1) {
+          localEmojis.push(remoteEmoji)
+        }
+      }
     }
 
-    return new Promise(resolve => resolve([]))
+    return localEmojis
   }
 
   categories(categoriesSet) {
