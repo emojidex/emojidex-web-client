@@ -188,10 +188,11 @@ export default class EmojidexData {
     return this.storage.hubCache.emojidex.categories
   }
 
-  authInfo(authInfoSet) {
+  async authInfo(authInfoSet) {
     if (authInfoSet) {
       this.EC.User.authInfo = authInfoSet
-      return this.storage.update('emojidex', { auth_info: authInfoSet }) // eslint-disable-line camelcase
+      await this.storage.update('emojidex', { auth_info: authInfoSet }) // eslint-disable-line camelcase
+      return this.storage.hubCache.emojidex.auth_info
     }
 
     return this.storage.hubCache.emojidex.auth_info
