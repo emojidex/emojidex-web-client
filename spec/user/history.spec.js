@@ -52,7 +52,6 @@ describe('EmojidexUserHistory', () => {
 
     if (hasPremiumAccount()) {
       it('next/prev', done => {
-        ECSpec.limit = 1
         setTimeout(() => { // History.sync()が終わっていない時があるので
           ECSpec.User.History.next(() => {
             expect(ECSpec.User.History.curPage).toEqual(2)

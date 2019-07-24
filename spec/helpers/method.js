@@ -47,6 +47,7 @@ this.helperBefore = helperBefore
 const helperBeforeForPremiumUser = function (chainsData) {
   this.ECSpec = new EmojidexClient({
     storageHubPath: hubPath,
+    limit: 1,
     onReady: () => {
       this.ECSpec.User.login(premiumUserToken).then(() => {
         helperChains(chainsData)
