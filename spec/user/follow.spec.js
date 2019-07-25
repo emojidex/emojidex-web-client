@@ -7,27 +7,24 @@ describe('EmojidexUserFollow', () => {
     })
   )
 
-  it('get following', done => {
-    ECSpec.User.Follow.getFollowing(following => {
-      expect(following).toEqual(jasmine.any(Array))
-      done()
-    })
+  it('get following', async done => {
+    const following = await ECSpec.User.Follow.getFollowing()
+    expect(following).toEqual(jasmine.any(Array))
+    done()
   })
 
   // TODO: Delete API is not working
-  xit('add following', done => {
-    ECSpec.User.Follow.addFollowing('test', following => {
-      expect(following).toContain('test')
-      done()
-    })
+  xit('add following', async done => {
+    const following = await ECSpec.User.Follow.addFollowing('test')
+    expect(following).toContain('test')
+    done()
   })
 
   // TODO: 503 error
-  xit('delete following', done => {
-    ECSpec.User.Follow.deleteFollowing('test', following => {
-      expect(following).not.toContain('test')
-      done()
-    })
+  xit('delete following', async done => {
+    const following = await ECSpec.User.Follow.deleteFollowing('test')
+    expect(following).not.toContain('test')
+    done()
   })
 
   describe('Followers  [require premium user]', () => {
@@ -39,11 +36,10 @@ describe('EmojidexUserFollow', () => {
     )
 
     if (hasPremiumAccount()) {
-      it('get followers', done => {
-        ECSpec.User.Follow.getFollowers(followers => {
-          expect(followers).toEqual(jasmine.any(Array))
-          done()
-        })
+      it('get followers', async done => {
+        const followers = await ECSpec.User.Follow.getFollowers()
+        expect(followers).toEqual(jasmine.any(Array))
+        done()
       })
     }
   })

@@ -15,7 +15,7 @@ const helperChains = function (chainsData) {
 
 this.helperChains = helperChains
 
-const hasUserAccount = function () {
+const hasUserAccount = function () { // eslint-disable-line no-unused-vars
   return typeof userInfo !== 'undefined' && userInfo !== null
 }
 

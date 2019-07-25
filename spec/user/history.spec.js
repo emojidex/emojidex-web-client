@@ -22,13 +22,13 @@ describe('EmojidexUserHistory', () => {
     expect(history[0].times_used).toBeTruthy()
     done()
   })
-  
+
   // NOTE: 現在のemojidex.comのAPIで、setはできているけどレスポンスが返ってこない状態
-  // it('set', async done => {
-  //   const response = await ECSpec.User.History.set('heart')
-  //   expect(response.emoji_code).toEqual('heart')
-  //   done()
-  // })
+  xit('set', async done => {
+    const response = await ECSpec.User.History.set('heart')
+    expect(response.emoji_code).toEqual('heart')
+    done()
+  })
 
   it('all', async done => {
     await specTimer(2000) // History.sync()が終わっていない時があるので

@@ -41,12 +41,12 @@ describe('EmojidexUser', () => {
         })
       }
     })
-    
+
     it('logs in by session', async done => {
       await ECSpec.User.login({
         authtype: 'token',
         username: testUserInfo.auth_user,
-        auth_token: testUserInfo.auth_token
+        auth_token: testUserInfo.auth_token // eslint-disable-line camelcase
       })
       const authInfo = await ECSpec.User.login({ authtype: 'session' })
       expect(authInfo.status).toEqual('verified')
@@ -57,29 +57,29 @@ describe('EmojidexUser', () => {
       await ECSpec.User.login({
         authtype: 'token',
         username: testUserInfo.auth_user,
-        auth_token: testUserInfo.auth_token
+        auth_token: testUserInfo.auth_token // eslint-disable-line camelcase
       })
       const authInfo = await ECSpec.User.login()
-      expect(ECSpec.User.authInfo.status).toEqual('verified')
+      expect(authInfo.status).toEqual('verified')
       done()
     })
-    
+
     it('logs out', async done => {
       await ECSpec.User.login({
         authtype: 'token',
         username: testUserInfo.auth_user,
-        auth_token: testUserInfo.auth_token
+        auth_token: testUserInfo.auth_token // eslint-disable-line camelcase
       })
       const authInfo = await ECSpec.User.logout()
       expect(authInfo.status).toEqual('none')
       done()
     })
-    
+
     it('failure', async done => {
       const authInfo = await ECSpec.User.login({
         authtype: 'token',
         username: 'aaa',
-        auth_token: 'aaa'
+        auth_token: 'aaa' // eslint-disable-line camelcase
       })
       expect(authInfo.status).toEqual('unverified')
       done()

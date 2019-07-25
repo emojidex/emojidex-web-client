@@ -7,38 +7,37 @@ export default class EmojidexUserFollow {
     this.followers = []
   }
 
-  _followAPI(options) {
-    if (this.EC.User.authInfo.token === null || this.EC.User.authInfo.token === undefined) {
+  async _followAPI(options) {
+    if (!this.EC.User.authInfo.token) {
       return Promise.reject(new Error('Require auth token.'))
     }
 
-    return axios({
-      method: options.type,
-      url: options.url,
-      params: { auth_token: this.EC.User.authInfo.token } // eslint-disable-line camelcase
-    }).then(response => {
+    try {
+      const response = await axios({
+        method: options.type,
+        url: options.url,
+        params: { auth_token: this.EC.User.authInfo.token } // eslint-disable-line camelcase
+      })
       return response.data
-    }).catch(error => {
+    } catch (error) {
       return error.response
-    })
+    }
   }
 
-  getFollowing(callback) {
+  async getFollowing() {
     const options = { url: `${this.EC.apiUrl}users/following` }
-    return this._followAPI(options).then(response => {
+
+    try {
+      const response = await this._followAPI(options)
       this.following = response.following
-      if (typeof callback === 'function') {
-        callback(this.following)
-      } else {
-        return this.following
-      }
-    }).catch(error => {
+      return this.following
+    } catch (error) {
       console.error(error)
-    })
+    }
   }
 
-  addFollowing(username, callback) {
-    if (username === null || username === undefined) {
+  async addFollowing(username) {
+    if (!username) {
       return Promise.reject(new Error('Require username.'))
     }
 
@@ -47,23 +46,21 @@ export default class EmojidexUserFollow {
       type: 'POST',
       params: { username }
     }
-    return this._followAPI(options).then(response => {
-      if (response.username !== undefined && response.username !== null) {
+
+    try {
+      const response = await this._followAPI(options)
+      if (response.username) {
         this.following.push(response.username)
       }
 
-      if (typeof callback === 'function') {
-        callback(this.following)
-      } else {
-        return this.following
-      }
-    }).catch(error => {
+      return this.following
+    } catch (error) {
       console.error(error)
-    })
+    }
   }
 
-  deleteFollowing(username, callback) {
-    if (username === null || username === undefined) {
+  async deleteFollowing(username) {
+    if (!username) {
       return Promise.reject(new Error('Require username.'))
     }
 
@@ -72,44 +69,38 @@ export default class EmojidexUserFollow {
       type: 'DELETE',
       params: { username }
     }
-    return this._followAPI(options).then(response => {
-      if (response.username !== undefined && response.username !== null) {
+
+    try {
+      const response = await this._followAPI(options)
+      if (response.username) {
         this.following.splice(this.following.indexOf(response.username), 1)
       }
 
-      if (typeof callback === 'function') {
-        callback(this.following)
-      } else {
-        return this.following
-      }
-    }).catch(error => {
+      return this.following
+    } catch (error) {
       console.error(error)
-    })
+    }
   }
 
-  getFollowers(callback) {
-    if (!(this.EC.User.authInfo.pro || this.EC.User.authInfo.premium)) {
+  async getFollowers() {
+    if (!this.EC.User.isSubscriber()) {
       return Promise.reject(new Error('Premium or Pro accounts only'))
     }
 
     const options = { url: `${this.EC.apiUrl}users/followers` }
-    return this._followAPI(options).then(response => {
+    try {
+      const response = await this._followAPI(options)
       this.followers = response.followers
-      if (typeof callback === 'function') {
-        callback(this.followers)
-      } else {
-        return this.followers
-      }
-    }).catch(error => {
+      return this.followers
+    } catch (error) {
       console.error(error)
-    })
+    }
   }
 
-  sync() {
-    Promise.all(
-      this.EC.User.authInfo.premium || this.EC.User.authInfo.pro ? [this.getFollowing(), this.getFollowers()] : [this.getFollowing()]
-    ).then(() => {
-      return this
-    })
+  async sync() {
+    await Promise.all(
+      this.EC.User.isSubscriber() ? [this.getFollowing(), this.getFollowers()] : [this.getFollowing()]
+    )
+    return this
   }
 }
