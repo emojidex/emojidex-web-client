@@ -1,21 +1,19 @@
 /* eslint-disable no-undef */
 describe('EmojidexCategories', () => {
   beforeAll(done => {
-      helperChains({
-        functions: [clearStorage, helperBefore, getFacesEmoji],
-        end: done
-      })
-    }
-  )
+    helperChains({
+      functions: [clearStorage, helperBefore, getFacesEmoji],
+      end: done
+    })
+  })
 
   it('getEmoji', done => {
-      ECSpec.Categories.getEmoji('faces', (emojis, calledData) => {
-        expect(calledData.categoryName).toEqual('faces')
-        expect(emojis).toContain(jasmine.objectContaining(facesEmoji[0]))
-        done()
-      })
-    }
-  )
+    ECSpec.Categories.getEmoji('faces', (emojis, calledData) => {
+      expect(calledData.categoryName).toEqual('faces')
+      expect(emojis).toContain(jasmine.objectContaining(facesEmoji[0]))
+      done()
+    })
+  })
 
   it('next', done => {
     ECSpec.Categories.calledData.callback = function () {

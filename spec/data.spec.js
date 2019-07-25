@@ -50,7 +50,7 @@ describe('EmojidexData', () => {
       expect(ECSpec.Data.storage.isSet('emojidex')).toBe(true)
       done()
     })
-    
+
     it('clear', done => {
       ECSpec.Data.storage.clear().then(() => {
         return ECSpec.Data.storage.hub.get('emojidex')

@@ -12,21 +12,21 @@ describe('EmojidexUserFavorites', () => {
     expect(favorites).toContain(jasmine.objectContaining(emojiEmoji))
     done()
   })
-  
+
   // NOTE: 現在のemojidex.comのAPIで、setはできているけどunsetが機能してない
-  // it('set', async done => {
-  //   const response = await ECSpec.User.Favorites.set('emoji')
-  //   const codes = response.favorites.map(emoji => { return emoji.code })
-  //   expect(codes).toContain('emoji')
-  //   done()
-  // })
-  // 
-  // it('unset', async done => {
-  //   const response = await ECSpec.User.Favorites.unset('emoji')
-  //   const codes = response.map(emoji => { return emoji.code })
-  //   expect(codes).not.toContain('emoji')
-  //   done()
-  // })
+  xit('set', async done => {
+    const response = await ECSpec.User.Favorites.set('emoji')
+    const codes = response.favorites.map(emoji => emoji.code)
+    expect(codes).toContain('emoji')
+    done()
+  })
+
+  xit('unset', async done => {
+    const response = await ECSpec.User.Favorites.unset('emoji')
+    const codes = response.map(emoji => emoji.code)
+    expect(codes).not.toContain('emoji')
+    done()
+  })
 
   it('all', async done => {
     await specTimer(2000) // Favorites.sync()が終わっていない時があるので
