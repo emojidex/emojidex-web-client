@@ -124,4 +124,8 @@ export default class EmojidexUser {
       this.Follow.sync()
     ])
   }
+
+  isSubscriber() {
+    return this.authInfo.premium || this.authInfo.pro
+  }
 }
