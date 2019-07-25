@@ -8,23 +8,24 @@ export default class EmojidexUserFavorites {
     this.maxPage = undefined
   }
 
-  _favoritesAPI(options) {
-    if (this.EC.User.authInfo.token === null || this.EC.User.authInfo.token === undefined) {
+  async _favoritesAPI(options) {
+    if (!this.EC.User.authInfo.token) {
       return Promise.reject(new Error('Require auth token.'))
     }
 
-    return axios({
-      method: options.type,
-      url: `${this.EC.apiUrl}users/favorites`,
-      params: options.params
-    }).then(response => {
+    try {
+      const response = await axios({
+        method: options.type,
+        url: `${this.EC.apiUrl}users/favorites`,
+        params: options.params
+      })
       return response.data
-    }).catch(error => {
+    } catch (error) {
       return error.response
-    })
+    }
   }
 
-  get(callback, page = 1) {
+  async get(page = 1) {
     const options = {
       params: {
         page,
@@ -33,78 +34,73 @@ export default class EmojidexUserFavorites {
         auth_token: this.EC.User.authInfo.token // eslint-disable-line camelcase
       }
     }
-    return this._favoritesAPI(options).then(response => {
+
+    try {
+      const response = await this._favoritesAPI(options)
       this._favorites = response.emoji
       this.meta = response.meta
       this.curPage = response.meta.page
       this.maxPage = Math.ceil(response.meta.total_count / this.EC.limit)
-
       return this.EC.Data.favorites(this._favorites)
-    }).then(() => {
-      if (typeof callback === 'function') {
-        callback(this._favorites)
-      } else {
-        return this._favorites
-      }
-    }).catch(error => {
+    } catch (error) {
       console.error(error)
-    })
+    }
   }
 
-  set(emojiCode) {
+  async set(emojiCode) {
     const options = {
       type: 'POST',
       params: { auth_token: this.EC.User.authInfo.token, emoji_code: emojiCode } // eslint-disable-line camelcase
     }
-    return this._favoritesAPI(options).then(response => {
-      this._favorites.push(response)
-      return this.EC.Data.favorites(this._favorites)
-    }).catch(error => {
+
+    try {
+      const response = await this._favoritesAPI(options)
+      this._favorite = await this.EC.Data.favorites(response)
+      return this._favorite
+    } catch (error) {
       console.error(error)
-    })
+    }
   }
 
-  unset(emojiCode) {
+  async unset(emojiCode) {
     const options = {
       type: 'DELETE',
       params: { auth_token: this.EC.User.authInfo.token, emoji_code: emojiCode } // eslint-disable-line camelcase
     }
-    return this._favoritesAPI(options).then(() => {
+
+    try {
+      await this._favoritesAPI(options)
       return this.sync()
-    }).catch(error => {
+    } catch (error) {
       console.error(error)
-    })
+    }
   }
 
   sync() {
     return this.get() // persistant favorites currently require an account
   }
 
-  all(callback) {
-    return this.EC.Data.favorites().then(data => {
-      if (typeof callback === 'function') {
-        callback(data)
-      } else {
-        return data
-      }
-    }).catch(error => {
+  all() {
+    try {
+      return this.EC.Data.favorites()
+    } catch (error) {
       console.error(error)
-    })
+    }
   }
 
-  next(callback) {
+  next() {
     if (this.maxPage === this.curPage) {
       return
     }
 
-    return this.get(callback, this.curPage + 1)
+    return this.get(this.curPage + 1)
   }
 
-  prev(callback) {
+  prev() {
     if (this.curPage === 1) {
       return
     }
 
-    return this.get(callback, this.curPage - 1)
+    return this.get(this.curPage - 1)
   }
 }
