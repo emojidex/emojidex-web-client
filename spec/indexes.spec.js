@@ -28,12 +28,11 @@ describe('EmojidexIndexes', () => {
     })
   )
 
-  it('select', done =>
-    ECSpec.Indexes.select('kiss', emojiData => {
-      expect(emojiData.code).toEqual('kiss')
-      done()
-    })
-  )
+  it('select', async done => {
+    const emojiData = await ECSpec.Indexes.select('kiss')
+    expect(emojiData.code).toEqual('kiss')
+    done()
+  })
 
   it('next', done => {
     ECSpec.Indexes.indexed.callback = function () {

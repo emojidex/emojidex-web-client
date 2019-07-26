@@ -7,103 +7,88 @@ describe('EmojidexSearch', () => {
     })
   )
 
-  it('search', done =>
-    ECSpec.Search.search('kissing', emojiData => {
-      expect(emojiData).toContain(jasmine.objectContaining({ code: 'kissing', moji: '😗', unicode: '1f617', category: 'faces' }))
-      done()
-    })
-  )
+  it('search', async done => {
+    const emojiData = await ECSpec.Search.search('kissing')
+    expect(emojiData).toContain(jasmine.objectContaining(emojiKissing))
+    done()
+  })
 
-  it('starting', done =>
-    ECSpec.Search.starting('kissing', emojiData => {
-      expect(emojiData).toContain(jasmine.objectContaining(emojiKissing))
-      done()
-    })
-  )
+  it('starting', async done => {
+    const emojiData = await ECSpec.Search.starting('kissing')
+    expect(emojiData).toContain(jasmine.objectContaining(emojiKissing))
+    done()
+  })
 
-  it('ending', done =>
-    ECSpec.Search.ending('kiss', emojiData => {
-      expect(emojiData).toContain(jasmine.objectContaining(emojiKiss))
-      done()
-    })
-  )
+  it('ending', async done => {
+    const emojiData = await ECSpec.Search.ending('kiss')
+    expect(emojiData).toContain(jasmine.objectContaining(emojiKiss))
+    done()
+  })
 
-  it('tags', done =>
-    ECSpec.Search.tags('GAKUEngine', emojiData => {
-      expect(emojiData).toBeTruthy(jasmine.objectContaining(gakuEngine))
-      done()
-    })
-  )
+  it('tags', async done => {
+    const emojiData = await ECSpec.Search.tags('GAKUEngine')
+    expect(emojiData).toBeTruthy(jasmine.objectContaining(gakuEngine))
+    done()
+  })
 
-  it('advanced: term', done =>
-    ECSpec.Search.advanced({ term: 'kissing' }, emojiData => {
-      expect(emojiData).toContain(jasmine.objectContaining({ code: 'kissing', moji: '😗', unicode: '1f617', category: 'faces' }))
-      done()
-    })
-  )
+  it('advanced: term', async done => {
+    const emojiData = await ECSpec.Search.advanced({ term: 'kissing' })
+    expect(emojiData).toContain(jasmine.objectContaining(emojiKissing))
+    done()
+  })
 
-  it('advanced: categories', done =>
-    ECSpec.Search.advanced({ term: 'kiss', categories: ['objects'] }, emojiData => {
-      expect(emojiData).toContain(jasmine.objectContaining(emojiKiss))
-      done()
-    })
-  )
-  it('advanced: tags', done =>
-    ECSpec.Search.advanced({ tags: ['GAKUEngine'] }, emojiData => {
-      expect(emojiData).toContain(jasmine.objectContaining(gakuEngine))
-      done()
-    })
-  )
+  it('advanced: categories', async done => {
+    const emojiData = await ECSpec.Search.advanced({ term: 'kiss', categories: ['objects'] })
+    expect(emojiData).toContain(jasmine.objectContaining(emojiKiss))
+    done()
+  })
 
-  it('find: use cached emoji', done =>
-    ECSpec.Search.find('kiss', emojiData => {
-      expect(emojiData).toEqual(jasmine.objectContaining(emojiKiss))
-      done()
-    })
-  )
+  it('advanced: tags', async done => {
+    const emojiData = await ECSpec.Search.advanced({ tags: ['GAKUEngine'] })
+    expect(emojiData).toContain(jasmine.objectContaining(gakuEngine))
+    done()
+  })
 
-  it('find: use ajax', done =>
-    ECSpec.Search.find('dragon', emojiData => {
-      expect(emojiData).toEqual(jasmine.objectContaining(emojiDragon))
-      done()
-    })
-  )
+  it('find: use cached emoji', async done => {
+    const emojiData = await ECSpec.Search.find('kiss')
+    expect(emojiData).toEqual(jasmine.objectContaining(emojiKiss))
+    done()
+  })
 
-  it('find: use ajax and auto escaping', done =>
-    ECSpec.Search.find('thinking face(p)', emojiData => {
-      expect(emojiData).toEqual(jasmine.objectContaining(emojiThinkingFaceP))
-      done()
-    })
-  )
+  it('find: use ajax', async done => {
+    const emojiData = await ECSpec.Search.find('dragon')
+    expect(emojiData).toEqual(jasmine.objectContaining(emojiDragon))
+    done()
+  })
 
-  it('find: not found', done =>
-    ECSpec.Search.find('aaaaaaaa', response => {
-      expect(response.statusText).toEqual('Not Found')
-      done()
-    })
-  )
+  it('find: use ajax and auto escaping', async done => {
+    const emojiData = await ECSpec.Search.find('thinking face(p)')
+    expect(emojiData).toEqual(jasmine.objectContaining(emojiThinkingFaceP))
+    done()
+  })
+
+  it('find: not found', async done => {
+    const response = await ECSpec.Search.find('aaaaaaaa')
+    expect(response.statusText).toEqual('Not Found')
+    done()
+  })
 
   return describe('Search and page transition', () => {
-    beforeAll(done =>
-      ECSpec.Search.starting('a', () => done())
-    )
-
-    it('next', done => {
-      ECSpec.Search.searched.callback = function () {
-        expect(ECSpec.Search.curPage).toEqual(2)
-        done()
-      }
-
-      ECSpec.Search.next()
+    beforeAll(async done => {
+      await ECSpec.Search.starting('a')
+      done()
     })
 
-    it('prev', done => {
-      ECSpec.Search.searched.callback = function () {
-        expect(ECSpec.Search.curPage).toEqual(1)
-        done()
-      }
+    it('next', async done => {
+      await ECSpec.Search.next()
+      expect(ECSpec.Search.curPage).toEqual(2)
+      done()
+    })
 
-      ECSpec.Search.prev()
+    it('prev', async done => {
+      await ECSpec.Search.prev()
+      expect(ECSpec.Search.curPage).toEqual(1)
+      done()
     })
   })
 })

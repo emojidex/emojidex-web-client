@@ -32,37 +32,33 @@ describe('EmojidexUtil', () => {
     expect(emoji[0].imgUrl).toBe(`${ECSpec.cdnUrl}/${ECSpec.sizeCode}/${emoji[0].code}.png`)
   })
 
-  it('converts an emoji object into an HTML tag set', done =>
-    ECSpec.Search.find('red_car', emoji => {
-      expect(ECSpec.Util.emojiToHTML(emoji)).toBe(
-        '<img class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/red_car.png" emoji-code="red_car" emoji-moji="🚗" alt="red car" />')
-      done()
-    })
-  )
+  it('converts an emoji object into an HTML tag set', async done => {
+    const emoji = await ECSpec.Search.find('red_car')
+    expect(ECSpec.Util.emojiToHTML(emoji)).toBe(
+      '<img class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/red_car.png" emoji-code="red_car" emoji-moji="🚗" alt="red car" />')
+    done()
+  })
 
-  it('converts an emoji object into an HTML tag set with link', done =>
-    ECSpec.Search.find('emojidex', emoji => {
-      expect(ECSpec.Util.emojiToHTML(emoji)).toBe(
-        '<a href="https://www.emojidex.com" emoji-code="emojidex"><img class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/emojidex.png" emoji-code="emojidex" alt="emojidex" /></a>')
-      done()
-    })
-  )
+  it('converts an emoji object into an HTML tag set with link', async done => {
+    const emoji = await ECSpec.Search.find('emojidex')
+    expect(ECSpec.Util.emojiToHTML(emoji)).toBe(
+      '<a href="https://www.emojidex.com" emoji-code="emojidex"><img class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/emojidex.png" emoji-code="emojidex" alt="emojidex" /></a>')
+    done()
+  })
 
-  it('converts an emoji object into a Markdown snippet', done =>
-    ECSpec.Search.find('red_car', emoji => {
-      expect(ECSpec.Util.emojiToMD(emoji)).toBe(
-        '![🚗](https://cdn.emojidex.com/emoji/xhdpi/red_car.png "red car")')
-      done()
-    })
-  )
+  it('converts an emoji object into a Markdown snippet', async done => {
+    const emoji = await ECSpec.Search.find('red_car')
+    expect(ECSpec.Util.emojiToMD(emoji)).toBe(
+      '![🚗](https://cdn.emojidex.com/emoji/xhdpi/red_car.png "red car")')
+    done()
+  })
 
-  it('converts an emoji object into a Markdown snippet with link', done =>
-    ECSpec.Search.find('emojidex', emoji => {
-      expect(ECSpec.Util.emojiToMD(emoji)).toBe(
-        '[![emojidex](https://cdn.emojidex.com/emoji/xhdpi/emojidex.png "emojidex") ](https://www.emojidex.com)')
-      done()
-    })
-  )
+  it('converts an emoji object into a Markdown snippet with link', async done => {
+    const emoji = await ECSpec.Search.find('emojidex')
+    expect(ECSpec.Util.emojiToMD(emoji)).toBe(
+      '[![emojidex](https://cdn.emojidex.com/emoji/xhdpi/emojidex.png "emojidex") ](https://www.emojidex.com)')
+    done()
+  })
 
   it('converts text with emoji html in it to plain text with emoji short codes', () => {
     testText = 'Test text <img class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/red_car.png" ' +
