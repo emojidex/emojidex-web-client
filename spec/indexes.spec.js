@@ -2,69 +2,38 @@
 describe('EmojidexIndexes', () => {
   beforeAll(done =>
     helperChains({
-      functions: [clearStorage, helperBefore, getExtendedEmojiData],
+      functions: [clearStorage, helperBefore],
       end: done
     })
   )
 
-  it('user', done =>
-    ECSpec.Indexes.user('emojidex', emojiData => {
-      expect(emojiData).toContain(emojiEmojidex[0])
-      done()
-    })
-  )
-
-  it('index', done =>
-    ECSpec.Indexes.index(emojiData => {
-      expect(emojiData.length).toBeTruthy()
-      done()
-    })
-  )
-
-  it('static', done =>
-    ECSpec.Indexes.static(['utf_emoji', 'extended_emoji'], 'en', emojiData => {
-      expect(ECSpec.Emoji._emojiInstance).toEqual(jasmine.arrayContaining([emojiData[0], emojiData[emojiData.length - 1]]))
-      done()
-    })
-  )
-
-  it('select', async done => {
-    const emojiData = await ECSpec.Indexes.select('kiss')
-    expect(emojiData.code).toEqual('kiss')
+  it('index', async done => {
+    const emojiData = await ECSpec.Indexes.index()
+    expect(emojiData.length).toBeTruthy()
+    await ECSpec.Indexes.next()
+    expect(ECSpec.Indexes.curPage).toEqual(2)
+    await ECSpec.Indexes.prev()
+    expect(ECSpec.Indexes.curPage).toEqual(1)
     done()
   })
 
-  it('next', done => {
-    ECSpec.Indexes.indexed.callback = function () {
-      expect(ECSpec.Indexes.curPage).toEqual(2)
-      done()
-    }
-
-    ECSpec.Indexes.next()
+  it('static', async done => {
+    const emojiData = await ECSpec.Indexes.static(['utf_emoji', 'extended_emoji'], 'en')
+    expect(ECSpec.Emoji._emojiInstance).toEqual(jasmine.arrayContaining([emojiData[0], emojiData[emojiData.length - 1]]))
+    done()
   })
 
-  it('prev', done => {
-    ECSpec.Indexes.indexed.callback = function () {
-      expect(ECSpec.Indexes.curPage).toEqual(1)
-      done()
-    }
-
-    ECSpec.Indexes.prev()
+  it('can not get newest index because user is not premium', async done => {
+    const emojiData = await ECSpec.Indexes.newest()
+    expect(emojiData.length).toEqual(0)
+    done()
   })
 
-  it('can not get newest index because user is not premium', done =>
-    ECSpec.Indexes.newest(emojiData => {
-      expect(emojiData.length).toEqual(0)
-      done()
-    })
-  )
-
-  it('can not get popular index because user is not premium', done =>
-    ECSpec.Indexes.popular(emojiData => {
-      expect(emojiData.length).toEqual(0)
-      done()
-    })
-  )
+  it('can not get popular index because user is not premium', async done => {
+    const emojiData = await ECSpec.Indexes.popular()
+    expect(emojiData.length).toEqual(0)
+    done()
+  })
 
   describe('[Premium user only]', () => {
     beforeEach(done => {
@@ -75,19 +44,25 @@ describe('EmojidexIndexes', () => {
     })
 
     if (hasPremiumAccount()) {
-      it('gets newest index', done =>
-        ECSpec.Indexes.newest(emojiData => {
-          expect(emojiData.length).toBeTruthy()
-          done()
-        })
-      )
+      it('gets newest index', async done => {
+        const emojiData = await ECSpec.Indexes.newest()
+        expect(emojiData.length).toBeTruthy()
+        await ECSpec.Indexes.next()
+        expect(ECSpec.Indexes.curPage).toEqual(2)
+        await ECSpec.Indexes.prev()
+        expect(ECSpec.Indexes.curPage).toEqual(1)
+        done()
+      })
 
-      it('gets popular index', done =>
-        ECSpec.Indexes.popular(emojiData => {
-          expect(emojiData.length).toBeTruthy()
-          done()
-        })
-      )
+      it('gets popular index', async done => {
+        const emojiData = await ECSpec.Indexes.popular()
+        expect(emojiData.length).toBeTruthy()
+        await ECSpec.Indexes.next()
+        expect(ECSpec.Indexes.curPage).toEqual(2)
+        await ECSpec.Indexes.prev()
+        expect(ECSpec.Indexes.curPage).toEqual(1)
+        done()
+      })
     }
   })
 })

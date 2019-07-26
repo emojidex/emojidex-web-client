@@ -34,8 +34,8 @@ export default class EmojidexEmoji {
   }
 
   // Gets the full list of caetgories available
-  seed(callback) {
-    return this.EC.Indexes.static(['utf_emoji', 'extended_emoji'], null, callback)
+  seed() {
+    return this.EC.Indexes.static(['utf_emoji', 'extended_emoji'])
   }
 
   all() {
