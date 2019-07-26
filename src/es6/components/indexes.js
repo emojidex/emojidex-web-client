@@ -112,8 +112,8 @@ export default class EmojidexIndexes {
         loadStatic(`${this.EC.apiUrl + type}`))
   }
 
-  select(code, callback, opts) {
-    return this.EC.Search.find(code, callback, opts)
+  select(code, opts) {
+    return this.EC.Search.find(code, opts)
   }
 
   next() {
