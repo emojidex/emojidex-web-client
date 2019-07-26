@@ -14,6 +14,7 @@ import EmojidexEmoji from './components/emoji'
 import EmojidexIndexes from './components/indexes'
 import EmojidexSearch from './components/search'
 import EmojidexUser from './components/user'
+import EmojidexUserEmoji from './components/user/emoji'
 import EmojidexUtil from './components/util'
 import _extend from 'lodash/extend'
 
@@ -61,6 +62,7 @@ export default class EmojidexClient {
       this.Customizations = new EmojidexCustomizations(this)
       this.Util = new EmojidexUtil(this)
       this.User = new EmojidexUser(this)
+      this.UserEmoji = new EmojidexUserEmoji(this)
       this.Indexes = new EmojidexIndexes(this)
       this.Search = new EmojidexSearch(this)
       this.Emoji = new EmojidexEmoji(this)

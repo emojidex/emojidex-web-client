@@ -25,12 +25,11 @@ describe('EmojidexEmoji', () => {
     )
   })
 
-  it('seed', done =>
-    ECSpec.Emoji.seed(emojiData => {
-      expect(ECSpec.Emoji._emojiInstance).toEqual(jasmine.arrayContaining([emojiData[0], emojiData[emojiData.length - 1]]))
-      done()
-    })
-  )
+  it('seed', async done => {
+    const emojiData = await ECSpec.Emoji.seed()
+    expect(ECSpec.Emoji._emojiInstance).toEqual(jasmine.arrayContaining([emojiData[0], emojiData[emojiData.length - 1]]))
+    done()
+  })
 
   it('all', done => {
     expect(ECSpec.Emoji.all().length).toBeTruthy()
