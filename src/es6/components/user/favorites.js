@@ -43,7 +43,7 @@ export default class EmojidexUserFavorites {
       this.meta = response.meta
       this.curPage = response.meta.page
       this.maxPage = Math.ceil(response.meta.total_count / this.EC.limit)
-      if (this.meta.total_count % this.EC.limit > 0) { // eslint-disable-line camelcase
+      if (this.meta.total_count % this.EC.limit > 0) {
         this.maxPage++
       }
 
