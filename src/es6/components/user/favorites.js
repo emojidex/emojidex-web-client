@@ -3,7 +3,9 @@ import axios from 'axios'
 export default class EmojidexUserFavorites {
   constructor(EC) {
     this.EC = EC
-    this._favorites = this.EC.Data.favorites()
+    this.EC.Data.favorites().then(favorites => {
+      this._favorites = favorites
+    })
     this.curPage = 1
     this.maxPage = undefined
   }

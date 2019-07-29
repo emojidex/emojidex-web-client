@@ -7,44 +7,37 @@ describe('EmojidexCategories', () => {
     })
   })
 
-  it('getEmoji', done => {
-    ECSpec.Categories.getEmoji('faces', (emojis, calledData) => {
-      expect(calledData.categoryName).toEqual('faces')
-      expect(emojis).toContain(jasmine.objectContaining(facesEmoji[0]))
-      done()
-    })
+  it('getEmoji', async done => {
+    const emojis = await ECSpec.Categories.getEmoji('faces')
+    expect(ECSpec.Categories.calledData.categoryName).toEqual('faces')
+    expect(emojis).toContain(jasmine.objectContaining(facesEmoji[0]))
+    done()
   })
 
-  it('next', done => {
-    ECSpec.Categories.calledData.callback = function () {
-      expect(ECSpec.Categories.curPage).toEqual(2)
-      done()
-    }
-
-    ECSpec.Categories.next()
+  it('next', async done => {
+    await ECSpec.Categories.next()
+    expect(ECSpec.Categories.calledData.categoryName).toEqual('faces')
+    expect(ECSpec.Categories.curPage).toEqual(2)
+    done()
   })
 
-  it('prev', done => {
-    ECSpec.Categories.calledData.callback = function () {
-      expect(ECSpec.Categories.curPage).toEqual(1)
-      done()
-    }
-
-    ECSpec.Categories.prev()
+  it('prev', async done => {
+    await ECSpec.Categories.prev()
+    expect(ECSpec.Categories.calledData.categoryName).toEqual('faces')
+    expect(ECSpec.Categories.curPage).toEqual(1)
+    done()
   })
 
-  it('sync', done =>
-    ECSpec.Categories.sync(categories => {
-      expect(categories.length).toBeTruthy()
-      done()
-    })
-  )
+  it('sync', async done => {
+    const categories = await ECSpec.Categories.sync()
+    expect(categories.length).toBeTruthy()
+    done()
+  })
 
-  it('all', done =>
-    ECSpec.Categories.all(categories => {
-      expect(categories).toBeTruthy()
-      done()
-    })
-  )
+  it('all', async done => {
+    const categories = await ECSpec.Categories.all()
+    expect(categories).toBeTruthy()
+    done()
+  })
 })
 /* eslint-enable no-undef */

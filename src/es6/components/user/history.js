@@ -3,7 +3,9 @@ import axios from 'axios'
 export default class EmojidexUserHistory {
   constructor(EC) {
     this.EC = EC
-    this._history = this.EC.Data.history()
+    this.EC.Data.history().then(history => {
+      this._history = history
+    })
     this.curPage = 1
     this.maxPage = undefined
   }
