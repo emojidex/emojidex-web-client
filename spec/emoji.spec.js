@@ -8,21 +8,18 @@ describe('EmojidexEmoji', () => {
   )
 
   describe('check update', () => {
-    it('need update', done => {
-      setTimeout(() => { // userDataSyncが終わっていないことがあるため
-        ECSpec.Data.storage.update('emojidex.seedUpdated', new Date('1/1/2016').toString()).then(() => {
-          expect(ECSpec.Emoji.checkUpdate()).toBe(true)
-          done()
-        })
-      }, 1000)
+    it('need update', async done => {
+      await specTimer(1000) // userDataSyncが終わっていないことがあるため
+      await ECSpec.Data.storage.update('emojidex.seedUpdated', new Date('1/1/2016').toString())
+      expect(ECSpec.Emoji.checkUpdate()).toBe(true)
+      done()
     })
 
-    it('unnecessary update', done =>
-      ECSpec.Data.storage.update('emojidex.seedUpdated', new Date().toString()).then(() => {
-        expect(ECSpec.Emoji.checkUpdate()).toBe(false)
-        done()
-      })
-    )
+    it('unnecessary update', async done => {
+      await ECSpec.Data.storage.update('emojidex.seedUpdated', new Date().toString())
+      expect(ECSpec.Emoji.checkUpdate()).toBe(false)
+      done()
+    })
   })
 
   it('seed', async done => {
@@ -31,46 +28,53 @@ describe('EmojidexEmoji', () => {
     done()
   })
 
-  it('all', done => {
-    expect(ECSpec.Emoji.all().length).toBeTruthy()
+  it('all', async done => {
+    const emojiData = await ECSpec.Emoji.all()
+    expect(emojiData.length).toBeTruthy()
     done()
   })
 
-  it('search', done =>
-    ECSpec.Emoji.search('kissing', emojiData => {
-      expect(emojiData).toContain(jasmine.objectContaining({ code: 'kissing', moji: '😗', unicode: '1f617', category: 'faces' }))
-      done()
-    })
-  )
-
-  it('starting', done =>
-    ECSpec.Emoji.starting('kiss', emojiData => {
-      expect(emojiData).toContain(jasmine.objectContaining(emojiKiss))
-      done()
-    })
-  )
-
-  it('ending', done =>
-    ECSpec.Emoji.ending('kiss', emojiData => {
-      expect(emojiData).toContain(jasmine.objectContaining(emojiKiss))
-      done()
-    })
-  )
-
-  it('tags', () => expect(ECSpec.Emoji.tags('weapon').length).toBeTruthy())
-
-  it('categories', () => expect(ECSpec.Emoji.categories('cosmos').length).toBeTruthy())
-
-  it('advenced', () => {
-    const searchs = { categories: 'tools', tags: 'weapon', term: 'rifle' }
-    expect(ECSpec.Emoji.advanced(searchs).length).toBeTruthy()
+  it('search', async done => {
+    const emojiData = await ECSpec.Emoji.search('kissing')
+    expect(emojiData).toContain(jasmine.objectContaining(emojiKissing))
+    done()
   })
 
-  it('flush', done =>
-    ECSpec.Emoji.flush().then(() => {
-      expect(ECSpec.Emoji.all().length).toBe(0)
-      done()
-    })
-  )
+  it('starting', async done => {
+    const emojiData = await ECSpec.Emoji.starting('kiss')
+    expect(emojiData).toContain(jasmine.objectContaining(emojiKiss))
+    done()
+  })
+
+  it('ending', async done => {
+    const emojiData = await ECSpec.Emoji.ending('kiss')
+    expect(emojiData).toContain(jasmine.objectContaining(emojiKiss))
+    done()
+  })
+
+  it('tags', async done => {
+    const emojiData = await ECSpec.Emoji.tags('weapon')
+    expect(emojiData.length).toBeTruthy()
+    done()
+  })
+
+  it('categories', async done => {
+    const emojiData = await ECSpec.Emoji.categories('cosmos')
+    expect(emojiData.length).toBeTruthy()
+    done()
+  })
+
+  it('advenced', async done => {
+    const emojiData = await ECSpec.Emoji.advanced({ categories: 'tools', tags: 'weapon', term: 'rifle' })
+    expect(emojiData.length).toBeTruthy()
+    done()
+  })
+
+  it('flush', async done => {
+    await ECSpec.Emoji.flush()
+    const emojiData = await ECSpec.Emoji.all()
+    expect(emojiData.length).toBe(0)
+    done()
+  })
 })
 /* eslint-enable no-undef */
