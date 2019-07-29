@@ -3,7 +3,9 @@ import axios from 'axios'
 export default class EmojidexUserHistory {
   constructor(EC) {
     this.EC = EC
-    this._history = this.EC.Data.history()
+    this.EC.Data.history().then(history => {
+      this._history = history
+    })
     this.curPage = 1
     this.maxPage = undefined
   }
@@ -42,6 +44,10 @@ export default class EmojidexUserHistory {
       this.meta = response.meta
       this.curPage = response.meta.page
       this.maxPage = Math.ceil(response.meta.total_count / this.EC.limit)
+      if (this.meta.total_count % this.EC.limit > 0) {
+        this.maxPage++
+      }
+
       return this.EC.Data.history(this._history)
     } catch (error) {
       console.error(error)

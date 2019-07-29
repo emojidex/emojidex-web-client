@@ -4,15 +4,17 @@ import _extend from 'lodash/extend'
 export default class EmojidexCategories {
   constructor(EC) {
     this.EC = EC
-    this._categories = this.EC.Data.categories()
     this.local = this.EC.options.locale
-    return this.sync(null, this.locale).then(() => {
+    return this.EC.Data.categories().then(categories => {
+      this._categories = categories
+      return this.sync()
+    }).then(() => {
       this.EC.Categories = this
       return this.EC.Categories
     })
   }
 
-  _categoriesAPI(categoryName, callback, opts, calledFunc) {
+  async _categoryEmojiAPI(categoryName, opts) {
     const param = {
       page: 1,
       limit: this.EC.limit,
@@ -24,109 +26,73 @@ export default class EmojidexCategories {
 
     _extend(param, opts)
 
-    this.calledFunc = calledFunc
     this.calledData = {
       categoryName,
-      callback,
       param
     }
 
-    return axios.get(`${this.EC.apiUrl}emoji`, {
-      params: param
-    }).then(response => {
+    try {
+      const response = await axios.get(`${this.EC.apiUrl}emoji`, { params: param })
       this.meta = response.data.meta
       this.results = response.data.emoji
       this.curPage = response.data.meta.page
       this.count = response.data.meta.count
-      return this.EC.Emoji.combine(response.data.emoji).then(() => {
-        if (typeof callback === 'function') {
-          callback(response.data.emoji, {
-            categoryName,
-            callback,
-            param
-          })
-        } else {
-          return response.data
-        }
-      })
-    }).catch(error => {
+      this.maxPage = Math.floor(this.meta.total_count / this.calledData.param.limit)
+      if (this.meta.total_count % this.calledData.param.limit > 0) {
+        this.maxPage++
+      }
+
+      await this.EC.Emoji.combine(response.data.emoji)
+      return response.data.emoji
+    } catch (error) {
       console.error(error)
-    })
+    }
   }
 
-  getEmoji(categoryName, callback, opts) {
+  getEmoji(categoryName, opts) {
     const param = { category: categoryName }
     _extend(param, opts)
-    return this._categoriesAPI(categoryName, callback, param, this.getEmoji)
+    return this._categoryEmojiAPI(categoryName, param)
   }
 
   next() {
-    if (this.count === this.calledData.param.limit) {
-      this.calledData.param.page++
+    if (this.maxPage === this.curPage) {
+      return
     }
 
-    return this.calledFunc(this.calledData.categoryName, this.calledData.callback, this.calledData.param)
+    this.calledData.param.page++
+    return this.getEmoji(this.calledData.categoryName, this.calledData.param)
   }
 
   prev() {
-    if (this.calledData.param.page > 1) {
-      this.calledData.param.page--
+    if (this.curPage === 1) {
+      return
     }
 
-    return this.calledFunc(this.calledData.categoryName, this.calledData.callback, this.calledData.param)
+    this.calledData.param.page--
+    return this.getEmoji(this.calledData.categoryName, this.calledData.param)
   }
 
   // Gets the full list of caetgories available
-  sync(callback, locale = this.locale) {
-    if (typeof this._categories !== 'undefined' && typeof this._categories.length !== 'undefined' && this._categories.length !== 0) {
-      if (this.locale === locale) {
-        return new Promise(resolve => {
-          if (typeof callback === 'function') {
-            callback(this._categories)
-          }
-
-          return resolve(this._categories)
-        })
-      }
-
-      return this._getCategory(callback, locale)
+  sync(locale = this.locale || 'en') {
+    if (this._categories.length && this.locale === locale) {
+      return this._categories
     }
 
-    if (typeof locale === 'undefined' || locale === null) {
-      ({ locale } = this.EC)
-    }
-
-    return this._getCategory(callback, locale)
+    return this._getCategories(locale)
   }
 
-  _getCategory(callback, locale) {
-    return axios.get(`${this.EC.apiUrl}categories`, {
-      params: { locale }
-    }).then(response => {
+  async _getCategories(locale) {
+    try {
+      const response = await axios.get(`${this.EC.apiUrl}categories`, { params: { locale } })
       this._categories = response.data.categories
-      return this.EC.Data.categories(response.data.categories).then(() => {
-        if (typeof callback === 'function') {
-          callback(this._categories)
-        } else {
-          return this._categories
-        }
-      })
-    }).catch(error => {
+      return this.EC.Data.categories(response.data.categories)
+    } catch (error) {
       console.error(error)
-    })
+    }
   }
 
-  all(callback) {
-    if (this._categories) {
-      if (typeof callback === 'function') {
-        callback(this._categories)
-      } else {
-        return this._categories
-      }
-    } else {
-      return setTimeout((() => {
-        return this.all(callback)
-      }), 500)
-    }
+  all() {
+    return this._categories
   }
 }

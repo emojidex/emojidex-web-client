@@ -161,12 +161,12 @@ export default class EmojidexData {
     return localEmojis
   }
 
-  categories(categoriesSet) {
+  async categories(categoriesSet) {
     if (categoriesSet) {
-      return this.storage.update('emojidex', { categories: categoriesSet })
+      await this.storage.update('emojidex', { categories: categoriesSet })
     }
 
-    return this.storage.hubCache.emojidex.categories
+    return this.storage.hubCache.emojidex.categories || []
   }
 
   async authInfo(authInfoSet) {
