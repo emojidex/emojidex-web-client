@@ -40,7 +40,7 @@ export default class EmojidexCustomizations {
         this.results = response.data.emoji
         this.curPage = response.data.meta.page
         this.maxPage = Math.ceil(this.meta.total_count / this.customized.param.limit)
-        if (this.meta.total_count % this.customized.param.limit > 0) { // eslint-disable-line camelcase
+        if (this.meta.total_count % this.customized.param.limit > 0) {
           this.maxPage++
         }
 
