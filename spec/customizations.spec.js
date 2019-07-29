@@ -7,36 +7,29 @@ describe('EmojidexCustomizations', () => {
     })
   )
 
-  it('get', done =>
-    ECSpec.Customizations.get(customizationEmojis => {
-      expect(customizationEmojis.length).toBeTruthy()
-      const result = customizationEmojis.every(emoji => {
-        return emoji.customizations.length
-      })
-      expect(result).toBeTruthy()
-      done()
+  it('get', async done => {
+    const customizationEmojis = await ECSpec.Customizations.get()
+    expect(customizationEmojis.length).toBeTruthy()
+    const result = customizationEmojis.every(emoji => {
+      return emoji.customizations.length
     })
-  )
+    expect(result).toBeTruthy()
+    done()
+  })
 
   describe('Customizations pages', () => {
-    beforeAll(done => {
+    beforeAll(async done => {
       ECSpec.limit = 1
-      ECSpec.Customizations.get(() => done())
+      await ECSpec.Customizations.get()
+      done()
     })
 
-    it('next/prev', done => {
-      ECSpec.Customizations.customized.callback = () => {
-        expect(ECSpec.Customizations.curPage).toEqual(2)
-
-        ECSpec.Customizations.customized.callback = () => {
-          expect(ECSpec.Customizations.curPage).toEqual(1)
-          done()
-        }
-
-        ECSpec.Customizations.prev()
-      }
-
-      ECSpec.Customizations.next()
+    it('next/prev', async done => {
+      await ECSpec.Customizations.next()
+      expect(ECSpec.Customizations.curPage).toEqual(2)
+      await ECSpec.Customizations.prev()
+      expect(ECSpec.Customizations.curPage).toEqual(1)
+      done()
     })
   })
 })

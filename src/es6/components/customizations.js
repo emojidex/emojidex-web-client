@@ -8,15 +8,11 @@ export default class EmojidexCustomizations {
     this.curPage = 1
   }
 
-  _customizationsAPI(callback, opts, calledFunc) {
-    const onFalsyProcess = callback => {
+  async _customizationsAPI(opts) {
+    const onFalsyProcess = () => {
       this.results = []
       this.curPage = 0
-      if (typeof callback === 'function') {
-        callback([])
-      } else {
-        return []
-      }
+      return []
     }
 
     const param = {
@@ -25,56 +21,48 @@ export default class EmojidexCustomizations {
       detailed: this.EC.detailed
     }
     _extend(param, opts)
+    this.customizedParam = param
 
-    this.customizedFunc = calledFunc
-    this.customized = {
-      callback,
-      param
-    }
-
-    return axios.get(`${this.EC.apiUrl}emoji/customizations`, {
-      params: param
-    }).then(response => {
+    try {
+      const response = await axios.get(`${this.EC.apiUrl}emoji/customizations`, { params: param })
       if (response.data.emoji) {
         this.meta = response.data.meta
         this.results = response.data.emoji
         this.curPage = response.data.meta.page
-        this.maxPage = Math.ceil(this.meta.total_count / this.customized.param.limit)
-        if (this.meta.total_count % this.customized.param.limit > 0) {
+        this.maxPage = Math.ceil(this.meta.total_count / this.customizedParam.limit)
+        if (this.meta.total_count % this.customizedParam.limit > 0) {
           this.maxPage++
         }
 
-        if (typeof callback === 'function') {
-          callback(response.data.emoji)
-        } else {
-          return response.data
-        }
-      } else {
-        return onFalsyProcess(callback)
+        return response.data.emoji
       }
-    }).catch(error => {
+
+      return onFalsyProcess()
+    } catch (error) {
       console.error(error)
-      return onFalsyProcess(callback)
-    })
+      return onFalsyProcess()
+    }
   }
 
-  get(callback, opts) {
-    return this._customizationsAPI(callback, opts, this.get)
+  get(opts) {
+    return this._customizationsAPI(opts)
   }
 
   next() {
-    if (this.maxPage > this.curPage) {
-      this.customized.param.page++
+    if (this.maxPage === this.curPage) {
+      return
     }
 
-    return this.customizedFunc(this.customized.callback, this.customized.param)
+    this.customizedParam.page++
+    return this.get(this.customizedParam)
   }
 
   prev() {
-    if (this.curPage > 1) {
-      this.customized.param.page--
+    if (this.curPage === 1) {
+      return
     }
 
-    return this.customizedFunc(this.customized.callback, this.customized.param)
+    this.customizedParam.page--
+    return this.get(this.customizedParam)
   }
 }
