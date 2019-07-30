@@ -87,35 +87,17 @@ export default class EmojidexData {
     return true
   }
 
-  emoji(emojiSet) {
+  async emoji(emojiSet) {
     if (emojiSet) {
-      if (this.storage.hubCache.emojidex.emoji &&
-          this.storage.hubCache.emojidex.emoji.length > 0) {
-        const hubEmoji = this.storage.hubCache.emojidex.emoji
-        for (let i = 0; i < emojiSet.length; i++) {
-          const newEmoji = emojiSet[i]
-          for (let j = 0; j < hubEmoji.length; j++) {
-            const emoji = hubEmoji[j]
-            if (newEmoji.code === emoji.code) {
-              hubEmoji.splice(hubEmoji.indexOf(emoji), 1, newEmoji)
-              break
-            } else if (emoji === hubEmoji[hubEmoji.length - 1]) {
-              hubEmoji.push(newEmoji)
-            }
-          }
-        }
-
-        return this.storage.update('emojidex', { emoji: hubEmoji })
+      if (this.storage.hubCache.emojidex.emoji && this.storage.hubCache.emojidex.emoji.length > 0) {
+        const hubEmoji = this.createEmojisForUpdate(this.storage.hubCache.emojidex.emoji, emojiSet)
+        await this.storage.update('emojidex', { emoji: hubEmoji })
       }
 
-      return this.storage.update('emojidex', { emoji: emojiSet })
+      await this.storage.update('emojidex', { emoji: emojiSet })
     }
 
-    if (this.storage.hubCache.emojidex.emoji) {
-      return this.storage.hubCache.emojidex.emoji
-    }
-
-    return undefined
+    return this.storage.hubCache.emojidex.emoji || []
   }
 
   async favorites(favoritesSet) {
