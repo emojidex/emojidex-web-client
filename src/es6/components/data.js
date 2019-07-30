@@ -22,54 +22,51 @@ export default class EmojidexData {
       this.storage = new EmojidexDataStorage()
     }
 
-    return this.storage.hub.onReadyFrame().then(() => {
-      return this.storage.hub.onConnect()
-    }).then(() => {
-      return this.storage.hub.getKeys()
-    }).then(keys => {
-      if (keys.indexOf('emojidex') !== -1) {
-        return this.storage.updateCache('emojidex')
+    return this.initialize()
+  }
+
+  async initialize() {
+    try {
+      const keys = await this.storage.keys()
+      if (keys.indexOf('emojidex') === -1) {
+        /* eslint-disable camelcase */
+        await this.storage.update('emojidex', {
+          moji_codes: {
+            moji_string: '',
+            moji_array: [],
+            moji_index: {}
+          },
+          emoji: this.EC.options.emoji || [],
+          history: this.EC.options.history || [],
+          favorites: this.EC.options.favorites || [],
+          categories: this.EC.options.categories || [],
+          auth_info: this.EC.options.authInfo || this.defaultAuthInfo
+        })
+        /* eslint-enable camelcase */
+      } else {
+        await this.storage.updateCache('emojidex')
       }
 
-      /* eslint-disable camelcase */
-
-      return this.storage.update('emojidex', {
-        moji_codes: {
-          moji_string: '',
-          moji_array: [],
-          moji_index: {}
-        },
-        emoji: this.EC.options.emoji || [],
-        history: this.EC.options.history || [],
-        favorites: this.EC.options.favorites || [],
-        categories: this.EC.options.categories || [],
-        auth_info: this.EC.options.authInfo || this.defaultAuthInfo
-      })
-
-      /* eslint-enable camelcase */
-    }).then(() => {
       if (this._needUpdate()) {
-        return this._initMojiCodes()
+        await this._initMojiCodes()
       }
 
-      return this.storage.get('emojidex')
-    }).then(() => {
       this.mojiCodes = this.storage.get('emojidex.moji_codes')
       this.EC.Data = this
       return this.EC.Data
-    }).catch(error => {
+    } catch (error) {
       console.error(error)
-    })
+    }
   }
 
-  _initMojiCodes() {
-    return this.storage.update('emojidex.moji_codes_updated', new Date().toString()).then(() => {
-      return axios.get(`${this.EC.apiUrl}moji_codes?locale=${this.EC.locale}`)
-    }).then(response => {
+  async _initMojiCodes() {
+    try {
+      await this.storage.update('emojidex.moji_codes_updated', new Date().toString())
+      const response = await axios.get(`${this.EC.apiUrl}moji_codes?locale=${this.EC.locale}`)
       return this.storage.update('emojidex.moji_codes', response.data)
-    }).catch(error => {
+    } catch (error) {
       console.error(error)
-    })
+    }
   }
 
   _needUpdate() {
