@@ -93,35 +93,33 @@ describe('EmojidexUtil', () => {
     expect(ECSpec.Util.deEmojifyHTML(testText2)).toBe(expectedText)
   })
 
-  it('finds emoji character codes in text and converts them with the chosen drop-in converter', done => {
+  it('finds emoji character codes in text and converts them with the chosen drop-in converter', async done => {
     testText = 'I have a 🚗🚗. My favorite sushi is :(サーモン)すし:. :-) :::xxxxxxxx:.'
 
     expectedText = 'I have a *moji=🚗*red car===3*moji=🚗*red car===3. My favorite sushi is :(サーモン)すし:. :-) :::xxxxxxxx:.'
 
-    ECSpec.Util.emojifyMoji(testText, emoji => {
+    const processedText = await ECSpec.Util.emojifyMoji(testText, emoji => {
       return '*moji=🚗*' + emoji.code + '===3'
-    }).then(processedText => {
-      expect(processedText).toBe(expectedText)
-      done()
     })
+    expect(processedText).toBe(expectedText)
+    done()
   })
 
-  it('finds short codes in text and converts them with the chosen drop-in converter', done => {
+  it('finds short codes in text and converts them with the chosen drop-in converter', async done => {
     testText = 'I have a 🚗. My favorite sushi is :(サーモン)すし:. :-) :::xxxxxxxx:.' +
       ':two hearts::lemon::cupcake::椛::hamburger::86 taillight(left)::幻::幻(白)::bat:'
 
     expectedText = 'I have a 🚗. My favorite sushi is *(サーモン)すし*. :-) :::xxxxxxxx:.' +
       '*two hearts**lemon**cupcake**椛**hamburger**86 taillight(left)**幻**幻(白)**bat*'
 
-    ECSpec.Util.emojifyCodes(testText, emoji => {
+    const processedText = await ECSpec.Util.emojifyCodes(testText, emoji => {
       return '*' + emoji.code + '*'
-    }).then(processedText => {
-      expect(processedText).toBe(expectedText)
-      done()
     })
+    expect(processedText).toBe(expectedText)
+    done()
   })
 
-  it('converts plain text with emoji characters and short codes into text with emoji HTML tags', done => {
+  it('converts plain text with emoji characters and short codes into text with emoji HTML tags', async done => {
     testText = 'Test text 🚗テスト:emojidex:'
 
     expectedText = 'Test text <img class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/red_car.png" ' +
@@ -129,60 +127,74 @@ describe('EmojidexUtil', () => {
       'emoji-code="emojidex"><img class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/emojidex.png" ' +
       'emoji-code="emojidex" alt="emojidex" /></a>'
 
-    ECSpec.Util.emojifyToHTML(testText).then(processed => {
-      expect(processed).toBe(expectedText)
-      done()
-    })
+    const processed = await ECSpec.Util.emojifyToHTML(testText)
+    expect(processed).toBe(expectedText)
+    done()
   })
 
-  it('finds emoji text with only emoji characters and converts them with the chosen drop-in converter', done => {
+  it('finds emoji text with only emoji characters and converts them with the chosen drop-in converter', async done => {
     testText = 'I have a 🚗. :-) :::xxxxxxxx:.'
 
     expectedText = 'I have a *red car*. :-) :::xxxxxxxx:.'
 
-    ECSpec.Util.emojify(testText, emoji => {
+    const processedText = await ECSpec.Util.emojify(testText, emoji => {
       return '*' + emoji.code + '*'
-    }).then(processedText => {
-      expect(processedText).toBe(expectedText)
-      done()
     })
+    expect(processedText).toBe(expectedText)
+    done()
   })
 
-  it('finds short codes in text with only short codes and converts them with the chosen drop-in converter', done => {
+  it('finds short codes in text with only short codes and converts them with the chosen drop-in converter', async done => {
     testText = 'My favorite sushi is :(サーモン)すし:. :-) :::xxxxxxxx:.'
 
     expectedText = 'My favorite sushi is *(サーモン)すし*. :-) :::xxxxxxxx:.'
 
-    ECSpec.Util.emojify(testText, emoji => {
+    const processedText = await ECSpec.Util.emojify(testText, emoji => {
       return '*' + emoji.code + '*'
-    }).then(processedText => {
-      expect(processedText).toBe(expectedText)
-      done()
     })
+    expect(processedText).toBe(expectedText)
+    done()
   })
 
-  it('finds emoji and short codes in text and converts them with the chosen drop-in converter', done => {
+  it('finds emoji and short codes in text and converts them with the chosen drop-in converter', async done => {
     testText = 'I have a 🚗. My favorite sushi is :(サーモン)すし:. :-) :::xxxxxxxx:.'
 
     expectedText = 'I have a *red car*. My favorite sushi is *(サーモン)すし*. :-) :::xxxxxxxx:.'
 
-    ECSpec.Util.emojify(testText, emoji => {
+    const processedText = await ECSpec.Util.emojify(testText, emoji => {
       return '*' + emoji.code + '*'
-    }).then(processedText => {
-      expect(processedText).toBe(expectedText)
-      done()
     })
+    expect(processedText).toBe(expectedText)
+    done()
   })
 
-  it('replace utf emoji & ZWJ emoji & plain text to html tag', done => {
+  it('replace utf emoji & ZWJ emoji & plain text to html tag', async done => {
     testText = '🚗🚗aaa👨‍👩‍👦👨‍👩‍👧bbb🚗ccc👨🏻‍👨🏿‍👦🏼ddd👨‍👶‍👧eee'
 
     expectedText = '<img class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/red_car.png" emoji-code="red_car" emoji-moji="🚗" alt="red car" /><img class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/red_car.png" emoji-code="red_car" emoji-moji="🚗" alt="red car" />aaa<span class="zwj-emoji"><img class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/family/0/man.png" emoji-code="man" emoji-moji="👨" alt="man" /><img class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/family/1/woman.png" emoji-code="woman" emoji-moji="👩" alt="woman" /><img class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/family/2/boy.png" emoji-code="boy" emoji-moji="👦" alt="boy" /></span><span class="zwj-emoji"><img class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/family/0/man.png" emoji-code="man" emoji-moji="👨" alt="man" /><img class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/family/1/woman.png" emoji-code="woman" emoji-moji="👩" alt="woman" /><img class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/family/2/girl.png" emoji-code="girl" emoji-moji="👧" alt="girl" /></span>bbb<img class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/red_car.png" emoji-code="red_car" emoji-moji="🚗" alt="red car" />ccc<span class="zwj-emoji"><img class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/family/0/man(wh).png" emoji-code="man(wh)" emoji-moji="👨🏻" alt="man(wh)" /><img class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/family/1/man(bk).png" emoji-code="man(bk)" emoji-moji="👨🏿" alt="man(bk)" /><img class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/family/2/boy(p).png" emoji-code="boy(p)" emoji-moji="👦🏼" alt="boy(p)" /></span>ddd<span class="zwj-emoji"><img class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/family/0/man.png" emoji-code="man" emoji-moji="👨" alt="man" /><img class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/family/2/girl.png" emoji-code="girl" emoji-moji="👧" alt="girl" /><img class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/family/4/baby.png" emoji-code="baby" emoji-moji="👶" alt="baby" /></span>eee'
 
-    ECSpec.Util.emojifyToHTML(testText).then(processed => {
-      expect(processed).toBe(expectedText)
-      done()
-    })
+    const processed = await ECSpec.Util.emojifyToHTML(testText)
+    expect(processed).toBe(expectedText)
+    done()
+  })
+
+  it('if incorrect ZWJ combination, without sorting and do not output ZWJ span tag', async done => {
+    testText = '👨‍👶‍👶‍👶‍👶‍👨'
+
+    expectedText = '<img class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/man.png" emoji-code="man" emoji-moji="👨" alt="man" /><img class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/baby.png" emoji-code="baby" emoji-moji="👶" alt="baby" /><img class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/baby.png" emoji-code="baby" emoji-moji="👶" alt="baby" /><img class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/baby.png" emoji-code="baby" emoji-moji="👶" alt="baby" /><img class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/baby.png" emoji-code="baby" emoji-moji="👶" alt="baby" /><img class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/man.png" emoji-code="man" emoji-moji="👨" alt="man" />'
+
+    const processed = await ECSpec.Util.emojifyToHTML(testText)
+    expect(processed).toBe(expectedText)
+    done()
+  })
+
+  it('if not combination emoji with ZWJ, remove ZWJ', async done => {
+    testText = '🚗‍🚗'
+    expectedText = '<img class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/red_car.png" emoji-code="red_car" emoji-moji="🚗" alt="red car" /><img class="emojidex-emoji" src="https://cdn.emojidex.com/emoji/xhdpi/red_car.png" emoji-code="red_car" emoji-moji="🚗" alt="red car" />'
+
+    const processed = await ECSpec.Util.emojifyToHTML(testText)
+    expect(processed).toBe(expectedText)
+    done()
   })
 })
 /* eslint-enable no-undef */
