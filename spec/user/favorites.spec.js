@@ -1,11 +1,9 @@
 /* eslint-disable no-undef */
 describe('EmojidexUserFavorites', () => {
-  beforeEach(done =>
-    helperChains({
-      functions: [clearStorage, helperBefore],
-      end: done
-    })
-  )
+  beforeEach(async done => {
+    await helperChains([clearStorage, helperBefore])
+    done()
+  })
 
   it('get', async done => {
     const favorites = await ECSpec.User.Favorites.get()
@@ -36,12 +34,10 @@ describe('EmojidexUserFavorites', () => {
   })
 
   describe('Favorites pages [require premium user]', () => {
-    beforeEach(done =>
-      helperChains({
-        functions: [clearStorage, helperBeforeForPremiumUser],
-        end: done
-      })
-    )
+    beforeEach(async done => {
+      await helperChains([clearStorage, helperBeforeForPremiumUser])
+      done()
+    })
 
     if (hasPremiumAccount()) {
       it('next/prev', async done => {

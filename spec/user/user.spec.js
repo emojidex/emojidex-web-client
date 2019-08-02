@@ -1,11 +1,9 @@
 /* eslint-disable no-undef */
 describe('EmojidexUser', () => {
-  beforeEach(done =>
-    helperChains({
-      functions: [clearStorage, helperBefore],
-      end: done
-    })
-  )
+  beforeEach(async done => {
+    await helperChains([clearStorage, helperBefore])
+    done()
+  })
 
   describe('Login', () => {
     it('logs in by auth token', async done => {

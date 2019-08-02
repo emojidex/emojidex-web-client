@@ -1,11 +1,9 @@
 /* eslint-disable no-undef */
 describe('EmojidexEmoji', () => {
-  beforeAll(done =>
-    helperChains({
-      functions: [clearStorage, helperBefore],
-      end: done
-    })
-  )
+  beforeAll(async done => {
+    await helperChains([clearStorage, helperBefore])
+    done()
+  })
 
   describe('check update', () => {
     it('need update', async done => {

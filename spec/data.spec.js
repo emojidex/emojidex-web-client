@@ -1,11 +1,9 @@
 /* eslint-disable no-undef */
 describe('EmojidexData', () => {
-  beforeAll(done =>
-    helperChains({
-      functions: [clearStorage, helperBeforeForEmojidexData],
-      end: done
-    })
-  )
+  beforeAll(async done => {
+    await helperChains([clearStorage, helperBeforeForEmojidexData])
+    done()
+  })
 
   it('has the Data class defined', () => expect(ECSpec.Data).toBeDefined())
 

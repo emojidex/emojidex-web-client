@@ -1,11 +1,9 @@
 /* eslint-disable no-undef */
 describe('EmojidexUserHistory', () => {
-  beforeEach(done =>
-    helperChains({
-      functions: [clearStorage, helperBefore],
-      end: done
-    })
-  )
+  beforeEach(async done => {
+    await helperChains([clearStorage, helperBefore])
+    done()
+  })
 
   it('get', async done => {
     const history = await ECSpec.User.History.get()
@@ -38,12 +36,10 @@ describe('EmojidexUserHistory', () => {
   })
 
   describe('History pages [require premium user]', () => {
-    beforeEach(done =>
-      helperChains({
-        functions: [clearStorage, helperBeforeForPremiumUser],
-        end: done
-      })
-    )
+    beforeEach(async done => {
+      await helperChains([clearStorage, helperBeforeForPremiumUser])
+      done()
+    })
 
     if (hasPremiumAccount()) {
       it('next/prev', async done => {

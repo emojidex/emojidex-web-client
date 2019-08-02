@@ -1,11 +1,9 @@
 /* eslint-disable no-undef */
 describe('EmojidexIndexes', () => {
-  beforeAll(done =>
-    helperChains({
-      functions: [clearStorage, helperBefore],
-      end: done
-    })
-  )
+  beforeAll(async done => {
+    await helperChains([clearStorage, helperBefore])
+    done()
+  })
 
   it('index', async done => {
     const emojiData = await ECSpec.Indexes.index()
@@ -36,11 +34,9 @@ describe('EmojidexIndexes', () => {
   })
 
   describe('[Premium user only]', () => {
-    beforeEach(done => {
-      helperChains({
-        functions: [setPremiumUser],
-        end: done
-      })
+    beforeEach(async done => {
+      await setPremiumUser()
+      done()
     })
 
     if (hasPremiumAccount()) {

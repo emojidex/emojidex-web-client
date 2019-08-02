@@ -9,8 +9,7 @@ export default class EmojidexCategories {
       this._categories = categories
       return this.sync()
     }).then(() => {
-      this.EC.Categories = this
-      return this.EC.Categories
+      return this
     })
   }
 

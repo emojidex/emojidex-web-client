@@ -1,11 +1,9 @@
 /* eslint-disable no-undef */
 describe('EmojidexUserFollow', () => {
-  beforeEach(done =>
-    helperChains({
-      functions: [clearStorage, helperBefore],
-      end: done
-    })
-  )
+  beforeEach(async done => {
+    await helperChains([clearStorage, helperBefore])
+    done()
+  })
 
   it('get following', async done => {
     const following = await ECSpec.User.Follow.getFollowing()
@@ -28,12 +26,10 @@ describe('EmojidexUserFollow', () => {
   })
 
   describe('Followers  [require premium user]', () => {
-    beforeEach(done =>
-      helperChains({
-        functions: [clearStorage, helperBeforeForPremiumUser],
-        end: done
-      })
-    )
+    beforeEach(async done => {
+      await helperChains([clearStorage, helperBeforeForPremiumUser])
+      done()
+    })
 
     if (hasPremiumAccount()) {
       it('get followers', async done => {

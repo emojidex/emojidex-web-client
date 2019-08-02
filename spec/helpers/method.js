@@ -1,25 +1,22 @@
 /* eslint-disable no-undef */
+/* eslint-disable no-unused-vars */
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000
 
 this.ECSpec = null
 
 const hubPath = 'https://www.emojidex.com/hub/1.0.0'
-const helperChains = function (chainsData) {
-  if (chainsData.functions.length === 0) {
-    chainsData.end()
-  } else {
-    const chainFunction = chainsData.functions.shift()
-    chainFunction(chainsData)
+
+const helperChains = async chainsMethod => {
+  for (const method of chainsMethod) {
+    await method() // eslint-disable-line no-await-in-loop
   }
 }
 
-this.helperChains = helperChains
-
-const hasUserAccount = function () { // eslint-disable-line no-unused-vars
+const hasUserAccount = () => {
   return typeof userInfo !== 'undefined' && userInfo !== null
 }
 
-const hasPremiumAccount = function () {
+const hasPremiumAccount = () => {
   return typeof premiumUserInfo !== 'undefined' && premiumUserInfo !== null
 }
 
@@ -31,79 +28,45 @@ if (hasPremiumAccount()) {
 }
 /* eslint-enable camelcase */
 
-const helperBefore = function (chainsData) {
-  this.ECSpec = new EmojidexClient({
-    storageHubPath: hubPath,
-    onReady: EC => {
-      EC.User.login(testUserToken).then(() => {
-        helperChains(chainsData)
-      })
-    }
-  })
+const helperBefore = async () => {
+  this.ECSpec = await new EmojidexClient({ storageHubPath: hubPath })
+  await this.ECSpec.User.login(testUserToken)
 }
 
-this.helperBefore = helperBefore
-
-const helperBeforeForPremiumUser = function (chainsData) {
-  this.ECSpec = new EmojidexClient({
+const helperBeforeForPremiumUser = async () => {
+  this.ECSpec = await new EmojidexClient({
     storageHubPath: hubPath,
-    limit: 1,
-    onReady: () => {
-      this.ECSpec.User.login(premiumUserToken).then(() => {
-        helperChains(chainsData)
-      })
-    }
+    limit: 1
   })
+  await this.ECSpec.User.login(premiumUserToken)
 }
 
-this.helperBeforeForPremiumUser = helperBeforeForPremiumUser
-
-const clearStorage = function (chainsData) {
+const clearStorage = async () => {
   const CSC = new CrossStorageClient(hubPath, { frameId: 'emojidex-client-storage-hub' })
-  return CSC.onReadyFrame().then(() => {
-    return CSC.onConnect()
-  }).then(() => {
-    return CSC.clear()
-  }).then(() => {
-    helperChains(chainsData)
-  })
+  await CSC.onReadyFrame()
+  await CSC.onConnect()
+  await CSC.clear()
 }
 
-this.clearStorage = clearStorage
-
-const helperBeforeForEmojidexData = function (chainsData) {
-  this.ECSpec = new EmojidexClient({
-    storageHubPath: hubPath,
-    onReady: () => {
-      helperChains(chainsData)
-    }
-  })
+const helperBeforeForEmojidexData = async () => {
+  this.ECSpec = await new EmojidexClient({ storageHubPath: hubPath })
 }
 
-this.helperBeforeForEmojidexData = helperBeforeForEmojidexData
-
-/* eslint-disable no-unused-vars */
-const getExtendedEmojiData = chainsData =>
-  axios.get('https://www.emojidex.com/api/v1/extended_emoji').then(response => {
-    this.emojiEmojidex = response.data
-    helperChains(chainsData)
-  })
-
-const getFacesEmoji = chainsData =>
-  axios.get('https://www.emojidex.com/api/v1/emoji', {
-    params: { category: 'faces' }
-  }).then(response => {
-    this.facesEmoji = response.data.emoji
-    helperChains(chainsData)
-  })
-
-const setPremiumUser = function (chainsData) {
-  this.ECSpec.User.login(premiumUserToken).then(() => {
-    helperChains(chainsData)
-  })
+const getExtendedEmojiData = async () => {
+  const response = await axios.get('https://www.emojidex.com/api/v1/extended_emoji')
+  this.emojiEmojidex = response.data
 }
 
-const specTimer = function (time) {
+const getFacesEmoji = async () => {
+  const response = await axios.get('https://www.emojidex.com/api/v1/emoji', { params: { category: 'faces' } })
+  this.facesEmoji = response.data.emoji
+}
+
+const setPremiumUser = async () => {
+  await this.ECSpec.User.login(premiumUserToken)
+}
+
+const specTimer = time => {
   return new Promise(resolve => {
     setTimeout(resolve, time)
   })

@@ -1,11 +1,9 @@
 /* eslint-disable no-undef */
 describe('EmojidexCustomizations', () => {
-  beforeAll(done =>
-    helperChains({
-      functions: [clearStorage, helperBefore],
-      end: done
-    })
-  )
+  beforeAll(async done => {
+    await helperChains([clearStorage, helperBefore])
+    done()
+  })
 
   it('get', async done => {
     const customizationEmojis = await ECSpec.Customizations.get()
