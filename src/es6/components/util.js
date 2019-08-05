@@ -46,15 +46,11 @@ export default class EmojidexUtil {
 
   // Breakout into an array
   breakout(items) {
-    if (items) {
-      if (Array.isArray(items)) {
-        return items
-      }
-
-      return [items]
+    if (Array.isArray(items)) {
+      return items
     }
 
-    return []
+    return items ? [items] : []
   }
 
   // Converts an emoji array to [{code: "moji_code", imgUrl: "https://cdn...moji_code.png}] format
@@ -71,14 +67,13 @@ export default class EmojidexUtil {
   // format is retrurned by the method passed as the processor parameter.
   // An emoji object is passed to the processor and formatted text should be returned.
   // Default processor converts to HTML tags.
-  emojify(source, processor = this.emojiToHTML) {
-    return this.emojifyMoji(source, processor).then(processed => {
+  async emojify(source, processor = this.emojiToHTML) {
+    try {
+      const processed = await this.emojifyMoji(source, processor)
       return this.emojifyCodes(processed, processor)
-    }).then(processed => {
-      return processed
-    }).catch(error => {
+    } catch (error) {
       console.error(error)
-    })
+    }
   }
 
   splitTextWithAcknowledgedEmoji(sourceText) {
@@ -111,172 +106,148 @@ export default class EmojidexUtil {
   }
 
   // Convert UTF emoji using the specified processor
-  emojifyMoji(source, processor = this.emojiToHTML) {
+  async emojifyMoji(source, processor = this.emojiToHTML) {
     processor = processor.bind(this)
 
     const getMojicodes = mojis => {
-      return mojis.map(moji => {
-        return this.EC.Data.mojiCodes.moji_index[moji]
-      })
+      return mojis.map(moji => this.EC.Data.mojiCodes.moji_index[moji])
     }
 
-    const getJwzReplacingPromises = (checkComponents, matchedMojiCodes, processor, combination = null) => {
+    const getZwjReplacingPromises = (checkComponents, emojiCodes, processor, combination = null) => {
       const promises = []
       for (let i = 0; i < checkComponents.length; i++) {
-        if (checkComponents[i] || checkComponents.includes(false)) {
-          promises.push(new Promise((resolve, reject) => {
-            this.EC.Search.find(matchedMojiCodes.shift()).then(result => {
-              if (Object.prototype.hasOwnProperty.call(result, 'code')) {
-                if (processor === this.getZwjEmojiTag) {
-                  resolve(processor.call(this, result, combination.base, i))
-                } else {
-                  resolve(processor.call(this, result))
-                }
-              }
-            }).catch(error => {
-              reject(error)
-            })
-          }))
+        if (!checkComponents[i]) {
+          continue
         }
+
+        const task = async () => {
+          try {
+            const result = await this.EC.Search.find(emojiCodes.shift())
+            if (Object.prototype.hasOwnProperty.call(result, 'code')) {
+              return processor === this.getZwjEmojiTag ? processor.call(this, result, combination.base, i) : processor.call(this, result)
+            }
+
+            return ''
+          } catch (error) {
+            Promise.reject(error)
+          }
+        }
+
+        promises.push(task)
       }
 
       return promises
     }
 
-    return new Promise((resolveEmojify, rejectEmojify) => {
-      const splittedSources = this.splitTextWithAcknowledgedEmoji(source)
-      const replacingSources = splittedSources.map(target => {
-        return new Promise((resolveReplace, rejectReplace) => {
-          if (/\u200D/.test(target)) {
-            // for used ZWJ emoji
-            const matchedMojis = target.match(this.utfPatternGlobal)
-            const matchedMojiCodes = getMojicodes(matchedMojis)
+    const replacedUtfSource = async mojiCodes => {
+      const replaceUtfEmoji = async code => {
+        try {
+          const result = await this.EC.Search.find(code)
+          return Object.prototype.hasOwnProperty.call(result, 'code') ? processor(result) : code
+        } catch (error) {
+          Promise.reject(error)
+        }
+      }
 
-            this.EC.Search.find(this.EC.Data.mojiCodes.moji_index[matchedMojis[0]]).then(result => {
-              if (result.combinations.length) {
-                result.combinations.forEach(combination => {
-                  // check for registered ZWJ emoji on emojidex.com
-                  let checkComponents = combination.components
-                  const sortedMatchedMojiCodes = []
-                  checkComponents = checkComponents.map((component, i) => {
-                    if (matchedMojiCodes.length) {
-                      for (let j = 0; j < matchedMojiCodes.length; j++) {
-                        if (component.includes(matchedMojiCodes[j])) {
-                          sortedMatchedMojiCodes.push({ emojiCode: matchedMojiCodes[j], layerNum: combination.component_layer_order[i] })
-                          matchedMojiCodes[j] = false
-                          return true
-                        }
+      const replacedUtfEmojis = await Promise.all(mojiCodes.map(code => replaceUtfEmoji(code)))
+      return replacedUtfEmojis.join('')
+    }
 
-                        if (j === matchedMojiCodes.length - 1) {
-                          return component[component.length - 1] === '' ? null : false
-                        }
-                      }
-                    }
+    const replacedSource = async target => {
+      if (/\u200D/.test(target)) {
+        // for used ZWJ emoji
+        const matchedMojis = target.match(this.utfPatternGlobal)
+        const matchedMojiCodes = getMojicodes(matchedMojis)
 
-                    return null
-                  })
-
-                  let zwjReplacingPromises = null
-                  const emojiCodes = sortedMatchedMojiCodes.sort((a, b) => {
-                    return a.layerNum < b.layerNum ? -1 : 1
-                  }).map(o => {
-                    return o.emojiCode
-                  })
-                  if (checkComponents.includes(false)) {
-                    // for incorrect ZWJ emoji
-                    zwjReplacingPromises = getJwzReplacingPromises(checkComponents, emojiCodes, processor)
-                  } else {
-                    // for correct ZWJ emoji
-                    zwjReplacingPromises = getJwzReplacingPromises(checkComponents, emojiCodes, this.getZwjEmojiTag, combination)
-                  }
-
-                  Promise.all(zwjReplacingPromises).then(zwjReplacedStrings => {
-                    if (checkComponents.includes(false)) {
-                      resolveReplace(zwjReplacedStrings.join(''))
-                    } else {
-                      this.EC.Search.find(combination.base).then(baseEmoji => {
-                        resolveReplace(this.getZwjEmojiSpanTag(baseEmoji, zwjReplacedStrings.join('')))
-                      })
-                    }
-                  })
-                })
-              } else {
-                const replaceingUtfEmojiPromises = []
-                matchedMojiCodes.forEach(code => {
-                  replaceingUtfEmojiPromises.push(new Promise(resolve => {
-                    this.EC.Search.find(code).then(result => {
-                      if (Object.prototype.hasOwnProperty.call(result, 'code')) {
-                        resolve(processor(result))
-                      }
-                    })
-                  }))
-                })
-                Promise.all(replaceingUtfEmojiPromises).then(replacedUtfEmoji => {
-                  resolveReplace(replacedUtfEmoji.join(''))
-                })
-              }
-            }).catch(error => {
-              rejectReplace(error)
-            })
-          } else if (this.utfPattern.test(target)) {
-            this.EC.Search.find(this.EC.Data.mojiCodes.moji_index[target]).then(result => {
-              if (Object.prototype.hasOwnProperty.call(result, 'code')) {
-                resolveReplace(processor(result))
-              }
-            }).catch(() => {
-              resolveReplace(target)
-            })
-          } else {
-            resolveReplace(target)
+        try {
+          const result = await this.EC.Search.find(matchedMojiCodes[0])
+          if (result.combinations.length === 0) {
+            // exist ZWJ, but first emoji is not a combination emoji
+            return replacedUtfSource(matchedMojiCodes)
           }
-        })
-      })
-      Promise.all(replacingSources).then(replacedSources => {
-        resolveEmojify(replacedSources.join(''))
-      }).catch(error => {
-        rejectEmojify(error)
-      })
-    })
+
+          const getZwjEmojiTag = async combination => {
+            // check for registered ZWJ emoji on emojidex.com
+            let checkComponents = combination.components
+            const sortedMatchedMojiCodes = []
+            checkComponents = checkComponents.map((component, i) => {
+              for (let j = 0; j < matchedMojiCodes.length; j++) {
+                if (component.includes(matchedMojiCodes[j])) {
+                  sortedMatchedMojiCodes.push({ emojiCode: matchedMojiCodes[j], layerNum: combination.component_layer_order[i] })
+                  matchedMojiCodes[j] = true
+                  return true
+                }
+              }
+
+              return null
+            })
+
+            if (matchedMojiCodes.filter(v => v !== true).length) {
+              // incorrect ZWJ combination
+              return replacedUtfSource(getMojicodes(matchedMojis))
+            }
+
+            const emojiCodes = sortedMatchedMojiCodes.sort((a, b) => a.layerNum < b.layerNum ? -1 : 1).map(o => o.emojiCode)
+            const zwjReplacingPromises = await getZwjReplacingPromises(checkComponents, emojiCodes, this.getZwjEmojiTag, combination)
+            const zwjReplacedStrings = await Promise.all(zwjReplacingPromises.map(promise => promise()))
+            const baseEmoji = await this.EC.Search.find(combination.base)
+            return this.getZwjEmojiSpanTag(baseEmoji, zwjReplacedStrings.join(''))
+          }
+
+          return Promise.all(result.combinations.map(combination => getZwjEmojiTag(combination)))
+        } catch (error) {
+          Promise.reject(error)
+        }
+      } else if (this.utfPattern.test(target)) {
+        try {
+          const result = await this.EC.Search.find(this.EC.Data.mojiCodes.moji_index[target])
+          if (Object.prototype.hasOwnProperty.call(result, 'code')) {
+            return processor(result)
+          }
+
+          return target
+        } catch (error) {
+          return target
+        }
+      } else {
+        return target
+      }
+    }
+
+    const splittedSources = this.splitTextWithAcknowledgedEmoji(source)
+    const replacedSources = await Promise.all(splittedSources.map(target => replacedSource(target)))
+    return replacedSources.join('')
   }
 
   // Convert emoji short codes using the specified processor
-  emojifyCodes(source, processor = this.emojiToHTML) {
+  async emojifyCodes(source, processor = this.emojiToHTML) {
     processor = processor.bind(this)
 
-    return new Promise((resolve, reject) => {
+    const findEmoji = async snip => {
+      try {
+        const result = await this.EC.Search.find(this.unEncapsulateCode(snip))
+        return Object.prototype.hasOwnProperty.call(result, 'code') ? { pre: snip, post: processor(result) } : null
+      } catch (error) {
+        return null
+      }
+    }
+
+    try {
       const targets = source.match(this.shortCodePattern)
       if (targets === null || targets.length === 0) {
-        resolve(source)
+        return source
       }
 
-      let count = targets.length
-      const replacements = []
-
-      for (const target of targets) {
-        const snip = `${target}`
-        this.EC.Search.find(this.unEncapsulateCode(snip)).then(result => {
-          if (Object.prototype.hasOwnProperty.call(result, 'code')) {
-            replacements.push({ pre: snip, post: processor(result) })
-          }
-
-          return source
-        }).then(() => {
-          count -= 1
-        }).catch(() => {
-          count -= 1
-        }).then(() => {
-          if (count === 0) {
-            for (const replacement of replacements) {
-              source = source.replace(replacement.pre, replacement.post)
-            }
-
-            resolve(source)
-          }
-        }).catch(error => {
-          reject(error)
-        })
+      const results = await Promise.all(targets.map(target => findEmoji(target)))
+      const replacements = results.filter(v => v !== null)
+      for (const replacement of replacements) {
+        source = source.replace(replacement.pre, replacement.post)
       }
-    })
+
+      return source
+    } catch (error) {
+      return Promise.reject(error)
+    }
   }
 
   // Shortcut to emojify with emojiToHTML as the processor
