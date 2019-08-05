@@ -1,11 +1,9 @@
 /* eslint-disable no-undef */
 describe('EmojidexSearch', () => {
-  beforeAll(done =>
-    helperChains({
-      functions: [clearStorage, helperBefore],
-      end: done
-    })
-  )
+  beforeAll(async done => {
+    await helperChains([clearStorage, helperBefore])
+    done()
+  })
 
   it('search', async done => {
     const emojiData = await ECSpec.Search.search('kissing')

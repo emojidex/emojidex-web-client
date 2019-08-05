@@ -1,10 +1,8 @@
 /* eslint-disable no-undef */
 describe('EmojidexUtil', () => {
-  beforeEach(done => {
-    helperChains({
-      functions: [clearStorage, helperBefore],
-      end: done
-    })
+  beforeEach(async done => {
+    await helperChains([clearStorage, helperBefore])
+    done()
   })
 
   it('escapes a term with escapeTerm', () => {

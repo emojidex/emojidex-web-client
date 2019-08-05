@@ -1,10 +1,8 @@
 /* eslint-disable no-undef */
 describe('EmojidexCategories', () => {
-  beforeAll(done => {
-    helperChains({
-      functions: [clearStorage, helperBefore, getFacesEmoji],
-      end: done
-    })
+  beforeAll(async done => {
+    await helperChains([clearStorage, helperBefore, getFacesEmoji])
+    done()
   })
 
   it('getEmoji', async done => {

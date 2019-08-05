@@ -52,8 +52,7 @@ export default class EmojidexData {
       }
 
       this.mojiCodes = this.storage.get('emojidex.moji_codes')
-      this.EC.Data = this
-      return this.EC.Data
+      return this
     } catch (error) {
       console.error(error)
     }
