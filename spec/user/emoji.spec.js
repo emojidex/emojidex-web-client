@@ -7,7 +7,8 @@ describe('EmojidexIndexes', () => {
 
   it('user', async done => {
     const emojiData = await ECSpec.UserEmoji.get('emojidex')
-    expect(emojiData).toContain(emojiEmojidex[0])
+    const codes = emojiEmojidex.map(emoji => emoji.code)
+    expect(codes).toContain(emojiData[0].code)
     done()
   })
 

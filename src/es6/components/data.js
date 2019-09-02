@@ -87,10 +87,10 @@ export default class EmojidexData {
     if (emojiSet) {
       if (this.storage.hubCache.emojidex.emoji && this.storage.hubCache.emojidex.emoji.length > 0) {
         const hubEmoji = this.createEmojisForUpdate(this.storage.hubCache.emojidex.emoji, emojiSet)
-        await this.storage.update('emojidex', { emoji: hubEmoji })
+        await this.storage.update('emojidex.emoji', hubEmoji)
+      } else {
+        await this.storage.update('emojidex.emoji', emojiSet)
       }
-
-      await this.storage.update('emojidex', { emoji: emojiSet })
     }
 
     return this.storage.hubCache.emojidex.emoji || []
@@ -100,9 +100,9 @@ export default class EmojidexData {
     if (favoritesSet) {
       if (this.storage.hubCache.emojidex.favorites && this.storage.hubCache.emojidex.favorites.length > 0) {
         const hubEmoji = this.createEmojisForUpdate(this.storage.hubCache.emojidex.favorites, favoritesSet)
-        await this.storage.update('emojidex', { favorites: hubEmoji })
+        await this.storage.update('emojidex.favorites', hubEmoji)
       } else {
-        await this.storage.update('emojidex', { favorites: favoritesSet })
+        await this.storage.update('emojidex.favorites', favoritesSet)
       }
     }
 
@@ -113,9 +113,9 @@ export default class EmojidexData {
     if (historySet) {
       if (this.storage.hubCache.emojidex.history && this.storage.hubCache.emojidex.history.length > 0) {
         const hubEmoji = this.createEmojisForUpdate(this.storage.hubCache.emojidex.history, historySet)
-        await this.storage.update('emojidex', { history: hubEmoji })
+        await this.storage.update('emojidex.history', hubEmoji)
       } else {
-        await this.storage.update('emojidex', { history: historySet })
+        await this.storage.update('emojidex.history', historySet)
       }
     }
 
@@ -141,7 +141,7 @@ export default class EmojidexData {
 
   async categories(categoriesSet) {
     if (categoriesSet) {
-      await this.storage.update('emojidex', { categories: categoriesSet })
+      await this.storage.update('emojidex.categories', categoriesSet)
     }
 
     return this.storage.hubCache.emojidex.categories || []
@@ -149,9 +149,7 @@ export default class EmojidexData {
 
   async authInfo(authInfoSet) {
     if (authInfoSet) {
-      this.EC.User.authInfo = authInfoSet
-      await this.storage.update('emojidex', { auth_info: authInfoSet }) // eslint-disable-line camelcase
-      return this.storage.hubCache.emojidex.auth_info
+      await this.storage.update('emojidex.auth_info', authInfoSet)
     }
 
     return this.storage.hubCache.emojidex.auth_info

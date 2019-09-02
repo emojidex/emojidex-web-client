@@ -36,15 +36,17 @@ const emojiThinkingFaceP = {
   base: 'thinking_face',
   variants: [
     'thinking_face',
+    'thinking_face(bk)',
+    'thinking_face(br)',
+    'thinking_face(p)',
     'thinking_face(smiley)',
     'thinking_face(wh)',
-    'thinking_face(p)',
-    'thinking_face(ye)',
-    'thinking_face(br)',
-    'thinking_face(bk)'
+    'thinking_face(ye)'
   ],
   score: 0,
-  r18: false
+  r18: false,
+  combinations: [],
+  customizations: []
 }
 
 const gakuEngine = {
