@@ -51,7 +51,11 @@ export default class EmojidexUser {
   // 'logs out' by clearing user data
   async logout() {
     this.authInfo = this.EC.Data.defaultAuthInfo
-    return this.EC.Data.authInfo(this.authInfo)
+    await this.EC.Data.storage.update('emojidex', {
+      history: [],
+      favorites: [],
+      auth_info: this.authInfo // eslint-disable-line camelcase
+    })
   }
 
   async _authenticateAPI(params) {

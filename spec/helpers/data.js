@@ -19,6 +19,11 @@ const emojiEmoji = {
   category: 'symbols'
 }
 
+const ninjaEmoji = {
+  code: 'ninja',
+  category: 'people'
+}
+
 const emojiDragon = {
   code: 'dragon',
   moji: '🐉',

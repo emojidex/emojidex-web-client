@@ -86,11 +86,10 @@ export default class EmojidexData {
   async emoji(emojiSet) {
     if (emojiSet) {
       if (this.storage.hubCache.emojidex.emoji && this.storage.hubCache.emojidex.emoji.length > 0) {
-        const hubEmoji = this.createEmojisForUpdate(this.storage.hubCache.emojidex.emoji, emojiSet)
-        await this.storage.update('emojidex.emoji', hubEmoji)
-      } else {
-        await this.storage.update('emojidex.emoji', emojiSet)
+        emojiSet = this.createEmojisForUpdate(this.storage.hubCache.emojidex.emoji, emojiSet)
       }
+
+      await this.storage.update('emojidex.emoji', emojiSet)
     }
 
     return this.storage.hubCache.emojidex.emoji || []
@@ -99,11 +98,14 @@ export default class EmojidexData {
   async favorites(favoritesSet) {
     if (favoritesSet) {
       if (this.storage.hubCache.emojidex.favorites && this.storage.hubCache.emojidex.favorites.length > 0) {
-        const hubEmoji = this.createEmojisForUpdate(this.storage.hubCache.emojidex.favorites, favoritesSet)
-        await this.storage.update('emojidex.favorites', hubEmoji)
-      } else {
-        await this.storage.update('emojidex.favorites', favoritesSet)
+        favoritesSet = this.createEmojisForUpdate(this.storage.hubCache.emojidex.favorites, favoritesSet)
       }
+
+      if (!this.storage.hubCache.emojidex.auth_info.premium && !this.storage.hubCache.emojidex.auth_info.pro) {
+        favoritesSet = favoritesSet.slice(0, 50)
+      }
+
+      await this.storage.update('emojidex.favorites', favoritesSet)
     }
 
     return this.storage.hubCache.emojidex.favorites || []
@@ -112,11 +114,14 @@ export default class EmojidexData {
   async history(historySet) {
     if (historySet) {
       if (this.storage.hubCache.emojidex.history && this.storage.hubCache.emojidex.history.length > 0) {
-        const hubEmoji = this.createEmojisForUpdate(this.storage.hubCache.emojidex.history, historySet)
-        await this.storage.update('emojidex.history', hubEmoji)
-      } else {
-        await this.storage.update('emojidex.history', historySet)
+        historySet = this.createEmojisForUpdate(this.storage.hubCache.emojidex.history, historySet)
       }
+
+      if (!this.storage.hubCache.emojidex.auth_info.premium && !this.storage.hubCache.emojidex.auth_info.pro) {
+        historySet = historySet.slice(0, 50)
+      }
+
+      await this.storage.update('emojidex.history', historySet)
     }
 
     return this.storage.hubCache.emojidex.history || []

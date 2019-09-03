@@ -47,7 +47,8 @@ export default class EmojidexUserFavorites {
         this.maxPage++
       }
 
-      return this.EC.Data.favorites(this._favorites)
+      await this.EC.Data.favorites(this._favorites)
+      return this._favorites
     } catch (error) {
       console.error(error)
     }
@@ -61,8 +62,8 @@ export default class EmojidexUserFavorites {
 
     try {
       const response = await this._favoritesAPI(options)
-      this._favorite = await this.EC.Data.favorites(response)
-      return this._favorite
+      this._favorites = await this.EC.Data.favorites(response)
+      return this._favorites
     } catch (error) {
       console.error(error)
     }

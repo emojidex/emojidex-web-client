@@ -68,8 +68,13 @@ describe('EmojidexUser', () => {
         username: testUserInfo.auth_user,
         auth_token: testUserInfo.auth_token // eslint-disable-line camelcase
       })
-      const authInfo = await ECSpec.User.logout()
+      await ECSpec.User.logout()
+      const authInfo = await ECSpec.Data.authInfo()
+      const favorites = await ECSpec.Data.favorites()
+      const history = await ECSpec.Data.history()
       expect(authInfo.status).toEqual('none')
+      expect(favorites.length).toEqual(0)
+      expect(history.length).toEqual(0)
       done()
     })
 

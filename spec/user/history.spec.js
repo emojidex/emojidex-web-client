@@ -7,9 +7,11 @@ describe('EmojidexUserHistory', () => {
 
   it('get', async done => {
     const history = await ECSpec.User.History.get()
+    const historyHabCache = await ECSpec.Data.history()
     expect(history.length).toBeTruthy()
     expect(history[0].code).toBeTruthy()
     expect(history[0].times_used).toBeTruthy()
+    expect(historyHabCache.length).toBeLessThanOrEqual(50)
     done()
   })
 
