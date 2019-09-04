@@ -30,10 +30,6 @@ export default class EmojidexCustomizations {
         this.results = response.data.emoji
         this.curPage = response.data.meta.page
         this.maxPage = Math.ceil(this.meta.total_count / this.customizedParam.limit)
-        if (this.meta.total_count % this.customizedParam.limit > 0) {
-          this.maxPage++
-        }
-
         return response.data.emoji
       }
 
