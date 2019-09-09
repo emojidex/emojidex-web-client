@@ -7,9 +7,9 @@ describe('EmojidexUserFavorites', () => {
 
   it('get', async done => {
     const favorites = await ECSpec.User.Favorites.get()
-    const favoritesHabCache = await ECSpec.Data.favorites()
+    const favoritesHubCache = await ECSpec.Data.favorites()
     expect(favorites).toContain(jasmine.objectContaining(ninjaEmoji))
-    expect(favoritesHabCache.length).toBeLessThanOrEqual(50)
+    expect(favoritesHubCache.length).toBeLessThanOrEqual(50)
     done()
   })
 

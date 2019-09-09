@@ -85,8 +85,8 @@ export default class EmojidexUserHistory {
 
     try {
       const response = await this._historyAPI(options)
-      this._history = await this.EC.Data.history(response)
-      return this._history
+      this._history = await this.EC.Data.history([response])
+      return response
     } catch (error) {
       console.error(error)
     }

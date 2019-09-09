@@ -58,8 +58,8 @@ export default class EmojidexUserFavorites {
 
     try {
       const response = await this._favoritesAPI(options)
-      this._favorites = await this.EC.Data.favorites(response)
-      return this._favorites
+      this._favorites = await this.EC.Data.favorites([response])
+      return response
     } catch (error) {
       console.error(error)
     }
