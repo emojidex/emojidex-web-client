@@ -42,11 +42,7 @@ export default class EmojidexIndexes {
       this.results = response.data.emoji
       this.curPage = response.data.meta.page
       this.count = response.data.meta.count
-      this.maxPage = Math.floor(this.meta.total_count / this.indexedParam.limit)
-      if (this.meta.total_count % this.indexedParam.limit > 0) {
-        this.maxPage++
-      }
-
+      this.maxPage = Math.ceil(this.meta.total_count / this.indexedParam.limit)
       await this.EC.Emoji.combine(response.data.emoji)
       return response.data.emoji
     } catch (error) {

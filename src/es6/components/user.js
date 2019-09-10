@@ -28,7 +28,7 @@ export default class EmojidexUser {
   // 3. {authtype: 'basic', user: 'username-or-email', password: '****'}
   // 4. {authtype: 'session'} return auth_info in localstorage.
   // * if no hash is given auto login is attempted
-  login(params) {
+  async login(params) {
     if (!params) {
       return this._autoLogin()
     }
@@ -49,9 +49,13 @@ export default class EmojidexUser {
 
   // logout:
   // 'logs out' by clearing user data
-  logout() {
+  async logout() {
     this.authInfo = this.EC.Data.defaultAuthInfo
-    return this.EC.Data.authInfo(this.authInfo)
+    await this.EC.Data.storage.update('emojidex', {
+      history: [],
+      favorites: [],
+      auth_info: this.authInfo // eslint-disable-line camelcase
+    })
   }
 
   async _authenticateAPI(params) {
@@ -75,14 +79,14 @@ export default class EmojidexUser {
   }
 
   // regular login with username/email and password
-  plainAuth(username, password) {
+  async plainAuth(username, password) {
     return this._authenticateAPI({
       username,
       password
     })
   }
 
-  tokenAuth(username, token) {
+  async tokenAuth(username, token) {
     return this._authenticateAPI({
       username,
       token
@@ -90,7 +94,7 @@ export default class EmojidexUser {
   }
 
   // auth with HTTP basic auth
-  basicAuth(user, password) {
+  async basicAuth(user, password) {
     return this._authenticateAPI({
       user,
       password
@@ -118,11 +122,9 @@ export default class EmojidexUser {
 
   async syncUserData() {
     this.authInfo = await this.EC.Data.authInfo()
-    return Promise.all([
-      this.Favorites.sync(),
-      this.History.sync(),
-      this.Follow.sync()
-    ])
+    await this.Favorites.sync()
+    await this.History.sync()
+    await this.Follow.sync()
   }
 
   isSubscriber() {

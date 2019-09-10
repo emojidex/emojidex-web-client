@@ -7,7 +7,9 @@ describe('EmojidexUserFavorites', () => {
 
   it('get', async done => {
     const favorites = await ECSpec.User.Favorites.get()
-    expect(favorites).toContain(jasmine.objectContaining(emojiEmoji))
+    const favoritesHubCache = await ECSpec.Data.favorites()
+    expect(favorites).toContain(jasmine.objectContaining(ninjaEmoji))
+    expect(favoritesHubCache.length).toBeLessThanOrEqual(50)
     done()
   })
 
@@ -29,7 +31,7 @@ describe('EmojidexUserFavorites', () => {
   it('all', async done => {
     await specTimer(2000) // Favorites.sync()が終わっていない時があるので
     const favorites = await ECSpec.User.Favorites.all()
-    expect(favorites).toContain(jasmine.objectContaining(emojiEmoji))
+    expect(favorites).toContain(jasmine.objectContaining(ninjaEmoji))
     done()
   })
 

@@ -44,11 +44,8 @@ export default class EmojidexUserHistory {
       this.meta = response.meta
       this.curPage = response.meta.page
       this.maxPage = Math.ceil(response.meta.total_count / this.EC.limit)
-      if (this.meta.total_count % this.EC.limit > 0) {
-        this.maxPage++
-      }
-
-      return this.EC.Data.history(this._history)
+      await this.EC.Data.history(this._history)
+      return this._history
     } catch (error) {
       console.error(error)
     }
@@ -70,6 +67,10 @@ export default class EmojidexUserHistory {
       this.historyInfoMeta = response.meta
       this.historyInfoCurPage = response.meta.page
       this.historyInfoMaxPage = Math.ceil(response.meta.total_count / this.EC.limit)
+      if (this.historyInfoMeta.total_count % this.EC.limit > 0) {
+        this.historyInfoMaxPage++
+      }
+
       return this._historyInfo
     } catch (error) {
       console.error(error)
@@ -84,8 +85,8 @@ export default class EmojidexUserHistory {
 
     try {
       const response = await this._historyAPI(options)
-      this._history = await this.EC.Data.history(response)
-      return this._history
+      this._history = await this.EC.Data.history([response])
+      return response
     } catch (error) {
       console.error(error)
     }

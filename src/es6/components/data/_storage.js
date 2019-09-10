@@ -83,7 +83,7 @@ export default class EmojidexDataStorage {
     }
   }
 
-  update(query, data) {
+  async update(query, data) {
     const merged = _extend({}, this.get(query.split('.')[0]), this._getChainedData(query, data, false))
     return this.set(query, merged)
   }
