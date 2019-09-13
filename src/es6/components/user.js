@@ -11,15 +11,13 @@ export default class EmojidexUser {
     this.Favorites = new EmojidexUserFavorites(this.EC)
     this.Follow = new EmojidexUserFollow(this.EC)
   }
-  // @_auto_login()
 
   // Checks for local saved login data, and if present sets the username and api_key
-  _autoLogin() {
-    if (typeof this.EC.Data.storage.hubCache !== 'undefined' &&
-        typeof this.EC.Data.storage.hubCache.emojidex !== 'undefined' &&
-        typeof this.EC.Data.storage.hubCache.emojidex.auth_info !== 'undefined' &&
-        this.EC.Data.storage.hubCache.emojidex.auth_info.status === 'verified') {
-      return this.syncUserData()
+  async _autoLogin() {
+    const status = await this.EC.Data.storage.get('emojidex.auth_info.status')
+    if (status === 'verified') {
+      await this.syncUserData()
+      return this.authInfo
     }
   }
 
@@ -30,28 +28,20 @@ export default class EmojidexUser {
   // 3. {authtype: 'basic', user: 'username-or-email', password: '****'}
   // 4. {authtype: 'session'} return auth_info in localstorage.
   // * if no hash is given auto login is attempted
-  login(params) {
+  async login(params) {
     if (!params) {
       return this._autoLogin()
     }
 
     switch (params.authtype) {
       case 'plain':
-        return this.plainAuth(params.username, params.password, params.callback)
+        return this.plainAuth(params.username, params.password)
       case 'token':
-        return this.tokenAuth(params.username, params.auth_token, params.callback)
+        return this.tokenAuth(params.username, params.auth_token)
       case 'basic':
-        return this.basicAuth(params.user, params.password, params.callback)
+        return this.basicAuth(params.user, params.password)
       case 'session':
-        if (typeof this.EC.Data.storage.hubCache !== 'undefined' &&
-            typeof this.EC.Data.storage.hubCache.emojidex !== 'undefined' &&
-            typeof this.EC.Data.storage.hubCache.emojidex.auth_info !== 'undefined' &&
-            this.EC.Data.storage.hubCache.emojidex.auth_info.status === 'verified') {
-          this.authInfo = this.EC.Data.storage.hubCache.emojidex.auth_info
-          return this.authInfo
-        }
-
-        break
+        return this._autoLogin()
       default:
         return this._autoLogin()
     }
@@ -59,92 +49,85 @@ export default class EmojidexUser {
 
   // logout:
   // 'logs out' by clearing user data
-  logout() {
-    return this.EC.Data.authInfo(this.EC.Data.defaultAuthInfo)
+  async logout() {
+    this.authInfo = this.EC.Data.defaultAuthInfo
+    await this.EC.Data.storage.update('emojidex', {
+      history: [],
+      favorites: [],
+      auth_info: this.authInfo // eslint-disable-line camelcase
+    })
   }
 
-  _authenticateAPI(params, callback) {
-    return axios.get(`${this.EC.apiUrl}users/authenticate`, {
-      params
-    }).then(response => {
-      return this._setAuthFromResponse(response.data).then(() => {
-        if (typeof callback === 'function') {
-          callback(this.authInfo)
-        } else {
-          return this.authInfo
-        }
-      })
-    }).catch(error => {
+  async _authenticateAPI(params) {
+    try {
+      const response = await axios.get(`${this.EC.apiUrl}users/authenticate`, { params })
+      await this._setAuthFromResponse(response.data)
+      return this.authInfo
+    } catch (error) {
+      if (error.response.status !== 401) {
+        console.error(error)
+        return
+      }
+
       this.authInfo = {
         status: error.response.data.auth_status,
         token: null,
         user: ''
       }
-      return this.EC.Data.authInfo(this.EC.Data.authInfo).then(() => {
-        if (typeof callback === 'function') {
-          callback({
-            authInfo: this.authInfo,
-            errorInfo: error.response
-          })
-        } else {
-          return {
-            authInfo: this.authInfo,
-            errorInfo: error.response
-          }
-        }
-      })
-    })
+      return this.EC.Data.authInfo(this.authInfo)
+    }
   }
 
   // regular login with username/email and password
-  plainAuth(username, password, callback) {
+  async plainAuth(username, password) {
     return this._authenticateAPI({
       username,
       password
-    },
-    callback)
-  }
-
-  tokenAuth(username, token, callback) {
-    return this._authenticateAPI({
-      username,
-      token
-    },
-    callback)
-  }
-
-  // auth with HTTP basic auth
-  basicAuth(user, password, callback) {
-    return this._authenticateAPI({
-      user,
-      password
-    },
-    callback)
-  }
-
-  // sets auth parameters from a successful auth request [login]
-  _setAuthFromResponse(response) {
-    return this.EC.Data.authInfo({
-      status: response.auth_status,
-      token: response.auth_token,
-      user: response.auth_user,
-      r18: response.r18,
-      premium: response.premium,
-      premiumExp: response.premium_exp,
-      pro: response.pro,
-      proExp: response.pro_exp
-    }).then(data => {
-      this.syncUserData()
-      return data
-    }).catch(error => {
-      console.error(error)
     })
   }
 
-  syncUserData() {
-    this.authInfo = this.EC.Data.storage.get('emojidex.auth_info')
-    this.Favorites.sync()
-    this.History.sync()
-    this.Follow.sync()
+  async tokenAuth(username, token) {
+    return this._authenticateAPI({
+      username,
+      token
+    })
+  }
+
+  // auth with HTTP basic auth
+  async basicAuth(user, password) {
+    return this._authenticateAPI({
+      user,
+      password
+    })
+  }
+
+  // sets auth parameters from a successful auth request [login]
+  async _setAuthFromResponse(response) {
+    try {
+      await this.EC.Data.authInfo({
+        status: response.auth_status,
+        token: response.auth_token,
+        user: response.auth_user,
+        r18: response.r18,
+        premium: response.premium,
+        premiumExp: response.premium_exp,
+        pro: response.pro,
+        proExp: response.pro_exp
+      })
+      return this.syncUserData()
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  async syncUserData() {
+    this.authInfo = await this.EC.Data.authInfo()
+    await this.Favorites.sync()
+    await this.History.sync()
+    await this.Follow.sync()
+  }
+
+  isSubscriber() {
+    return this.authInfo.premium || this.authInfo.pro
   }
 }

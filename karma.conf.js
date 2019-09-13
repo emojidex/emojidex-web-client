@@ -6,6 +6,7 @@ module.exports = function(config) {
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '',
+    browserNoActivityTimeout: 60000,
 
 
     // frameworks to use
@@ -13,8 +14,7 @@ module.exports = function(config) {
     frameworks: ['jasmine'],
     client: {
       jasmine: {
-        random: false,
-        timeoutInterval: 10000
+        random: false
       }
     },
 

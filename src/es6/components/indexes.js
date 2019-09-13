@@ -10,16 +10,12 @@ export default class EmojidexIndexes {
     this.maxPage = 0
   }
 
-  _indexesAPI(query, callback, opts, func) {
-    const onFalsyProcess = callback => {
+  async _indexesAPI(query, opts, func) {
+    const onFalsyProcess = () => {
       this.results = []
       this.curPage = 0
       this.count = 0
-      if (typeof callback === 'function') {
-        callback([])
-      } else {
-        return []
-      }
+      return []
     }
 
     const param = {
@@ -27,106 +23,76 @@ export default class EmojidexIndexes {
       limit: this.EC.limit,
       detailed: this.EC.detailed
     }
-    if (this.EC.User.authInfo.token !== null) {
+    if (this.EC.User.authInfo.token) {
       _extend(param, { auth_token: this.EC.User.authInfo.token }) // eslint-disable-line camelcase
     }
 
     _extend(param, opts)
 
     this.indexedFunc = func
-    this.indexed = {
-      query,
-      callback,
-      param
-    }
+    this.indexedParam = param
 
-    return axios.get(`${this.EC.apiUrl}${query}`, {
-      params: param
-    }).then(response => {
-      if (response.data.emoji) {
-        this.meta = response.data.meta
-        this.results = response.data.emoji
-        this.curPage = response.data.meta.page
-        this.count = response.data.meta.count
-        this.maxPage = Math.floor(this.meta.total_count / this.indexed.param.limit) // eslint-disable-line camelcase
-        if (this.meta.total_count % this.indexed.param.limit > 0) { // eslint-disable-line camelcase
-          this.maxPage++
-        }
-
-        return this.EC.Emoji.combine(response.data.emoji).then(() => {
-          if (typeof callback === 'function') {
-            callback(response.data.emoji)
-          } else {
-            return response.data
-          }
-        })
+    try {
+      const response = await axios.get(`${this.EC.apiUrl}${query}`, { params: param })
+      if (!response.data.emoji) {
+        return onFalsyProcess()
       }
 
-      return onFalsyProcess(callback)
-    }).catch(error => {
+      this.meta = response.data.meta
+      this.results = response.data.emoji
+      this.curPage = response.data.meta.page
+      this.count = response.data.meta.count
+      this.maxPage = Math.ceil(this.meta.total_count / this.indexedParam.limit)
+      await this.EC.Emoji.combine(response.data.emoji)
+      return response.data.emoji
+    } catch (error) {
       console.error(error)
-      return onFalsyProcess(callback)
-    })
+      return onFalsyProcess()
+    }
   }
 
-  index(callback, opts) {
-    return this._indexesAPI('emoji', callback, opts, this.index)
+  index(opts) {
+    return this._indexesAPI('emoji', opts, this.index)
   }
 
-  newest(callback, opts) {
-    return this._indexesAPI('newest', callback, opts, this.newest)
+  newest(opts) {
+    return this._indexesAPI('newest', opts, this.newest)
   }
 
-  popular(callback, opts) {
-    return this._indexesAPI('popular', callback, opts, this.popular)
+  popular(opts) {
+    return this._indexesAPI('popular', opts, this.popular)
   }
 
-  user(username, callback, opts) {
-    return this._indexesAPI(`users/${username}/emoji`, callback, opts)
-  }
-
-  static(staticType, language, callback) {
-    let loadedNum = 0
-    let loadedEmoji = []
-
-    const loadStatic = urlString => {
-      return axios.get(urlString).then(response => {
-        loadedEmoji = loadedEmoji.concat(response.data)
-        if (++loadedNum === staticType.length) {
-          return this.EC.Emoji.combine(loadedEmoji).then(data => {
-            if (typeof callback === 'function') {
-              callback(data)
-            } else {
-              return data
-            }
-          })
-        }
-      }).catch(error => {
+  async static(staticType, language) {
+    const loadStatic = async urlString => {
+      try {
+        const response = await axios.get(urlString)
+        return response.data
+      } catch (error) {
         console.error(error)
-      })
+      }
     }
 
-    return staticType.map(type =>
-      language ?
-        loadStatic(`${this.EC.apiUrl + type}?locale=${language}`) :
-        loadStatic(`${this.EC.apiUrl + type}`))
-  }
-
-  select(code, callback, opts) {
-    return this.EC.Search.find(code, callback, opts)
+    const promises = staticType.map(type => loadStatic(`${this.EC.apiUrl + type}${language ? `?locale=${language}` : ''}`))
+    const results = await Promise.all(promises)
+    return this.EC.Emoji.combine(results.flat())
   }
 
   next() {
-    if (this.maxPage > this.curPage) {
-      this.indexed.param.page++
-      return this.indexedFunc(this.indexed.callback, this.indexed.param, this.indexedFunc)
+    if (this.maxPage === this.curPage) {
+      return
     }
+
+    this.indexedParam.page++
+    return this.indexedFunc(this.indexedParam)
   }
 
   prev() {
-    if (this.indexed.param.page > 1) {
-      this.indexed.param.page--
-      return this.indexedFunc(this.indexed.callback, this.indexed.param, this.indexedFunc)
+    if (this.curPage === 1) {
+      return
     }
+
+    this.indexedParam.page--
+    return this.indexedFunc(this.indexedParam)
   }
 }

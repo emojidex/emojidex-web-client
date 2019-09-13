@@ -14,6 +14,7 @@ import EmojidexEmoji from './components/emoji'
 import EmojidexIndexes from './components/indexes'
 import EmojidexSearch from './components/search'
 import EmojidexUser from './components/user'
+import EmojidexUserEmoji from './components/user/emoji'
 import EmojidexUtil from './components/util'
 import _extend from 'lodash/extend'
 
@@ -56,20 +57,25 @@ export default class EmojidexClient {
     this.limit = this.options.limit
     this.locale = this.options.locale
 
-    // new Emojidex modules
-    this.Data = new EmojidexData(this, this.options).then(() => {
+    return this.initialize()
+  }
+
+  async initialize() {
+    try {
+      // new Emojidex modules
+      this.Data = await new EmojidexData(this, this.options)
       this.Customizations = new EmojidexCustomizations(this)
-      this.Util = new EmojidexUtil(this)
-      this.User = new EmojidexUser(this)
+      this.Emoji = new EmojidexEmoji(this)
       this.Indexes = new EmojidexIndexes(this)
       this.Search = new EmojidexSearch(this)
-      this.Emoji = new EmojidexEmoji(this)
-      this.Categories = new EmojidexCategories(this)
-      return this.Categories
-    }).then(() => {
-      this.options.onReady(this)
-    }).catch(error => {
+      this.User = new EmojidexUser(this)
+      this.UserEmoji = new EmojidexUserEmoji(this)
+      this.Util = new EmojidexUtil(this)
+      this.Categories = await new EmojidexCategories(this)
+
+      return this
+    } catch (error) {
       console.error(error)
-    })
+    }
   }
 }

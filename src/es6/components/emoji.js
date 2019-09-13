@@ -5,13 +5,13 @@ export default class EmojidexEmoji {
     this._emojiInstance = []
   }
 
-  _emoji() {
+  async _emoji() {
     if (this._emojiInstance) {
       return this._emojiInstance
     }
 
     if (this.checkUpdate()) {
-      this.EC.Data.storage.update('emojidex.seedUpdated', new Date().toString())
+      await this.EC.Data.storage.update('emojidex.seedUpdated', new Date().toString())
       return this.seed()
     }
 
@@ -34,8 +34,8 @@ export default class EmojidexEmoji {
   }
 
   // Gets the full list of caetgories available
-  seed(callback) {
-    return this.EC.Indexes.static(['utf_emoji', 'extended_emoji'], null, callback)
+  seed() {
+    return this.EC.Indexes.static(['utf_emoji', 'extended_emoji'])
   }
 
   all() {
@@ -43,77 +43,62 @@ export default class EmojidexEmoji {
   }
 
   // internal collection search
-  search(term, callback) {
-    const results = (this._emoji().filter(moji => moji.code.match(term)).map(moji => moji))
-    if (typeof callback === 'function') {
-      callback(results)
-    }
-
-    return results
+  async search(term) {
+    const emojis = await this._emoji()
+    return emojis.filter(moji => moji.code.match(term)).map(moji => moji)
   }
 
   // internal collection search (starting with)
-  starting(term, callback) {
-    const results = (this._emoji().filter(moji => moji.code.match(`^${term}`)).map(moji => moji))
-    if (typeof callback === 'function') {
-      callback(results)
-    }
-
-    return results
+  async starting(term) {
+    const emojis = await this._emoji()
+    return emojis.filter(moji => moji.code.match(`^${term}`)).map(moji => moji)
   }
 
   // internal collection search (starting with)
-  ending(term, callback) {
-    const results = (this._emoji().filter(moji => moji.code.match(term + '$')).map(moji => moji))
-    if (typeof callback === 'function') {
-      callback(results)
-    }
-
-    return results
+  async ending(term) {
+    const emojis = await this._emoji()
+    return emojis.filter(moji => moji.code.match(term + '$')).map(moji => moji)
   }
 
   // search for emoji with the given tags
-  tags(tags, opts) {
+  async tags(tags, opts) {
     tags = this.EC.Util.breakout(tags)
-    const selection = (typeof opts !== 'undefined' && typeof opts.selection !== 'undefined') ? opts.selection : this._emoji()
+    const selection = opts && opts.selection ? opts.selection : await this._emoji()
     let collect = []
     for (let i = 0; i < tags.length; i++) {
-      const tag = tags[i]
-      collect = collect.concat((selection.filter(moji => moji.tags.indexOf(tag) >= 0).map(moji => moji)))
+      collect = collect.concat(selection.filter(moji => moji.tags.indexOf(tags[i]) >= 0).map(moji => moji))
     }
 
     return collect
   }
 
   // gets emoji in any of the given categories
-  categories(categories, opts) {
+  async categories(categories, opts) {
     categories = this.EC.Util.breakout(categories)
-    const source = (typeof opts !== 'undefined' && typeof opts.selection !== 'undefined') ? opts.selection : this._emoji()
+    const source = opts && opts.selection ? opts.selection : await this._emoji()
     let collect = []
     for (let i = 0; i < categories.length; i++) {
-      const category = categories[i]
-      collect = collect.concat((source.filter(moji => moji.category === category).map(moji => moji)))
+      collect = collect.concat(source.filter(moji => moji.category === categories[i]).map(moji => moji))
     }
 
     return collect
   }
 
   // searches by term (regex OK), containing the tags given, in any of the given categories
-  advanced(searchs) {
-    return this.categories(
-      searchs.categories,
-      { selection: this.tags(searchs.tags, { selection: this.search(searchs.term) }) }
-    )
+  async advanced(searchs) {
+    const searchResult = await this.search(searchs.term)
+    const tagsResult = await this.tags(searchs.tags, { selection: searchResult })
+    return this.categories(searchs.categories, { selection: tagsResult })
   }
 
   // Concatenates and flattens the given emoji array into the @emoji array
-  combine(emoji) {
-    return this.EC.Data.emoji(emoji).then(hubData => {
-      this._emojiInstance = hubData.emoji
+  async combine(emoji) {
+    try {
+      this._emojiInstance = await this.EC.Data.emoji(emoji)
       return this._emojiInstance
-    }).catch(error => {
+    } catch (error) {
       console.error(error)
-    })
+    }
   }
 
   // Clears the emoji array and emoji in storage.

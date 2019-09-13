@@ -1,96 +1,91 @@
 /* eslint-disable no-undef */
 describe('EmojidexUser', () => {
-  beforeEach(done =>
-    helperChains({
-      functions: [clearStorage, helperBefore],
-      end: done
-    })
-  )
+  beforeEach(async done => {
+    await helperChains([clearStorage, helperBefore])
+    done()
+  })
 
   describe('Login', () => {
-    it('logs in by auth token', done =>
-      ECSpec.User.login({
+    it('logs in by auth token', async done => {
+      const authInfo = await ECSpec.User.login({
         authtype: 'token',
         username: testUserInfo.auth_user,
-        auth_token: testUserInfo.auth_token, // eslint-disable-line camelcase
-        callback(authInfo) {
-          expect(authInfo.status).toEqual('verified')
-          done()
-        }
+        auth_token: testUserInfo.auth_token // eslint-disable-line camelcase
       })
-    )
+      expect(authInfo.status).toEqual('verified')
+      done()
+    })
 
     describe('[Require user info]', () => {
       if (hasUserAccount()) {
-        it('logs in by plain authentication (username, password)', done =>
-          ECSpec.User.login({
-            authtype: 'plain', username: userInfo.auth_user, password: userInfo.password, callback(authInfo) {
-              expect(authInfo.status).toEqual('verified')
-              done()
-            }
+        it('logs in by plain authentication (username, password)', async done => {
+          const authInfo = await ECSpec.User.login({
+            authtype: 'plain',
+            username: userInfo.auth_user,
+            password: userInfo.password
           })
-        )
+          expect(authInfo.status).toEqual('verified')
+          done()
+        })
 
-        it('logs in through a basic login scheme (email, password)', done =>
-          ECSpec.User.login({
-            authtype: 'basic', user: userInfo.email, password: userInfo.password, callback(authInfo) {
-              expect(authInfo.status).toEqual('verified')
-              done()
-            }
+        it('logs in through a basic login scheme (email, password)', async done => {
+          const authInfo = await ECSpec.User.login({
+            authtype: 'basic',
+            user: userInfo.email,
+            password: userInfo.password
           })
-        )
+          expect(authInfo.status).toEqual('verified')
+          done()
+        })
       }
     })
-    
-    it('logs in by session', done => {
-      ECSpec.User.login({
+
+    it('logs in by session', async done => {
+      await ECSpec.User.login({
         authtype: 'token',
         username: testUserInfo.auth_user,
-        auth_token: testUserInfo.auth_token
-      }).then(() => {
-        return ECSpec.User.login({ authtype: 'session' })
-      }).then(authInfo => {
-        expect(authInfo.status).toEqual('verified')
-        done()
+        auth_token: testUserInfo.auth_token // eslint-disable-line camelcase
       })
+      const authInfo = await ECSpec.User.login({ authtype: 'session' })
+      expect(authInfo.status).toEqual('verified')
+      done()
     })
-    
-    it('logs in by auto', done => {
-      ECSpec.User.login({
+
+    it('logs in by auto', async done => {
+      await ECSpec.User.login({
         authtype: 'token',
         username: testUserInfo.auth_user,
-        auth_token: testUserInfo.auth_token
-      }).then(() => {
-        return ECSpec.User.login()
-      }).then(() => {
-        expect(ECSpec.User.authInfo.status).toEqual('verified')
-        done()
+        auth_token: testUserInfo.auth_token // eslint-disable-line camelcase
       })
+      const authInfo = await ECSpec.User.login()
+      expect(authInfo.status).toEqual('verified')
+      done()
     })
-    
-    it('logs out', done => {
-      ECSpec.User.login({
+
+    it('logs out', async done => {
+      await ECSpec.User.login({
         authtype: 'token',
         username: testUserInfo.auth_user,
-        auth_token: testUserInfo.auth_token
-      }).then(() => {
-        return ECSpec.User.logout()
-      }).then(() => {
-        expect(ECSpec.User.authInfo.status).toEqual('none')
-        done()
+        auth_token: testUserInfo.auth_token // eslint-disable-line camelcase
       })
+      await ECSpec.User.logout()
+      const authInfo = await ECSpec.Data.authInfo()
+      const favorites = await ECSpec.Data.favorites()
+      const history = await ECSpec.Data.history()
+      expect(authInfo.status).toEqual('none')
+      expect(favorites.length).toEqual(0)
+      expect(history.length).toEqual(0)
+      done()
     })
-    
-    it('failure', done => {
-      ECSpec.User.login({
+
+    it('failure', async done => {
+      const authInfo = await ECSpec.User.login({
         authtype: 'token',
         username: 'aaa',
-        auth_token: 'aaa'
-      }).then(response => {
-        expect(response.errorInfo.status).toEqual(401)
-        expect(response.errorInfo.statusText).toEqual('Unauthorized')
-        done()
+        auth_token: 'aaa' // eslint-disable-line camelcase
       })
+      expect(authInfo.status).toEqual('unverified')
+      done()
     })
   })
 
@@ -104,17 +99,15 @@ describe('EmojidexUser', () => {
 
     describe('[Require premium user info] User Details', () => {
       if (hasPremiumAccount()) {
-        it('has r18, pro, premium, etc.', done =>
-          ECSpec.User.login({
+        it('has r18, pro, premium, etc.', async done => {
+          const authInfo = await ECSpec.User.login({
             authtype: 'token',
             username: premiumUserInfo.auth_user,
-            auth_token: premiumUserInfo.auth_token, // eslint-disable-line camelcase
-            callback(authInfo) {
-              expect(authInfo.premium).toEqual(true)
-              done()
-            }
+            auth_token: premiumUserInfo.auth_token // eslint-disable-line camelcase
           })
-        )
+          expect(authInfo.premium).toEqual(true)
+          done()
+        })
       }
     })
   })

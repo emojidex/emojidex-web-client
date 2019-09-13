@@ -24,11 +24,11 @@ export default class EmojidexDataStorage {
     return wrap ? chained : chained[query.first]
   }
 
-  _getHubData(query) {
+  async _getHubData(query) {
     query = query.split('.')
-    return this.hub.onConnect().then(() => {
-      return this.hub.get(query.shift())
-    }).then(hubData => {
+    try {
+      await this.connect()
+      let hubData = await this.hub.get(query.shift())
       if (query.length) {
         for (let i = 0; i < query.length; i++) {
           const q = query[i]
@@ -37,9 +37,9 @@ export default class EmojidexDataStorage {
       }
 
       return hubData
-    }).catch(error => {
+    } catch (error) {
       console.error(error)
-    })
+    }
   }
 
   _getParsedQuery(query) {
@@ -51,6 +51,7 @@ export default class EmojidexDataStorage {
     }
   }
 
+  // TODO: jQuery Storage APIの時の名残で文字列クエリー処理を実装したけど、そのうち書き直したい。lodashを使えば良さそう。
   get(query) {
     query = Array.isArray(query) ? query : query.split('.')
     let cache = this.hubCache
@@ -68,34 +69,30 @@ export default class EmojidexDataStorage {
     return cache
   }
 
-  set(query, data, update) {
+  async set(query, data) {
     const firstQuery = query.split('.')[0]
-    return this.hub.onConnect().then(() => {
-      if (update) {
-        const newData = {}
-        newData[firstQuery] = data
-        return this.hub.set(firstQuery, JSON.stringify(newData))
-      }
+    try {
+      await this.connect()
+      const newData = {}
+      newData[firstQuery] = data
+      await this.hub.set(firstQuery, JSON.stringify(newData))
 
-      return this.hub.set(firstQuery, this._getChainedData(query, data))
-    }).then(() => {
       return this.updateCache(firstQuery)
-    }).catch(error => {
+    } catch (error) {
       console.error(error)
-    })
+    }
   }
 
-  update(query, data) {
+  async update(query, data) {
     const merged = _extend({}, this.get(query.split('.')[0]), this._getChainedData(query, data, false))
-    return this.set(query, merged, true)
+    return this.set(query, merged)
   }
 
-  updateCache(key) {
-    return this.hub.onConnect().then(() => {
-      return key ? key : this.hub.getKeys()
-    }).then(keys => {
-      return this.hub.get(keys)
-    }).then(hubData => {
+  async updateCache(key) {
+    try {
+      await this.connect()
+      const keys = key ? key : await this.hub.getKeys()
+      const hubData = await this.hub.get(keys)
       const data = JSON.parse(hubData)
       if (key) {
         this.hubCache[key] = data[key]
@@ -104,9 +101,9 @@ export default class EmojidexDataStorage {
 
       this.hubCache = data
       return this.hubCache
-    }).catch(error => {
+    } catch (error) {
       console.error(error)
-    })
+    }
   }
 
   _remove(query) {
@@ -127,15 +124,16 @@ export default class EmojidexDataStorage {
     return this.update(query.first, target)
   }
 
-  clear() {
-    return this.hub.onConnect().then(() => {
+  async clear() {
+    try {
+      await this.connect()
       return this.hub.clear()
-    }).catch(error => {
+    } catch (error) {
       console.error(error)
-    })
+    }
   }
 
-  keys(query) {
+  async keys(query) {
     if (query) {
       const keys = []
       const cache = this.get(query)
@@ -148,11 +146,12 @@ export default class EmojidexDataStorage {
       return keys
     }
 
-    return this.hub.onConnect().then(() => {
+    try {
+      await this.connect()
       return this.hub.getKeys()
-    }).catch(error => {
+    } catch (error) {
       console.error(error)
-    })
+    }
   }
 
   isEmpty(query) {
@@ -161,5 +160,10 @@ export default class EmojidexDataStorage {
 
   isSet(query) {
     return Boolean(this.get(query))
+  }
+
+  async connect() {
+    await this.hub.onReadyFrame()
+    return this.hub.onConnect()
   }
 }

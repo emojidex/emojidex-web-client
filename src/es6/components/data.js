@@ -22,54 +22,50 @@ export default class EmojidexData {
       this.storage = new EmojidexDataStorage()
     }
 
-    return this.storage.hub.onReadyFrame().then(() => {
-      return this.storage.hub.onConnect()
-    }).then(() => {
-      return this.storage.hub.getKeys()
-    }).then(keys => {
-      if (keys.indexOf('emojidex') !== -1) {
-        return this.storage.updateCache('emojidex')
-      }
-
-      /* eslint-disable camelcase */
-
-      return this.storage.update('emojidex', {
-        moji_codes: {
-          moji_string: '',
-          moji_array: [],
-          moji_index: {}
-        },
-        emoji: this.EC.options.emoji || [],
-        history: this.EC.options.history || [],
-        favorites: this.EC.options.favorites || [],
-        categories: this.EC.options.categories || [],
-        auth_info: this.EC.options.authInfo || this.defaultAuthInfo
-      })
-
-      /* eslint-enable camelcase */
-    }).then(() => {
-      if (this._needUpdate()) {
-        return this._initMojiCodes()
-      }
-
-      return this.storage.get('emojidex')
-    }).then(() => {
-      this.mojiCodes = this.storage.get('emojidex.moji_codes')
-      this.EC.Data = this
-      return this.EC.Data
-    }).catch(error => {
-      console.error(error)
-    })
+    return this.initialize()
   }
 
-  _initMojiCodes() {
-    return this.storage.update('emojidex.moji_codes_updated', new Date().toString()).then(() => {
-      return axios.get(`${this.EC.apiUrl}moji_codes?locale=${this.EC.locale}`)
-    }).then(response => {
-      return this.storage.update('emojidex.moji_codes', response.data)
-    }).catch(error => {
+  async initialize() {
+    try {
+      const keys = await this.storage.keys()
+      if (keys.indexOf('emojidex') === -1) {
+        /* eslint-disable camelcase */
+        await this.storage.update('emojidex', {
+          moji_codes: {
+            moji_string: '',
+            moji_array: [],
+            moji_index: {}
+          },
+          emoji: this.EC.options.emoji || [],
+          history: this.EC.options.history || [],
+          favorites: this.EC.options.favorites || [],
+          categories: this.EC.options.categories || [],
+          auth_info: this.EC.options.authInfo || this.defaultAuthInfo
+        })
+        /* eslint-enable camelcase */
+      } else {
+        await this.storage.updateCache('emojidex')
+      }
+
+      if (this._needUpdate()) {
+        await this._initMojiCodes()
+      }
+
+      this.mojiCodes = this.storage.get('emojidex.moji_codes')
+      return this
+    } catch (error) {
       console.error(error)
-    })
+    }
+  }
+
+  async _initMojiCodes() {
+    try {
+      await this.storage.update('emojidex.moji_codes_updated', new Date().toString())
+      const response = await axios.get(`${this.EC.apiUrl}moji_codes?locale=${this.EC.locale}`)
+      return this.storage.update('emojidex.moji_codes', response.data)
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   _needUpdate() {
@@ -87,111 +83,78 @@ export default class EmojidexData {
     return true
   }
 
-  emoji(emojiSet) {
+  async emoji(emojiSet) {
     if (emojiSet) {
-      if (this.storage.hubCache.emojidex.emoji &&
-          this.storage.hubCache.emojidex.emoji.length > 0) {
-        const hubEmoji = this.storage.hubCache.emojidex.emoji
-        for (let i = 0; i < emojiSet.length; i++) {
-          const newEmoji = emojiSet[i]
-          for (let j = 0; j < hubEmoji.length; j++) {
-            const emoji = hubEmoji[j]
-            if (newEmoji.code === emoji.code) {
-              hubEmoji.splice(hubEmoji.indexOf(emoji), 1, newEmoji)
-              break
-            } else if (emoji === hubEmoji[hubEmoji.length - 1]) {
-              hubEmoji.push(newEmoji)
-            }
-          }
-        }
-
-        return this.storage.update('emojidex', { emoji: hubEmoji })
+      if (this.storage.hubCache.emojidex.emoji && this.storage.hubCache.emojidex.emoji.length > 0) {
+        emojiSet = this.createEmojisForUpdate(this.storage.hubCache.emojidex.emoji, emojiSet)
       }
 
-      return this.storage.update('emojidex', { emoji: emojiSet })
+      await this.storage.update('emojidex.emoji', emojiSet)
     }
 
-    if (this.storage.hubCache.emojidex.emoji) {
-      return this.storage.hubCache.emojidex.emoji
-    }
-
-    return undefined
+    return this.storage.hubCache.emojidex.emoji || []
   }
 
-  favorites(favoritesSet) {
+  async favorites(favoritesSet) {
     if (favoritesSet) {
-      if (this.storage.hubCache.emojidex.favorites &&
-          this.storage.hubCache.emojidex.favorites.length > 0) {
-        const hubEmoji = this.storage.hubCache.emojidex.favorites
-        for (let i = 0; i < favoritesSet.length; i++) {
-          const newEmoji = favoritesSet[i]
-          for (let j = 0; j < hubEmoji.length; j++) {
-            const emoji = hubEmoji[j]
-            if (newEmoji.code === emoji.code) {
-              hubEmoji.splice(hubEmoji.indexOf(emoji), 1, newEmoji)
-              break
-            } else if (emoji === hubEmoji[hubEmoji.length - 1]) {
-              hubEmoji.push(newEmoji)
-            }
-          }
-        }
-
-        return this.storage.update('emojidex', { favorites: hubEmoji })
+      if (this.storage.hubCache.emojidex.favorites && this.storage.hubCache.emojidex.favorites.length > 0) {
+        favoritesSet = this.createEmojisForUpdate(this.storage.hubCache.emojidex.favorites, favoritesSet)
       }
 
-      return this.storage.update('emojidex', { favorites: favoritesSet })
+      if (!this.storage.hubCache.emojidex.auth_info.premium && !this.storage.hubCache.emojidex.auth_info.pro) {
+        favoritesSet = favoritesSet.slice(0, 50)
+      }
+
+      await this.storage.update('emojidex.favorites', favoritesSet)
     }
 
-    if (this.storage.hubCache.emojidex.favorites) {
-      return new Promise(resolve => resolve(this.storage.hubCache.emojidex.favorites))
-    }
-
-    return new Promise(resolve => resolve([]))
+    return this.storage.hubCache.emojidex.favorites || []
   }
 
-  history(historySet) {
+  async history(historySet) {
     if (historySet) {
-      if (this.storage.hubCache.emojidex.history &&
-          this.storage.hubCache.emojidex.history.length > 0) {
-        const hubEmoji = this.storage.hubCache.emojidex.history
-        for (let i = 0; i < historySet.length; i++) {
-          const newEmoji = historySet[i]
-          for (let j = 0; j < hubEmoji.length; j++) {
-            const emoji = hubEmoji[j]
-            if (newEmoji.code === emoji.code) {
-              hubEmoji.splice(hubEmoji.indexOf(emoji), 1, newEmoji)
-              break
-            } else if (emoji === hubEmoji[hubEmoji.length - 1]) {
-              hubEmoji.push(newEmoji)
-            }
-          }
-        }
-
-        return this.storage.update('emojidex', { history: hubEmoji })
+      if (this.storage.hubCache.emojidex.history && this.storage.hubCache.emojidex.history.length > 0) {
+        historySet = this.createEmojisForUpdate(this.storage.hubCache.emojidex.history, historySet)
       }
 
-      return this.storage.update('emojidex', { history: historySet })
+      if (!this.storage.hubCache.emojidex.auth_info.premium && !this.storage.hubCache.emojidex.auth_info.pro) {
+        historySet = historySet.slice(0, 50)
+      }
+
+      await this.storage.update('emojidex.history', historySet)
     }
 
-    if (this.storage.hubCache.emojidex.history) {
-      return new Promise(resolve => resolve(this.storage.hubCache.emojidex.history))
-    }
-
-    return new Promise(resolve => resolve([]))
+    return this.storage.hubCache.emojidex.history || []
   }
 
-  categories(categoriesSet) {
+  createEmojisForUpdate(localEmojis, remoteEmojis) {
+    for (let i = 0; i < remoteEmojis.length; i++) {
+      const remoteEmoji = remoteEmojis[i]
+      for (let j = 0; j < localEmojis.length; j++) {
+        const localEmoji = localEmojis[j]
+        if (remoteEmoji.code === localEmoji.code) {
+          localEmojis[j] = remoteEmoji
+          break
+        } else if (localEmojis.length === j + 1) {
+          localEmojis.push(remoteEmoji)
+        }
+      }
+    }
+
+    return localEmojis
+  }
+
+  async categories(categoriesSet) {
     if (categoriesSet) {
-      return this.storage.update('emojidex', { categories: categoriesSet })
+      await this.storage.update('emojidex.categories', categoriesSet)
     }
 
-    return this.storage.hubCache.emojidex.categories
+    return this.storage.hubCache.emojidex.categories || []
   }
 
-  authInfo(authInfoSet) {
+  async authInfo(authInfoSet) {
     if (authInfoSet) {
-      this.EC.User.authInfo = authInfoSet
-      return this.storage.update('emojidex', { auth_info: authInfoSet }) // eslint-disable-line camelcase
+      await this.storage.update('emojidex.auth_info', authInfoSet)
     }
 
     return this.storage.hubCache.emojidex.auth_info
