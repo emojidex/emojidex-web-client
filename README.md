@@ -5,8 +5,7 @@ favorites etc. against the emojidex API.
 
 Building
 --------
-You will need node with a usable npm and grunt. In general grunt should be
-installed globally or should be present and usable in your path. We'll assume you have a
+You will need node with a usable npm and gulp or webpack. In general gulp should be installed globally or should be present and usable in your path. We'll assume you have a
 working node/npm that you either installed using your package manager or built yourself.
 
 ### Get the source
@@ -36,15 +35,14 @@ yarn dev
 ```
 
 The jasmin spec runner page is accessable on port 8888 of your local host
-[http://localhost:8888](http://localhost:8888).
+[http://localhost:8888/?random=false](http://localhost:8888/?random=false).
 
 Design
 ======
 The client is a state machine as much as it can be. Instance variables will usually apply to
 the current state and will often be automatically changed after an operation. As such:
 *DO NOT RELY ON INSTANCE VARIABLES TO BE ACCURATE AFTER CONSECUTIVE OR PARALLEL OPERATIONS*
-Either be careful not to create race conditions or make sure you obtain data solely off of
-callbacks. Utilize callbacks efficiently.
+Either be careful not to create race conditions or make sure you obtain data solely off of results data.
 
 _ALWAYS_ create a separate instance of the client for each widget or component you are using
 the client in. If you have two separate pieces of code operating on the same view or in the same
@@ -58,6 +56,8 @@ Client
   ┣User  
   ┃  ┣History  
   ┃  ┗Favorites  
+  ┃  ┗Follow  
+  ┃  ┗Emoji  
   ┣Search  
   ┣Data  
   ┗Util  
@@ -71,15 +71,13 @@ Argument Layout
 ---------------
 For the sake of uniformity and familiarity most methods will have the same layout:
 ```js
-ClassObject.Tool.someMethod(primary, secondary = [], callback = null, opts)
+ClassObject.Tool.someMethod(primary, secondary = [], opts)
 ```
 That is:
   1. primary: the primary argument, such as the search term
   2. secondary: secondary, teritary, etc. arguments are always pre-initialized to some value, but
     can always be set to null to ignore them (the _breakout method checks and fixes nulls).
-  3. callback: always the second to last argument, defines a callback method to which the results
-    will be passed after a successful transaction.
-  4. opts: can be ignored. The opts hash can contain any overrides you may want and is where you
+  3. opts: can be ignored. The opts hash can contain any overrides you may want and is where you
     can manually specify "page", "limit", and "detailed" on a per-operation basis.
 
 Usage
@@ -124,7 +122,7 @@ emojidex.logout();
 
 Search
 ------
-Search results can be taken in a callback or can be found in the .results instance variable:
+Search results can be taken in async/await or then or can be found in the .results instance variable:
 ```json
 emojidex.Search.results
 > [{category: 'faces', code 'smiley face with winking eye'}, ...]
@@ -133,26 +131,26 @@ emojidex.Search.results
 Basic code search:
 ```js
 # signature
-search(term, callback = null, opts)
+search(term, opts)
 # usage
-emojidex.Search.search("smile");
+const results = await emojidex.Search.search("smile");
 ```
 
 Advanced code search:
 *note that more tags will yeiled fewer results (AND) and more categories will yield more results (OR)*
 ```js
 # signature
-advanced(search_details, callback = null, opts)
+advanced(search_details, opts)
 # usage
-emojidex.Search.advanced({term: "smile", tags: ["happy"], categories: ["faces", "people"]});
+const results = await emojidex.Search.advanced({term: "smile", tags: ["happy"], categories: ["faces", "people"]});
 ```
 
 Tag search:
 ```js
 # signature
-tags: (tags, callback = null, opts) ->
+tags: (tags, opts) ->
 # usage
-emojidex.Search.tags(["open source", "education"]);
+const results = await emojidex.Search.tags(["open source", "education"]);
 ```
 
 History
@@ -249,7 +247,7 @@ For running specs:
 yarn test
 ```
 
-and open `localhost:8888` in your browser.
+and open `localhost:8888/?random=false` in your browser.
 
 License
 =======
