@@ -42,6 +42,7 @@
     "karma-chrome-launcher": "^2.2.0",
     "karma-cli": "^2.0.0",
     "karma-jasmine": "^2.0.1",
+    "karma-parallel": "^0.3.1",
     "puppeteer": "^1.18.1",
     "webpack": "^4.35.0",
     "webpack-cli": "^3.3.5"
