@@ -13,6 +13,7 @@ import EmojidexData from './components/data'
 import EmojidexEmoji from './components/emoji'
 import EmojidexIndexes from './components/indexes'
 import EmojidexSearch from './components/search'
+import EmojidexThreed from './components/threed'
 import EmojidexUser from './components/user'
 import EmojidexUserEmoji from './components/user/emoji'
 import EmojidexUtil from './components/util'
@@ -68,6 +69,7 @@ export default class EmojidexClient {
       this.Emoji = new EmojidexEmoji(this)
       this.Indexes = new EmojidexIndexes(this)
       this.Search = new EmojidexSearch(this)
+      this.Threed = new EmojidexThreed(this)
       this.User = new EmojidexUser(this)
       this.UserEmoji = new EmojidexUserEmoji(this)
       this.Util = new EmojidexUtil(this)

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+    <title>emojidex</title>
+    <meta content="" name="description">
+    <meta content="width=device-width" name="viewport">
+    <script src="../../dist/js/emojidex-client.js"></script>
+    <script>
+      window.onload = async () => {
+        const EC = await new EmojidexClient()
+        const container = document.querySelector('#container')
+        const canvas = await EC.Threed.createCanvas(container, 'poop')
+        container.appendChild(canvas)
+      };
+    </script>
+    <style type="text/css">
+      <!--
+        .threed-emoji {
+          display: inline-block !important;
+          position: relative;
+          vertical-align: middle;
+          width: 1.2em;
+          height: 1.2em;
+        }
+        .text-wrap {
+          display: flex;
+          font-size: 30px;
+        }
+      -->
+    </style>
+  </head>
+  <body>
+    <div class="text-wrap">
+      aaa
+      <div id="container" class="threed-emoji"></div>
+      bbb
+    </div>
+  </body>
+</html>
