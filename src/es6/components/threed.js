@@ -8,15 +8,13 @@ export default class EmojidexThreed {
     this.lookAt = new THREE.Vector3(0, 1, 0)
   }
 
-  // TODO: code, default size
-  async createCanvas(container, code) {
+  createCanvasData(code, address, canvas, container) {
     if (!code) {
       console.error('Emoji code is empty.')
       return
     }
 
-    const canvas = document.createElement('canvas')
-    const size = container.getBoundingClientRect().width
+    const size = container.getBoundingClientRect().height
 
     const renderer = new THREE.WebGLRenderer({
       canvas,
@@ -31,26 +29,18 @@ export default class EmojidexThreed {
     const controls = new OrbitControls(camera)
 
     const scene = new THREE.Scene()
-    const loader = new GLTFLoader()
-    const loadData = () => {
-      return new Promise(resolve => {
-        loader.load(`https://${this.EC.env.cdnAddr}/utf/${code}.glb`, data => {
-          scene.add(data.scene)
-          resolve()
-        })
-      })
-    }
-
-    await loadData()
-
     const directionalLight = new THREE.DirectionalLight(0xFFFFFF)
     directionalLight.intensity = 1
     directionalLight.position.set(10, 10, 10)
     scene.add(directionalLight)
-
     const ambientLight = new THREE.AmbientLight(0xFFFFFF)
     ambientLight.intensity = 0.5
     scene.add(ambientLight)
+
+    const loader = new GLTFLoader()
+    loader.load(`https://${this.EC.env.cdnAddr}/${address}/${code}.glb`, data => {
+      scene.add(data.scene)
+    })
 
     const update = () => {
       requestAnimationFrame(() => {
@@ -64,7 +54,5 @@ export default class EmojidexThreed {
     }
 
     update()
-
-    return canvas
   }
 }

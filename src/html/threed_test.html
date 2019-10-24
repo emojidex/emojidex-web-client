@@ -6,13 +6,17 @@
     <title>emojidex</title>
     <meta content="" name="description">
     <meta content="width=device-width" name="viewport">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="../../dist/js/emojidex-client.js"></script>
     <script>
       window.onload = async () => {
         const EC = await new EmojidexClient()
-        const container = document.querySelector('#container')
-        const canvas = await EC.Threed.createCanvas(container, 'poop')
-        container.appendChild(canvas)
+        document.getElementById('container').innerHTML = await EC.Util.emojifyToThreed('💩aaa:poop:bbb')
+        const canvases = document.getElementsByClassName('emojidex-canvas')
+        for (let i = 0; i < canvases.length; i++) {
+          const canvas = canvases[i]
+          EC.Threed.createCanvasData(canvas.dataset.code, canvas.dataset.address, canvas, canvas.parentElement)
+        }
       };
     </script>
     <style type="text/css">
@@ -32,10 +36,6 @@
     </style>
   </head>
   <body>
-    <div class="text-wrap">
-      aaa
-      <div id="container" class="threed-emoji"></div>
-      bbb
-    </div>
+    <div id="container" class="text-wrap"></div>
   </body>
 </html>
