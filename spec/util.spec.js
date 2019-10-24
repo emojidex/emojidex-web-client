@@ -194,5 +194,13 @@ describe('EmojidexUtil', () => {
     expect(processed).toBe(expectedText)
     done()
   })
+
+  it('replace utf emoji to 3D', async done => {
+    testText = '💩aaa:poop:bbb'
+
+    const processed = await ECSpec.Util.emojifyToThreed(testText)
+    expect(processed).toContain('canvas')
+    done()
+  })
 })
 /* eslint-enable no-undef */

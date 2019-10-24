@@ -26,7 +26,7 @@ export default class EmojidexThreed {
 
     const camera = new THREE.PerspectiveCamera(50, size / size)
     camera.position.set(0, 1, 3)
-    const controls = new OrbitControls(camera)
+    const controls = new OrbitControls(camera, canvas)
 
     const scene = new THREE.Scene()
     const directionalLight = new THREE.DirectionalLight(0xFFFFFF)
