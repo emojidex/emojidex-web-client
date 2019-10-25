@@ -15,7 +15,7 @@
         const canvases = document.getElementsByClassName('emojidex-canvas')
         for (let i = 0; i < canvases.length; i++) {
           const canvas = canvases[i]
-          EC.Threed.createCanvasData(canvas.dataset.code, canvas.dataset.address, canvas, canvas.parentElement)
+          EC.Threed.createCanvasData(canvas.dataset.code, canvas.dataset.address, canvas, canvas.parentElement.clientHeight)
         }
       };
     </script>

@@ -8,13 +8,11 @@ export default class EmojidexThreed {
     this.lookAt = new THREE.Vector3(0, 1, 0)
   }
 
-  createCanvasData(code, address, canvas, container) {
+  createCanvasData(code, address, canvas, size) {
     if (!code) {
       console.error('Emoji code is empty.')
       return
     }
-
-    const size = container.getBoundingClientRect().height
 
     const renderer = new THREE.WebGLRenderer({
       canvas,
