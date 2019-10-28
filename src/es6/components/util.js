@@ -251,18 +251,19 @@ export default class EmojidexUtil {
   }
 
   // Shortcut to emojify with emojiToHTML as the processor
-  emojifyToHTML(source) {
+  async emojifyToHTML(source) {
     return this.emojify(source, this.emojiToHTML)
   }
 
   // Shortcut to emojify with emojiToMD as the processor
-  emojifyToMD(source) {
+  async emojifyToMD(source) {
     return this.emojify(source, this.emojiToMD)
   }
 
   // Shortcut to emojify with emojiToThreed as the processor
-  emojifyToThreed(source) {
-    return this.emojify(source, this.emojiToThreed)
+  async emojifyToThreed(source, returnCanvas = true) {
+    const element = await this.emojify(source, this.emojiToThreed)
+    return `${returnCanvas ? '<canvas id="emojidex-canvas"></canvas>' : ''}${element}`
   }
 
   // Returns an HTML image/link tag for an emoji from an emoji object
@@ -299,10 +300,10 @@ export default class EmojidexUtil {
     return img
   }
 
-  // Returns a 3D for an emoji from an emoji object
+  // Returns a 3D container class for an emoji from an emoji object
   emojiToThreed(emoji) {
     // TODO: 3Dアセットの有無を調べて、存在しなかったらemojiToHTMLを使用する
-    return `<canvas class="emojidex-canvas" data-code="${emoji.code}" data-address="${emoji.moji ? 'utf' : 'extended'}" width="36" height="36" style="witdh: 36px; height: 36px;"></canvas>`
+    return `<div class="emojidex-scene emoji" data-code="${this.escapeTerm(emoji.code)}" data-address="${emoji.moji ? 'utf' : 'extended'}"></div>`
   }
 
   // Change emoji HTML tags into emoji codes and returns a string

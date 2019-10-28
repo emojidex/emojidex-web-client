@@ -12,21 +12,27 @@
       window.onload = async () => {
         const EC = await new EmojidexClient()
         document.getElementById('container').innerHTML = await EC.Util.emojifyToThreed('💩aaa:poop:bbb')
-        const canvases = document.getElementsByClassName('emojidex-canvas')
-        for (let i = 0; i < canvases.length; i++) {
-          const canvas = canvases[i]
-          EC.Threed.createCanvasData(canvas.dataset.code, canvas.dataset.address, canvas, canvas.parentElement.clientHeight)
+        EC.Threed.initialize(document.getElementById('emojidex-canvas'))
+        const elements = document.getElementsByClassName('emojidex-scene')
+        for (let i = 0; i < elements.length; i++) {
+          const element = elements[i]
+          EC.Threed.addScene(element.dataset.code, element.dataset.address, element)
         }
       };
     </script>
     <style type="text/css">
       <!--
-        .threed-emoji {
+        #emojidex-canvas {
+          position: absolute;
+          left: 0;
+        }
+        .emojidex-scene {
           display: inline-block !important;
           position: relative;
           vertical-align: middle;
           width: 1.2em;
           height: 1.2em;
+          top: -0.1em;
         }
         .text-wrap {
           display: flex;
