@@ -42,14 +42,14 @@
     "karma-cli": "^2.0.0",
     "karma-jasmine": "^3.3.1",
     "karma-parallel": "^0.3.1",
-    "puppeteer": "^1.18.1",
+    "puppeteer": "^5.4.1",
     "webpack": "^4.35.0",
     "webpack-cli": "^3.3.5"
   },
   "dependencies": {
     "axios": "^0.19.0",
     "core-js": "3",
-    "cross-storage": "https://github.com/snowsunny/cross-storage.git",
+    "scania-cross-storage": "2.0.2",
     "lodash": "^4.17.14"
   },
   "scripts": {
