@@ -20,6 +20,8 @@ import _extend from 'lodash/extend'
 
 export default class EmojidexClient {
   constructor(options) {
+    console.log(111)
+
     this.env = {
       apiVer: 1,
       cdnAddr: 'cdn.emojidex.com',

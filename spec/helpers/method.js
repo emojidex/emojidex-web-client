@@ -4,7 +4,8 @@ jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000
 
 this.ECSpec = null
 
-const hubPath = 'https://www.emojidex.com/hub/1.0.0'
+// const hubPath = 'https://www.emojidex.com/hub'
+const hubPath = 'http://localhost:9999/hub'
 
 const helperChains = async chainsMethod => {
   for (const method of chainsMethod) {
@@ -43,9 +44,10 @@ const helperBeforeForPremiumUser = async () => {
 
 const clearStorage = async () => {
   const CSC = new CrossStorageClient(hubPath, { frameId: 'emojidex-client-storage-hub' })
+  console.log(333, CSC)
   await CSC.onReadyFrame()
   await CSC.onConnect()
-  await CSC.clear()
+  // await CSC.clear()
 }
 
 const helperBeforeForEmojidexData = async () => {

@@ -1,8 +1,8 @@
-import { CrossStorageClient } from 'cross-storage'
+import { CrossStorageClient } from 'scania-cross-storage'
 import _extend from 'lodash/extend'
 
 export default class EmojidexDataStorage {
-  constructor(hubPath = 'https://www.emojidex.com/hub/1.0.0') {
+  constructor(hubPath = 'https://www.emojidex.com/hub') {
     this.hub = new CrossStorageClient(hubPath, { frameId: 'emojidex-client-storage-hub' })
     this.hubCache = {}
   }
@@ -92,8 +92,11 @@ export default class EmojidexDataStorage {
     try {
       await this.connect()
       const keys = key ? key : await this.hub.getKeys()
+      console.log('keys: ',keys)
       const hubData = await this.hub.get(keys)
-      const data = JSON.parse(hubData)
+      console.log(hubData)
+      // debugger
+      const data = hubData ? JSON.parse(hubData) : null
       if (key) {
         this.hubCache[key] = data[key]
         return this.hubCache[key]
@@ -163,7 +166,7 @@ export default class EmojidexDataStorage {
   }
 
   async connect() {
-    await this.hub.onReadyFrame()
+    // await this.hub.onReadyFrame()
     return this.hub.onConnect()
   }
 }

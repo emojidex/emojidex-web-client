@@ -63,7 +63,7 @@ gulp.task('env', (done) => {
 gulp.task('jasmineBrowser', () => {
   let testFiles = [
     'node_modules/axios/dist/axios.js',
-    'node_modules/cross-storage/lib/client.js',
+    'node_modules/scania-cross-storage/dist/client.js',
     'dist/js/emojidex-client.js',
     'tmp/authinfo.js',
     'spec/helpers/*.js',
