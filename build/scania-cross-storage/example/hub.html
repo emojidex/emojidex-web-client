@@ -1,0 +1,21 @@
+<!doctype html>
+<head>
+  <title>Cross Storage Hub</title>
+</head>
+<body>
+<script type="text/javascript" src="node_modules/localforage/localforage.js"></script>
+  <script type="text/javascript" src="../lib/hub.js"></script>
+  <script>
+    // Limit requests to any client running on .localhost:300x
+    CrossStorageHub.init([
+      {origin: /\.mydomain.com$/, allow: ['get', 'set', 'del']},
+      {origin:  /.*localhost:900\d$/, allow: ['get', 'set', 'del']}
+    ], {
+      driver      : localforage.INDEXEDDB,
+      name        : 'MysDB',
+      storeName   : 'ShareStorage',
+      description : 'My shared storage
+    });
+  </script>
+</body>
+</html>

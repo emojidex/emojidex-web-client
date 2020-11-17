@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="localforage/dist/localforage.js"></script>
+    <script src="scania-cross-storage/dist/hub.js"></script>
+    <script>
+      (function() {
+        CrossStorageHub.init([
+          {
+            origin: /.+/,
+            allow: ['get', 'set', 'del', 'getKeys', 'clear']
+          }
+        ], { name: 'emojidex-client' });
+
+      }).call(this);
+
+    </script>
+  </head>
+</html>

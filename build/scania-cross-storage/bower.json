@@ -1,0 +1,33 @@
+{
+  "name": "scania-cross-storage",
+  "version": "2.0.1",
+  "description": "Cross domain localStorage, indexedDB and WebSQL using localforage",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "localforage": "^1.7.3"
+  },
+  "authors": [
+    {
+      "name": "Mohammed Ayowa",
+      "email": "mohammde.ayowa@scania.com",
+      "url": "http://danielstjules.com"
+    }
+  ],
+  "keywords": [
+    "local",
+    "storage",
+    "cross",
+    "domain"
+  ],
+  "ignore": [
+    ".*",
+    "media",
+    "gulpfile.js",
+    "package.json",
+    "README.md",
+    "index.js",
+    "lib",
+    "example",
+    "test"
+  ]
+}
