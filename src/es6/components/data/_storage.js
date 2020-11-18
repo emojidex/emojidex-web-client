@@ -92,10 +92,9 @@ export default class EmojidexDataStorage {
     try {
       await this.connect()
       const keys = key ? key : await this.hub.getKeys()
-      console.log('keys: ',keys)
+      console.log('keys:', keys)
       const hubData = await this.hub.get(keys)
       console.log(hubData)
-      // debugger
       const data = hubData ? JSON.parse(hubData) : null
       if (key) {
         this.hubCache[key] = data[key]
@@ -137,6 +136,7 @@ export default class EmojidexDataStorage {
   }
 
   async keys(query) {
+    console.log('query:', query)
     if (query) {
       const keys = []
       const cache = this.get(query)

@@ -38,7 +38,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'node_modules/scania-cross-storage/lib/client.js',
+      'node_modules/scania-cross-storage/dist/client.js',
       'node_modules/axios/dist/axios.js',
       'dist/js/emojidex-client.js',
       'tmp/authinfo.js',

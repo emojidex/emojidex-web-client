@@ -9,13 +9,13 @@ describe('EmojidexData', () => {
 
   it('has the Data class defined', () => expect(ECSpec.Data).toBeDefined())
 
-  xdescribe('initialize', () => {
+  describe('initialize', () => {
     it('first access to storage', done => {
       expect(ECSpec.Data.storage.isEmpty('emojidex')).toBe(false)
       done()
     })
 
-    xdescribe('check initialize data', () => {
+    describe('check initialize data', () => {
       it('emojidex.emoji', done => {
         expect(ECSpec.Data.storage.get('emojidex.emoji')).toEqual([])
         done()
@@ -46,6 +46,7 @@ describe('EmojidexData', () => {
     it('after', async done => {
       expect(ECSpec.Data.storage.isEmpty('emojidex')).toBe(false)
       const keys = await ECSpec.Data.storage.keys('emojidex')
+      // debugger
       expect(keys).toEqual(['moji_codes', 'emoji', 'history', 'favorites', 'categories', 'auth_info', 'moji_codes_updated'])
       expect(ECSpec.Data.storage.isSet('emojidex')).toBe(true)
       done()

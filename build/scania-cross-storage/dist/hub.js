@@ -78,7 +78,7 @@
    */
   CrossStorageHub._listener = function(message) {
     var origin, targetOrigin, request, method, error, result, response;
-
+    console.log('hub listener --------', message)
     // postMessage returns the string "null" as the origin for "file://"
     origin = (message.origin === 'null') ? 'file://' : message.origin;
 
@@ -199,7 +199,7 @@
    * Clears localStorage.
    */
   CrossStorageHub._clear = function() {
-    localforage.clear();
+    return localforage.clear();
   };
 
   /**

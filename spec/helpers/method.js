@@ -47,7 +47,7 @@ const clearStorage = async () => {
   console.log(333, CSC)
   await CSC.onReadyFrame()
   await CSC.onConnect()
-  // await CSC.clear()
+  await CSC.clear()
 }
 
 const helperBeforeForEmojidexData = async () => {
