@@ -4,7 +4,8 @@ jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000
 
 this.ECSpec = null
 
-const hubPath = 'https://www.emojidex.com/hub/1.0.0'
+const hubPath = 'https://www.emojidex.com/hub/1.1.0' // emojidex.com hub
+// const hubPath = 'http://localhost:9999' // local hub
 
 const helperChains = async chainsMethod => {
   for (const method of chainsMethod) {

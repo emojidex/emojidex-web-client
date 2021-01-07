@@ -2,7 +2,7 @@ import { CrossStorageClient } from 'cross-storage'
 import _extend from 'lodash/extend'
 
 export default class EmojidexDataStorage {
-  constructor(hubPath = 'https://www.emojidex.com/hub/1.0.0') {
+  constructor(hubPath = 'https://www.emojidex.com/hub/1.1.0') {
     this.hub = new CrossStorageClient(hubPath, { frameId: 'emojidex-client-storage-hub' })
     this.hubCache = {}
   }
@@ -91,8 +91,7 @@ export default class EmojidexDataStorage {
   async updateCache(key) {
     try {
       await this.connect()
-      const keys = key ? key : await this.hub.getKeys()
-      const hubData = await this.hub.get(keys)
+      const hubData = await this.hub.get(key)
       const data = JSON.parse(hubData)
       if (key) {
         this.hubCache[key] = data[key]
