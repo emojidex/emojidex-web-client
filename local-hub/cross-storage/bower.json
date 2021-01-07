@@ -1,0 +1,30 @@
+{
+  "name": "cross-storage",
+  "version": "1.0.0",
+  "description": "Cross domain local storage",
+  "license": "Apache-2.0",
+  "authors": [
+    {
+      "name": "Daniel St. Jules",
+      "email": "danielst.jules@gmail.com",
+      "url": "http://danielstjules.com"
+    }
+  ],
+  "keywords": [
+    "local",
+    "storage",
+    "cross",
+    "domain"
+  ],
+  "ignore": [
+    ".*",
+    "media",
+    "gulpfile.js",
+    "package.json",
+    "README.md",
+    "index.js",
+    "lib",
+    "example",
+    "test"
+  ]
+}

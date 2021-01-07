@@ -1,0 +1,9 @@
+language: node_js
+node_js:
+  - '4.2'
+script:
+  - npm run saucetest
+env:
+  global:
+    - secure: bL3VTCycgkXYNtnehowvX3hIgOreNH4itXyw096kDtsu7CMnk5ubEzbnih76EOtDECc0k+HOAAikYEvGSxK+Am9EsFGEKPGs5r/KmLeH0oPEWc7bCkQFvrMr9WLAyuSv/zjBUo7ReYJ1h1TcMProwLWDEdHFFdrnxsuLYn2NAiw=
+    - secure: WmrXIrRG9dq21tNHuER3pMPosv4KgoNhaLQHvol7kSLeWz3bWNR2z2oM6PYtj5ODN1MaoKyYknB9Z2XbpFB2rsgM6I0ECvGnIShVBGXn9u/O5zFt0xQItIJaYZZDauSCe+xSTIhcYXutaJQK1qPBiFg1U92aSNtpsVRNYkvs230=

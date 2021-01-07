@@ -22,6 +22,7 @@
     "@babel/register": "^7.4.4",
     "babel-eslint": "^10.0.2",
     "babel-loader": "^8.0.6",
+    "concurrently": "^5.3.0",
     "del": "^2.2.2",
     "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.1.0",
@@ -37,25 +38,30 @@
     "gulp-header": "^2.0.9",
     "gulp-jasmine-browser": "^4.1.0",
     "gulp-watch": "^5.0.1",
+    "http-server": "^0.12.3",
     "karma": "^5.1.1",
     "karma-chrome-launcher": "^3.1.0",
     "karma-cli": "^2.0.0",
     "karma-jasmine": "^3.3.1",
     "karma-parallel": "^0.3.1",
-    "puppeteer": "^1.18.1",
+    "puppeteer": "^5.5.0",
     "webpack": "^4.35.0",
     "webpack-cli": "^3.3.5"
   },
   "dependencies": {
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "core-js": "3",
-    "cross-storage": "https://github.com/snowsunny/cross-storage.git",
+    "cross-storage": "snowsunny/cross-storage.git",
+    "localforage": "^1.9.0",
     "lodash": "^4.17.14"
   },
   "scripts": {
     "build": "gulp clean; webpack --mode development; webpack --mode production; gulp",
     "dev": "webpack --mode development -w",
-    "test": "yarn build; gulp env; karma start --single-run",
-    "test-watch": "yarn build; gulp env; karma start"
+    "test": "yarn build; yarn gulp env; yarn karma start --single-run",
+    "test-watch": "yarn build; gulp env; karma start",
+    "test-with-local-hub": "yarn -s concurrently -p \"[{name}]\" -n \"HTTP,TEST\" -c \"bgBlue.bold,bgGreen.bold\" \"yarn local-hub\" \"yarn build; yarn gulp env; yarn karma start --single-run\" -k",
+    "test-only": "yarn -s concurrently -p \"[{name}]\" -n \"LHUB,TEST\" -c \"bgBlue.bold,bgGreen.bold\" \"yarn local-hub\" \"yarn karma start --single-run\" -k",
+    "local-hub": "yarn http-server local-hub -sp 9999"
   }
 }

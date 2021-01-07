@@ -1,0 +1,27 @@
+ui: mocha-bdd
+server: "./test/server.js"
+concurrency: 1
+scripts:
+  - "test/es6-promise.auto.min.js"
+  - "lib/client.js"
+browsers:
+  - name: chrome
+    version: 34
+    platform: Linux
+  - name: chrome
+    version: latest
+    platform: Linux
+  - name: firefox
+    version: 29
+    platform: Linux
+  - name: firefox
+    version: latest
+    platform: Linux
+  - name: safari
+    version: 7
+  - name: ie
+    version: 8..latest
+  - name: android
+    version: latest
+  - name: iphone
+    version: 8.0
