@@ -19,7 +19,7 @@ module.exports = function(config) {
     ],
     parallelOptions: {
       executors: 8, // Defaults to cpu-count - 1
-      shardStrategy: 'round-robin'
+      // shardStrategy: 'round-robin'
       // shardStrategy: 'description-length'
       // shardStrategy: 'custom'
       // customShardStrategy: function(config) {
@@ -43,6 +43,7 @@ module.exports = function(config) {
       'dist/js/emojidex-client.js',
       'tmp/authinfo.js',
       'spec/helpers/*.js',
+      // 'spec/data.spec.js' // for simple test
       'spec/**/*.spec.js'
     ],
 
@@ -83,7 +84,16 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['ChromeHeadless'],
+    // browsers: ['ChromeHeadless'],
+    browsers: ['ChromeHeadlessDisableWebSecurity'],
+    customLaunchers: {
+      ChromeHeadlessDisableWebSecurity: {
+        base: 'ChromeHeadless',
+        flags: [
+          '--disable-web-security'
+        ]
+      }
+    },
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits

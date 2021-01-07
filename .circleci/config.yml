@@ -23,4 +23,5 @@ jobs:
           name: create .env
           command:
             echo -e ${env} >> .env
+      # - run: yarn -s test-with-local-hub # test with loacal hub
       - run: yarn test

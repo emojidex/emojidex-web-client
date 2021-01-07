@@ -67,6 +67,7 @@ gulp.task('jasmineBrowser', () => {
     'dist/js/emojidex-client.js',
     'tmp/authinfo.js',
     'spec/helpers/*.js',
+    // 'spec/data.spec.js' // for simple test
     'spec/**/*.spec.js'
   ];
   return gulp.src(testFiles)
