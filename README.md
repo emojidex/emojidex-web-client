@@ -50,16 +50,18 @@ module each piece of code should have a different client instance.
 
 The client is broken up into a set of nested modules:  
 Client  
-  ┣Emoji  
   ┣Categories  
+  ┣Customizations  
+  ┗Data  
+    ┗Storage  
+  ┣Emoji  
   ┣Indexes  
-  ┣User  
-  ┃  ┣History  
-  ┃  ┗Favorites  
-  ┃  ┗Follow  
-  ┃  ┗Emoji  
   ┣Search  
-  ┣Data  
+  ┗User  
+    ┣Emoji  
+    ┣Favorites  
+    ┣Follow  
+    ┗History  
   ┗Util  
 
 The Data modules should usually be ignored unless you're doing something particularly
@@ -240,14 +242,29 @@ The quickest way to find your auth_token is to log in on your browser, open up y
 settings by clicking on your username in the top right, and scrolling down to the Auth Token
 field (or to do an auth request with CURL as in the developer.emojidex.com documentation).
 
-Building and Running Tests
---------------------------
-For running specs:
+Testing with Karma(ChromeHeadless)
+----------------------------------
 ```shell
 yarn test
 ```
 
-and open `localhost:8888/?random=false` in your browser.
+Testing with browser
+--------------------------
+For running specs:
+```shell
+yarn gulp spec
+```
+
+and open `http://localhost:8888/?random=false` in your browser.
+
+Testing with local hub
+----------------------
+Testing with local cross-storage's hub.  
+```shell
+yarn test-with-local-hub
+```
+
+and change hub url to `http://localhost:9999`
 
 License
 =======
